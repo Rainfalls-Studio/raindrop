@@ -66,13 +66,13 @@ namespace rnd::debug{
 	#define LOG_SHUTDOWN() ::rnd::debug::Logger::getInstance().shutdown()
 	#define LOG_ALLOW(level, allowed) ::rnd::debug::Logger::getInstance().allow(level, allowed)
 	#define LOG_IS_ALLOWED(level, allowed) ::rnd::debug::Logger::getInstance().isAllowed(level)
-	#define LOG(level, msg, reason) ::rnd::debug::Logger::getInstance().log(level, msg, reason, __FILE__, __PRETTY_FUNCTION__, __LINE__)
+	#define LOG_LOG(level, msg, reason) ::rnd::debug::Logger::getInstance().log(level, msg, reason, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 #else
 	#define LOG_INIT(arg)
 	#define LOG_SHUTDOWN() 
 	#define LOG_ALLOW(level, allowed)
 	#define LOG_IS_ALLOWED(level, allowed)
-	#define LOG(level, msg, reason)
+	#define LOG_LOG(level, msg, reason)
 #endif
 
 #endif

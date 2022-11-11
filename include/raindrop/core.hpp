@@ -27,15 +27,46 @@
 // debug
 #define PROFILE true
 #define LOGGER true
+
+#define LOG_LEVEL true
+#define WARN_LEVEL true
+#define ERR_LEVEL true
+#define CRITIC_LEVEL true
+
 #define RND_ASSERTS true
 
+#include "debug/Logger.hpp"
 
 // macros
-#if defined(RND_ASSERTS) && RND_ASSERTS == true
-	#include "debug/Logger.hpp"
-    #define RND_ASSERT(x, msg) {if(!(x)) {LOG(rnd::debug::Error, "Assertion Failed: ", msg);__debugbreak();}}
+
+#if defined(LOG_LEVEL) && LOG_LEVEL == true
+	#define LOG(...) LOG_LOG(rnd::debug::Info, __VA_ARGS__)
 #else
-    #define RND_ASSERT(x, msg)
+	#define LOG(...)
+#endif
+
+#if defined(WARN_LEVEL) && WARN_LEVEL == true
+	#define WARN(...) LOG_LOG(rnd::debug::Warn, __VA_ARGS__)
+#else
+	#define WARN(...)
+#endif
+
+#if defined(ERR_LEVEL) && ERR_LEVEL == true
+	#define ERR(...) LOG_LOG(rnd::debug::Error, __VA_ARGS__)
+#else
+	#define ERR(...)
+#endif
+
+#if defined(CRITIC_LEVEL) && CRITIC_LEVEL == true
+	#define CRITIC(...) LOG_LOG(rnd::debug::Critical, __VA_ARGS__)
+#else
+	#define CRITIC(...)
+#endif
+
+#if defined(RND_ASSERTS) && RND_ASSERTS == true
+	#define RND_ASSERT(x, msg) {if(!(x)) {ERR("Assertion Failed: ", msg);__debugbreak();}}
+#else
+	#define RND_ASSERT(x, msg)
 #endif
 
 #endif

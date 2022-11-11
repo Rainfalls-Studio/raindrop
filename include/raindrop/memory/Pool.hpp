@@ -1,6 +1,6 @@
 /**
- * @brief this file contain memory pool.
- * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
+ * @brief this file contain memory pool dara structure.
+ * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING.
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
 
@@ -55,6 +55,11 @@ namespace rnd::memory{
 				chunk->next = begin;
 				instanceCount++;
 			}
+
+			void reserve(uint32_t count);
+			
+			uint32_t getSize();
+			bool empty();
 
 		private:
 			struct Chunk{

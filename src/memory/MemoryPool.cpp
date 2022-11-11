@@ -6,7 +6,6 @@
 namespace rnd::memory{
 	void Pool::init(uint32_t instanceSize, uint32_t instanceCount){
 		PROFILE_FUNCTION();
-		LOG(debug::Info, "initialize memory pool", "none");
 
 		destroy();
 
@@ -17,7 +16,6 @@ namespace rnd::memory{
 
 	void Pool::shutdown(){
 		PROFILE_FUNCTION();
-		LOG(debug::Info, "shutdown memory pool", "none");
 		destroy();
 	}
 
@@ -34,13 +32,10 @@ namespace rnd::memory{
 
 	void Pool::pushOneChunk(){
 		PROFILE_FUNCTION();
-		if (begin){
-			Chunk* next = begin->next;
-			begin->next = allocOneChunk();
-			begin->next = next;
-		} else {
-			begin = allocOneChunk();
-		}
+
+		Chunk* instance = allocOneChunk();
+		instance->next = begin;
+		begin = instance;
 
 		instanceCount++;
 	}
@@ -50,7 +45,7 @@ namespace rnd::memory{
 		Chunk* instance = (Chunk*)malloc(getChunkSize());
 
 		if (instance == nullptr){
-			LOG(debug::Critical, "malloc error", "failed to allocate pool chunk");
+			ERR("malloc error", "failed to allocate pool chunk");
 			exit(EXIT_FAILURE);
 		}
 
@@ -88,5 +83,18 @@ namespace rnd::memory{
 		for (int i=0; i<count; i++){
 			if (!destroyOneChunk()) break;
 		}
+	}
+
+	void Pool::reserve(uint32_t count){
+		PROFILE_FUNCTION();
+		pushChunks(count);
+	}
+
+	uint32_t Pool::getSize(){
+		return instanceCount;
+	}
+
+	bool Pool::empty(){
+		return begin == nullptr;
 	}
 }
