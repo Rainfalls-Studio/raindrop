@@ -7,14 +7,14 @@ namespace rnd::debug{
 	Instrumentor::Instrumentor() : m_CurrentSession(nullptr), m_ProfileCount(0) {}
 
 	void Instrumentor::BeginSession(const std::string& name, const std::string& filepath){
-		LOG(Info, "begin instrumentor session", (name + " : " + filepath).c_str());
+		LOG("begin instrumentor session", (name + " : " + filepath).c_str());
 		m_OutputStream.open(filepath);
 		WriteHeader();
 		m_CurrentSession = new InstrumentationSession{ name };
 	}
 
 	void Instrumentor::EndSession(){
-		LOG(Info, "end instrumentor session", m_CurrentSession->Name.c_str());
+		LOG("end instrumentor session", m_CurrentSession->Name.c_str());
 		WriteFooter();
 		m_OutputStream.close();
 

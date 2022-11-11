@@ -6,14 +6,25 @@ int main(int argc, char** argv){
 	PROFILE_BEGIN_SESSION("test", "profile.json");
 	PROFILE_RECORD();
 
-	rnd::memory::Pool pool;
-	pool.init<int>(50);
-	
-	int* value = pool.pop<int>();
+	rnd::memory::DynamicArray array;
 
-	pool.shutdown();
+	const int size = 10000;
+	array.init<int>(size, 500);
+
+
+	for (int i; i<size; i++){
+		int* a = array.get<int>(i);
+		*a = i;
+	}
+
+	
+	int* a = array.get<int>(50);
+	printf("%d\n", *a);
 
 	LOG("end", "end successfully");
+
+	array.shutdown();
+
 	PROFILE_END_SESSION();
 	LOG_SHUTDOWN();
 
