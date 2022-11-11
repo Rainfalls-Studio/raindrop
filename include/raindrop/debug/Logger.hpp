@@ -18,11 +18,12 @@
  * 
  */
 
-#ifndef __RAINDROP_LOGGER_HPP__
-#define __RAINDROP_LOGGER_HPP__
+#ifndef __RAINDROP_DEBUG_LOGGER_HPP__
+#define __RAINDROP_DEBUG_LOGGER_HPP__
 
 #include "core.hpp"
 #include <stdio.h>
+#include <mutex>
 
 namespace rnd::debug{
 	enum LogLevel{
@@ -54,6 +55,7 @@ namespace rnd::debug{
 			FILE* out = nullptr;
 			bool fileOwner = false;
 			uint8_t allowedLogs = UINT8_MAX;
+			std::mutex lock;
 
 			static Logger instance;
 	};
@@ -70,7 +72,7 @@ namespace rnd::debug{
 	#define LOG_SHUTDOWN() 
 	#define LOG_ALLOW(level, allowed)
 	#define LOG_IS_ALLOWED(level, allowed)
-	#define LOG(level, msg, ...)
+	#define LOG(level, msg, reason)
 #endif
 
 #endif

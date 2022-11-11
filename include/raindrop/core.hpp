@@ -27,5 +27,15 @@
 // debug
 #define PROFILE true
 #define LOGGER true
+#define RND_ASSERTS true
+
+
+// macros
+#if defined(RND_ASSERTS) && RND_ASSERTS == true
+	#include "debug/Logger.hpp"
+    #define RND_ASSERT(x, msg) {if(!(x)) {LOG(rnd::debug::Error, "Assertion Failed: ", msg);__debugbreak();}}
+#else
+    #define RND_ASSERT(x, msg)
+#endif
 
 #endif

@@ -1,8 +1,8 @@
 #include "debug/Instrumentor.hpp"
 #include "debug/Logger.hpp"
 
+rnd::debug::Instrumentor rnd::debug::Instrumentor::instance;
 namespace rnd::debug{
-	Instrumentor Instrumentor::instance;
 
 	Instrumentor::Instrumentor() : m_CurrentSession(nullptr), m_ProfileCount(0) {}
 

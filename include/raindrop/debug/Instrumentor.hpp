@@ -104,10 +104,13 @@ namespace rnd::debug{
 	};
 }
 
+#define COMBINE(x, y) x  ## y
+#define LEVEL1(x,y) COMBINE(x,y)
+
 #if defined(PROFILE) && PROFILE == true
 	#define PROFILE_BEGIN_SESSION(name, filepath) ::rnd::debug::Instrumentor::Get().BeginSession(name, filepath)
 	#define PROFILE_END_SESSION() ::rnd::debug::Instrumentor::Get().EndSession()
-	#define PROFILE_SCOPE(name) (::rnd::debug::InstrumentationTimer timer ## __LINE__) (name)
+	#define PROFILE_SCOPE(name) LEVEL1(::rnd::debug::InstrumentationTimer timer, __LINE__) (name)
 	#define PROFILE_FUNCTION() PROFILE_SCOPE(__PRETTY_FUNCTION__)
 	#define PROFILE_RECORD() ::rnd::debug::Instrumentor::Get().setFrameTarget(UINT64_MAX)
 	#define PROFILE_STOP_RECORD() ::rnd::debug::Instrumentor::Get().setFrameTarget(0)

@@ -1,8 +1,9 @@
 #include "debug/Logger.hpp"
 #include <stdlib.h>
 
+rnd::debug::Logger rnd::debug::Logger::instance;
+
 namespace rnd::debug{
-	Logger Logger::instance;
 
 	inline const char* info(){
 		return "INFO ::";
@@ -39,13 +40,17 @@ namespace rnd::debug{
 	}
 
 	void Logger::log(LogLevel level, const char* msg, const char* reason, const char* file, const char* fnc, int line){
-		if (!isAllowed(level)) return;
+		lock.lock();
 
-		fprintf(out, "%s %s\n", levelToStr(level), msg);
-		fprintf(out, "reason : %s\n", reason);
-		fprintf(out, "from :: file : \"%s\" | function : \"%s\" | line %d\n", file, fnc, line);
-		fprintf(out, "\n\n");
-		fflush(out);
+		if (isAllowed(level)){
+			fprintf(out, "%s %s\n", levelToStr(level), msg);
+			fprintf(out, "reason : %s\n", reason);
+			fprintf(out, "from :: file : \"%s\" | function : \"%s\" | line %d\n", file, fnc, line);
+			fprintf(out, "\n\n");
+			fflush(out);
+		}
+		
+		lock.unlock();
 	}
 
 	void Logger::init(const char* filepath){
