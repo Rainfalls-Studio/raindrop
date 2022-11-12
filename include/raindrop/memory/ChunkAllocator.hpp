@@ -28,7 +28,8 @@
 namespace rnd::memory{
 	class ChunkAllocator : public Allocator{
 		public:
-			ChunkAllocator() : Allocator(){}
+			ChunkAllocator() : Allocator() {};
+			~ChunkAllocator() = default;
 
 			void init(uint32_t dataSize, uint32_t size, uint32_t instancePerChunk = 50);
 
@@ -39,8 +40,8 @@ namespace rnd::memory{
 
 			void shutdown();
 
-			virtual void* allocate();
-			virtual void deallocate(void* ptr);
+			virtual void* allocate() override;
+			virtual void deallocate(void* ptr) override;
 
 			void clear();
 

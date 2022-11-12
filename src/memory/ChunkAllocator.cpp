@@ -4,6 +4,8 @@
 
 namespace rnd::memory{
 	void ChunkAllocator::init(uint32_t dataSize, uint32_t size, uint32_t instancePerChunk){
+		PROFILE_FUNCTION();
+		new (this) ChunkAllocator();
 		this->dataSize = rnd_max(dataSize, sizeof(Buffer));
 		this->instancePerChunk = instancePerChunk;
 
@@ -12,6 +14,7 @@ namespace rnd::memory{
 	}
 
 	void ChunkAllocator::shutdown(){
+		PROFILE_FUNCTION();
 		freeChunks();
 		dataSize = 0;
 		instancePerChunk = 0;
@@ -56,11 +59,9 @@ namespace rnd::memory{
 		buffer->next = buffers;
 		buffers = buffer;
 	}
-
 	void* ChunkAllocator::allocate(){
-		PROFILE_FUNCTION();
-		if (buffers == nullptr) return nullptr;
-
+		if (buffers == nullptr) pushChunk();
+		
 		Buffer* buffer = buffers;
 		buffers = buffers->next;
 
@@ -73,14 +74,17 @@ namespace rnd::memory{
 	}
 
 	ChunkAllocator::Buffer* ChunkAllocator::Chunk::get(){
+		PROFILE_FUNCTION();
 		return (Buffer*)((char*)this + sizeof(Chunk));
 	}
 
 	void ChunkAllocator::clear(){
+		PROFILE_FUNCTION();
 		freeChunks();
 	}
 
 	void ChunkAllocator::freeChunks(){
+		PROFILE_FUNCTION();
 		Chunk* chunk = begin;
 
 		while (chunk){

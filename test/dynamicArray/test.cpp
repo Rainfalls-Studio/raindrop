@@ -7,27 +7,14 @@ int main(int argc, char** argv){
 	PROFILE_RECORD();
 
 	rnd::memory::DynamicArray array;
+	array.init(sizeof(int), 500);
 
-	const int size = 500;
-	array.init<int>(size, 50);
-
-
-	for (int i; i<size; i++){
-		int* a = array.get<int>(i);
-		*a = i;
+	for (int i=0; i<500; i++){
+		void* ptr = array.get(i);
 	}
-
-	
-	int* a = array.get<int>(476);
-	printf("%d\n", *a);
-
-	for (int i=0; i<100; i++){
-		array.push<int>(5);
-	}
-
-	LOG("end", "end successfully");
 
 	array.shutdown();
+	LOG("end", "end successfully");
 
 	PROFILE_END_SESSION();
 	LOG_SHUTDOWN();

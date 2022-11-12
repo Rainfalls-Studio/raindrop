@@ -22,6 +22,7 @@
 #define __RAINDROP_MEMORY_DYNAMIC_ARRAY_HPP__
 
 #include "core.hpp"
+#include "Allocator.hpp"
 
 namespace rnd::memory{
 	class DynamicArray{
@@ -29,55 +30,41 @@ namespace rnd::memory{
 			DynamicArray() = default;
 			~DynamicArray() = default;
 
-			void init(uint32_t instanceSize, uint32_t instanceCount, uint32_t instancePerChunk = 50);
-
-			template<typename T>
-			void init(uint32_t instanceCount, uint32_t instancePerChunk = 50){
-				init(sizeof(T), instanceCount, instancePerChunk);
-			}
+			void init(Allocator* allocator, uint32_t elementSize, uint32_t size, uint32_t elementPerChunk = 50);
+			void init(uint32_t elementSize, uint32_t size, uint32_t elementPerChunk = 50);
 
 			void shutdown();
 
-			template<typename T>
-			T* get(uint32_t index){
-				return (T*)getFromIndex(index);
-			}
-
-			void resize(uint32_t size);
-
 			uint32_t size();
+			bool empty();
 
-			template<typename T>
-			void push(T t){
-				pushData(&t);
-			}
+			void* get(uint32_t index);
 
 		private:
 			struct Chunk{
+				Chunk(DynamicArray* owner);
+
 				Chunk* next = nullptr;
+				DynamicArray* owner = nullptr;
 
-				void* get(uint32_t index, uint32_t instanceSize);
-
-				// data stored here
+				void* get(uint32_t index);
 			};
 
-			Chunk* begin = nullptr;
-			
-			uint32_t instanceSize = 0;
-			uint32_t instancePerChunk = 0;
-			uint32_t chunkSize = 0;
+			uint32_t elementSize = 0;
+			uint32_t elementPerChunk = 0;
+			Allocator* allocator = nullptr;
+			bool customAllocator = false;
 			uint32_t chunkCount = 0;
-			uint32_t instanceCount = 0;
 
-			void pushChunk();
+			Chunk* begin = nullptr;
+			Chunk* end = nullptr;
+
+			void createAllocator(uint32_t size);
+
+			void pushBack(Chunk* chunk);
 			void pushChunks(uint32_t count);
-			Chunk* allocChunk();
-			Chunk* getLastChunk();
-			void* getFromIndex(uint32_t index);
-			Chunk* getChunkFromIndex(uint32_t index);
-			void popFromHere(Chunk* start);
-			void pushData(void* data);
-			uint32_t getMaxSize();
+			Chunk* allocateChunk();
+			Chunk* getChunk(uint32_t id);
 	};
 }
 

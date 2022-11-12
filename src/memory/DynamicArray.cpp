@@ -1,142 +1,119 @@
 #include "memory/DynamicArray.hpp"
+#include "memory/ChunkAllocator.hpp"
 #include "debug/Logger.hpp"
 #include "debug/Instrumentor.hpp"
-
-#include <glm/glm.hpp>
+#include <math.h>
 
 namespace rnd::memory{
-	void DynamicArray::init(uint32_t instanceSize, uint32_t instanceCount, uint32_t instancePerChunk){
+	void DynamicArray::init(Allocator* allocator, uint32_t elementSize, uint32_t size, uint32_t elementPerChunk){
 		PROFILE_FUNCTION();
+		customAllocator = true;
+		this->allocator = allocator;
+		this->elementSize = elementSize;
+		this->elementPerChunk = elementPerChunk;
 
-		this->instanceSize = instanceSize;
-		this->instancePerChunk = instancePerChunk;
-		this->chunkSize = instanceSize * instancePerChunk;
+		int chunkCount = std::ceil((float)size / (float)elementPerChunk);
+		pushChunks(chunkCount);
+	}
 
-		int chunkCount = glm::ceil((float)instanceCount / (float)instancePerChunk);
-
+	void DynamicArray::init(uint32_t elementSize, uint32_t size, uint32_t elementPerChunk){
+		PROFILE_FUNCTION();
+		createAllocator(size);
+		this->elementSize = elementSize;
+		this->elementPerChunk = elementPerChunk;
+		
+		int chunkCount = std::ceil((float)size / (float)elementPerChunk);
 		pushChunks(chunkCount);
 	}
 
 	void DynamicArray::shutdown(){
 		PROFILE_FUNCTION();
-		popFromHere(begin);
+		if (customAllocator){
+			((ChunkAllocator*)allocator)->shutdown();
+			free(allocator);
+		}
+		allocator = nullptr;
 	}
-	
-	void DynamicArray::pushChunk(){
+
+	void DynamicArray::createAllocator(uint32_t size){
+		PROFILE_FUNCTION();
+		allocator = (ChunkAllocator*)malloc(sizeof(ChunkAllocator));
+		
+		((ChunkAllocator*)allocator)->init(elementSize * elementPerChunk + sizeof(Chunk), size / 4, 4);
+	}
+
+	void DynamicArray::pushBack(Chunk* chunk){
 		PROFILE_FUNCTION();
 
-		Chunk* instance = allocChunk();
-
 		if (begin){
-			Chunk* last = getLastChunk();
-			last->next = instance;
+			end->next = chunk;
+			end = chunk;
 		} else {
-			begin = instance;
+			begin = chunk;
+			end = chunk;
 		}
-
 		chunkCount++;
+	}
+
+	DynamicArray::Chunk* DynamicArray::allocateChunk(){
+		PROFILE_FUNCTION();
+		Chunk* chunk = (Chunk*)allocator->allocate();
+		new (chunk) Chunk(this);
+		return chunk;
 	}
 
 	void DynamicArray::pushChunks(uint32_t count){
 		PROFILE_FUNCTION();
-
 		for (int i=0; i<count; i++){
-			pushChunk();
+			pushBack(allocateChunk());
 		}
 	}
 
-	DynamicArray::Chunk* DynamicArray::allocChunk(){
+	DynamicArray::Chunk::Chunk(DynamicArray* owner) : owner{owner}{
 		PROFILE_FUNCTION();
-
-		Chunk* instance = (Chunk*)malloc(sizeof(Chunk) + chunkSize);
-
-		if (instance == nullptr){
-			ERR("malloc error", "failed to allocate dynamic array chunk");
-			exit(1);
-		}
-
-		instance->next = nullptr;
-
-		return instance;
+		next = nullptr;
 	}
-
-	DynamicArray::Chunk* DynamicArray::getLastChunk(){
+	
+	void* DynamicArray::Chunk::get(uint32_t index){
 		PROFILE_FUNCTION();
+		RND_ASSERT(index < owner->elementPerChunk, "index out of range");
 
-		Chunk* chunk = begin;
-		while (chunk->next){
-			chunk = chunk->next;
-		}
+		char* ptr = ((char*)this) + sizeof(Chunk);
+		uint32_t offset = owner->elementSize * index;
 
-		return chunk;
-	}
-
-	void* DynamicArray::getFromIndex(uint32_t index){
-		PROFILE_FUNCTION();
-		uint32_t chunkID = (float)index / (float)instancePerChunk;
-		uint32_t localID = index - (chunkID * instancePerChunk);
-		Chunk* chunk = getChunkFromIndex(chunkID);
-
-		return chunk->get(localID, instanceSize);
-	}
-
-	DynamicArray::Chunk* DynamicArray::getChunkFromIndex(uint32_t index){
-		PROFILE_FUNCTION();
-
-		Chunk* chunk = begin;
-		for (int i=0; i<index; i++){
-			RND_ASSERT(chunk != nullptr, "dynamic array chunk getter, index overflow");
-			chunk = chunk->next;
-		}
-		return chunk;
-	}
-
-	void DynamicArray::resize(uint32_t size){
-		PROFILE_FUNCTION();
-		instanceCount = size;
-		int chunkCount = glm::ceil((float)size / (float)instancePerChunk);
-		
-		if (chunkCount == this->chunkCount){
-			return;
-		} else if (chunkCount > this->chunkCount){
-			int dif = this->chunkCount - chunkCount;
-			pushChunks(dif);
-		} else {
-			Chunk* chunk = getChunkFromIndex(chunkCount+1);
-			popFromHere(chunk);
-		}
-	}
-
-	void DynamicArray::popFromHere(Chunk* start){
-		PROFILE_FUNCTION();
-		Chunk* chunk = start;
-
-		while (chunk){
-			Chunk* next = chunk->next;
-			free(chunk);
-			chunk = next;
-			chunkCount--;
-		}
-	}
-
-	void* DynamicArray::Chunk::get(uint32_t index, uint32_t instanceSize){
-		char* dataPtr = (char*)this + sizeof(Chunk);
-		uint32_t offset = index * instanceSize;
-		return dataPtr + offset;
+		return (void*)(ptr + index);
 	}
 
 	uint32_t DynamicArray::size(){
-		return instanceCount;
+		PROFILE_FUNCTION();
+		return elementPerChunk * chunkCount;
 	}
 
-	void DynamicArray::pushData(void* data){
-		if (instanceCount > getMaxSize()){
-			pushChunk();
+	bool DynamicArray::empty(){
+		PROFILE_FUNCTION();
+		return chunkCount == 0;
+	}
+
+	void* DynamicArray::get(uint32_t index){
+		PROFILE_FUNCTION();
+		RND_ASSERT(index < elementPerChunk * chunkCount, "index out of range");
+		
+		uint32_t chunkID = ((float)index) / ((float)elementPerChunk);
+		uint32_t localID = index - (chunkID * elementPerChunk);
+
+		return getChunk(chunkID)->get(localID);
+	}
+
+	DynamicArray::Chunk* DynamicArray::getChunk(uint32_t id){
+		PROFILE_FUNCTION();
+		RND_ASSERT(id < chunkCount, "index out of range");
+		// printf("%d\n", id);
+		
+		Chunk* chunk = begin;
+		for (int i=0; i<id; i++){
+			chunk = chunk->next;
 		}
-		memcpy(getFromIndex(instanceCount), data, instanceSize);
-	}
 
-	uint32_t DynamicArray::getMaxSize(){
-		return chunkCount * instancePerChunk;
+		return chunk;
 	}
 }
