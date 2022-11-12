@@ -13,7 +13,6 @@ namespace rnd::memory{
 	void ForwardLinkedList::init(uint32_t elementSize){
 		PROFILE_FUNCTION();
 		this->elementSize = elementSize + sizeof(Node);
-		printf("aa\n");
 		allocator = createAllocator();
 	}
 
@@ -52,7 +51,7 @@ namespace rnd::memory{
 	void ForwardLinkedList::pop(){
 		PROFILE_FUNCTION();
 		if (!end) return;
-		
+
 		Node* node = end;
 		end = end->next;
 		allocator->deallocate(node);
@@ -88,10 +87,8 @@ namespace rnd::memory{
 	
 	Allocator* ForwardLinkedList::createAllocator(){
 		PROFILE_FUNCTION();
-		printf("aa\n");
 		ChunkAllocator* allocator = (ChunkAllocator*)malloc(sizeof(ChunkAllocator));
 		allocator->init(elementSize, 0, 100);
-		printf("aa\n");
 		return allocator;
 	}
 
