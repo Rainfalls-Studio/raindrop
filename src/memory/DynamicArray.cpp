@@ -28,8 +28,8 @@ namespace rnd::memory{
 
 	void DynamicArray::shutdown(){
 		PROFILE_FUNCTION();
-		if (customAllocator){
-			((ChunkAllocator*)allocator)->shutdown();
+		if (!customAllocator){
+			allocator->shutdown();
 			free(allocator);
 		}
 		allocator = nullptr;

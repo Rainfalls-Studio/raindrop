@@ -38,8 +38,7 @@ namespace rnd::memory{
 				init(sizeof(T), size, instancePerChunk);
 			}
 
-			void shutdown();
-
+			virtual void shutdown() override;
 			virtual void* allocate() override;
 			virtual void deallocate(void* ptr) override;
 

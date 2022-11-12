@@ -60,6 +60,7 @@ namespace rnd::memory{
 		buffers = buffer;
 	}
 	void* ChunkAllocator::allocate(){
+		PROFILE_FUNCTION();
 		if (buffers == nullptr) pushChunk();
 		
 		Buffer* buffer = buffers;

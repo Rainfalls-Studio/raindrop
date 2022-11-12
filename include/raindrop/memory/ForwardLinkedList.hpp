@@ -1,7 +1,6 @@
-
 /**
- * @brief thes file contain the data structure allocator, a critical part of the engine.
- * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
+ * @brief this file contain forward linked list structure. (First in, first out)
+ * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING.
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
 
@@ -19,21 +18,52 @@
  * 
  */
 
-#ifndef __RAINDROP_MEMORY_ALLOCATOR_HPP__
-#define __RAINDROP_MEMORY_ALLOCATOR_HPP__
+#ifndef __RAINDROP_MEMORY_FORWARD_LINKED_LIST_HPP__
+#define __RAINDROP_MEMORY_FORWARD_LINKED_LIST_HPP__
 
 #include "core.hpp"
+#include "Allocator.hpp"
 
 namespace rnd::memory{
-	class Allocator{
+	class ForwardLinkedList{
 		public:
-			Allocator() = default;		
-			~Allocator() = default;
+			ForwardLinkedList() = default;
+			~ForwardLinkedList() = default;
 
-			virtual void shutdown() = 0;
+			void init(Allocator* allocator, uint32_t elementSize);
+			void init(uint32_t elementSize);
 
-			virtual void* allocate() = 0;
-			virtual void deallocate(void* ptr) = 0;
+			void shutdown();
+
+			void push(void* ptr);
+			void pop();
+
+			void* front();
+			void* back();
+
+			void clear();
+
+			uint32_t size();
+			bool empty();
+
+		private:
+			Allocator* allocator = nullptr;
+			bool customAllocator = false;
+
+			struct Node{
+				Node* next = nullptr;
+				// data stored here
+
+				void* get();
+			};
+
+			Node* begin = nullptr;
+			Node* end = nullptr;
+
+			uint32_t elementSize = 0;
+			uint32_t nodeCount = 0;
+
+			Allocator* createAllocator();
 	};
 }
 
