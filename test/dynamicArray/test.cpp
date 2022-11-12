@@ -8,8 +8,8 @@ int main(int argc, char** argv){
 
 	rnd::memory::DynamicArray array;
 
-	const int size = 10000;
-	array.init<int>(size, 500);
+	const int size = 500;
+	array.init<int>(size, 50);
 
 
 	for (int i; i<size; i++){
@@ -18,8 +18,12 @@ int main(int argc, char** argv){
 	}
 
 	
-	int* a = array.get<int>(50);
+	int* a = array.get<int>(476);
 	printf("%d\n", *a);
+
+	for (int i=0; i<100; i++){
+		array.push<int>(5);
+	}
 
 	LOG("end", "end successfully");
 

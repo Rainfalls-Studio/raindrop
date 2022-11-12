@@ -45,6 +45,13 @@ namespace rnd::memory{
 
 			void resize(uint32_t size);
 
+			uint32_t size();
+
+			template<typename T>
+			void push(T t){
+				pushData(&t);
+			}
+
 		private:
 			struct Chunk{
 				Chunk* next = nullptr;
@@ -60,14 +67,17 @@ namespace rnd::memory{
 			uint32_t instancePerChunk = 0;
 			uint32_t chunkSize = 0;
 			uint32_t chunkCount = 0;
+			uint32_t instanceCount = 0;
 
 			void pushChunk();
 			void pushChunks(uint32_t count);
 			Chunk* allocChunk();
+			Chunk* getLastChunk();
 			void* getFromIndex(uint32_t index);
 			Chunk* getChunkFromIndex(uint32_t index);
 			void popFromHere(Chunk* start);
-
+			void pushData(void* data);
+			uint32_t getMaxSize();
 	};
 }
 

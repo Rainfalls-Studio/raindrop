@@ -27,8 +27,13 @@ namespace rnd::memory{
 
 		Chunk* instance = allocChunk();
 
-		instance->next = begin;
-		begin = instance;
+		if (begin){
+			Chunk* last = getLastChunk();
+			last->next = instance;
+		} else {
+			begin = instance;
+		}
+
 		chunkCount++;
 	}
 
@@ -50,7 +55,20 @@ namespace rnd::memory{
 			exit(1);
 		}
 
+		instance->next = nullptr;
+
 		return instance;
+	}
+
+	DynamicArray::Chunk* DynamicArray::getLastChunk(){
+		PROFILE_FUNCTION();
+
+		Chunk* chunk = begin;
+		while (chunk->next){
+			chunk = chunk->next;
+		}
+
+		return chunk;
 	}
 
 	void* DynamicArray::getFromIndex(uint32_t index){
@@ -75,6 +93,7 @@ namespace rnd::memory{
 
 	void DynamicArray::resize(uint32_t size){
 		PROFILE_FUNCTION();
+		instanceCount = size;
 		int chunkCount = glm::ceil((float)size / (float)instancePerChunk);
 		
 		if (chunkCount == this->chunkCount){
@@ -83,7 +102,7 @@ namespace rnd::memory{
 			int dif = this->chunkCount - chunkCount;
 			pushChunks(dif);
 		} else {
-			Chunk* chunk = getChunkFromIndex(chunkCount);
+			Chunk* chunk = getChunkFromIndex(chunkCount+1);
 			popFromHere(chunk);
 		}
 	}
@@ -104,5 +123,20 @@ namespace rnd::memory{
 		char* dataPtr = (char*)this + sizeof(Chunk);
 		uint32_t offset = index * instanceSize;
 		return dataPtr + offset;
+	}
+
+	uint32_t DynamicArray::size(){
+		return instanceCount;
+	}
+
+	void DynamicArray::pushData(void* data){
+		if (instanceCount > getMaxSize()){
+			pushChunk();
+		}
+		memcpy(getFromIndex(instanceCount), data, instanceSize);
+	}
+
+	uint32_t DynamicArray::getMaxSize(){
+		return chunkCount * instancePerChunk;
 	}
 }
