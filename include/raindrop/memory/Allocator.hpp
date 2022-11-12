@@ -1,6 +1,6 @@
 
 /**
- * @brief thes file contain the event mediator. This class handle event calls over the engine
+ * @brief thes file contain the data structure allocator, a critical part of the engine.
  * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
@@ -19,20 +19,20 @@
  * 
  */
 
-#pragma once
+#ifndef __RAINDROP_MEMORY_ALLOCATOR_HPP__
+#define __RAINDROP_MEMORY_ALLOCATOR_HPP__
 
 #include "core.hpp"
-#include "memory/DynamicArray.hpp"
 
-namespace rnd::events{
-	class Mediator{
+namespace rnd::memory{
+	class Allocator{
 		public:
-			Mediator();
-			~Mediator();
-		
-			void initizalize(uint32_t eventTypeCount);
+			Allocator() = default;		
+			~Allocator() = default;
 
-		private:
-			memory::DynamicArray eventTypePool;
+			virtual void* allocate() = 0;
+			virtual void deallocate(void* ptr) = 0;
 	};
 }
+
+#endif

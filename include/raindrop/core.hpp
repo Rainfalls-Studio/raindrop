@@ -24,9 +24,12 @@
 
 #include <stdint.h>
 
+#define __FUNC__ __func__
+
 // debug
 #define PROFILE true
 #define LOGGER true
+#define MEMORY_CHECK true
 
 #define LOG_LEVEL true
 #define WARN_LEVEL true
@@ -35,6 +38,7 @@
 
 #define RND_ASSERTS true
 
+#include "memory/memory.hpp"
 #include "debug/Logger.hpp"
 
 // macros
@@ -68,5 +72,8 @@
 #else
 	#define RND_ASSERT(x, msg)
 #endif
+
+#define rnd_max(a, b) a > b ? a : b
+#define rnd_min(a, b) a < b ? a : b
 
 #endif

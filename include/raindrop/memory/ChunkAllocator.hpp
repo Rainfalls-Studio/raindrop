@@ -1,6 +1,6 @@
 
 /**
- * @brief thes file contain the event mediator. This class handle event calls over the engine
+ * @brief thes file contain the data structure allocator, a critical part of the engine.
  * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
@@ -19,20 +19,54 @@
  * 
  */
 
-#pragma once
+#ifndef __RAINDROP_MEMORY_CHUNK_ALLOCATOR_HPP__
+#define __RAINDROP_MEMORY_CHUNK_ALLOCATOR_HPP__
 
 #include "core.hpp"
-#include "memory/DynamicArray.hpp"
+#include "Allocator.hpp"
 
-namespace rnd::events{
-	class Mediator{
+namespace rnd::memory{
+	class ChunkAllocator : public Allocator{
 		public:
-			Mediator();
-			~Mediator();
-		
-			void initizalize(uint32_t eventTypeCount);
+			ChunkAllocator() : Allocator(){}
+
+			void init(uint32_t dataSize, uint32_t size, uint32_t instancePerChunk = 50);
+
+			template<typename T>
+			void init(uint32_t size, uint32_t instancePerChunk = 50){
+				init(sizeof(T), size, instancePerChunk);
+			}
+
+			void shutdown();
+
+			virtual void* allocate();
+			virtual void deallocate(void* ptr);
+
+			void clear();
 
 		private:
-			memory::DynamicArray eventTypePool;
+			struct Buffer{
+				Buffer* next = nullptr;
+			};
+
+			struct Chunk{
+				Chunk* next = nullptr;
+				Buffer* get();
+			};
+
+			Chunk* begin = nullptr;
+			Buffer* buffers = nullptr;
+
+			uint32_t dataSize = 0;
+			uint32_t instancePerChunk = 0;
+
+			Chunk* allocateChunk();
+			void pushChunk();
+			void pushChunks(uint32_t count);
+			void pushBuffer(Buffer* buffer);
+
+			void freeChunks();
 	};
 }
+
+#endif

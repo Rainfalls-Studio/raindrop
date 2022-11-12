@@ -1,6 +1,6 @@
 
 /**
- * @brief thes file contain the event mediator. This class handle event calls over the engine
+ * @brief thes file contain the fondamental memory functions.
  * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
@@ -19,20 +19,29 @@
  * 
  */
 
-#pragma once
+#ifndef __RAINDROP_MEMORY_MEMORY_HPP__
+#define __RAINDROP_MEMORY_MEMORY_HPP__
 
 #include "core.hpp"
-#include "memory/DynamicArray.hpp"
 
-namespace rnd::events{
-	class Mediator{
-		public:
-			Mediator();
-			~Mediator();
-		
-			void initizalize(uint32_t eventTypeCount);
+namespace rnd::memory{
 
-		private:
-			memory::DynamicArray eventTypePool;
-	};
+	// allocation
+	void* malloc(uint32_t size);
+	void* calloc(uint32_t count, uint32_t size);
+	void* realloc(void* memory, uint32_t newSize);
+	void free(void* memory);
+
+	// memory modifier
+	void* memcpy(void* dst, const void* src, uint32_t n);
+	errno_t memcpy_s(void* dst, uint32_t dstS, const void* src, uint32_t size);
+	void* mempcpy(void* dst, const char* src, uint32_t n);
+	void* memset(void* dst, int32_t val, size_t size);
+	int memcmp(const void* buf1, const void* buf2, uint32_t size);
+	
+	uint32_t getMemStat(const char* fnc);
+	uint32_t getLeakedMemoryCount();
+	bool isMemoryLeaked();
 }
+
+#endif
