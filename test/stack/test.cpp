@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv){
 
-	LOG_INIT("out.log");
+	RND_LOG_INIT("out.log");
 	PROFILE_BEGIN_SESSION("test", "profile.json");
 	PROFILE_RECORD();
 
@@ -17,10 +17,10 @@ int main(int argc, char** argv){
 
 	stack.shutdown();
 
-	LOG("end", "end successfully");
+	RND_LOG("end", "end successfully");
 
 	PROFILE_END_SESSION();
-	LOG_SHUTDOWN();
+	RND_LOG_SHUTDOWN();
 
 	return EXIT_SUCCESS;
 }

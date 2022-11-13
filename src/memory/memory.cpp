@@ -8,7 +8,7 @@ namespace rnd::memory{
 	#define COMBINE(x, y) x  ## y
 	#define LEVEL1(x,y) COMBINE(x,y)
 
-	#if defined(MEMORY_CHECK) && MEMORY_CHECK == true
+	#if defined(RND_MEMORY_CHECK) && RND_MEMORY_CHECK == true
 
 		struct MemoryStats{
 			std::map<std::string, uint32_t> map;
@@ -19,7 +19,7 @@ namespace rnd::memory{
 
 		#define ALLOC() stats.leakedMemory++
 		#define FREE() stats.leakedMemory--
-		#define CALL() stats.map[__FUNC__]++
+		#define CALL() stats.map[RND__FUNC__]++
 	
 		uint32_t getMemStat(const char* fnc){
 			return stats.map[fnc];

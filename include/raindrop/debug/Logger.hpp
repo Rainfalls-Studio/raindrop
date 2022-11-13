@@ -61,18 +61,18 @@ namespace rnd::debug{
 	};
 }
 
-#if defined(LOGGER) && LOGGER == true
-	#define LOG_INIT(arg) ::rnd::debug::Logger::getInstance().init(arg)
-	#define LOG_SHUTDOWN() ::rnd::debug::Logger::getInstance().shutdown()
-	#define LOG_ALLOW(level, allowed) ::rnd::debug::Logger::getInstance().allow(level, allowed)
-	#define LOG_IS_ALLOWED(level, allowed) ::rnd::debug::Logger::getInstance().isAllowed(level)
-	#define LOG_LOG(level, msg, reason) ::rnd::debug::Logger::getInstance().log(level, msg, reason, __FILE__, __PRETTY_FUNCTION__, __LINE__)
+#if defined(RND_LOGGER) && RND_LOGGER == true
+	#define RND_LOG_INIT(arg) ::rnd::debug::Logger::getInstance().init(arg)
+	#define RND_LOG_SHUTDOWN() ::rnd::debug::Logger::getInstance().shutdown()
+	#define RND_LOG_ALLOW(level, allowed) ::rnd::debug::Logger::getInstance().allow(level, allowed)
+	#define RND_LOG_IS_ALLOWED(level, allowed) ::rnd::debug::Logger::getInstance().isAllowed(level)
+	#define RND_LOG_LOG(level, msg, reason) ::rnd::debug::Logger::getInstance().log(level, msg, reason, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 #else
-	#define LOG_INIT(arg)
-	#define LOG_SHUTDOWN() 
-	#define LOG_ALLOW(level, allowed)
-	#define LOG_IS_ALLOWED(level, allowed)
-	#define LOG_LOG(level, msg, reason)
+	#define RND_LOG_INIT(arg)
+	#define RND_LOG_SHUTDOWN() 
+	#define RND_LOG_ALLOW(level, allowed)
+	#define RND_LOG_IS_ALLOWED(level, allowed)
+	#define RND_LOG_LOG(level, msg, reason)
 #endif
 
 #endif

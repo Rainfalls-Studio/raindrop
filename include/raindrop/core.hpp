@@ -24,17 +24,17 @@
 
 #include <stdint.h>
 
-#define __FUNC__ __func__
+#define RND__FUNC__ __func__
 
 // debug
-#define PROFILE true
-#define LOGGER true
-#define MEMORY_CHECK true
+#define RND_PROFILE true
+#define RND_LOGGER true
+#define RND_MEMORY_CHECK true
 
-#define LOG_LEVEL true
-#define WARN_LEVEL true
-#define ERR_LEVEL true
-#define CRITIC_LEVEL true
+#define RND_LOG_LEVEL true
+#define RND_WARN_LEVEL true
+#define RND_ERR_LEVEL true
+#define RND_CRITIC_LEVEL true
 
 #define RND_ASSERTS true
 
@@ -43,37 +43,43 @@
 
 // macros
 
-#if defined(LOG_LEVEL) && LOG_LEVEL == true
-	#define LOG(...) LOG_LOG(rnd::debug::Info, __VA_ARGS__)
+#if defined(RND_LOG_LEVEL) && RND_LOG_LEVEL == true
+	#define RND_LOG(...) RND_LOG_LOG(rnd::debug::Info, __VA_ARGS__)
 #else
-	#define LOG(...)
+	#define RND_LOG(...)
 #endif
 
-#if defined(WARN_LEVEL) && WARN_LEVEL == true
-	#define WARN(...) LOG_LOG(rnd::debug::Warn, __VA_ARGS__)
+#if defined(RND_WARN_LEVEL) && RND_WARN_LEVEL == true
+	#define RND_WARN(...) RND_LOG_LOG(rnd::debug::Warn, __VA_ARGS__)
 #else
-	#define WARN(...)
+	#define RND_WARN(...)
 #endif
 
-#if defined(ERR_LEVEL) && ERR_LEVEL == true
-	#define ERR(...) LOG_LOG(rnd::debug::Error, __VA_ARGS__)
+#if defined(RND_ERR_LEVEL) && RND_ERR_LEVEL == true
+	#define RND_ERR(...) RND_LOG_LOG(rnd::debug::Error, __VA_ARGS__)
 #else
-	#define ERR(...)
+	#define RND_ERR(...)
 #endif
 
-#if defined(CRITIC_LEVEL) && CRITIC_LEVEL == true
-	#define CRITIC(...) LOG_LOG(rnd::debug::Critical, __VA_ARGS__)
+#if defined(RND_CRITIC_LEVEL) && RND_CRITIC_LEVEL == true
+	#define RND_CRITIC(...) RND_LOG_LOG(rnd::debug::Critical, __VA_ARGS__)
 #else
-	#define CRITIC(...)
+	#define RND_CRITIC(...)
 #endif
 
 #if defined(RND_ASSERTS) && RND_ASSERTS == true
-	#define RND_ASSERT(x, msg) {if(!(x)) {ERR("Assertion Failed: ", msg);__debugbreak();}}
+	#define RND_ASSERT(x, msg) {if(!(x)) {RND_ERR("Assertion Failed: ", msg);__debugbreak();}}
 #else
 	#define RND_ASSERT(x, msg)
 #endif
 
 #define rnd_max(a, b) a > b ? a : b
 #define rnd_min(a, b) a < b ? a : b
+
+namespace rnd{
+	using EventID = uint32_t;
+
+	static constexpr EventID EVENT_NONE = (EventID)-1;
+}
 
 #endif

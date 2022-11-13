@@ -33,12 +33,33 @@ namespace rnd::memory{
 			void init(Allocator* allocator, uint32_t elementSize, uint32_t size, uint32_t elementPerChunk = 50);
 			void init(uint32_t elementSize, uint32_t size, uint32_t elementPerChunk = 50);
 
+			template<typename T>
+			void init(uint32_t size, Allocator* allocator = nullptr, uint32_t elementPerChunk = 50){
+				if (allocator){
+					init(allocator, sizeof(T), size, elementPerChunk);
+				} else {
+					init(sizeof(T), size, elementPerChunk);
+				}
+			}
+
 			void shutdown();
 
 			uint32_t size();
 			bool empty();
 
 			void* get(uint32_t index);
+
+			template<typename T>
+			T& get(uint32_t index){
+				return *(T*)get(index);
+			}
+
+			void reserve(uint32_t elementCount);
+
+			template<typename T>
+			static uint32_t allocatorSize(){
+				return sizeof(T);
+			}
 
 		private:
 			struct Chunk{
@@ -49,6 +70,8 @@ namespace rnd::memory{
 
 				void* get(uint32_t index);
 			};
+
+			void reset();
 
 			uint32_t elementSize = 0;
 			uint32_t elementPerChunk = 0;

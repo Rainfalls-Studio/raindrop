@@ -2,25 +2,25 @@
 
 int main(int argc, char** argv){
 
-	LOG_INIT("out.log");
+	RND_LOG_INIT("out.log");
 	PROFILE_BEGIN_SESSION("test", "profile.json");
 	PROFILE_RECORD();
 
 	rnd::memory::ForwardLinkedList list;
-	list.init(sizeof(int));
+	list.init<int>();
 	
 	for (int i=0; i<50; i++){
-		list.push(&i);
+		list.push<int>(i);
 	}
 
 	for (int i=0; i<65; i++){
 		list.pop();
 	}
 
-	for (int i=0; i<1000; i++){
+	for (int i=0; i<100000; i++){
 		int a = rand() % 2;
-		if (a == 0){
-			list.push(&i);
+		if (a == 1){
+			list.push<int>(i);
 		} else {
 			list.pop();
 		}
@@ -28,10 +28,10 @@ int main(int argc, char** argv){
 
 	list.shutdown();
 
-	LOG("end", "end successfully");
+	RND_LOG("end", "end successfully");
 
 	PROFILE_END_SESSION();
-	LOG_SHUTDOWN();
+	RND_LOG_SHUTDOWN();
 
 	return EXIT_SUCCESS;
 }

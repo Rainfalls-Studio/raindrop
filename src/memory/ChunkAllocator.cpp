@@ -5,10 +5,15 @@
 namespace rnd::memory{
 	void ChunkAllocator::init(uint32_t dataSize, uint32_t size, uint32_t instancePerChunk){
 		PROFILE_FUNCTION();
-		new (this) ChunkAllocator();
+		new (this) (ChunkAllocator);
+
+		begin = nullptr;
+		buffers = nullptr;
+
 		this->dataSize = rnd_max(dataSize, sizeof(Buffer));
 		this->instancePerChunk = instancePerChunk;
 
+		pthread_mutex_init(&lock, nullptr);
 		int chunkCount = std::ceil((float)size / (float)instancePerChunk);
 		pushChunks(chunkCount);
 	}
@@ -25,7 +30,7 @@ namespace rnd::memory{
 		Chunk* chunk = (Chunk*)malloc(sizeof(Chunk) + (dataSize * instancePerChunk));
 
 		if (chunk == nullptr){
-			ERR("malloc error", "failed to allocate a chunk allocator's chunk");
+			RND_ERR("malloc error", "failed to allocate a chunk allocator's chunk");
 			exit(EXIT_FAILURE);
 		}
 
@@ -61,17 +66,21 @@ namespace rnd::memory{
 	}
 	void* ChunkAllocator::allocate(){
 		PROFILE_FUNCTION();
+		pthread_mutex_lock(&lock);
 		if (buffers == nullptr) pushChunk();
 		
 		Buffer* buffer = buffers;
 		buffers = buffers->next;
+		pthread_mutex_unlock(&lock);
 
 		return buffer;
 	}
 
 	void ChunkAllocator::deallocate(void* ptr){
 		PROFILE_FUNCTION();
+		pthread_mutex_lock(&lock);
 		pushBuffer((Buffer*)ptr);
+		pthread_mutex_unlock(&lock);
 	}
 
 	ChunkAllocator::Buffer* ChunkAllocator::Chunk::get(){

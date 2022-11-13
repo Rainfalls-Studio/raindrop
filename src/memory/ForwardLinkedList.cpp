@@ -6,6 +6,8 @@ namespace rnd::memory{
 	void ForwardLinkedList::init(Allocator* allocator, uint32_t elementSize){
 		PROFILE_FUNCTION();
 		customAllocator = true;
+		begin = nullptr;
+		end = nullptr;
 		this->allocator = allocator;
 		this->elementSize = elementSize + sizeof(Node);
 	}
@@ -13,6 +15,8 @@ namespace rnd::memory{
 	void ForwardLinkedList::init(uint32_t elementSize){
 		PROFILE_FUNCTION();
 		this->elementSize = elementSize + sizeof(Node);
+		begin = nullptr;
+		end = nullptr;
 		allocator = createAllocator();
 	}
 

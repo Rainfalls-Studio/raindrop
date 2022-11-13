@@ -34,6 +34,16 @@ namespace rnd::memory{
 
 			virtual void* allocate() = 0;
 			virtual void deallocate(void* ptr) = 0;
+
+			template<typename T>
+			T& allocate(){
+				return *(T*)allocate();
+			}
+
+			template<typename T>
+			void deallocate(T &t){
+				deallocate(&t);
+			}
 	};
 }
 

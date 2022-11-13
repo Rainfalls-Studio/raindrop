@@ -10,6 +10,7 @@
 #include "memory/ChunkAllocator.hpp"
 #include "memory/DynamicArray.hpp"
 #include "memory/ForwardLinkedList.hpp"
+#include "memory/Stack.hpp"
 
 #include "events/EventMediator.hpp"
 

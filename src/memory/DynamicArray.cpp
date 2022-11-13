@@ -5,8 +5,19 @@
 #include <math.h>
 
 namespace rnd::memory{
+	void DynamicArray::reset(){
+		elementSize = 0;
+		elementPerChunk = 0;
+		allocator = nullptr;
+		customAllocator = false;
+		chunkCount = 0;
+	}
+
+
 	void DynamicArray::init(Allocator* allocator, uint32_t elementSize, uint32_t size, uint32_t elementPerChunk){
 		PROFILE_FUNCTION();
+		reset();
+
 		customAllocator = true;
 		this->allocator = allocator;
 		this->elementSize = elementSize;
@@ -18,6 +29,8 @@ namespace rnd::memory{
 
 	void DynamicArray::init(uint32_t elementSize, uint32_t size, uint32_t elementPerChunk){
 		PROFILE_FUNCTION();
+		reset();
+
 		createAllocator(size);
 		this->elementSize = elementSize;
 		this->elementPerChunk = elementPerChunk;
@@ -107,7 +120,6 @@ namespace rnd::memory{
 	DynamicArray::Chunk* DynamicArray::getChunk(uint32_t id){
 		PROFILE_FUNCTION();
 		RND_ASSERT(id < chunkCount, "index out of range");
-		// printf("%d\n", id);
 		
 		Chunk* chunk = begin;
 		for (int i=0; i<id; i++){
@@ -115,5 +127,11 @@ namespace rnd::memory{
 		}
 
 		return chunk;
+	}
+
+	void DynamicArray::reserve(uint32_t elementCount){
+		PROFILE_FUNCTION();
+		int chunkCount = std::ceil((float)(elementCount * elementSize)/ (float)elementPerChunk);
+		pushChunks(chunkCount);
 	}
 }

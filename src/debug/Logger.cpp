@@ -28,7 +28,7 @@ namespace rnd::debug{
 			case Error: return error();
 			case Critical: return critical();
 		}
-		return "UNKNOWN LOG LEVEL :: ";
+		return "UNKNOWN RND_LOG LEVEL :: ";
 	}
 
 	void Logger::allow(LogLevel level, bool allowed){

@@ -37,6 +37,11 @@ namespace rnd::memory{
 			uint32_t size();
 
 			void* allocate(uint32_t size);
+
+			template<typename T>
+			T& allocate(){
+				return *(T*)allocate(sizeof(T));
+			}
 			
 		private:
 			char* memory = nullptr;

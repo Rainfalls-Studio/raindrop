@@ -2,22 +2,24 @@
 
 int main(int argc, char** argv){
 
-	LOG_INIT("out.log");
+	RND_LOG_INIT("out.log");
 	PROFILE_BEGIN_SESSION("test", "profile.json");
 	PROFILE_RECORD();
 
 	rnd::memory::DynamicArray array;
-	array.init(sizeof(int), 500);
+	array.init<int>(500);
 
 	for (int i=0; i<500; i++){
-		void* ptr = array.get(i);
+		int a = array.get<int>(i);
 	}
 
+	array.reserve(50);
+
 	array.shutdown();
-	LOG("end", "end successfully");
+	RND_LOG("end", "end successfully");
 
 	PROFILE_END_SESSION();
-	LOG_SHUTDOWN();
+	RND_LOG_SHUTDOWN();
 
 	return EXIT_SUCCESS;
 }

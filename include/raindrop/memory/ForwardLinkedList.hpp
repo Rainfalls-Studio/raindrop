@@ -33,18 +33,47 @@ namespace rnd::memory{
 			void init(Allocator* allocator, uint32_t elementSize);
 			void init(uint32_t elementSize);
 
+			template<typename T>
+			void init(Allocator* allocator = nullptr){
+				if (allocator){
+					init(allocator, sizeof(T));
+				} else {
+					init(sizeof(T));
+				}
+			}
+
 			void shutdown();
 
 			void push(void* ptr);
 			void pop();
 
+			template<typename T>
+			void push(T &t){
+				push(&t);
+			}
+
 			void* front();
 			void* back();
+
+			template<typename T>
+			T& front(){
+				return *(T*)front();
+			}
+
+			template<typename T>
+			T& back(){
+				return *(T*)back();
+			}
 
 			void clear();
 
 			uint32_t size();
 			bool empty();
+
+			template<typename T>
+			static uint32_t allocatorSize(){
+				return sizeof(T) + sizeof(Node);
+			}
 
 		private:
 			Allocator* allocator = nullptr;

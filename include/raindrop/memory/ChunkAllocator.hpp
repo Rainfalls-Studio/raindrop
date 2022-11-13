@@ -24,6 +24,7 @@
 
 #include "core.hpp"
 #include "Allocator.hpp"
+#include "pthread.h"
 
 namespace rnd::memory{
 	class ChunkAllocator : public Allocator{
@@ -59,6 +60,7 @@ namespace rnd::memory{
 
 			uint32_t dataSize = 0;
 			uint32_t instancePerChunk = 0;
+			pthread_mutex_t lock;
 
 			Chunk* allocateChunk();
 			void pushChunk();
