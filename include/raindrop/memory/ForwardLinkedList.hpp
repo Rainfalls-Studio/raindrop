@@ -41,7 +41,7 @@ namespace rnd::memory{
 	 * @tparam threadSafe true if threadsafe is activated for this list
 	 * @tparam Allocator the allocator, can accelerate the push and pop methodes, the allocator has to be for ForwardLinkedListNode<T> type
 	 */
-	template<typename T, template<typename A, bool> typename Allocator, bool threadSafe = true>
+	template<typename T, template<typename A, bool> typename Allocator = allocators::Allocator, bool threadSafe = true>
 	class ForwardLinkedList{
 		public:
 			using FullAllocator = Allocator<ForwardLinkedListNode<T>, threadSafe>;

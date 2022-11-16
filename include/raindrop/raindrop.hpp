@@ -9,7 +9,7 @@
 #include "memory/memory.hpp"
 #include "memory/allocators/Allocator.hpp"
 #include "memory/allocators/ChunkAllocator.hpp"
-#include "memory/DynamicArray.hpp"
+#include "memory/ChunkedArray.hpp"
 #include "memory/ForwardLinkedList.hpp"
 #include "memory/Stack.hpp"
 
