@@ -14,7 +14,7 @@
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Portions of this software are licensed under the LGPL license OpenAL Soft Copyright (C) 1991 Free Software Foundation, Inc. 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
  * 
  */
 
@@ -22,78 +22,153 @@
 #define __RAINDROP_MEMORY_FORWARD_LINKED_LIST_HPP__
 
 #include "core.hpp"
-#include "Allocator.hpp"
+#include "debug/Instrumentor.hpp"
+#include "allocators/Allocator.hpp"
+#include <pthread.h>
 
 namespace rnd::memory{
+
+	template<typename T>
+	struct ForwardLinkedListNode{
+		T data;
+		ForwardLinkedListNode* next = nullptr;
+	};
+
+	/**
+	 * @brief a forward linked list, useful in cases where a lot of pushes and pops are made and whene indexing is not needed
+	 * 
+	 * @tparam T the type to store
+	 * @tparam threadSafe true if threadsafe is activated for this list
+	 * @tparam Allocator the allocator, can accelerate the push and pop methodes, the allocator has to be for ForwardLinkedListNode<T> type
+	 */
+	template<typename T, template<typename A, bool> typename Allocator, bool threadSafe = true>
 	class ForwardLinkedList{
 		public:
+			using FullAllocator = Allocator<ForwardLinkedListNode<T>, threadSafe>;
+
 			ForwardLinkedList() = default;
 			~ForwardLinkedList() = default;
 
-			void init(Allocator* allocator, uint32_t elementSize);
-			void init(uint32_t elementSize);
+			template<typename ...Args>
+			void init(Args... args){
+				PROFILE_FUNCTION();
 
-			template<typename T>
-			void init(Allocator* allocator = nullptr){
-				if (allocator){
-					init(allocator, sizeof(T));
-				} else {
-					init(sizeof(T));
+				externalAllocator = false;
+				this->allocator = (FullAllocator*)malloc(sizeof(FullAllocator));
+				this->allocator->init(args...);
+
+				if constexpr(threadSafe) pthread_mutex_init(&lock, nullptr);
+			}
+
+			void init(FullAllocator *allocator){
+				PROFILE_FUNCTION();
+				externalAllocator = true;
+				this->allocator = allocator;
+
+				if constexpr(threadSafe) pthread_mutex_init(&lock, nullptr);
+			}
+
+			void shutdown(){
+				PROFILE_FUNCTION();
+
+				if (!externalAllocator){
+					free(allocator);
 				}
+				allocator = nullptr;
+
+				if constexpr(threadSafe) pthread_mutex_destroy(&lock);
 			}
 
-			void shutdown();
+			void push(const T &t){
+				PROFILE_FUNCTION();
 
-			void push(void* ptr);
-			void pop();
+				if constexpr(threadSafe) pthread_mutex_lock(&lock);
+				Node& node = allocateNode();
+				node.next = nullptr;
 
-			template<typename T>
-			void push(T &t){
-				push(&t);
+				if (_back){
+					_back->next = &node;
+				} else {
+					_front = &node;
+				}
+
+				_back = &node;
+				count++;
+				if constexpr(threadSafe) pthread_mutex_unlock(&lock);
 			}
 
-			void* front();
-			void* back();
+			void pop(){
+				PROFILE_FUNCTION();
+				
+				if constexpr(threadSafe) pthread_mutex_lock(&lock);
+				if (_front){
+					Node* node = _front;
+					_front = _front->next;
+					allocator->deallocate(*node);
+					count--;
+				}
+				if constexpr(threadSafe) pthread_mutex_unlock(&lock);
 
-			template<typename T>
+			}
+
 			T& front(){
-				return *(T*)front();
+				PROFILE_FUNCTION();
+
+				if constexpr(threadSafe) pthread_mutex_lock(&lock);
+				T& data = _front->data;
+				if constexpr(threadSafe) pthread_mutex_unlock(&lock);
+				return data;
 			}
 
-			template<typename T>
 			T& back(){
-				return *(T*)back();
+				PROFILE_FUNCTION();
+
+				if constexpr(threadSafe) pthread_mutex_lock(&lock);
+				T& data = _back->data;
+				if constexpr(threadSafe) pthread_mutex_unlock(&lock);
+
+				return data;
 			}
 
-			void clear();
+			uint32_t size() const{
+				PROFILE_FUNCTION();
+				return count;
+			}
 
-			uint32_t size();
-			bool empty();
+			bool empty() const{
+				PROFILE_FUNCTION();
+				return size() == 0;
+			}
 
-			template<typename T>
-			static uint32_t allocatorSize(){
-				return sizeof(T) + sizeof(Node);
+			void clear(){
+				PROFILE_FUNCTION();
+				if constexpr(threadSafe) pthread_mutex_lock(&lock);
+				while (!empty()){
+					pop();
+				}
+				if constexpr(threadSafe) pthread_mutex_unlock(&lock);
 			}
 
 		private:
-			Allocator* allocator = nullptr;
-			bool customAllocator = false;
+			using Node = ForwardLinkedListNode<T>;
 
-			struct Node{
-				Node* next = nullptr;
-				// data stored here
+			Node* _front = nullptr;
+			Node* _back = nullptr;
+			uint32_t count = 0;
 
-				void* get();
-			};
+			FullAllocator* allocator = nullptr;
+			bool externalAllocator = false;
 
-			Node* begin = nullptr;
-			Node* end = nullptr;
+			pthread_mutex_t lock;
 
-			uint32_t elementSize = 0;
-			uint32_t nodeCount = 0;
-
-			Allocator* createAllocator();
+			Node& allocateNode(){
+				PROFILE_FUNCTION();
+				Node &node = allocator->allocate();
+				node.next = nullptr;
+				return node;
+			}
 	};
+
 }
 
 #endif

@@ -6,27 +6,47 @@ int main(int argc, char** argv){
 	PROFILE_BEGIN_SESSION("test", "profile.json");
 	PROFILE_RECORD();
 
-	rnd::memory::ForwardLinkedList list;
-	list.init<int>();
-	
-	for (int i=0; i<50; i++){
-		list.push<int>(i);
-	}
+	RND_LOG("default allocator", "");
+	{
+		rnd::memory::ForwardLinkedList<int, rnd::memory::allocators::Allocator, true> list;
+		list.init();
+		RND_LOG("initialization", "success");
 
-	for (int i=0; i<65; i++){
-		list.pop();
-	}
+		for (int i=0; i<500; i++){
+			list.push(i);
+		}
+		RND_LOG("push", "success");
 
-	for (int i=0; i<100000; i++){
-		int a = rand() % 2;
-		if (a == 1){
-			list.push<int>(i);
-		} else {
+		for (int i=0; i<500; i++){
 			list.pop();
 		}
+		RND_LOG("pop", "success");
+
+		list.shutdown();
+		RND_LOG("shutdown", "success");
 	}
 
-	list.shutdown();
+	{
+		RND_LOG("chunk allocator", "");
+		rnd::memory::allocators::ChunkAllocator<rnd::memory::ForwardLinkedListNode<int>> allocator;
+
+		rnd::memory::ForwardLinkedList<int, rnd::memory::allocators::ChunkAllocator, true> list;
+		list.init(&allocator);
+		RND_LOG("initialization", "success");
+
+		for (int i=0; i<500; i++){
+			list.push(i);
+		}
+		RND_LOG("push", "success");
+
+		for (int i=0; i<500; i++){
+			list.pop();
+		}
+		RND_LOG("pop", "success");
+
+		list.shutdown();
+		RND_LOG("shutdown", "success");
+	}
 
 	RND_LOG("end", "end successfully");
 
