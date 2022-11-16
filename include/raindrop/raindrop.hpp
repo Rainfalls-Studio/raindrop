@@ -7,7 +7,8 @@
 #include "debug/Logger.hpp"
 
 #include "memory/memory.hpp"
-#include "memory/ChunkAllocator.hpp"
+#include "memory/allocators/Allocator.hpp"
+#include "memory/allocators/ChunkAllocator.hpp"
 #include "memory/DynamicArray.hpp"
 #include "memory/ForwardLinkedList.hpp"
 #include "memory/Stack.hpp"

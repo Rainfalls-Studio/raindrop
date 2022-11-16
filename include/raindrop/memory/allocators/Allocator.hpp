@@ -15,59 +15,41 @@
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Portions of this software are licensed under the LGPL license OpenAL Soft Copyright (C) 1991 Free Software Foundation, Inc. 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
  * 
  */
 
-#ifndef __RAINDROP_MEMORY_CHUNK_ALLOCATOR_HPP__
-#define __RAINDROP_MEMORY_CHUNK_ALLOCATOR_HPP__
+#ifndef __RAINDROP_MEMORY_ALLOCATORS_ALLOCATOR_HPP__
+#define __RAINDROP_MEMORY_ALLOCATORS_ALLOCATOR_HPP__
 
 #include "core.hpp"
-#include "Allocator.hpp"
-#include "pthread.h"
 
-namespace rnd::memory{
-	class ChunkAllocator : public Allocator{
+namespace rnd::memory::allocators{
+
+	/**
+	 * @brief default allocator
+	 * 
+	 * @tparam T 
+	 */
+	template<typename T, bool>
+	class Allocator{
 		public:
-			ChunkAllocator() : Allocator() {};
-			~ChunkAllocator() = default;
+			Allocator() = default;
+			~Allocator() = default;
 
-			void init(uint32_t dataSize, uint32_t size, uint32_t instancePerChunk = 50);
+			Allocator(Allocator &) = delete;
+			Allocator& operator=(Allocator &) = delete;
 
-			template<typename T>
-			void init(uint32_t size, uint32_t instancePerChunk = 50){
-				init(sizeof(T), size, instancePerChunk);
+			void init(){};
+			void shutdown(){};
+
+			T& allocate(){
+				return *(T*)malloc(sizeof(T));
 			}
 
-			virtual void shutdown() override;
-			virtual void* allocate() override;
-			virtual void deallocate(void* ptr) override;
-
-			void clear();
-
-		private:
-			struct Buffer{
-				Buffer* next = nullptr;
-			};
-
-			struct Chunk{
-				Chunk* next = nullptr;
-				Buffer* get();
-			};
-
-			Chunk* begin = nullptr;
-			Buffer* buffers = nullptr;
-
-			uint32_t dataSize = 0;
-			uint32_t instancePerChunk = 0;
-			pthread_mutex_t lock;
-
-			Chunk* allocateChunk();
-			void pushChunk();
-			void pushChunks(uint32_t count);
-			void pushBuffer(Buffer* buffer);
-
-			void freeChunks();
+			void deallocate(T& t){
+				free(&t);
+			}
 	};
 }
 
