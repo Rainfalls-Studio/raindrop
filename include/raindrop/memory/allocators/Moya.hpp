@@ -1,7 +1,7 @@
 #ifndef AllocatorH
 #define AllocatorH
 
-#include <memory>
+#include <core.hpp>
 
 namespace Moya {
 

@@ -22,7 +22,7 @@
 #ifndef __RAINDROP_CORE_HPP__
 #define __RAINDROP_CORE_HPP__
 
-#include <stdint.h>
+#include "pch.hpp"
 
 #define RND__FUNC__ __func__
 
@@ -41,7 +41,6 @@
 #include "memory/memory.hpp"
 #include "events/events.hpp"
 #include "debug/Logger.hpp"
-#include "pch.hpp"
 
 // macros
 
@@ -79,23 +78,22 @@
 #define rnd_min(a, b) a < b ? a : b
 
 namespace rnd{
-	namespace memory{
-		template<typename T, typename Allocator = std::allocator<T>>
-		using DynamicArray = std::vector<T>;
-		template<typename T, size_t size>
-		using Array = std::array<T, size>;
-		template<typename T, typename Allocator = std::allocator<T>>
-		using List = std::list<T, Allocator>;
-		template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<T>>
-		using HashMap = std::map<Key, T, Compare, Allocator>;
-		template<typename T, typename Compare = std::less<T>, typename Allocator = std::allocator<T>>
-		using Set = std::set<T, Compare, Allocator>;
-		template<typename T, typename Allocator = std::allocator<T>>
-		using Deque = std::deque<T, Allocator>;
-		template<typename T, typename Sequence = Deque<T>>
-		using Queue = std::queue<T, Sequence>;
-	}
-	namespace mem = memory;
+	template<typename T, typename Allocator = std::allocator<T>>
+	using DynamicArray = std::vector<T>;
+	template<typename T, size_t size>
+	using Array = std::array<T, size>;
+	template<typename T, typename Allocator = std::allocator<T>>
+	using List = std::list<T, Allocator>;
+	template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>>
+	using Map = std::map<Key, T, Compare, Allocator>;
+	template<typename T, typename Compare = std::less<T>, typename Allocator = std::allocator<T>>
+	using Set = std::set<T, Compare, Allocator>;
+	template<typename T, typename Allocator = std::allocator<T>>
+	using Deque = std::deque<T, Allocator>;
+	template<typename T, typename Sequence = Deque<T>>
+	using Queue = std::queue<T, Sequence>;
+	template<size_t growSize = 1024>
+	using Stack = memory::Stack;
 }
 
 #endif
