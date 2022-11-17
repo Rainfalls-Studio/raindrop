@@ -1,6 +1,5 @@
-
 /**
- * @brief thes file contain the data structure allocator, a critical part of the engine.
+ * @brief thes file contain the event mediator. This class handle event calls over the engine
  * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
@@ -15,42 +14,17 @@
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
-
  * 
  */
 
-#ifndef __RAINDROP_MEMORY_ALLOCATORS_ALLOCATOR_HPP__
-#define __RAINDROP_MEMORY_ALLOCATORS_ALLOCATOR_HPP__
+#ifndef __RAINDROP_EVENTS_EVENTS_MEDIATOR_HPP__
+#define __RAINDROP_EVENTS_EVENTS_MEDIATOR_HPP__
 
 #include "core.hpp"
 
-namespace rnd::memory::allocators{
-
-	/**
-	 * @brief default allocator
-	 * 
-	 * @tparam T 
-	 */
-	template<typename T, bool>
-	class Allocator{
-		public:
-			Allocator() = default;
-			~Allocator() = default;
-
-			Allocator(Allocator &) = delete;
-			Allocator& operator=(Allocator &) = delete;
-
-			void init(){};
-			void shutdown(){};
-
-			T& allocate(){
-				return *(T*)malloc(sizeof(T));
-			}
-
-			void deallocate(T& t){
-				free(&t);
-			}
-	};
+namespace rnd::events{
+	using EventID = uint32_t;
+	static constexpr EventID EVENT_NONE = (EventID)-1;
 }
 
 #endif

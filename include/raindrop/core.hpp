@@ -39,7 +39,9 @@
 #define RND_ASSERTS true
 
 #include "memory/memory.hpp"
+#include "events/events.hpp"
 #include "debug/Logger.hpp"
+#include "pch.hpp"
 
 // macros
 
@@ -77,9 +79,23 @@
 #define rnd_min(a, b) a < b ? a : b
 
 namespace rnd{
-	using EventID = uint32_t;
-
-	static constexpr EventID EVENT_NONE = (EventID)-1;
+	namespace memory{
+		template<typename T, typename Allocator = std::allocator<T>>
+		using DynamicArray = std::vector<T>;
+		template<typename T, size_t size>
+		using Array = std::array<T, size>;
+		template<typename T, typename Allocator = std::allocator<T>>
+		using List = std::list<T, Allocator>;
+		template<typename Key, typename T, typename Compare = std::less<Key>, typename Allocator = std::allocator<T>>
+		using HashMap = std::map<Key, T, Compare, Allocator>;
+		template<typename T, typename Compare = std::less<T>, typename Allocator = std::allocator<T>>
+		using Set = std::set<T, Compare, Allocator>;
+		template<typename T, typename Allocator = std::allocator<T>>
+		using Deque = std::deque<T, Allocator>;
+		template<typename T, typename Sequence = Deque<T>>
+		using Queue = std::queue<T, Sequence>;
+	}
+	namespace mem = memory;
 }
 
 #endif

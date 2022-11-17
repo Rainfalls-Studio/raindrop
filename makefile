@@ -35,6 +35,9 @@ dbgRebuild: rebuild
 rebuild: clean
 rebuild: $(DLL)
 
+pch:
+	$(CXX) -std=$(STD_VERSION) -c include/raindrop/pch.hpp -o include/raindrop/pch.pch
+
 clean:
 	@del $(OBJ)\*.o
 
