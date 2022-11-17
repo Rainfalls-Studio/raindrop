@@ -69,6 +69,13 @@ int main(int argc, char** argv){
 		RND_LOG("update", "success");
 	#endif
 
+	#if true
+		for (int i=0; i<250; i+=10){
+			eventMediator.unsubscribe(i, fnc1);
+		}
+		RND_LOG("unsubscribe", "success");
+	#endif
+
 	eventMediator.shutdown();
 	RND_LOG("shutdown", "success");
 

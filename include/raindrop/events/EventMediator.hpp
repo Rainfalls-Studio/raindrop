@@ -134,6 +134,7 @@ namespace rnd::events{
 			}
 
 			void update(){
+				PROFILE_FUNCTION();
 				auto &list = calls[currentFrame];
 				for (auto &c : list){
 					Event& event = get(c.event);
@@ -144,7 +145,37 @@ namespace rnd::events{
 				dataBuffers[currentFrame].reset();
 				currentFrame = (currentFrame + 1) % frameCount;
 			}
-			
+
+			void unsubscribe(EventID id, EventMt mt, void* instance){
+				PROFILE_FUNCTION();
+
+				Event& event = get(id);
+
+				auto it = event.subscribers.begin();
+
+				while (it != event.subscribers.end()){
+					bool found = false;
+
+					if (instance){
+						found = it->instance == instance && it->methode == mt;
+					} else {
+						found = it->funtion == (EventFn)mt;
+					}
+
+					if (found){
+						event.subscribers.erase(it);
+						break; // the subscriber is supposedly only once in the subscriber list
+					}
+
+					it++;
+				}
+			}
+
+			void unsubscribe(EventID id, EventFn fn){
+				PROFILE_FUNCTION();
+				unsubscribe(id, (EventMt)fn, nullptr);
+			}		
+
 		private:
 			void createCalls(){
 				PROFILE_FUNCTION();
@@ -204,6 +235,7 @@ namespace rnd::events{
 
 			template<typename T, typename U, typename... Args>
 			void copy(char* dst, T& t, U& u, Args&... args){
+				PROFILE_FUNCTION();
 				memory::memcpy(dst, &t, sizeof(T));
 				dst += sizeof(T);
 				copy(u, args...);
@@ -211,12 +243,14 @@ namespace rnd::events{
 
 			template<typename T>
 			void copy(char* dst, T& t){
+				PROFILE_FUNCTION();
 				memory::memcpy(dst, &t, sizeof(T));
 			}
 
 			void copy(char* dst){}
 
 			void triggerEvent(Event &event, void* data){
+				PROFILE_FUNCTION();
 				for (auto &s : event.subscribers){
 					if (s.instance){
 						if (s.methode(s.instance, data)) break;
