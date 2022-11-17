@@ -32,35 +32,12 @@ namespace rnd::events{
 			using EventFn = bool(*)(void*); // event function (the data pointer)
 			using EventMt = bool(*)(void*, void*); // event method (the instance pointer and the data pointer)
 
-			template<typename... Args>
-			class DataLayout{
-				public:
-					DataLayout(){
-						_add<Args...>();
-					}
-
-					operator uint32_t(){
-						return size;
-					}
-				
-				private:
-					template<typename T, typename U, typename... Argsb>
-					void _add(){
-						size += sizeof(T);
-						_add<U, Argsb...>();
-					}
-
-					template<typename T>
-					void _add(){
-						size += sizeof(T);
-					}
-
-					uint32_t size;
-			};
-
 			void init(uint32_t frameCount = 2){
 				PROFILE_FUNCTION();
 				this->frameCount = frameCount;
+
+				createDataBuffers();
+				createCalls();
 			}
 
 			void shutdown(){
@@ -96,7 +73,7 @@ namespace rnd::events{
 			template<typename... Args>
 			EventID registerEvent(const char* name){
 				PROFILE_FUNCTION();
-				return registerEvent(name, DataLayout<Args...>());
+				return registerEvent(name, sizeof...(Args));
 			}
 
 			EventID getEventID(const char* name){
@@ -132,6 +109,41 @@ namespace rnd::events{
 				PROFILE_FUNCTION();
 				subscribe(id, (EventMt)fn, nullptr);
 			}
+
+			template<typename... Args>
+			void trigger(EventID id, const Args&... args){
+				PROFILE_FUNCTION();
+
+				uint32_t size = get(id).dataSize;
+				RND_ASSERT(size == sizeof...(Args), "the args given are different that what the event require. Check the args and make sure you are triggering the right event");
+
+				void* ptr = allocateData(size);
+				copy((char*)ptr, args...);
+
+				Call call;
+				call.event = id;
+				call.data = ptr;
+
+				calls->push_back(call);
+			}
+
+			template<typename... Args>
+			void trigger(const char* name, const Args&... args){
+				PROFILE_FUNCTION();
+				trigger(getEventID(name), args...);
+			}
+
+			void update(){
+				auto &list = calls[currentFrame];
+				for (auto &c : list){
+					Event& event = get(c.event);
+					triggerEvent(event, c.data);
+				}
+
+				list.clear();
+				dataBuffers[currentFrame].reset();
+				currentFrame = (currentFrame + 1) % frameCount;
+			}
 			
 		private:
 			void createCalls(){
@@ -143,13 +155,17 @@ namespace rnd::events{
 			void createDataBuffers(){
 				PROFILE_FUNCTION();
 				destroyDataBuffers();
-				dataBuffers = new std::vector<char>[frameCount];
+				dataBuffers = new Stack<>[frameCount];
+
+				for (int i=0; i>frameCount; i++){
+					dataBuffers[i].init(50000); // TODO : RAI-19
+				}
 			}
 
 			void destroyCalls(){
 				PROFILE_FUNCTION();
 				if (calls){
-					delete calls;
+					delete[] calls;
 				}
 				calls = nullptr;
 			}
@@ -181,23 +197,54 @@ namespace rnd::events{
 
 			struct Event{
 				Event(const std::string& name) : name{name}{}
-				mem::List<Subscriber> subscribers{};
+				List<Subscriber> subscribers{};
 				uint32_t dataSize = 0;
 				const std::string& name;
 			};
 
+			template<typename T, typename U, typename... Args>
+			void copy(char* dst, T& t, U& u, Args&... args){
+				memory::memcpy(dst, &t, sizeof(T));
+				dst += sizeof(T);
+				copy(u, args...);
+			}
+
+			template<typename T>
+			void copy(char* dst, T& t){
+				memory::memcpy(dst, &t, sizeof(T));
+			}
+
+			void copy(char* dst){}
+
+			void triggerEvent(Event &event, void* data){
+				for (auto &s : event.subscribers){
+					if (s.instance){
+						if (s.methode(s.instance, data)) break;
+					} else {
+						if (s.funtion(data)) break;
+					}
+				}
+			}
+
 			uint32_t frameCount = 0;
-			std::unordered_map<std::string, EventID> nameToIDMap{};
-			std::vector<Event> events;
+			Map<std::string, EventID> nameToIDMap{};
+			DynamicArray<Event> events;
 			
-			mem::List<Call, CallAllocator>* calls = nullptr;
-			std::vector<char>* dataBuffers = nullptr;
+			List<Call, CallAllocator>* calls = nullptr;
+			Stack<>* dataBuffers = nullptr;
+
+			uint8_t currentFrame = 0;
+
+			void* allocateData(uint32_t size){
+				PROFILE_FUNCTION();
+				return dataBuffers[currentFrame].allocate(size);
+			}
 
 			Event& get(EventID id){
+				PROFILE_FUNCTION();
 				RND_ASSERT(id < events.size(), "event id out of range");
 				return events[id];
 			}
-
 	};
 }
 

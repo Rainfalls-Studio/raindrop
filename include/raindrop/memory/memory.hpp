@@ -44,4 +44,6 @@ namespace rnd::memory{
 	bool isMemoryLeaked();
 }
 
+#include "Stack.hpp"
+
 #endif

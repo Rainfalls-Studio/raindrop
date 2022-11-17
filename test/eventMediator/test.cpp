@@ -30,29 +30,44 @@ int main(int argc, char** argv){
 	eventMediator.init();
 	RND_LOG("initialize", "success");
 
-	for (int i=0; i<250; i++){
-		const char name[] = {(char)i, '\0'};
-		eventMediator.registerEvent<int, int>(name);
-	}
-	RND_LOG("register", "success");
+	#if true // registring test
+		for (int i=0; i<250; i++){
+			const char name[] = {(char)i, '\0'};
+			eventMediator.registerEvent(name);
+		}
+		RND_LOG("register", "success");
+	#endif
 	
-	for (int i=0; i<500; i++){
-		eventMediator.subscribe(i / 2, fnc1);
-	}
+	#if true // subscribtion test
+		for (int i=0; i<500; i++){
+			eventMediator.subscribe(i / 2, fnc1);
+		}
 
-	for (int i=0; i<250; i+=2){
-		eventMediator.subscribe(i, fnc2);
-	}
-	RND_LOG("function subscription", "success");
+		for (int i=0; i<250; i+=2){
+			eventMediator.subscribe(i, fnc2);
+		}
+		RND_LOG("function subscription", "success");
 
-	for (int i=0; i<100; i++){
-		eventMediator.subscribe(i, mtd1, &i);
-	}
+		for (int i=0; i<100; i++){
+			eventMediator.subscribe(i, mtd1, &i);
+		}
 
-	for (int i=0; i<50; i++){
-		eventMediator.subscribe(i, mtd2, &i);
-	}
-	RND_LOG("methode subscription", "success");
+		for (int i=0; i<50; i++){
+			eventMediator.subscribe(i, mtd2, &i);
+		}
+		RND_LOG("methode subscription", "success");
+	#endif
+
+	#if true // trigger and update
+		for (int i=0; i<50; i++){
+
+			eventMediator.trigger(i);
+		}
+		RND_LOG("trigger", "success");
+
+		eventMediator.update();
+		RND_LOG("update", "success");
+	#endif
 
 	eventMediator.shutdown();
 	RND_LOG("shutdown", "success");
