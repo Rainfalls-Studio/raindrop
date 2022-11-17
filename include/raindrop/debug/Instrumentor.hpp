@@ -26,14 +26,6 @@
 
 #include "core.hpp"
 
-#include <string>
-#include <chrono>
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <thread>
-#include <mutex>
-
 namespace rnd::debug{
 	struct ProfileResult{
 		std::string Name;
