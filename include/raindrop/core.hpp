@@ -95,6 +95,8 @@ namespace rnd{
 	using Queue = std::queue<T, Sequence>;
 	template<size_t growSize = 1024>
 	using Stack = memory::Stack;
+	template<typename T, typename Container = DynamicArray<T>, typename Compare = std::less<typename Container::value_type>>
+	using PriorityQueue = std::priority_queue<T, Container, Compare>;
 
 	using Thread = std::thread;
 	using Mutex = std::mutex;
