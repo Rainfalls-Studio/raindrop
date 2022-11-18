@@ -41,6 +41,7 @@
 #include "memory/memory.hpp"
 #include "events/events.hpp"
 #include "debug/Logger.hpp"
+#include "thread/Barrier.hpp"
 
 // macros
 
@@ -94,6 +95,12 @@ namespace rnd{
 	using Queue = std::queue<T, Sequence>;
 	template<size_t growSize = 1024>
 	using Stack = memory::Stack;
+
+	using Thread = std::thread;
+	using Mutex = std::mutex;
+	using Barrier = thread::Barrier;
+	using ConditionVariable = std::condition_variable;
+
 }
 
 #endif
