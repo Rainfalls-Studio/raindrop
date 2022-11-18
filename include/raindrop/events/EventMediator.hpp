@@ -135,14 +135,19 @@ namespace rnd::events{
 
 			void update(){
 				PROFILE_FUNCTION();
-				auto &list = calls[currentFrame];
+				uint32_t frame = (currentFrame + 1) % frameCount;
+
+				auto &list = calls[frame];
 				for (auto &c : list){
 					Event& event = get(c.event);
 					triggerEvent(event, c.data);
 				}
 
 				list.clear();
-				dataBuffers[currentFrame].reset();
+				dataBuffers[frame].reset();
+			}
+
+			void nextFrame(){
 				currentFrame = (currentFrame + 1) % frameCount;
 			}
 

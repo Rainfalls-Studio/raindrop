@@ -20,6 +20,16 @@ bool mtd2(void* instance, void* ptr){
 	return false;
 }
 
+void threadFnc(rnd::events::Mediator* mediator, rnd::Barrier* barrier){
+
+	for (int i=0; i<150; i++){
+		mediator->trigger(i);
+
+		barrier->wait(); // frame update
+		barrier->wait(); // loop restart
+	}
+}
+
 int main(int argc, char** argv){
 
 	RND_LOG_INIT("out.log");
@@ -69,7 +79,25 @@ int main(int argc, char** argv){
 		RND_LOG("update", "success");
 	#endif
 
-	#if true
+	#if true // multithreading test
+
+		rnd::Barrier barrier(2);
+		rnd::Thread thread(&threadFnc, &eventMediator, &barrier);
+
+		for (int i=0; i<150; i++){
+			eventMediator.update();
+
+			barrier.wait();
+			eventMediator.nextFrame();
+			barrier.wait();
+		}
+		
+		thread.join();
+
+		RND_LOG("multithreading", "success");
+	#endif
+
+	#if true // unsubscribing
 		for (int i=0; i<250; i+=10){
 			eventMediator.unsubscribe(i, fnc1);
 		}
