@@ -37,7 +37,7 @@ int main(int argc, char** argv){
 	PROFILE_RECORD();
 
 	rnd::events::Mediator eventMediator;
-	eventMediator.init();
+	eventMediator.init(2, 2);
 	RND_LOG("initialize", "success");
 
 	#if true // registring test
@@ -85,7 +85,8 @@ int main(int argc, char** argv){
 		rnd::Thread thread(&threadFnc, &eventMediator, &barrier);
 
 		for (int i=0; i<150; i++){
-			eventMediator.update();
+			eventMediator.update(0);
+			eventMediator.update(1);
 
 			barrier.wait();
 			eventMediator.nextFrame();

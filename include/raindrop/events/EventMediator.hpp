@@ -32,9 +32,10 @@ namespace rnd::events{
 			using EventFn = bool(*)(void*); // event function (the data pointer)
 			using EventMt = bool(*)(void*, void*); // event method (the instance pointer and the data pointer)
 
-			void init(uint32_t frameCount = 2){
+			void init(uint32_t frameCount = 2, uint32_t layerCount = 1){
 				PROFILE_FUNCTION();
 				this->frameCount = frameCount;
+				this->layerCount = layerCount;
 
 				createDataBuffers();
 				createCalls();
@@ -124,7 +125,9 @@ namespace rnd::events{
 				call.event = id;
 				call.data = ptr;
 
-				calls->push_back(call);
+				for (int i=0; i<layerCount; i++){
+					calls[i][currentFrame].push_back(call);
+				}
 			}
 
 			template<typename... Args>
@@ -133,11 +136,11 @@ namespace rnd::events{
 				trigger(getEventID(name), args...);
 			}
 
-			void update(){
+			void update(uint32_t layerID = 0){
 				PROFILE_FUNCTION();
 				uint32_t frame = (currentFrame + 1) % frameCount;
 
-				auto &list = calls[frame];
+				auto &list = calls[layerID][frame];
 				for (auto &c : list){
 					Event& event = get(c.event);
 					triggerEvent(event, c.data);
@@ -185,7 +188,10 @@ namespace rnd::events{
 			void createCalls(){
 				PROFILE_FUNCTION();
 				destroyCalls();
-				calls = new std::list<Call, CallAllocator>[frameCount];
+				calls = new std::list<Call, CallAllocator>*[layerCount];
+				for (int i=0; i<layerCount; i++){
+					calls[i] = new std::list<Call, CallAllocator>[frameCount];
+				}
 			}
 
 			void createDataBuffers(){
@@ -201,6 +207,9 @@ namespace rnd::events{
 			void destroyCalls(){
 				PROFILE_FUNCTION();
 				if (calls){
+					for (int i=0; i<layerCount; i++){
+						delete[] calls[i];
+					}
 					delete[] calls;
 				}
 				calls = nullptr;
@@ -266,10 +275,11 @@ namespace rnd::events{
 			}
 
 			uint32_t frameCount = 0;
+			uint32_t layerCount = 0;
 			Map<std::string, EventID> nameToIDMap{};
 			DynamicArray<Event> events;
 			
-			List<Call, CallAllocator>* calls = nullptr;
+			List<Call, CallAllocator>** calls = nullptr;
 			Stack<>* dataBuffers = nullptr;
 
 			uint8_t currentFrame = 0;
