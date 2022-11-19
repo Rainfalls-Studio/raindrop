@@ -9,7 +9,6 @@ namespace rnd::layers{
 	void LayerStack::shutdown(){
 		PROFILE_FUNCTION();
 		clear();
-
 	}
 
 	void LayerStack::clear(){
@@ -20,5 +19,6 @@ namespace rnd::layers{
 			memory::free(l.layer);
 		}
 		layers.clear();
+		nextID=0;
 	}
 }
