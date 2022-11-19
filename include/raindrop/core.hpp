@@ -39,8 +39,10 @@
 #define RND_ASSERTS true
 
 #include "memory/memory.hpp"
+#include "memory/Stack.hpp"
 #include "events/events.hpp"
 #include "debug/Logger.hpp"
+#include "debug/Instrumentor.hpp"
 #include "thread/Barrier.hpp"
 
 // macros

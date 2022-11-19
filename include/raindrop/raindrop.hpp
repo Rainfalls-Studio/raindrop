@@ -11,4 +11,6 @@
 
 #include "events/EventMediator.hpp"
 
+#include "layers/LayerStack.hpp"
+
 #endif
