@@ -1,5 +1,5 @@
-#include "memory/Stack.hpp"
 #include "debug/Instrumentor.hpp"
+#include "memory/Stack.hpp"
 
 namespace rnd::memory{
 	void Stack::init(uint32_t size){
