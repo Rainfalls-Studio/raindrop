@@ -44,6 +44,9 @@ namespace rnd::layers{
 				T* layer = (T*)memory::malloc(sizeof(T));
 				new (layer) T(args...);
 
+				layer->uid = nextID;
+				nextID++;
+
 				node.layer = (Layer*)layer;
 				node.priority = priority;
 
@@ -57,8 +60,10 @@ namespace rnd::layers{
 			struct LayerNode{
 				Layer* layer;
 				float priority = 1.f;
-			};,kln
-*
+			};
+
+			LUID nextID = 0;
+
 			friend bool operator<(const LayerNode& a, const LayerNode& b);
 			friend bool operator>(const LayerNode& a, const LayerNode& b);
 
