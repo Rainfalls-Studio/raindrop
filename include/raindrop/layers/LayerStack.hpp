@@ -57,8 +57,8 @@ namespace rnd::layers{
 			struct LayerNode{
 				Layer* layer;
 				float priority = 1.f;
-			};
-
+			};,kln
+*
 			friend bool operator<(const LayerNode& a, const LayerNode& b);
 			friend bool operator>(const LayerNode& a, const LayerNode& b);
 
