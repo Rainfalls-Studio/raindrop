@@ -109,6 +109,7 @@ namespace rnd{
 	using Barrier = thread::Barrier;
 	using ConditionVariable = std::condition_variable;
 
+	using Extent = glm::u32vec2;
 }
 
 #endif
