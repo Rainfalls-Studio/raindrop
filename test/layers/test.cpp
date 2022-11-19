@@ -28,6 +28,8 @@ int main(int argc, char** argv){
 		layerStack.pushLayer<Layer1>(i, i);
 	}
 
+	layerStack.shutdown();
+
 	RND_LOG("shutdown", "success");
 
 	PROFILE_END_SESSION();

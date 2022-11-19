@@ -23,9 +23,14 @@
 #include "core.hpp"
 
 namespace rnd::layers{
+	using LUID = uint16_t;
 	class Layer{
+		friend class LayerStack;
 		public:
 			virtual ~Layer() = default;
+		
+		protected:
+			LUID uid;
 	};
 }
 
