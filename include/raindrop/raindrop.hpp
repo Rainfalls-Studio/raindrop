@@ -10,6 +10,7 @@
 #include "memory/Stack.hpp"
 
 #include "events/EventMediator.hpp"
+#include "events/defaultEvents.hpp"
 
 #include "layers/LayerStack.hpp"
 
