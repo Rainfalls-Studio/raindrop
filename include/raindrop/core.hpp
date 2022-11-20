@@ -41,6 +41,7 @@
 #include "memory/memory.hpp"
 #include "memory/Stack.hpp"
 #include "events/events.hpp"
+#include "events/keys.hpp"
 #include "debug/Logger.hpp"
 #include "debug/Instrumentor.hpp"
 #include "thread/Barrier.hpp"
@@ -109,6 +110,7 @@ namespace rnd{
 	using Barrier = thread::Barrier;
 	using ConditionVariable = std::condition_variable;
 
+	using Extent = glm::u32vec2;
 }
 
 #endif
