@@ -1,6 +1,6 @@
 # Raindrop
 
-
+* [Linear](https://linear.app/rainfalls-studios/project/raindrop-9ac0fc621b17) (roadmap and TODO list)
 
 ## Features
 
@@ -13,3 +13,4 @@
 * [ImGui](https://github.com/ocornut/imgui) (MIT)
 * [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) (MIT)
 * [yaml-cpp](https://github.com/jbeder/yaml-cpp) (MIT)
+* [Moya-lang/Allocator](https://github.com/moya-lang/Allocator) (BSD-2-Clause license)
