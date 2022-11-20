@@ -5,7 +5,7 @@
 namespace rnd::window{
 	Window* Window::create(API api){
 		switch (api){
-			case API::SDL2: new SDL2_Window();
+			case API::SDL2: return new SDL2_Window();
 			// case API::GLWF:
 		}
 		RND_ASSERT(false, "unknown window API");

@@ -3,7 +3,7 @@
 namespace rnd::events::defaults{
 	
 	static EventID IDs[COUNT];
-
+	
 	void init(Mediator &mediator){
 		PROFILE_FUNCTION();
 		IDs[QUIT] = mediator.registerEvent(getName(QUIT));
@@ -54,14 +54,15 @@ namespace rnd::events::defaults{
 		IDs[CONTROLLER_BUTTON_UP] = mediator.registerEvent<ControllerButtonUpEventData>(getName(CONTROLLER_BUTTON_UP));
 		IDs[CONTROLLER_DEVICE_ADDED] = mediator.registerEvent<ControllerDeviceAddedEventData>(getName(CONTROLLER_DEVICE_ADDED));
 		IDs[CONTROLLER_DEVICE_REMOVED] = mediator.registerEvent<ControllerDeviceRemovedEventData>(getName(CONTROLLER_DEVICE_REMOVED));
-		IDs[CONTROLLER_DEVICE_REMAPED] = mediator.registerEvent<ControllerDeviceRemappedEventData>(getName(CONTROLLER_DEVICE_REMAPED));
+		IDs[CONTROLLER_DEVICE_REMAPPED] = mediator.registerEvent<ControllerDeviceRemappedEventData>(getName(CONTROLLER_DEVICE_REMAPPED));
 		IDs[CONTROLLER_TOUCHPAD_DOWN] = mediator.registerEvent<ControllerTouchpadDownEventData>(getName(CONTROLLER_TOUCHPAD_DOWN));
 		IDs[CONTROLLER_TOUCHPAD_UP] = mediator.registerEvent<ControllerTouchpadUpEventData>(getName(CONTROLLER_TOUCHPAD_UP));
 		IDs[CONTROLLER_TOUCHPAD_MOTION] = mediator.registerEvent<ControllerTouchpadMotionEventData>(getName(CONTROLLER_TOUCHPAD_MOTION));
 		IDs[FINGER_DOWN] = mediator.registerEvent<FingerDownEventData>(getName(FINGER_DOWN));
 		IDs[FINGER_UP] = mediator.registerEvent<FingerUpEventData>(getName(FINGER_UP));
 		IDs[FINGER_MOTION] = mediator.registerEvent<FingerMotionEventData>(getName(FINGER_MOTION));
-		IDs[DOLLAR_GERSTURE] = mediator.registerEvent<DollarGestureEvent>(getName(DOLLAR_GERSTURE));
+		IDs[DOLLAR_GERSTURE] = mediator.registerEvent<DollarGestureEventData>(getName(DOLLAR_GERSTURE));
+		IDs[DOLLAR_RECORD] = mediator.registerEvent<DollarGestureEventData>(getName(DOLLAR_GERSTURE));
 		IDs[MULTI_GESTURE] = mediator.registerEvent<MultiGestureEventData>(getName(MULTI_GESTURE));
 		IDs[CLIPBOARD_UPDATE] = mediator.registerEvent(getName(CLIPBOARD_UPDATE)); // TODO: RAI-61
 		IDs[DROP_FILE] = mediator.registerEvent<DropFileEventData>(getName(DROP_FILE));
@@ -129,7 +130,7 @@ namespace rnd::events::defaults{
 			case CONTROLLER_BUTTON_UP: return "Controller Button Up";
 			case CONTROLLER_DEVICE_ADDED: return "Controller Device Added";
 			case CONTROLLER_DEVICE_REMOVED: return "Controller Device Removed";
-			case CONTROLLER_DEVICE_REMAPED: return "Controller Device Remaped";
+			case CONTROLLER_DEVICE_REMAPPED: return "Controller Device Remaped";
 			case CONTROLLER_TOUCHPAD_DOWN: return "Controller Touchpad Down";
 			case CONTROLLER_TOUCHPAD_UP: return "Controller Touchpad Up";
 			case CONTROLLER_TOUCHPAD_MOTION: return "Controller Touchpad Motion";

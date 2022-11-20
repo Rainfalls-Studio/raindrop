@@ -125,9 +125,7 @@ namespace rnd::events{
 				call.event = id;
 				call.data = ptr;
 
-				for (int i=0; i<layerCount; i++){
-					calls[i][currentFrame].push_back(call);
-				}
+				calls[currentFrame].push_back(call);
 			}
 
 			template<typename... Args>
@@ -140,18 +138,18 @@ namespace rnd::events{
 				PROFILE_FUNCTION();
 				uint32_t frame = (currentFrame + 1) % frameCount;
 
-				auto &list = calls[layerID][frame];
+				auto &list = calls[frame];
 				for (auto &c : list){
 					Event& event = get(c.event);
 					triggerEvent(event, c.data);
 				}
 
-				list.clear();
 				dataBuffers[frame].reset();
 			}
 
 			void nextFrame(){
 				currentFrame = (currentFrame + 1) % frameCount;
+				calls[currentFrame].clear();
 			}
 
 			void unsubscribe(EventID id, EventMt mt, void* instance){
@@ -188,10 +186,7 @@ namespace rnd::events{
 			void createCalls(){
 				PROFILE_FUNCTION();
 				destroyCalls();
-				calls = new std::list<Call, CallAllocator>*[layerCount];
-				for (int i=0; i<layerCount; i++){
-					calls[i] = new std::list<Call, CallAllocator>[frameCount];
-				}
+				calls = new std::list<Call, CallAllocator>[frameCount];
 			}
 
 			void createDataBuffers(){
@@ -199,7 +194,7 @@ namespace rnd::events{
 				destroyDataBuffers();
 				dataBuffers = new Stack<>[frameCount];
 
-				for (int i=0; i>frameCount; i++){
+				for (int i=0; i<frameCount; i++){
 					dataBuffers[i].init(50000); // TODO : RAI-19
 				}
 			}
@@ -207,9 +202,6 @@ namespace rnd::events{
 			void destroyCalls(){
 				PROFILE_FUNCTION();
 				if (calls){
-					for (int i=0; i<layerCount; i++){
-						delete[] calls[i];
-					}
 					delete[] calls;
 				}
 				calls = nullptr;
@@ -252,7 +244,7 @@ namespace rnd::events{
 				PROFILE_FUNCTION();
 				memory::memcpy(dst, &t, sizeof(T));
 				dst += sizeof(T);
-				copy(u, args...);
+				copy(dst, u, args...);
 			}
 
 			template<typename T>
@@ -267,7 +259,7 @@ namespace rnd::events{
 				PROFILE_FUNCTION();
 				for (auto &s : event.subscribers){
 					if (s.instance){
-						if (s.methode(s.instance, data)) break;
+						if (s.methode(data, s.instance)) break;
 					} else {
 						if (s.funtion(data)) break;
 					}
@@ -279,7 +271,7 @@ namespace rnd::events{
 			Map<std::string, EventID> nameToIDMap{};
 			DynamicArray<Event> events;
 			
-			List<Call, CallAllocator>** calls = nullptr;
+			List<Call, CallAllocator>* calls = nullptr;
 			Stack<>* dataBuffers = nullptr;
 
 			uint8_t currentFrame = 0;
