@@ -64,6 +64,7 @@ namespace rnd::events{
 			WINDOW_FOCUS_LOST,
 			WINDOW_CLOSE,
 			WINDOW_TAKE_FOCUS,
+			WINDOW_HIT_TEST,
 			WINDOW_DISPLAY_CHANGED,
 			KEY_DOWN,
 			KEY_UP,
@@ -86,7 +87,7 @@ namespace rnd::events{
 			CONTROLLER_BUTTON_UP,
 			CONTROLLER_DEVICE_ADDED,
 			CONTROLLER_DEVICE_REMOVED,
-			CONTROLLER_DEVICE_REMAPED,
+			CONTROLLER_DEVICE_REMAPPED,
 			CONTROLLER_TOUCHPAD_DOWN,
 			CONTROLLER_TOUCHPAD_UP,
 			CONTROLLER_TOUCHPAD_MOTION,
@@ -133,6 +134,7 @@ namespace rnd::events{
 		using WindowFocusLostEventData = WindowShownEventData;
 		using WindowCloseEventData = WindowShownEventData;
 		using WindowTakeFocusEventData = WindowShownEventData;
+		using WindowHitTestEventData = WindowShownEventData;
 
 		struct WindowResizedEventData{
 			const window::Window* window;
@@ -141,7 +143,7 @@ namespace rnd::events{
 		using WindowSizeChangedEventData = WindowResizedEventData;
 
 		struct WindowDisplayChangedEventData{
-			window::Window& window;
+			const window::Window* window;
 			uint32_t displayID;
 		};
 
@@ -288,19 +290,20 @@ namespace rnd::events{
 		struct FingerDownEventData{
 			const window::Window* window;
 			// const event::Finger* finger; // TODO: RAI-55
-			glm::i32vec2 pos;
+			glm::vec2 pos;
 			float pressure;
 		};
 
 		struct FingerUpEventData{
 			const window::Window* window;
 			// const event::Finger* finger; // TODO: RAI-55
+			glm::vec2 pos;
 		};
 
 		struct FingerMotionEventData{
 			const window::Window* window;
 			// const event::Finger* finger; // TODO: RAI-55
-			glm::i32vec2 pos;
+			glm::vec2 pos;
 			float pressure;
 		};
 
@@ -308,7 +311,11 @@ namespace rnd::events{
 			// TODO
 		};
 
-		struct DollarGestureEvent{
+		struct DollarGestureEventData{
+			// TODO
+		};
+
+		struct DollarRecordEventData{
 			// TODO
 		};
 

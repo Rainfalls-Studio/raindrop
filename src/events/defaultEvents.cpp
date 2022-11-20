@@ -31,6 +31,7 @@ namespace rnd::events::defaults{
 		IDs[WINDOW_FOCUS_LOST] = mediator.registerEvent<WindowFocusLostEventData>(getName(WINDOW_FOCUS_LOST));
 		IDs[WINDOW_CLOSE] = mediator.registerEvent<WindowCloseEventData>(getName(WINDOW_CLOSE));
 		IDs[WINDOW_TAKE_FOCUS] = mediator.registerEvent<WindowTakeFocusEventData>(getName(WINDOW_TAKE_FOCUS));
+		IDs[WINDOW_HIT_TEST] = mediator.registerEvent<WindowHitTestEventData>(getName(WINDOW_HIT_TEST));
 		IDs[WINDOW_DISPLAY_CHANGED] = mediator.registerEvent<WindowDisplayChangedEventData>(getName(WINDOW_DISPLAY_CHANGED));
 		IDs[KEY_DOWN] = mediator.registerEvent<KeyDownEventData>(getName(KEY_DOWN));
 		IDs[KEY_UP] = mediator.registerEvent<KeyUpEventData>(getName(KEY_UP));
@@ -105,6 +106,7 @@ namespace rnd::events::defaults{
 			case WINDOW_FOCUS_LOST: return "Window Focus Lost";
 			case WINDOW_CLOSE: return "Window Close";
 			case WINDOW_TAKE_FOCUS: return "Window Take Focus";
+			case WINDOW_HIT_TEST: return "Window Hit Test";
 			case WINDOW_DISPLAY_CHANGED: return "Window Display Changed";
 			case KEY_DOWN: return "Key Down";
 			case KEY_UP: return "Key Up";
