@@ -39,8 +39,11 @@
 #define RND_ASSERTS true
 
 #include "memory/memory.hpp"
+#include "memory/Stack.hpp"
 #include "events/events.hpp"
+#include "events/keys.hpp"
 #include "debug/Logger.hpp"
+#include "debug/Instrumentor.hpp"
 #include "thread/Barrier.hpp"
 
 // macros
@@ -95,12 +98,19 @@ namespace rnd{
 	using Queue = std::queue<T, Sequence>;
 	template<size_t growSize = 1024>
 	using Stack = memory::Stack;
+	template<typename T, typename Container = DynamicArray<T>, typename Compare = std::less<typename Container::value_type>>
+	using PriorityQueue = std::priority_queue<T, Container, Compare>;
+	template<typename Key, typename T,typename Hash = std::hash<T>, typename Compare = std::less<Key>, typename Allocator = std::allocator<std::pair<const Key, T>>>
+	using UnorderedMap = std::unordered_map<Key, T, Hash, Compare, Allocator>;
+	template<typename T, typename Hash = std::hash<T>, typename Compare = std::equal_to<T>, typename Allocator = std::allocator<T>>
+	using UnorderedSet = std::unordered_set<T, Hash, Compare, Allocator>;
 
 	using Thread = std::thread;
 	using Mutex = std::mutex;
 	using Barrier = thread::Barrier;
 	using ConditionVariable = std::condition_variable;
 
+	using Extent = glm::u32vec2;
 }
 
 #endif
