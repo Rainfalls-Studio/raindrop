@@ -199,27 +199,355 @@ namespace rnd::window{
 		return SDL_GetWindowFlags(handle) & SDL_WINDOW_UTILITY;
 	}
 
+
+	void onQuitEvent(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		mediator.trigger("Quit");
+	}
+
+	void onAppTermining(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		mediator.trigger("App Termining");
+	}
+
+	void onAppLowMemory(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		mediator.trigger("App Low Memory");
+	}
+
+	void onAppWillEnterBackground(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		mediator.trigger("App Will Enter Background");
+	}
+
+	void onAppDidEnterBackground(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		mediator.trigger("App Did Enter Background");
+	}
+
+	void onAppWillEnterForground(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		mediator.trigger("App Will Enter Forground");	
+	}
+
+	void onAppDidEnterForground(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		mediator.trigger("App Did Enter Forground");
+	}
+
+	void onLocalChanged(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		mediator.trigger("Local Changed");
+	}
+
+	void onDisplayOrientation(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onDisplayConnected(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+
+	}
+
+	void onDisplayDisconnected(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+
+	}
+
+	void onDisplayEvent(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		switch (event.display.event){
+			case SDL_DISPLAYEVENT_ORIENTATION: onDisplayOrientation(event, mediator); break;
+			case SDL_DISPLAYEVENT_CONNECTED: onDisplayConnected(event, mediator); break;
+			case SDL_DISPLAYEVENT_DISCONNECTED: onDisplayDisconnected(event, mediator); break;
+		}
+	}
+
+	void onWindowShown(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowHidden(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowExposed(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowResized(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowSizeChanged(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowMinimized(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowMaximized(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowRestored(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowEnter(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowLeave(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowFocusGained(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowFocusLost(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowClose(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowTakeFocus(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowHitTest(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
+	void onWindowDisplayChanged(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+	}
+
 	void onWindowEvent(SDL_Event &event, events::Mediator& mediator){
 		PROFILE_FUNCTION();
 
 		switch (event.window.event){
-			case SDL_WINDOWEVENT_SHOWN: break;
-			case SDL_WINDOWEVENT_HIDDEN: break;
-			case SDL_WINDOWEVENT_EXPOSED: break;
-			case SDL_WINDOWEVENT_RESIZED: break;
-			case SDL_WINDOWEVENT_SIZE_CHANGED: break;
-			case SDL_WINDOWEVENT_MINIMIZED: break;
-			case SDL_WINDOWEVENT_MAXIMIZED: break;
-			case SDL_WINDOWEVENT_RESTORED: break;
-			case SDL_WINDOWEVENT_ENTER: break;
-			case SDL_WINDOWEVENT_LEAVE: break;
-			case SDL_WINDOWEVENT_FOCUS_GAINED: break;
-			case SDL_WINDOWEVENT_FOCUS_LOST: break;
-			case SDL_WINDOWEVENT_CLOSE: break;
-			case SDL_WINDOWEVENT_TAKE_FOCUS: break;
-			case SDL_WINDOWEVENT_HIT_TEST: break;
-			case SDL_WINDOWEVENT_DISPLAY_CHANGED: break;
+			case SDL_WINDOWEVENT_SHOWN: onWindowShown(event, mediator); break;
+			case SDL_WINDOWEVENT_HIDDEN: onWindowHidden(event, mediator); break;
+			case SDL_WINDOWEVENT_EXPOSED: onWindowExposed(event, mediator); break;
+			case SDL_WINDOWEVENT_RESIZED: onWindowResized(event, mediator); break;
+			case SDL_WINDOWEVENT_SIZE_CHANGED: onWindowSizeChanged(event, mediator); break;
+			case SDL_WINDOWEVENT_MINIMIZED: onWindowMinimized(event, mediator); break;
+			case SDL_WINDOWEVENT_MAXIMIZED: onWindowMaximized(event, mediator); break;
+			case SDL_WINDOWEVENT_RESTORED: onWindowRestored(event, mediator); break;
+			case SDL_WINDOWEVENT_ENTER: onWindowEnter(event, mediator); break;
+			case SDL_WINDOWEVENT_LEAVE: onWindowLeave(event, mediator); break;
+			case SDL_WINDOWEVENT_FOCUS_GAINED: onWindowFocusGained(event, mediator); break;
+			case SDL_WINDOWEVENT_FOCUS_LOST: onWindowFocusLost(event, mediator); break;
+			case SDL_WINDOWEVENT_CLOSE: onWindowClose(event, mediator); break;
+			case SDL_WINDOWEVENT_TAKE_FOCUS: onWindowTakeFocus(event, mediator); break;
+			case SDL_WINDOWEVENT_HIT_TEST: onWindowHitTest(event, mediator); break;
+			case SDL_WINDOWEVENT_DISPLAY_CHANGED: onWindowDisplayChanged(event, mediator); break;
 		}
+	}
+
+	void onKeyDown(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onKeyUp(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onTextEditing(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onTextInput(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onKeyMapChanged(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onMouseMotion(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onMouseButtonDown(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onMouseButtonUp(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onMouseWheel(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onJoystickAxisMotion(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onJoystickBallMotion(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onJoystickHatMotion(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onJoystickButtonDown(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onJoystickButtonUp(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onJoystickDeviceAdded(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onJoystickDeviceRemoved(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerAxisMotion(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerButtonDown(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerButtonUp(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerDeviceAdded(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerDeviceRemoved(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerDeviceRemaped(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerTouchpadDown(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerTouchpadUp(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerTouchpadMotion(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onControllerSensorUpdate(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onFingerDown(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onFingerUp(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onFingerMotion(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onDollarGersture(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onDollarRecord(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onMultiGesture(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onClipboardUpdate(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onDropFile(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onDropText(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onDropBegin(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onDropComplete(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onAudioDeviceAdded(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onAudioDeviceRemoved(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
+	}
+
+	void onSensorUpdate(SDL_Event &event, events::Mediator& mediator){
+		PROFILE_FUNCTION();
+		
 	}
 
 	void SDL2_Window::event(events::Mediator& mediator){
@@ -228,57 +556,56 @@ namespace rnd::window{
 		SDL_Event event;
 		while (SDL_PollEvent(&event)){
 			switch (event.type){
-				case SDL_QUIT: break;
-				case SDL_APP_TERMINATING: break;
-				case SDL_APP_LOWMEMORY: break;
-				case SDL_APP_WILLENTERBACKGROUND: break;
-				case SDL_APP_DIDENTERBACKGROUND: break;
-				case SDL_APP_WILLENTERFOREGROUND: break;
-				case SDL_APP_DIDENTERFOREGROUND: break;
-				case SDL_LOCALECHANGED: break;
-				case SDL_DISPLAYEVENT: break;
+				case SDL_QUIT: onQuitEvent(event, mediator); break;
+				case SDL_APP_TERMINATING: onAppTermining(event, mediator); break;
+				case SDL_APP_LOWMEMORY: onAppLowMemory(event, mediator); break;
+				case SDL_APP_WILLENTERBACKGROUND: onAppWillEnterBackground(event, mediator); break;
+				case SDL_APP_DIDENTERBACKGROUND: onAppDidEnterBackground(event, mediator); break;
+				case SDL_APP_WILLENTERFOREGROUND: onAppWillEnterForground(event, mediator); break;
+				case SDL_APP_DIDENTERFOREGROUND: onAppDidEnterForground(event, mediator); break;
+				case SDL_LOCALECHANGED: onLocalChanged(event, mediator); break;
+				case SDL_DISPLAYEVENT: onDisplayEvent(event, mediator); break;
 				case SDL_WINDOWEVENT: onWindowEvent(event, mediator); break;
-				case SDL_SYSWMEVENT: break;
-				case SDL_KEYDOWN: break;
-				case SDL_KEYUP: break;
-				case SDL_TEXTEDITING: break;
-				case SDL_TEXTINPUT: break;
-				case SDL_KEYMAPCHANGED: break;
-				case SDL_MOUSEMOTION: break;
-				case SDL_MOUSEBUTTONDOWN: break;
-				case SDL_MOUSEBUTTONUP: break;
-				case SDL_MOUSEWHEEL: break;
-				case SDL_JOYAXISMOTION: break;
-				case SDL_JOYBALLMOTION: break;
-				case SDL_JOYHATMOTION: break;
-				case SDL_JOYBUTTONDOWN: break;
-				case SDL_JOYBUTTONUP: break;
-				case SDL_JOYDEVICEADDED: break;
-				case SDL_JOYDEVICEREMOVED: break;
-				case SDL_CONTROLLERAXISMOTION: break;
-				case SDL_CONTROLLERBUTTONDOWN: break;
-				case SDL_CONTROLLERBUTTONUP: break;
-				case SDL_CONTROLLERDEVICEADDED: break;
-				case SDL_CONTROLLERDEVICEREMOVED: break;
-				case SDL_CONTROLLERDEVICEREMAPPED: break;
-				case SDL_CONTROLLERTOUCHPADDOWN: break;
-				case SDL_CONTROLLERTOUCHPADMOTION: break;
-				case SDL_CONTROLLERTOUCHPADUP: break;
-				case SDL_CONTROLLERSENSORUPDATE: break;
-				case SDL_FINGERDOWN: break;
-				case SDL_FINGERUP: break;
-				case SDL_FINGERMOTION: break;
-				case SDL_DOLLARGESTURE: break;
-				case SDL_DOLLARRECORD: break;
-				case SDL_MULTIGESTURE: break;
-				case SDL_CLIPBOARDUPDATE: break;
-				case SDL_DROPFILE: break;
-				case SDL_DROPTEXT: break;
-				case SDL_DROPBEGIN: break;
-				case SDL_DROPCOMPLETE: break;
-				case SDL_AUDIODEVICEADDED: break;
-				case SDL_AUDIODEVICEREMOVED: break;
-				case SDL_SENSORUPDATE: break;
+				case SDL_KEYDOWN: onKeyDown(event, mediator); break;
+				case SDL_KEYUP: onKeyUp(event, mediator); break;
+				case SDL_TEXTEDITING: onTextEditing(event, mediator); break;
+				case SDL_TEXTINPUT: onTextInput(event, mediator); break;
+				case SDL_KEYMAPCHANGED: onKeyMapChanged(event, mediator); break;
+				case SDL_MOUSEMOTION: onMouseMotion(event, mediator); break;
+				case SDL_MOUSEBUTTONDOWN: onMouseButtonDown(event, mediator); break;
+				case SDL_MOUSEBUTTONUP: onMouseButtonUp(event, mediator); break;
+				case SDL_MOUSEWHEEL: onMouseWheel(event, mediator); break;
+				case SDL_JOYAXISMOTION: onJoystickAxisMotion(event, mediator); break;
+				case SDL_JOYBALLMOTION: onJoystickBallMotion(event, mediator); break;
+				case SDL_JOYHATMOTION: onJoystickHatMotion(event, mediator); break;
+				case SDL_JOYBUTTONDOWN: onJoystickButtonDown(event, mediator); break;
+				case SDL_JOYBUTTONUP: onJoystickButtonUp(event, mediator); break;
+				case SDL_JOYDEVICEADDED: onJoystickDeviceAdded(event, mediator); break;
+				case SDL_JOYDEVICEREMOVED: onJoystickDeviceRemoved(event, mediator); break;
+				case SDL_CONTROLLERAXISMOTION: onControllerAxisMotion(event, mediator); break;
+				case SDL_CONTROLLERBUTTONDOWN: onControllerButtonDown(event, mediator); break;
+				case SDL_CONTROLLERBUTTONUP: onControllerButtonUp(event, mediator); break;
+				case SDL_CONTROLLERDEVICEADDED: onControllerDeviceAdded(event, mediator); break;
+				case SDL_CONTROLLERDEVICEREMOVED: onControllerDeviceRemoved(event, mediator); break;
+				case SDL_CONTROLLERDEVICEREMAPPED: onControllerDeviceRemaped(event, mediator); break;
+				case SDL_CONTROLLERTOUCHPADDOWN: onControllerTouchpadDown(event, mediator); break;
+				case SDL_CONTROLLERTOUCHPADMOTION: onControllerTouchpadMotion(event, mediator); break;
+				case SDL_CONTROLLERTOUCHPADUP: onControllerTouchpadUp(event, mediator); break;
+				case SDL_CONTROLLERSENSORUPDATE: onControllerSensorUpdate(event, mediator); break;
+				case SDL_FINGERDOWN: onFingerDown(event, mediator); break;
+				case SDL_FINGERUP: onFingerUp(event, mediator); break;
+				case SDL_FINGERMOTION: onFingerMotion(event, mediator); break;
+				case SDL_DOLLARGESTURE: onDollarGersture(event, mediator); break;
+				case SDL_DOLLARRECORD: onDollarRecord(event, mediator); break;
+				case SDL_MULTIGESTURE: onMultiGesture(event, mediator); break;
+				case SDL_CLIPBOARDUPDATE: onClipboardUpdate(event, mediator); break;
+				case SDL_DROPFILE: onDropFile(event, mediator); break;
+				case SDL_DROPTEXT: onDropText(event, mediator); break;
+				case SDL_DROPBEGIN: onDropBegin(event, mediator); break;
+				case SDL_DROPCOMPLETE: onDropComplete(event, mediator); break;
+				case SDL_AUDIODEVICEADDED: onAudioDeviceAdded(event, mediator); break;
+				case SDL_AUDIODEVICEREMOVED: onAudioDeviceRemoved(event, mediator); break;
+				case SDL_SENSORUPDATE: onSensorUpdate(event, mediator); break;
 			}
 		}
 	}
