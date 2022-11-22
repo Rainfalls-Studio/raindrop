@@ -4,7 +4,7 @@ VERSION = 0.1.0
 # compiler
 CXX = g++
 STD_VERSION = c++17
-LIBSFLAGS = -lmingw32 -lSDL2main -lSDL2 -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -lyaml-cpp -lEFX-Util -lOpenAL32 -lsndfile -lvulkan-1
+LIBSFLAGS = -lmingw32 -lSDL2main -lSDL2 -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -lyaml-cpp -lEFX-Util -lOpenAL32 -lsndfile -lvulkan-1 -lglad
 CFLAGS =
 DEFINES = -D VERSION='"$(VERSION)"'
 INCLUDE = -I include/raindrop/ -I include/libs/

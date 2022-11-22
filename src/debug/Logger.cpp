@@ -38,41 +38,35 @@ namespace rnd::debug{
 	bool Logger::isAllowed(LogLevel level){
 		return (allowedLogs >> level) & 1U;
 	}
+	
+	void Logger::begin(LogLevel level, const char* file, const char* fnc, int line){
+		out << levelToStr(level) << " \"" << file << "\"; \"" << fnc << "\"; " << line;
+	}
 
-	void Logger::log(LogLevel level, const char* msg, const char* reason, const char* file, const char* fnc, int line){
-		lock.lock();
-
-		if (isAllowed(level)){
-			fprintf(out, "%s %s\n", levelToStr(level), msg);
-			fprintf(out, "reason : %s\n", reason);
-			fprintf(out, "from :: file : \"%s\" | function : \"%s\" | line %d\n", file, fnc, line);
-			fprintf(out, "\n\n");
-			fflush(out);
-		}
-		
-		lock.unlock();
+	void Logger::end(){
+		out << '\n';
+		out.flush();
 	}
 
 	void Logger::init(const char* filepath){
-		fileOwner = true;
+		file.open(filepath);
 
-		out = fopen(filepath, "w");
-		if (out == nullptr){
-			fprintf(stderr, "failed to open / create \"%s\" file", filepath);
-			exit(EXIT_FAILURE);
+		if (!file.is_open()){
+			fprintf(stderr, "LOGGER ERROR : Faild to open : %s\n", filepath);
+			throw std::runtime_error("LOGGER ERROR : Faild to open output file");
 		}
-	}
 
-	void Logger::init(FILE* out){
-		fileOwner = false;
-		this->out = out;
+		out.rdbuf(file.rdbuf());
 	}
 
 	void Logger::shutdown(){
-		if (fileOwner){
-			fclose(out);
+		if (file.is_open()){
+			file.close();
 		}
-		out = nullptr;
+	}
+
+	void Logger::init(std::ostream out){
+		this->out.rdbuf(out.rdbuf());
 	}
 
 	Logger& Logger::getInstance(){

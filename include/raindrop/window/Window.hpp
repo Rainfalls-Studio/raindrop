@@ -81,6 +81,8 @@ namespace rnd::window{
 			virtual bool isPopup() const = 0;
 			virtual bool isUtility() const = 0;
 
+			virtual API getAPI() const = 0;
+
 			static void event(events::Mediator& mediator);
 
 		private:

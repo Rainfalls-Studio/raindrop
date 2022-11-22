@@ -25,6 +25,8 @@
 #include "pch.hpp"
 
 #define RND__FUNC__ __func__
+#define RND__COMPLETE_FUNC__ __PRETTY_FUNCTION__
+#define RND__FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 // debug
 #define RND_PROFILE true

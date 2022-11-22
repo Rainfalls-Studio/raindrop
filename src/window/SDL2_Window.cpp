@@ -882,4 +882,11 @@ namespace rnd::window{
 		}
 	}
 
+	API SDL2_Window::getAPI() const{
+		return API::SDL2;
+	}
+
+	SDL_Window* SDL2_Window::getWindow() const{
+		return handle;
+	}
 }
