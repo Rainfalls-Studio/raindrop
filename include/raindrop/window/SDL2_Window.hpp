@@ -60,6 +60,9 @@ namespace rnd::window{
 			virtual bool isPopup() const override;
 			virtual bool isUtility() const override;
 
+			virtual API getAPI() const override;
+			SDL_Window* getWindow() const;
+
 			static void event(events::Mediator& mediator);
 
 		private:
