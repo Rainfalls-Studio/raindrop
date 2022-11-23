@@ -24,6 +24,12 @@
 
 #include "pch.hpp"
 
+#define RND_MAJOR 0
+#define RND_MINOR 1
+#define RND_PATCH 0
+
+#define RND_DEVELOPMENT_STAGE "pre-alpha"
+
 #define RND__FUNC__ __func__
 #define RND__COMPLETE_FUNC__ __PRETTY_FUNCTION__
 #define RND__FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
@@ -82,6 +88,8 @@
 
 #define rnd_max(a, b) a > b ? a : b
 #define rnd_min(a, b) a < b ? a : b
+
+#define RND_RUNTIME_ERR(...) RND_ERR(__VA_ARGS__); throw std::runtime_error(std::string(__VA_ARGS__))
 
 namespace rnd{
 	template<typename T, typename Allocator = std::allocator<T>>

@@ -28,10 +28,7 @@ namespace rnd::render::context::opengl{
 			throw std::domain_error("opengl SDL2 Context creation : failed to create a context");
 		}
 
-		RND_LOG("opengl info:", "");
-		RND_LOG("vendor : ", (const char*)glGetString(GL_VENDOR));
-		RND_LOG("renderer : ", (const char*)glGetString(GL_RENDERER));
-		RND_LOG("version : ", (const char*)glGetString(GL_VERSION));
+		RND_LOG("opengl info : Vendor : ", glGetString(GL_VENDOR), " | renderer : ", glGetString(GL_RENDERER), " | version : ", glGetString(GL_VERSION));
 	}
 
 	void Opengl_Context::initWithGLFW(window::Window* w){
