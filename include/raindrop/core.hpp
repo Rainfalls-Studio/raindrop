@@ -114,6 +114,8 @@ namespace rnd{
 	using UnorderedMap = std::unordered_map<Key, T, Hash, Compare, Allocator>;
 	template<typename T, typename Hash = std::hash<T>, typename Compare = std::equal_to<T>, typename Allocator = std::allocator<T>>
 	using UnorderedSet = std::unordered_set<T, Hash, Compare, Allocator>;
+	template<size_t size>
+	using Bitset = std::bitset<size>;
 
 	using Thread = std::thread;
 	using Mutex = std::mutex;
