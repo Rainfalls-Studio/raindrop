@@ -34,7 +34,7 @@ namespace rnd::render::vulkan{
 			Pipeline(const Pipeline &) = delete;
 			Pipeline& operator=(const Pipeline &) = delete;
 
-			void initialize(PipelineBuilder& builder);
+			void init(PipelineBuilder& builder);
 			const PipelineConfigInfo& getConfig();
 			void bind(VkCommandBuffer commandBuffer, uint32_t setsIndex[]);
 			void bindPushConstant(VkCommandBuffer, void* data); 

@@ -189,7 +189,7 @@ namespace rnd::render::vulkan{
 		createImageView(builder);
 
 		Buffer staginBuffer;
-		staginBuffer.initialize(device);
+		staginBuffer.init(device);
 
 		VkDeviceSize imageSize = extent.width * extent.height * pixelSize;
 		staginBuffer.alloc(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);

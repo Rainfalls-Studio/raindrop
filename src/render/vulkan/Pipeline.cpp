@@ -25,7 +25,7 @@ namespace rnd::render::vulkan{
 	}
 
 	Pipeline::Pipeline(PipelineBuilder& builder){
-		initialize(builder);
+		init(builder);
 	}
 
 	Pipeline::~Pipeline(){
@@ -40,7 +40,7 @@ namespace rnd::render::vulkan{
 		}
 	}
 
-	void Pipeline::initialize(PipelineBuilder& builder){
+	void Pipeline::init(PipelineBuilder& builder){
 		device = builder.device;
 
 		createShaderModules(builder);

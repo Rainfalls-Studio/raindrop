@@ -1,15 +1,18 @@
 #include "render/vulkan/SwapChain.hpp"
+#include "core.hpp"
 
-
+#include <vulkan/vk_enum_string_helper.h>
 #include <limits>
 #include <stdexcept>
 
 namespace rnd::render::vulkan{
 	SwapChain::SwapChain(std::shared_ptr<SwapChain> previous){
+		PROFILE_FUNCTION();
 		oldSwapChain = previous;
 	}
 
 	SwapChain::~SwapChain(){
+		PROFILE_FUNCTION();
 		if (swapchain){
 			framebuffers.clear();
 
@@ -25,6 +28,7 @@ namespace rnd::render::vulkan{
 	}
 	
 	void SwapChain::create(){
+		PROFILE_FUNCTION();
 		createSwapchain();
 		createRenderPass();
 		createFramebuffers();
@@ -32,7 +36,8 @@ namespace rnd::render::vulkan{
 		oldSwapChain = nullptr;
 	}
 
-	void SwapChain::initialize(SwapChainBuilder &builder){
+	void SwapChain::init(SwapChainBuilder &builder){
+		PROFILE_FUNCTION();
 		extent = builder.extent;
 		refreshType = builder.refreshMode;
 		device = builder.device;
@@ -42,10 +47,12 @@ namespace rnd::render::vulkan{
 	}
 
 	VkFormat SwapChain::findDepthFormat(){
+		PROFILE_FUNCTION();
 		return device->getPhysicalDevice()->findSupportedFormat({VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT}, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 	}
 
 	void SwapChain::createSwapchain(){
+		PROFILE_FUNCTION();
 		PhysicalDevice* physicalDevice = device->getPhysicalDevice();
 		auto swapChainSupport = physicalDevice->getSwapChainSupport();
 
@@ -96,11 +103,21 @@ namespace rnd::render::vulkan{
 
 		createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapchain;
 
-		if (vkCreateSwapchainKHR(device->getDevice(), &createInfo, nullptr, &swapchain) != VK_SUCCESS){
-			throw "failed to create the swapchain";
+		{
+			VkResult result = vkCreateSwapchainKHR(device->getDevice(), &createInfo, nullptr, &swapchain);
+
+			if (result != VK_SUCCESS){
+				RND_RUNTIME_ERR("create render swapchain : vkCreateSwapchainKHR :: ", string_VkResult(result));
+			}
+		}
+		
+		{
+			VkResult result = vkGetSwapchainImagesKHR(device->getDevice(), swapchain, &imageCount, nullptr);
+			if (result != VK_SUCCESS){
+				RND_RUNTIME_ERR("render swapchain, failed to get the swapchain images : vkGetSwapchainImagesKHR :: ", string_VkResult(result));
+			}
 		}
 
-		vkGetSwapchainImagesKHR(device->getDevice(), swapchain, &imageCount, nullptr);
 		images.resize(imageCount);
 		vkGetSwapchainImagesKHR(device->getDevice(), swapchain, &imageCount, images.data());
 
@@ -109,6 +126,7 @@ namespace rnd::render::vulkan{
 	}
 
 	void SwapChain::createFramebuffers(){
+		PROFILE_FUNCTION();
 		depthFormat = findDepthFormat();
 
 		framebuffers.resize(images.size());
@@ -125,11 +143,12 @@ namespace rnd::render::vulkan{
 
 			builder.enableDepthAttachment(depthFormat);
 			builder.setAttachments(attachments);
-			framebuffers[i].initialize(builder);
+			framebuffers[i].init(builder);
 		}
 	}
 
 	void SwapChain::createSyncObjects(){
+		PROFILE_FUNCTION();
 		imageAvailableSemaphores.resize(framesInFlight);
 		renderFinishedSemaphores.resize(framesInFlight);
 		inFlightFences.resize(framesInFlight);
@@ -145,13 +164,15 @@ namespace rnd::render::vulkan{
 		for (size_t i = 0; i < static_cast<size_t>(framesInFlight); i++) {
 			if (vkCreateSemaphore(device->getDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
 				vkCreateSemaphore(device->getDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-				vkCreateFence(device->getDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
+				vkCreateFence(device->getDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS){
 
-				throw "failed to create synchronization objects for a frame!";
+					RND_RUNTIME_ERR("render swaphain, failed to create synchronization objects");
+				}
 		}
 	}
 
 	VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats){
+		PROFILE_FUNCTION();
 		for (const auto &availableFormat : availableFormats) {
 			if (availableFormat.format == wantedSurfaceFormat.format && availableFormat.colorSpace == wantedSurfaceFormat.colorSpace) 
 				return availableFormat;
@@ -163,6 +184,7 @@ namespace rnd::render::vulkan{
 	}
 
 	VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes){
+		PROFILE_FUNCTION();
 		for (const auto &presentMode : availablePresentModes){
 			if (presentMode == static_cast<VkPresentModeKHR>(refreshType))
 				return presentMode;
@@ -174,6 +196,7 @@ namespace rnd::render::vulkan{
 	}
 
 	VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities){
+		PROFILE_FUNCTION();
 		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
 			return capabilities.currentExtent;
 
@@ -187,40 +210,49 @@ namespace rnd::render::vulkan{
 	}
 
 	VkFramebuffer SwapChain::getFrameBuffer(uint8_t index){
+		PROFILE_FUNCTION();
 		return framebuffers[index].getFramebuffer();
 	}
 
 	VkImageView SwapChain::getImageView(uint8_t index){
+		PROFILE_FUNCTION();
 		return framebuffers[index].getAttachmentImageView(0);
 	}
 
 	VkRenderPass SwapChain::getRenderPass(){
+		PROFILE_FUNCTION();
 		return renderPass;
 	}
 
 	uint8_t SwapChain::getImageCount(){
+		PROFILE_FUNCTION();
 		return images.size();
 	}
 
 	VkFormat SwapChain::getImageFormat(){
+		PROFILE_FUNCTION();
 		return imageFormat;
 	}
 	
 	VkExtent2D SwapChain::getExtent(){
+		PROFILE_FUNCTION();
 		return extent;
 	}
 
 	uint8_t SwapChain::getFrameInFlightCount(){
+		PROFILE_FUNCTION();
 		return framesInFlight;
 	}
 
 	VkResult SwapChain::acquireNextImage(uint32_t *imageIndex){
+		PROFILE_FUNCTION();
 		vkWaitForFences(device->getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 		VkResult result = vkAcquireNextImageKHR(device->getDevice(), swapchain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, imageIndex);
 		return result;
 	}
 
-	VkResult SwapChain::submitCommandBuffer(VkCommandBuffer* buffers, uint32_t *imageIndex){;
+	VkResult SwapChain::submitCommandBuffer(VkCommandBuffer* buffers, uint32_t *imageIndex){
+		PROFILE_FUNCTION();
 		if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
 			vkWaitForFences(device->getDevice(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
 		
@@ -242,9 +274,21 @@ namespace rnd::render::vulkan{
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		vkResetFences(device->getDevice(), 1, &inFlightFences[currentFrame]);
-		if (vkQueueSubmit(device->getQueue(QueueFamily::FAMILY_GRAPHIC, 0), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
-			throw "failed to submit draw command buffer";
+		{
+			VkResult result = vkResetFences(device->getDevice(), 1, &inFlightFences[currentFrame]);
+
+			if (result != VK_SUCCESS){
+				RND_RUNTIME_ERR("render swapchain, failed to reste a syncronisation fence : vkResetFences :: ", string_VkResult(result));
+			}
+		}
+
+		{
+			VkResult result = vkQueueSubmit(device->getQueue(QueueFamily::FAMILY_GRAPHIC, 0), 1, &submitInfo, inFlightFences[currentFrame]);
+
+			if (result != VK_SUCCESS){
+				RND_RUNTIME_ERR("render swapchain, failed to submit frame command buffer : vkQueueSubmit :: ", string_VkResult(result));
+			}
+		}
 
 		VkPresentInfoKHR presentInfo = {};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -258,7 +302,7 @@ namespace rnd::render::vulkan{
 
 		presentInfo.pImageIndices = imageIndex;
 
-		auto result = vkQueuePresentKHR(device->getQueue(QueueFamily::FAMILY_PRESENT, 0), &presentInfo);
+		VkResult result = vkQueuePresentKHR(device->getQueue(QueueFamily::FAMILY_PRESENT, 0), &presentInfo);
 
 		currentFrame = (currentFrame + 1) % framesInFlight;
 
@@ -266,18 +310,22 @@ namespace rnd::render::vulkan{
 	}
 
 	bool SwapChain::compareFormats(const SwapChain& swapChain){
+		PROFILE_FUNCTION();
 		return swapChain.depthFormat == depthFormat && swapChain.imageFormat == imageFormat;
 	}
 
 	SwapChainRefreshMode SwapChain::getRefreshMode(){
+		PROFILE_FUNCTION();
 		return refreshType;
 	} 
 
 	VkImage SwapChain::getCurrentImage(){
+		PROFILE_FUNCTION();
 		return framebuffers[currentFrame].getAttachmentImage(0);
 	}
 
 	void SwapChain::createRenderPass(){
+		PROFILE_FUNCTION();
 		VkAttachmentDescription depthAttachment{};
 		depthAttachment.format = findDepthFormat();
 		depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -331,7 +379,10 @@ namespace rnd::render::vulkan{
 		renderPassInfo.dependencyCount = 1;
 		renderPassInfo.pDependencies = &dependency;
 
-		if (vkCreateRenderPass(device->getDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
-			throw "failed to create render pass";	
+		VkResult result = vkCreateRenderPass(device->getDevice(), &renderPassInfo, nullptr, &renderPass);
+
+		if (result != VK_SUCCESS){
+			RND_RUNTIME_ERR("render swapchain, failed to create the render pass : vkCreateRenderPass :: ", string_VkResult(result));
+		}
 	}
 }

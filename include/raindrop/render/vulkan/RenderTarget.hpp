@@ -31,7 +31,7 @@ namespace rnd::render::vulkan{
 
 			RenderTarget() = default;
 			RenderTarget(RenderTargetBuilder &builder){
-				initialize(builder);
+				init(builder);
 			}
 
 			~RenderTarget();
@@ -39,7 +39,7 @@ namespace rnd::render::vulkan{
 			RenderTarget(const RenderTarget &) = delete;
 			RenderTarget& operator=(const RenderTarget &) = delete;
 
-			void initialize(RenderTargetBuilder &builder);
+			void init(RenderTargetBuilder &builder);
 			void beginRenderPass(VkCommandBuffer commandBuffer);
 			void endRenderPass(VkCommandBuffer commandBuffer);
 			VkRenderPass getRenderPass();

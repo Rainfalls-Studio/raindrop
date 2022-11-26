@@ -33,7 +33,7 @@ namespace rnd::render::vulkan{
 			Buffer(const Buffer &) = delete;
 			Buffer &operator=(const Buffer &) = delete;
 
-			void initialize(LogicalDevice* device);
+			void init(LogicalDevice* device);
 			void alloc(VkDeviceSize bufferSize, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryProperties);
 
 			void setInstanceProperties(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignement);

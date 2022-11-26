@@ -43,14 +43,15 @@ namespace rnd::render::vulkan{
 
 			PhysicalDevice() = default;
 			PhysicalDevice(PhysicalDeviceBuidler &builder){
-				initialize(builder);
+				init(builder);
 			}
-			~PhysicalDevice();
+			~PhysicalDevice() = default;
 
 			PhysicalDevice(const PhysicalDevice &) = delete;
 			PhysicalDevice& operator=(const PhysicalDevice &) = delete;
 
-			void initialize(PhysicalDeviceBuidler &builder);
+			void init(PhysicalDeviceBuidler &builder);
+			void shutdown();
 
 			VkFormat findSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 			uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);

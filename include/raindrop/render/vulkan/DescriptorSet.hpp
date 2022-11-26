@@ -32,12 +32,12 @@ namespace rnd::render::vulkan{
 		public:
 			DescriptorSet() = default;
 			DescriptorSet(DescriptorSetBuilder &builder){
-				initialize(builder);
+				init(builder);
 			}
 
 			~DescriptorSet();
 
-			void initialize(DescriptorSetBuilder &builder);
+			void init(DescriptorSetBuilder &builder);
 
 			DescriptorSetLayout& getLayout();
 			DescriptorPool& getPool();

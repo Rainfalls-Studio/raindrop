@@ -1,6 +1,7 @@
 #include "render/vulkan/LogicalDevice.hpp"
 #include "render/vulkan/CommandPool.hpp"
 #include "render/vulkan/utils.hpp"
+#include "core.hpp"
 
 #include <stdexcept>
 #include <cassert>
@@ -14,6 +15,7 @@ namespace rnd::render::vulkan{
 	};
 
 	void LogicalDevice::createCommandPools(LogicalDeviceBuilder &builder){
+		PROFILE_FUNCTION();
 		auto families = physicalDevice->getEnabledFamilies();
 
 		for (int i=0; i<FAMILY_COUNT; i++){
@@ -23,7 +25,7 @@ namespace rnd::render::vulkan{
 				b.setFamily(static_cast<QueueFamily>(i));
 				b.setLogicalDevice(this);
 				b.setFlag(builder.commandPoolFlags[i]);
-				pool->initialize(b);
+				pool->init(b);
 				commandPools[i] = pool;
 			} else {
 				commandPools[i] = nullptr;
@@ -31,7 +33,8 @@ namespace rnd::render::vulkan{
 		}
 	}
 
-	void LogicalDevice::initialize(LogicalDeviceBuilder &builder){
+	void LogicalDevice::init(LogicalDeviceBuilder &builder){
+		PROFILE_FUNCTION();
 		assert(builder.physicalDevice != nullptr && "cannot create a logical device without a valid physical device");
 		physicalDevice = builder.physicalDevice;
 		Instance* instance = physicalDevice->getInstance();
@@ -138,7 +141,8 @@ namespace rnd::render::vulkan{
 		createCommandPools(builder);
 	}
 
-	LogicalDevice::~LogicalDevice(){
+	void LogicalDevice::shutdown(){
+		PROFILE_FUNCTION();
 		for (int i=0; i<FAMILY_COUNT; i++){
 			if (queues[i].queueCount > 0){
 				delete[] queues[i].queues;
@@ -153,10 +157,12 @@ namespace rnd::render::vulkan{
 	}
 
 	VkDevice LogicalDevice::getDevice() const{
+		PROFILE_FUNCTION();
 		return device;
 	}
 
 	void LogicalDevice::createImageWithInfo(const VkImageCreateInfo &imageInfo, VkMemoryPropertyFlags properties, VkImage &image, VkDeviceMemory &imageMemory){
+		PROFILE_FUNCTION();
 		if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
 			throw "failed to create image !";
 		}
@@ -185,6 +191,7 @@ namespace rnd::render::vulkan{
 	}
 
 	void LogicalDevice::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer,VkDeviceMemory &bufferMemory){
+		PROFILE_FUNCTION();
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 		bufferInfo.size = size;
@@ -217,18 +224,22 @@ namespace rnd::render::vulkan{
 	}
 
 	VkQueue LogicalDevice::getQueue(QueueFamily family, uint32_t index){
+		PROFILE_FUNCTION();
 		return queues[family].queues[index];
 	}
 
 	Instance* LogicalDevice::getInstance(){
+		PROFILE_FUNCTION();
 		return physicalDevice->getInstance();
 	}
 
 	CommandPool* LogicalDevice::getCommandPool(QueueFamily family){
+		PROFILE_FUNCTION();
 		return commandPools[family];
 	}
 
 	PhysicalDevice* LogicalDevice::getPhysicalDevice(){
+		PROFILE_FUNCTION();
 		return physicalDevice;
 	}
 }

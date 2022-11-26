@@ -10,8 +10,8 @@ namespace rnd::render::vulkan{
 		}
 	}
 	
-	void DescriptorSetLayout::initialize(const DescriptorSetLayoutBuilder &builder){
-		assert(builder.device != nullptr && "cannot initialize a descriptor set layout without a valid device");
+	void DescriptorSetLayout::init(const DescriptorSetLayoutBuilder &builder){
+		assert(builder.device != nullptr && "cannot init a descriptor set layout without a valid device");
 		this->device = builder.device;
 		bindings = builder.bindings;
 

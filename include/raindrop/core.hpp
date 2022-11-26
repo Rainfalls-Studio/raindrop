@@ -123,6 +123,12 @@ namespace rnd{
 	using ConditionVariable = std::condition_variable;
 
 	using Extent = glm::u32vec2;
+
+	struct Version{
+		uint32_t major;
+		uint32_t minor;
+		uint32_t patch;
+	};
 }
 
 #endif

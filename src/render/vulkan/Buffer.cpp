@@ -22,7 +22,7 @@ namespace rnd::render::vulkan{
 		device->createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, memory);
 	}
 
-	void Buffer::initialize(LogicalDevice* device){
+	void Buffer::init(LogicalDevice* device){
 		this->device = device;
 	}
 

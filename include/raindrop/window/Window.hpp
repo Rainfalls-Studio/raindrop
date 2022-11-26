@@ -25,14 +25,6 @@
 #include "events/EventMediator.hpp"
 
 namespace rnd::window{
-
-	enum class API{
-		SDL2 = 1 << 0,
-		GLWF = 1 << 1,
-
-		Default = SDL2,
-	};
-
 	enum Flag{
 		None = 0,
 		Fullscreen = 1 << 0,
@@ -49,44 +41,44 @@ namespace rnd::window{
 	
 	class Window{
 		public:
-			virtual ~Window() = default;
+			~Window() = default;
 
-			static Window* create(API api);
+			void init(Extent extent, const char* title, uint32_t flags);
+			void shutdown();
 
-			virtual void init(Extent extent, const char* title, uint32_t flags) = 0;
-			virtual void shutdown() = 0;
+			void fullscreen(bool state);
+			void resizable(bool state);
+			void minimize();
+			void maximize();
+			void focus();
+			void show();
+			void hide();
 
-			virtual void fullscreen(bool state) = 0;
-			virtual void resizable(bool state) = 0;
-			virtual void minimize() = 0;
-			virtual void maximize() = 0;
-			virtual void focus() = 0;
-			virtual void show() = 0;
-			virtual void hide() = 0;
-
-			virtual glm::i32vec2 getPosition() const = 0;
-			virtual const char* getTitle() const = 0;
-			virtual Extent getExtent() const = 0;
-			virtual Extent getMaxExtent() const = 0;
-			virtual Extent getMinExtent() const = 0;
-			virtual float getOpacity() const = 0;
-			virtual bool isFullscreen() const = 0;
-			virtual bool isBorderless() const = 0;
-			virtual bool isHidden() const = 0;
-			virtual bool isResizable() const = 0;
-			virtual bool isHighDPIAllowed() const = 0;
-			virtual bool isAlwaysOnTop() const = 0;
-			virtual bool isTaskBarHidden() const = 0;
-			virtual bool isTooltip() const = 0;
-			virtual bool isPopup() const = 0;
-			virtual bool isUtility() const = 0;
-
-			virtual API getAPI() const = 0;
+			glm::i32vec2 getPosition() const;
+			const char* getTitle() const;
+			Extent getExtent() const;
+			Extent getMaxExtent() const;
+			Extent getMinExtent() const;
+			float getOpacity() const;
+			bool isFullscreen() const;
+			bool isBorderless() const;
+			bool isHidden() const;
+			bool isResizable() const;
+			bool isHighDPIAllowed() const;
+			bool isAlwaysOnTop() const;
+			bool isTaskBarHidden() const;
+			bool isTooltip() const;
+			bool isPopup() const;
+			bool isUtility() const;
 
 			static void event(events::Mediator& mediator);
 
+			static const char* getAPIName();
+			static Version getAPIVersion();
+			void* getWindowHandle() const;
+			
 		private:
-
+			void* handle;
 	};
 }
 

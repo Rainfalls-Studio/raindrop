@@ -7,7 +7,7 @@
 
 namespace rnd::render::vulkan{
 	Framebuffer::Framebuffer(FramebufferBuilder &builder){
-		initialize(builder);
+		init(builder);
 	}
 
 	Framebuffer::~Framebuffer(){
@@ -46,7 +46,7 @@ namespace rnd::render::vulkan{
 		vkDestroyFramebuffer(device, framebuffer, nullptr);
 	}
 
-	void Framebuffer::initialize(FramebufferBuilder &builder){
+	void Framebuffer::init(FramebufferBuilder &builder){
 		assert(builder.device != nullptr && "cannot create a framebuffer without a valid device");
 		device = builder.device;
 
@@ -130,7 +130,7 @@ namespace rnd::render::vulkan{
 		builder.enableDepthAttachment(depthFormat, depthAttachmentEnabled);
 
 		destroy();
-		initialize(builder);
+		init(builder);
 	}
 
 	VkImage Framebuffer::createColorAttachmentImage(FramebufferBuilder &builder, FramebufferAttachments::Attachment &attachmentBuilder, ColorAttachment& attachment){

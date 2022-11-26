@@ -10,7 +10,7 @@ namespace rnd::render::vulkan{
 		}
 	}
 
-	void DescriptorPool::initialize(DescriptorPoolBuilder &builder){
+	void DescriptorPool::init(DescriptorPoolBuilder &builder){
 		device = builder.device;
 		VkDescriptorPoolCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;

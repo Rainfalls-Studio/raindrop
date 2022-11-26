@@ -1,5 +1,5 @@
 /**
- * @brief this file contain the vulkan memory buffer
+ * @brief this file contain the renderer, it's handle all the render in the engine
  * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
@@ -17,32 +17,40 @@
  * 
  */
 
-#ifndef __RAINDROP_RENDER_VULKAN_DESCRIPTOR_POOL_HPP__
-#define __RAINDROP_RENDER_VULKAN_DESCRIPTOR_POOL_HPP__
+#ifndef __RAINDROP_RENDER_RENDERER_HPP__
+#define __RAINDROP_RENDER_RENDERER_HPP__
 
-#include "builders/DescriptorPoolBuilder.hpp"
+#include "core.hpp"
+#include "window/Window.hpp"
+#include "vulkan/AllocationCallback.hpp"
+#include "vulkan/Instance.hpp"
+#include "vulkan/PhysicalDevice.hpp"
+#include "vulkan/LogicalDevice.hpp"
+#include "vulkan/SwapChain.hpp"
+#include "vulkan/BasicRenderer.hpp"
 
-namespace rnd::render::vulkan{
-	class DescriptorPool{
-		friend class DescriptorWriter;
+namespace rnd::render{
+	class Renderer{
 		public:
-			DescriptorPool() = default;
-			DescriptorPool(DescriptorPoolBuilder &builder){
-				init(builder);
-			}
+			Renderer() = default;
+			~Renderer() = default;
 
-			~DescriptorPool();
+			void init(window::Window &window);
+			void shutdown();
 
-			void init(DescriptorPoolBuilder &builder);
-
-			bool allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor);
-			void freeDescriptors(std::vector<VkDescriptorSet> &descriptors);
-			void resetPool();
-			VkDescriptorPool getPool();
+			void render();
 
 		private:
-			LogicalDevice* device = nullptr;
-			VkDescriptorPool pool = VK_NULL_HANDLE;
+			vulkan::AllocationCallback allocCallback;
+			vulkan::Instance instance;
+			vulkan::PhysicalDevice physicalDevice;
+			vulkan::LogicalDevice logicalDevice;
+			vulkan::renderer::BasicRenderer renderer;
+
+			void createInstance(window::Window &window);
+			void createPhysicalDevice();
+			void createLogicalDevice();
+			void createRenderer();
 	};
 }
 

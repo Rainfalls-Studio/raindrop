@@ -30,18 +30,13 @@ namespace rnd::render::vulkan::renderer{
 	class BasicRenderer{
 		public:
 			BasicRenderer(BasicRendererBuilder& builder){
-				initialize(builder);
+				init(builder);
 			}
 
-			~BasicRenderer(){
-				vkDeviceWaitIdle(device->getDevice());
-				swapChain.reset();
+			BasicRenderer() = default;
+			~BasicRenderer() = default;
 
-				vkFreeCommandBuffers(device->getDevice(), device->getCommandPool(FAMILY_GRAPHIC)->getCommandPool(), bufferCount, commandBuffers);
-				delete[] commandBuffers;
-			}
-
-			void initialize(BasicRendererBuilder& builder){
+			void init(BasicRendererBuilder& builder){
 				device = builder.device;
 				extent = builder.extent;
 				extent = builder.extent;
@@ -52,6 +47,14 @@ namespace rnd::render::vulkan::renderer{
 
 				createSwapChain();
 				createCommandBuffers();
+			}
+
+			void shutdown(){
+				vkDeviceWaitIdle(device->getDevice());
+				swapChain.reset();
+
+				vkFreeCommandBuffers(device->getDevice(), device->getCommandPool(FAMILY_GRAPHIC)->getCommandPool(), bufferCount, commandBuffers);
+				delete[] commandBuffers;
 			}
 
 			void onWindowMinimized(){
@@ -198,6 +201,7 @@ namespace rnd::render::vulkan::renderer{
 			}
 
 			void createSwapChain(){
+
 				vkDeviceWaitIdle(device->getDevice());
 
 				SwapChainBuilder scBuilder;
@@ -212,7 +216,7 @@ namespace rnd::render::vulkan::renderer{
 					oldSwapChain = swapChain;
 					swapChain = std::make_shared<SwapChain>(oldSwapChain);
 
-					swapChain->initialize(scBuilder);
+					swapChain->init(scBuilder);
 
 					if (!swapChain->compareFormats(*oldSwapChain)){
 						throw "swap chain image or depth format has changed";

@@ -4,7 +4,7 @@
 #include <cassert>
 
 namespace rnd::render::vulkan{
-	void DescriptorWriter::initialize(LogicalDevice* device, DescriptorSetLayout* setLayout, DescriptorPool* pool){
+	void DescriptorWriter::init(LogicalDevice* device, DescriptorSetLayout* setLayout, DescriptorPool* pool){
 		assert(device != nullptr && "cannot create a descriptor writer without a valid device");
 		assert(setLayout != nullptr && "cannot create a descriptor writer without a valid descriptor set layout");
 		assert(pool != nullptr && "cannot create a descriptor writer without a valid descriptor pool");

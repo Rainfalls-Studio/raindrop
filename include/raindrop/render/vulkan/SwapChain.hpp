@@ -28,12 +28,12 @@ namespace rnd::render::vulkan{
 		public:
 			~SwapChain();
 			SwapChain(SwapChainBuilder &builder){
-				initialize(builder);
+				init(builder);
 			}
 			SwapChain() = default;
 
 			SwapChain(std::shared_ptr<SwapChain> previous);
-			void initialize(SwapChainBuilder &builder);
+			void init(SwapChainBuilder &builder);
 
 			SwapChain(const SwapChain &) = delete;
 			SwapChain& operator=(const SwapChain &) = delete;
@@ -66,7 +66,6 @@ namespace rnd::render::vulkan{
 			VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
 			VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
 			VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
-
 
 			VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 			std::shared_ptr<SwapChain> oldSwapChain = nullptr;

@@ -29,10 +29,10 @@ namespace rnd::render::vulkan{
 		public:
 			DescriptorSetLayout() = default;
 			DescriptorSetLayout(const DescriptorSetLayoutBuilder &builder){
-				initialize(builder);
+				init(builder);
 			}
 			~DescriptorSetLayout();
-			void initialize(const DescriptorSetLayoutBuilder &builder);
+			void init(const DescriptorSetLayoutBuilder &builder);
 
 			VkDescriptorSetLayout getDescriptorSetLayout();
 

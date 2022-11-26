@@ -28,15 +28,16 @@ namespace rnd::render::vulkan{
 		public:
 			Instance() = default;
 			Instance(InstanceBuilder &builder){
-				initialize(builder);
+				init(builder);
 			}
 
-			~Instance();
+			~Instance() = default;
 
 			Instance(const Instance &) = delete;
 			Instance& operator=(const Instance &) = delete;
 
-			void initialize(InstanceBuilder &builder);
+			void init(InstanceBuilder &builder);
+			void shutdown();
 
 			bool isValidationLayersEnabled() const;
 			VkInstance getInstance() const;

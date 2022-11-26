@@ -30,7 +30,7 @@ namespace rnd::render::vulkan{
 			Framebuffer(FramebufferBuilder &builder);
 			~Framebuffer();
 
-			void initialize(FramebufferBuilder &builder);
+			void init(FramebufferBuilder &builder);
 			void destroy();
 
 			VkImage getAttachmentImage(uint8_t attachmentIndex);

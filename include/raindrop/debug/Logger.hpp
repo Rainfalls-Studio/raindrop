@@ -80,7 +80,7 @@ namespace rnd::debug{
 
 			template<typename T>
 			void print(T& t){
-				out << t;
+				out << " " << t;
 			}
 	};
 }

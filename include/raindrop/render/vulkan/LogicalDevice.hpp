@@ -32,14 +32,15 @@ namespace rnd::render::vulkan{
 		public:
 			LogicalDevice() = default;
 			LogicalDevice(LogicalDeviceBuilder &builder){
-				initialize(builder);
+				init(builder);
 			}
-			~LogicalDevice();
+			~LogicalDevice() = default;
 
 			LogicalDevice(const LogicalDevice &) = delete;
 			LogicalDevice& operator=(const LogicalDevice &) = delete;
 
-			void initialize(LogicalDeviceBuilder &builder);
+			void init(LogicalDeviceBuilder &builder);
+			void shutdown();
 
 			VkDevice getDevice() const;
 			VkQueue getQueue(QueueFamily family, uint32_t index);

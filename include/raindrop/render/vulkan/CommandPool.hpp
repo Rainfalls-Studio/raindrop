@@ -35,7 +35,7 @@ namespace rnd::render::vulkan{
 			CommandPool(const CommandPool &) = delete;
 			CommandPool &operator=(const CommandPool &) = delete;
 
-			void initialize(CommandPoolBuilder &builder);
+			void init(CommandPoolBuilder &builder);
 
 			VkCommandPool getCommandPool();
 			QueueFamily getFamily();

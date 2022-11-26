@@ -1,12 +1,12 @@
 #include "render/vulkan/Instance.hpp"
+#include "core.hpp"
 
-#include <string.h>
-#include <stdexcept>
-#include <unordered_set>
-
+#include <cstring>
 #include <SDL2/SDL_vulkan.h>
+#include <vulkan/vk_enum_string_helper.h>
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData) {
+	PROFILE_FUNCTION();
 
 	if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT){
 		fprintf(stderr, "%s\n", pCallbackData->pMessage);
@@ -18,6 +18,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
 }
 
 static inline VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger) {
+	PROFILE_FUNCTION();
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 
     if (func != nullptr) {
@@ -28,7 +29,7 @@ static inline VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const V
 }
 
 static inline void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator){
-
+	PROFILE_FUNCTION();
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr) {
         func(instance, debugMessenger, pAllocator);
@@ -36,18 +37,8 @@ static inline void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUti
 }
 
 namespace rnd::render::vulkan{
-	Instance::~Instance(){
-		if (validationLayerEnabled) DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-
-		for (auto &layer : validationLayers){
-			delete layer;
-		}
-
-		vkDestroySurfaceKHR(instance, surface, nullptr);
-		vkDestroyInstance(instance, nullptr);
-	}
-
-	void Instance::initialize(InstanceBuilder &builder){
+	void Instance::init(InstanceBuilder &builder){
+		PROFILE_FUNCTION();
 		validationLayerEnabled = builder.validationLayersEnabled;
 		if (validationLayerEnabled){
 			checkValidationLayers(builder.validationLayers);
@@ -80,16 +71,25 @@ namespace rnd::render::vulkan{
 			createInfo.enabledLayerCount = 0;
 			createInfo.ppEnabledLayerNames = nullptr;
 		}
+		
+		{
+			PROFILE_SCOPE("vkCreateInstance");
+			VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 
-		if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS){
-			throw "failed to create the vulkan instance";
+			if (result != VK_SUCCESS){
+				RND_RUNTIME_ERR("failed to create the vulkan instance : vkCreateInstance :: ", string_VkResult(result));
+			}
 		}
 
 		checkRequiredExtensions(builder.window);
 		setupDebugMessenger();
 
-		if (SDL_Vulkan_CreateSurface(static_cast<SDL_Window*>(builder.window), instance, &surface) == SDL_FALSE){
-			throw "failed to create the window surface";
+		{
+			PROFILE_SCOPE("SDL_Vulkan_CreateSurface");
+			SDL_bool result = SDL_Vulkan_CreateSurface(static_cast<SDL_Window*>(builder.window), instance, &surface);
+			if (result == SDL_FALSE){
+				RND_RUNTIME_ERR("failed to create the window surface : SDL_Vulkan_CreateSurface :: ", SDL_GetError());
+			}
 		}
 
 		validationLayers.resize(builder.validationLayers.size());
@@ -101,14 +101,27 @@ namespace rnd::render::vulkan{
 		}
 	}
 
+	void Instance::shutdown(){
+		PROFILE_FUNCTION();
+		if (validationLayerEnabled) DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+
+		for (auto &layer : validationLayers){
+			delete[] layer;
+		}
+
+		vkDestroySurfaceKHR(instance, surface, nullptr);
+		vkDestroyInstance(instance, nullptr);
+	}
+
 	void Instance::checkValidationLayers(std::vector<const char *> &validationLayers){
+		PROFILE_FUNCTION();
 		uint32_t count;
 		vkEnumerateInstanceLayerProperties(&count, nullptr);
 
 		std::vector<VkLayerProperties> availableLayers(count);
 		vkEnumerateInstanceLayerProperties(&count, availableLayers.data());
 
-		for (const auto &layerName : validationLayers){
+		for (auto &layerName : validationLayers){
 			bool layerFound = false;
 
 			for (const auto &layerProperties : availableLayers){
@@ -119,12 +132,13 @@ namespace rnd::render::vulkan{
 			}
 
 			if (!layerFound){
-				throw std::string("cannot found \"" + std::string(layerName) + "\" validation layer").c_str();
+				RND_RUNTIME_ERR("vulkan instance, failed to found \"" + std::string(layerName) + "\" validation layer");
 			}
 		}
 	}
 
 	std::vector<const char*> Instance::getRequiredExtensions(void* window){
+		PROFILE_FUNCTION();
 		SDL_Window* win = static_cast<SDL_Window*>(window);
 
 		unsigned int count = 0;
@@ -141,6 +155,7 @@ namespace rnd::render::vulkan{
 	}
 
 	void Instance::setDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo){
+		PROFILE_FUNCTION();
 		createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 		createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
@@ -152,6 +167,7 @@ namespace rnd::render::vulkan{
 	}
 
 	void Instance::checkRequiredExtensions(void *window){
+		PROFILE_FUNCTION();
 		uint32_t extensionsCount = 0;
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, nullptr);
 
@@ -167,35 +183,43 @@ namespace rnd::render::vulkan{
 
 		for (const auto &required : requiredExtensions){
 			if (available.find(required) == available.end()){
-				throw "missing required SDL2 vulkan extensions";
+				RND_RUNTIME_ERR("vulkan instance, missing required SDL2 vulkan extention");
 			}
 		}
 	}
 
 	void Instance::setupDebugMessenger(){
+		PROFILE_FUNCTION();
 		if (!validationLayerEnabled) return;
 		
 		VkDebugUtilsMessengerCreateInfoEXT createInfo;
 		setDebugMessengerCreateInfo(createInfo);
 
-		if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS){
-			throw "failed to create the debug messenger";
+		{
+			VkResult result = CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger);
+			if (result != VK_SUCCESS){
+				RND_RUNTIME_ERR("vulkan instance, failed to create the debug messenger : CreateDebugUtilsMessengerEXT :: ", string_VkResult(result));
+			}
 		}
 	}
 
 	bool Instance::isValidationLayersEnabled() const{
+		PROFILE_FUNCTION();
 		return validationLayerEnabled;
 	}
 
 	VkInstance Instance::getInstance() const{
+		PROFILE_FUNCTION();
 		return instance;
 	}
 
 	VkSurfaceKHR Instance::getSurface() const{
+		PROFILE_FUNCTION();
 		return surface;
 	}
 
 	std::vector<char*>& Instance::getValidationLayers(){
+		PROFILE_FUNCTION();
 		return validationLayers;
 	}
 }

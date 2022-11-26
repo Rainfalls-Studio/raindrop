@@ -32,10 +32,10 @@ namespace rnd::render::vulkan{
 	class DescriptorWriter{
 		public:
 			DescriptorWriter(LogicalDevice* device, DescriptorSetLayout* setLayout, DescriptorPool* pool){
-				initialize(device, setLayout, pool);
+				init(device, setLayout, pool);
 			}
 
-			void initialize(LogicalDevice* device, DescriptorSetLayout* setLayout, DescriptorPool* pool);
+			void init(LogicalDevice* device, DescriptorSetLayout* setLayout, DescriptorPool* pool);
 			
 			void writeBuffer(uint32_t binding, VkDescriptorBufferInfo *bufferInfo);
 			void writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo);

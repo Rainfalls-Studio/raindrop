@@ -9,7 +9,7 @@ namespace rnd::render::vulkan{
 		if (commandPool) vkDestroyCommandPool(device->getDevice(), commandPool, nullptr);
 	}
 
-	void CommandPool::initialize(CommandPoolBuilder &builder){
+	void CommandPool::init(CommandPoolBuilder &builder){
 		assert(builder.device != nullptr && "cannot create a command pool without a valid logical device");
 		assert(builder.family != FAMILY_NONE && "cannot create a command pool without a defined family");
 

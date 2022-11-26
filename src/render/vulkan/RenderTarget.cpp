@@ -13,7 +13,7 @@ namespace rnd::render::vulkan{
 		vkDestroyRenderPass(device->getDevice(), renderPass, nullptr);
 	}
 
-	void RenderTarget::initialize(RenderTargetBuilder &builder){
+	void RenderTarget::init(RenderTargetBuilder &builder){
 		assert(builder.device != nullptr && "cannot create a render target without a valid device");
 		
 		device = builder.device;

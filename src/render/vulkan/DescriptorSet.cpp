@@ -22,7 +22,7 @@ namespace rnd::render::vulkan{
 		}
 	}
 
-	void DescriptorSet::initialize(DescriptorSetBuilder &builder){
+	void DescriptorSet::init(DescriptorSetBuilder &builder){
 		assert(builder.device != nullptr && "cannot create a descriptor set without a valid device");
 		device = builder.device;
 		sets = new VkDescriptorSet[builder.descriptorSetCount];
@@ -53,7 +53,7 @@ namespace rnd::render::vulkan{
 			poolBuilder.addPoolSize(t.first, t.second * builder.descriptorSetCount);
 		}
 
-		pool.initialize(poolBuilder);
+		pool.init(poolBuilder);
 	}
 
 	void DescriptorSet::createSetLayout(DescriptorSetBuilder &builder){
@@ -65,7 +65,7 @@ namespace rnd::render::vulkan{
 			layoutBuilder.addBinding(d.binding, d.type, d.stage, d.type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ? d.imageCount : 1);
 		}
 
-		layout.initialize(layoutBuilder);
+		layout.init(layoutBuilder);
 	}
 
 	void DescriptorSet::createBuffers(DescriptorSetBuilder &builder){
@@ -87,7 +87,7 @@ namespace rnd::render::vulkan{
 			buffer = new Buffer[descriptorSetCount];
 
 			for (uint32_t i=0; i<descriptorSetCount; i++){
-				buffer[i].initialize(builder.device);
+				buffer[i].init(builder.device);
 				buffer[i].alloc(offset, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 				buffer[i].map();
 			}
