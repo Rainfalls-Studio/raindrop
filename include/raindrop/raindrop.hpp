@@ -10,5 +10,6 @@
 #include "events/defaultEvents.hpp"
 #include "layers/LayerStack.hpp"
 #include "window/Window.hpp"
+#include "render/Renderer.hpp"
 
 #endif

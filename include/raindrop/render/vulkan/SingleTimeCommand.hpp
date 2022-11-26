@@ -1,7 +1,6 @@
 /**
- * @brief this file contain the parent render Context class
+ * @brief this file contain the vulkan memory buffer
  * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
- * @attention IF YOU DO ANY CHANGE IN THIS FILE, MAKE SURE THAT THE WHOLE PROJECT IS RECOMPILED
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
 
@@ -18,27 +17,30 @@
  * 
  */
 
-#ifndef __RAINDROP_RENDER_CONTEXT_HPP__
-#define __RAINDROP_RENDER_CONTEXT_HPP__
+#ifndef __RAINDROP_RENDER_VULKAN_SINGLE_TIME_COMMAND_HPP__
+#define __RAINDROP_RENDER_VULKAN_SINGLE_TIME_COMMAND_HPP__
+#include <vulkan/vulkan.h>
+#include "LogicalDevice.hpp"
+#include "CommandPool.hpp"
 
-#include "core.hpp"
-#include "window/Window.hpp"
-
-namespace rnd::render{
-
-	enum class API{
-		Vulkan, // RAI-68
-		Opengl, // RAI-69
-	};
-
-	class Context{
+namespace rnd::render::vulkan{
+	class SingleTimeCommand{
 		public:
-			virtual ~Context() = default;
-			static Context* create(API api);
+			SingleTimeCommand(LogicalDevice* device, QueueFamily family, uint32_t queueIndex);
+			~SingleTimeCommand();
 
-			virtual void init(window::Window* window) = 0;
+			SingleTimeCommand(const SingleTimeCommand &) = delete;
+			SingleTimeCommand& operator=(const SingleTimeCommand &) = delete;
+
+			void begin();
+			void end();
+			VkCommandBuffer getCommandBuffer();
 
 		private:
+			VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
+			VkQueue queue = VK_NULL_HANDLE;
+			LogicalDevice* device = nullptr;
+			CommandPool* commandPool = nullptr;
 
 	};
 }

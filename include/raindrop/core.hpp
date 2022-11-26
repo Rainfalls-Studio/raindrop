@@ -24,6 +24,12 @@
 
 #include "pch.hpp"
 
+#define RND_MAJOR 0
+#define RND_MINOR 1
+#define RND_PATCH 0
+
+#define RND_DEVELOPMENT_STAGE "pre-alpha"
+
 #define RND__FUNC__ __func__
 #define RND__COMPLETE_FUNC__ __PRETTY_FUNCTION__
 #define RND__FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
@@ -83,6 +89,8 @@
 #define rnd_max(a, b) a > b ? a : b
 #define rnd_min(a, b) a < b ? a : b
 
+#define RND_RUNTIME_ERR(...) RND_ERR(__VA_ARGS__); throw std::runtime_error(std::string(__VA_ARGS__))
+
 namespace rnd{
 	template<typename T, typename Allocator = std::allocator<T>>
 	using DynamicArray = std::vector<T>;
@@ -106,6 +114,8 @@ namespace rnd{
 	using UnorderedMap = std::unordered_map<Key, T, Hash, Compare, Allocator>;
 	template<typename T, typename Hash = std::hash<T>, typename Compare = std::equal_to<T>, typename Allocator = std::allocator<T>>
 	using UnorderedSet = std::unordered_set<T, Hash, Compare, Allocator>;
+	template<size_t size>
+	using Bitset = std::bitset<size>;
 
 	using Thread = std::thread;
 	using Mutex = std::mutex;
@@ -113,6 +123,12 @@ namespace rnd{
 	using ConditionVariable = std::condition_variable;
 
 	using Extent = glm::u32vec2;
+
+	struct Version{
+		uint32_t major;
+		uint32_t minor;
+		uint32_t patch;
+	};
 }
 
 #endif

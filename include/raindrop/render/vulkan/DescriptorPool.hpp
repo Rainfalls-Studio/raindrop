@@ -1,7 +1,6 @@
 /**
- * @brief this file contain the opengl Context class, derived of the Context class
+ * @brief this file contain the vulkan memory buffer
  * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
- * @attention IF YOU DO ANY CHANGE IN THIS FILE, MAKE SURE THAT THE WHOLE PROJECT IS RECOMPILED
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
  */
 
@@ -18,21 +17,32 @@
  * 
  */
 
-#ifndef __RAINDROP_RENDER_CONTEXT_OPENGL_OPENGL_CONTEXT_HPP__
-#define __RAINDROP_RENDER_CONTEXT_OPENGL_OPENGL_CONTEXT_HPP__
+#ifndef __RAINDROP_RENDER_VULKAN_DESCRIPTOR_POOL_HPP__
+#define __RAINDROP_RENDER_VULKAN_DESCRIPTOR_POOL_HPP__
 
-#include "../../Context.hpp"
+#include "builders/DescriptorPoolBuilder.hpp"
 
-namespace rnd::render::context::opengl{
-	class Opengl_Context : public Context{
+namespace rnd::render::vulkan{
+	class DescriptorPool{
+		friend class DescriptorWriter;
 		public:
-			virtual void init(window::Window* window) override;
-		
-		private:
-			void initWithSDL2(window::Window* window);
-			void initWithGLFW(window::Window* window);
+			DescriptorPool() = default;
+			DescriptorPool(DescriptorPoolBuilder &builder){
+				init(builder);
+			}
 
-			void* context = nullptr;
+			~DescriptorPool();
+
+			void init(DescriptorPoolBuilder &builder);
+
+			bool allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor);
+			void freeDescriptors(std::vector<VkDescriptorSet> &descriptors);
+			void resetPool();
+			VkDescriptorPool getPool();
+
+		private:
+			LogicalDevice* device = nullptr;
+			VkDescriptorPool pool = VK_NULL_HANDLE;
 	};
 }
 

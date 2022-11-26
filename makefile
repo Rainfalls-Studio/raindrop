@@ -17,7 +17,7 @@ LIB = libs
 DLL = raindrop
 
 # source files
-SRCS = $(wildcard $(SRC)/*.cpp) $(wildcard $(SRC)/**/*.cpp) $(wildcard $(SRC)/**/**/*.cpp)
+SRCS = $(wildcard $(SRC)/*.cpp) $(wildcard $(SRC)/**/*.cpp) $(wildcard $(SRC)/**/**/*.cpp) $(wildcard $(SRC)/**/**/**/*.cpp)
 OBJS := $(patsubst %.cpp, $(OBJ)/%.o, $(notdir $(SRCS)))
 
 all: $(DLL)
@@ -51,6 +51,9 @@ $(OBJ)/%.o : $(SRC)/*/%.cpp
 	$(CXX) -fPIC -std=$(STD_VERSION) -shared -o $@ -c $< $(INCLUDE) -L $(LIB) $(DEFINES) $(CFLAGS)
 
 $(OBJ)/%.o : $(SRC)/*/*/%.cpp
+	$(CXX) -fPIC -std=$(STD_VERSION) -shared -o $@ -c $< $(INCLUDE) -L $(LIB) $(DEFINES) $(CFLAGS)
+	
+$(OBJ)/%.o : $(SRC)/*/*/*/%.cpp
 	$(CXX) -fPIC -std=$(STD_VERSION) -shared -o $@ -c $< $(INCLUDE) -L $(LIB) $(DEFINES) $(CFLAGS)
 
 info:
