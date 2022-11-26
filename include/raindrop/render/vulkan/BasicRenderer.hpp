@@ -20,16 +20,17 @@
 #ifndef __RAINDROP_RENDER_VULKAN_BASIC_RENDERER_HPP__
 #define __RAINDROP_RENDER_VULKAN_BASIC_RENDERER_HPP__
 
+#include "core.hpp"
 #include "builders/BasicRendererBuilder.hpp"
 #include "CommandPool.hpp"
 #include "utils.hpp"
-
-#include <assert.h>
+#include "vulkan/vk_enum_string_helper.h"
 
 namespace rnd::render::vulkan::renderer{
 	class BasicRenderer{
 		public:
 			BasicRenderer(BasicRendererBuilder& builder){
+				PROFILE_FUNCTION();
 				init(builder);
 			}
 
@@ -37,6 +38,7 @@ namespace rnd::render::vulkan::renderer{
 			~BasicRenderer() = default;
 
 			void init(BasicRendererBuilder& builder){
+				PROFILE_FUNCTION();
 				device = builder.device;
 				extent = builder.extent;
 				extent = builder.extent;
@@ -50,6 +52,7 @@ namespace rnd::render::vulkan::renderer{
 			}
 
 			void shutdown(){
+				PROFILE_FUNCTION();
 				vkDeviceWaitIdle(device->getDevice());
 				swapChain.reset();
 
@@ -58,11 +61,13 @@ namespace rnd::render::vulkan::renderer{
 			}
 
 			void onWindowMinimized(){
+				PROFILE_FUNCTION();
 				extent = {0, 0};
 				windowResized = true;
 			}
 
 			void onWindowResied(VkExtent2D extent){
+				PROFILE_FUNCTION();
 				this->extent = extent;
 
 				// if the with or the height is null, do not render, otherwise render
@@ -71,15 +76,18 @@ namespace rnd::render::vulkan::renderer{
 			}
 
 			void stopRendering(){
+				PROFILE_FUNCTION();
 				render = false;
 			}
 
 			void continueRendering(){
+				PROFILE_FUNCTION();
 				render = true;
 			}
 			
 			// return the command buffer |!| VK_NULL_HANDLE if cannot render
 			VkCommandBuffer beginFrame(){
+				PROFILE_FUNCTION();
 				if (!render) return VK_NULL_HANDLE;
 
 				VkResult result = swapChain->acquireNextImage(&currentBufferIndex);
@@ -109,7 +117,8 @@ namespace rnd::render::vulkan::renderer{
 			}
 
 			void endFrame(){
-				assert(frameStarted ==  true && "cannot end a frame if it's not started");
+				PROFILE_FUNCTION();
+				RND_ASSERT(frameStarted == true, "cannot end a frame if it's not started");
 				
 				VkCommandBuffer commandBuffer = commandBuffers[currentBufferIndex];
 				VkResult result = vkEndCommandBuffer(commandBuffer);
@@ -123,7 +132,7 @@ namespace rnd::render::vulkan::renderer{
 				if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || windowResized){
 					createSwapChain();
 				} else if (result != VK_SUCCESS) {
-					throw (std::string("failed to submit the command buffer | ") + resultToStr(result)).c_str();
+					RND_RUNTIME_ERR("renderer, failed to submit the command buffer : swapchain::submitCommandBuffer :: ", string_VkResult(result));
 				}
 
 				frameStarted = false;
@@ -131,6 +140,7 @@ namespace rnd::render::vulkan::renderer{
 			}
 
 			void beginSwapChainRenderPass(){
+				PROFILE_FUNCTION();
 				assert(frameStarted == true && "cannot begin swap chain render pass if a fram is not a started");
 
 				VkCommandBuffer commandBuffer = commandBuffers[currentBufferIndex];
@@ -167,23 +177,28 @@ namespace rnd::render::vulkan::renderer{
 			}
 
 			void endSwapChainRenderPass(VkCommandBuffer commandBuffer){
+				PROFILE_FUNCTION();
     			vkCmdEndRenderPass(commandBuffer);
 			}
 
 			void setClearColor(VkClearColorValue color){
+				PROFILE_FUNCTION();
 				clearColor = color;
 			}
 
 			void setClearDepthStencil(VkClearDepthStencilValue value){
+				PROFILE_FUNCTION();
 				clearDepthStencil = value;
 			}
 
 			VkRenderPass getSwapChainRenderPass(){
+				PROFILE_FUNCTION();
 				return swapChain->getRenderPass();
 			}
 
 		private:
 			void createCommandBuffers(){
+				PROFILE_FUNCTION();
 				commandBuffers = new VkCommandBuffer[bufferCount];
 
 				VkCommandBufferAllocateInfo info{};
@@ -196,12 +211,12 @@ namespace rnd::render::vulkan::renderer{
 				VkResult result = vkAllocateCommandBuffers(device->getDevice(), &info, commandBuffers);
 
 				if (result != VK_SUCCESS){
-					throw (std::string("failed to allocate command buffers | ") + resultToStr(result)).c_str();
+					RND_RUNTIME_ERR("renderer, failed to callocate the command buffers : vkAllocateCommandBuffers :: ", string_VkResult(result));
 				}
 			}
 
 			void createSwapChain(){
-
+				PROFILE_FUNCTION();
 				vkDeviceWaitIdle(device->getDevice());
 
 				SwapChainBuilder scBuilder;
@@ -219,7 +234,7 @@ namespace rnd::render::vulkan::renderer{
 					swapChain->init(scBuilder);
 
 					if (!swapChain->compareFormats(*oldSwapChain)){
-						throw "swap chain image or depth format has changed";
+						RND_RUNTIME_ERR("renderer, failed to recreate the swapchain, the image or depth format has changed");
 					}
 				}
 

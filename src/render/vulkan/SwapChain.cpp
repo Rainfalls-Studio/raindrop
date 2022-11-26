@@ -166,8 +166,8 @@ namespace rnd::render::vulkan{
 				vkCreateSemaphore(device->getDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
 				vkCreateFence(device->getDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS){
 
-					RND_RUNTIME_ERR("render swaphain, failed to create synchronization objects");
-				}
+				RND_RUNTIME_ERR("render swaphain, failed to create synchronization objects");
+			}
 		}
 	}
 
@@ -253,8 +253,12 @@ namespace rnd::render::vulkan{
 
 	VkResult SwapChain::submitCommandBuffer(VkCommandBuffer* buffers, uint32_t *imageIndex){
 		PROFILE_FUNCTION();
-		if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
-			vkWaitForFences(device->getDevice(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
+
+		{
+			PROFILE_SCOPE("wait for fence :: vkWaitForFences");
+			if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
+				vkWaitForFences(device->getDevice(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
+		}
 		
 		imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
 
@@ -275,6 +279,7 @@ namespace rnd::render::vulkan{
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
 		{
+			PROFILE_SCOPE("reset fences :: vkResetFences");
 			VkResult result = vkResetFences(device->getDevice(), 1, &inFlightFences[currentFrame]);
 
 			if (result != VK_SUCCESS){
@@ -283,6 +288,7 @@ namespace rnd::render::vulkan{
 		}
 
 		{
+			PROFILE_SCOPE("submit queue :: vkQueueSubmit");
 			VkResult result = vkQueueSubmit(device->getQueue(QueueFamily::FAMILY_GRAPHIC, 0), 1, &submitInfo, inFlightFences[currentFrame]);
 
 			if (result != VK_SUCCESS){
@@ -302,7 +308,13 @@ namespace rnd::render::vulkan{
 
 		presentInfo.pImageIndices = imageIndex;
 
-		VkResult result = vkQueuePresentKHR(device->getQueue(QueueFamily::FAMILY_PRESENT, 0), &presentInfo);
+		
+		VkResult result;
+		
+		{
+			PROFILE_SCOPE("queue present :: vkQueuePresentKHR");
+			result = vkQueuePresentKHR(device->getQueue(QueueFamily::FAMILY_PRESENT, 0), &presentInfo);
+		}
 
 		currentFrame = (currentFrame + 1) % framesInFlight;
 
