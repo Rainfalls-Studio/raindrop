@@ -10,8 +10,8 @@
 // architecture from Austin Morlan : https://austinmorlan.com/posts/entity_component_system/
 // =============================================================================
 
-#ifndef __RAINDROP_ECS_HPP__
-#define __RAINDROP_ECS_HPP__
+#ifndef __RAINDROP_ECS_ECS_HPP__
+#define __RAINDROP_ECS_ECS_HPP__
 
 #include "core.hpp"
 
@@ -46,6 +46,7 @@ namespace rnd::ECS{
 	class ComponentArray : public IComponentArray{
 		public:
 			void insert(Entity entity, T component){
+				PROFILE_FUNCTION();
 				RND_ASSERT(_entityToIndexMap.find(entity) == _entityToIndexMap.end(), "Component added to same entity more than once.");
 
 				// Put new entry at end and update the maps
@@ -57,6 +58,7 @@ namespace rnd::ECS{
 			}
 
 			void remove(Entity entity){
+				PROFILE_FUNCTION();
 				RND_ASSERT(_entityToIndexMap.find(entity) != _entityToIndexMap.end(), "Removing non-existent component.");
 
 				// Copy element at end into deleted element's place to maintain density
@@ -76,13 +78,20 @@ namespace rnd::ECS{
 			}
 
 			T& get(Entity entity){
+				PROFILE_FUNCTION();
 				RND_ASSERT(_entityToIndexMap.find(entity) != _entityToIndexMap.end(), "Retrieving non-existent component.");
 
 				// Return a reference to the entity's component
 				return _componentArray[_entityToIndexMap[entity]];
 			}
 
+			bool has(Entity entity){
+				PROFILE_FUNCTION();
+				return _entityToIndexMap.find(entity) != _entityToIndexMap.end();
+			}
+
 			void entityDestroyed(Entity entity) override{
+				PROFILE_FUNCTION();
 				if (_entityToIndexMap.find(entity) != _entityToIndexMap.end()){
 					// Remove the entity's component if it existed
 					remove(entity);
@@ -117,6 +126,7 @@ namespace rnd::ECS{
 		public:
 			template<typename T> 
 			void registerComponent(){
+				PROFILE_FUNCTION();
 				const char* typeName = typeid(T).name();
 
 				RND_ASSERT(_ComponentTypes.find(typeName) == _ComponentTypes.end(), "Registering component type more than once.");
@@ -133,6 +143,7 @@ namespace rnd::ECS{
 
 			template<typename T>
 			ComponentType getComponentType(){
+				PROFILE_FUNCTION();
 				const char* typeName = typeid(T).name();
 
 				RND_ASSERT(_ComponentTypes.find(typeName) != _ComponentTypes.end(), "Component not registered before use.");
@@ -143,18 +154,21 @@ namespace rnd::ECS{
 
 			template<typename T>
 			void addComponent(Entity entity, T component){
+				PROFILE_FUNCTION();
 				// Add a component to the array for an entity
 				getComponentArray<T>()->insert(entity, component);
 			}
 
 			template<typename T>
 			void removeComponent(Entity entity){
+				PROFILE_FUNCTION();
 				// Remove a component from the array for an entity
 				getComponentArray<T>()->remove(entity);
 			}
 
 			template<typename T>
 			T& getComponent(Entity entity){
+				PROFILE_FUNCTION();
 				// Get a reference to a component from the array for an entity
 				return getComponentArray<T>()->get(entity);
 			}
@@ -169,6 +183,12 @@ namespace rnd::ECS{
 				}
 			}
 
+			template<typename T>
+			bool has(Entity entity){
+				PROFILE_FUNCTION();
+				return getCompnentArray<T>()->has(entity);
+			}
+
 		private:
 			// Map from type string pointer to a component type
 			UnorderedMap<const char*, ComponentType> _ComponentTypes{};
@@ -181,6 +201,7 @@ namespace rnd::ECS{
 
 			// Convenience function to get the statically casted pointer to the ComponentArray of type T.
 			template<typename T> std::shared_ptr<ComponentArray<T>> getComponentArray(){
+				PROFILE_FUNCTION();
 				const char* typeName = typeid(T).name();
 				RND_ASSERT(_ComponentTypes.find(typeName) != _ComponentTypes.end(), "Component not registered before use.");
 				return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[typeName]);
@@ -190,6 +211,7 @@ namespace rnd::ECS{
 	class EntityManager{
 		public:
 			EntityManager(){
+				PROFILE_FUNCTION();
 				// fill the available entity queue with ids
 				for (Entity entity = 0; entity<MAX_ENTITIES; entity++)
 					_availablesEntities.push(entity);
@@ -201,6 +223,7 @@ namespace rnd::ECS{
 			 * @return Entity id
 			 */
 			Entity create(){
+				PROFILE_FUNCTION();
 				RND_ASSERT(_livingEntityCount < MAX_ENTITIES, "Too many entites in existence.");
 
 				// take the fisrt available id from the available entity queue
@@ -217,6 +240,7 @@ namespace rnd::ECS{
 			 * @param entity the entity to destroy
 			 */
 			void destroy(Entity entity){
+				PROFILE_FUNCTION();
 				RND_ASSERT(entity < MAX_ENTITIES, "Entiity out of range.");
 
 				// reset the entity's components
@@ -233,6 +257,7 @@ namespace rnd::ECS{
 			 * @param signature the new signature state of the entity
 			 */
 			void setSignature(Entity entity, Signature signature){
+				PROFILE_FUNCTION();
 				RND_ASSERT(entity < MAX_ENTITIES, "Entity out of range.");
 				_signatures[entity] = signature;
 			}
@@ -243,11 +268,13 @@ namespace rnd::ECS{
 			 * @return the signature of the entity as a bitfield with the size of EntityManager::MAX_COMPONENT
 			 */
 			Signature getSignature(Entity entity){
+				PROFILE_FUNCTION();
 				RND_ASSERT(entity < MAX_ENTITIES, "Entity out of range.");
 				return _signatures[entity];
 			}
 
 			inline Entity getLivingCount() const {
+				PROFILE_FUNCTION();
 				return _livingEntityCount;
 			}
 
@@ -279,6 +306,7 @@ namespace rnd::ECS{
 		public:
 			template<typename T, typename... _Args>
 			std::shared_ptr<T> registerSystem(_Args&&... __args) {
+				PROFILE_FUNCTION();
 				const char* typeName = typeid(T).name();
 
 				RND_ASSERT(mSystems.find(typeName) == mSystems.end(), "Registering system more than once.");
@@ -291,6 +319,7 @@ namespace rnd::ECS{
 
 			template<typename T>
 			void setSignature(Signature signature){
+				PROFILE_FUNCTION();
 				const char* typeName = typeid(T).name();
 
 				RND_ASSERT(mSystems.find(typeName) != mSystems.end(), "System used before registered.");
@@ -300,6 +329,7 @@ namespace rnd::ECS{
 			}
 
 			void entityDestroyed(Entity entity){
+				PROFILE_FUNCTION();
 				// Erase a destroyed entity from all system lists
 				// mEntities is a set so no check needed
 				for (auto const& pair : mSystems)
@@ -311,6 +341,7 @@ namespace rnd::ECS{
 			}
 
 			void EntitySignatureChanged(Entity entity, Signature entitySignature){
+				PROFILE_FUNCTION();
 				// Notify each system that an entity's signature changed
 				for (auto const& pair : mSystems)
 				{
@@ -344,6 +375,7 @@ namespace rnd::ECS{
 			Registry() {Init();}
 
 			void Init(){
+				PROFILE_FUNCTION();
 				// Create pointers to each manager
 				_componentManager = std::make_unique<ComponentManager>();
 				_entityManager = std::make_unique<EntityManager>();
@@ -352,14 +384,14 @@ namespace rnd::ECS{
 
 			// Entity methods
 			Entity create(){
+				PROFILE_FUNCTION();
 				return _entityManager->create();
 			}
 
 			void destroy(Entity entity){
+				PROFILE_FUNCTION();
 				_entityManager->destroy(entity);
-
 				_componentManager->entityDestroyed(entity);
-
 				_systemManager->entityDestroyed(entity);
 			}
 
@@ -367,11 +399,13 @@ namespace rnd::ECS{
 			// Component methods
 			template<typename T>
 			void registerComponent(){
+				PROFILE_FUNCTION();
 				_componentManager->registerComponent<T>();
 			}
 
 			template<typename T>
 			void addComponent(Entity entity, T component){
+				PROFILE_FUNCTION();
 				_componentManager->addComponent<T>(entity, component);
 
 				auto signature = _entityManager->getSignature(entity);
@@ -383,6 +417,7 @@ namespace rnd::ECS{
 
 			template<typename T>
 			void removeComponent(Entity entity) {
+				PROFILE_FUNCTION();
 				_componentManager->removeComponent<T>(entity);
 
 				auto signature = _entityManager->getSignature(entity);
@@ -393,23 +428,33 @@ namespace rnd::ECS{
 			}
 
 			template<typename T>
+			bool has(Entity entity){
+				PROFILE_FUNCTION();
+				return _componentManager->has<T>(entity);
+			}
+
+			template<typename T>
 			T& getComponent(Entity entity){
+				PROFILE_FUNCTION();
 				return _componentManager->getComponent<T>(entity);
 			}
 
 			template<typename T>
 			ComponentType getComponentType(){
+				PROFILE_FUNCTION();
 				return _componentManager->getComponentType<T>();
 			}
 
 			// System methods
 			template<typename T, typename... _Args>
 			std::shared_ptr<T> RegisterSystem(_Args&&... __args){
+				PROFILE_FUNCTION();
 				return _systemManager->registerSystem<T>(std::forward<_Args>(__args)...);
 			}
 
 			template<typename T>
 			void setSystemSignature(Signature signature){
+				PROFILE_FUNCTION();
 				_systemManager->setSignature<T>(signature);
 			}
 
