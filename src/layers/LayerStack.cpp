@@ -21,4 +21,13 @@ namespace rnd::layers{
 		layers.clear();
 		nextID=0;
 	}
+
+	void LayerStack::update(const FrameData& data){
+		PROFILE_FUNCTION();
+
+		for (auto &l : layers){
+			l.layer->update(data);
+		}
+
+	}
 }

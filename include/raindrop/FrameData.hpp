@@ -1,5 +1,5 @@
 /**
- * @brief this file contain the layer classes needed by the layer stack.
+ * @brief this file contain the frame data structure, it's a strcuture that is sent to every layers every ticks. It contain everything needed by layers to work
  * @warning DO NOT CHANGE ANYTHING IF YOU NOT KNOWN WHAT YOU ARE DOING
  * @attention IF YOU DO ANY CHANGE IN THIS FILE, MAKE SURE THAT THE WHOLE PROJECT IS RECOMPILED
  * @authors @Aalexdev (aaleex3984@gmail.com), ... (add here)
@@ -17,23 +17,22 @@
  * 
  */
 
-#ifndef __RAINDROP_LAYERS_LAYER_HPP__
-#define __RAINDROP_LAYERS_LAYER_HPP__
+#ifndef __RAINDROP_FRAME_DATA_HPP__
+#define __RAINDROP_FRAME_DATA_HPP__
 
 #include "core.hpp"
-#include "FrameData.hpp"
+#include "render/Renderer.hpp"
 
-namespace rnd::layers{
-	using LUID = uint16_t;
-	class Layer{
-		friend class LayerStack;
-		public:
-			virtual ~Layer() = default;
+namespace rnd{
+	// maybe needed for dynamic profiling
+	struct FrameStats{
+		// to complete
+	};
 
-			virtual void update(const FrameData& data){}
-		
-		protected:
-			LUID uid;
+	struct FrameData{
+		float dt; // seconds
+		render::Renderer& renderer;
+		FrameStats& lastStats;
 	};
 }
 

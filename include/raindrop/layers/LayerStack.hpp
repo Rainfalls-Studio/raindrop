@@ -22,6 +22,7 @@
 
 #include "core.hpp"
 #include "Layer.hpp"
+#include "FrameData.hpp"
 
 namespace rnd::layers{
 	class LayerStack{
@@ -55,6 +56,8 @@ namespace rnd::layers{
 			}
 
 			void clear();
+
+			void update(const FrameData& data);
 		
 		private:
 			struct LayerNode{
