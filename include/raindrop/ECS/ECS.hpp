@@ -127,15 +127,15 @@ namespace rnd::ECS{
 			template<typename T> 
 			void registerComponent(){
 				PROFILE_FUNCTION();
-				const char* typeName = typeid(T).name();
+				size_t id = typeid(T).hash_code();
 
-				RND_ASSERT(_ComponentTypes.find(typeName) == _ComponentTypes.end(), "Registering component type more than once.");
+				RND_ASSERT(_ComponentTypes.find(id) == _ComponentTypes.end(), "Registering component type more than once.");
 
 				// Add this component type to the component type map
-				_ComponentTypes.insert({typeName, _NextComponentType});
+				_ComponentTypes.insert({id, _NextComponentType});
 
 				// Create a ComponentArray pointer and add it to the component arrays map
-				_componentArrays.insert({typeName, std::make_shared<ComponentArray<T>>()});
+				_componentArrays.insert({id, std::make_shared<ComponentArray<T>>()});
 
 				// Increment the value so that the next component registered will be different
 				_NextComponentType++;
@@ -144,12 +144,12 @@ namespace rnd::ECS{
 			template<typename T>
 			ComponentType getComponentType(){
 				PROFILE_FUNCTION();
-				const char* typeName = typeid(T).name();
+				size_t id = typeid(T).name();
 
-				RND_ASSERT(_ComponentTypes.find(typeName) != _ComponentTypes.end(), "Component not registered before use.");
+				RND_ASSERT(_ComponentTypes.find(id) != _ComponentTypes.end(), "Component not registered before use.");
 
 				// Return this component's type - used for creating signatures
-				return _ComponentTypes[typeName];
+				return _ComponentTypes[id];
 			}
 
 			template<typename T>
@@ -186,15 +186,15 @@ namespace rnd::ECS{
 			template<typename T>
 			bool has(Entity entity){
 				PROFILE_FUNCTION();
-				return getCompnentArray<T>()->has(entity);
+				return getComponentArray<T>()->has(entity);
 			}
 
 		private:
 			// Map from type string pointer to a component type
-			UnorderedMap<const char*, ComponentType> _ComponentTypes{};
+			UnorderedMap<size_t, ComponentType> _ComponentTypes{};
 
 			// Map from type string pointer to a component array
-			UnorderedMap<const char*, std::shared_ptr<IComponentArray>> _componentArrays{};
+			UnorderedMap<size_t, std::shared_ptr<IComponentArray>> _componentArrays{};
 
 			// The component type to be assigned to the next registered component - starting at 0
 			ComponentType _NextComponentType{};
@@ -202,9 +202,9 @@ namespace rnd::ECS{
 			// Convenience function to get the statically casted pointer to the ComponentArray of type T.
 			template<typename T> std::shared_ptr<ComponentArray<T>> getComponentArray(){
 				PROFILE_FUNCTION();
-				const char* typeName = typeid(T).name();
-				RND_ASSERT(_ComponentTypes.find(typeName) != _ComponentTypes.end(), "Component not registered before use.");
-				return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[typeName]);
+				size_t id = typeid(T).hash_code();
+				RND_ASSERT(_ComponentTypes.find(id) != _ComponentTypes.end(), "Component not registered before use.");
+				return std::static_pointer_cast<ComponentArray<T>>(_componentArrays[id]);
 			}
 	};
 
@@ -307,25 +307,25 @@ namespace rnd::ECS{
 			template<typename T, typename... _Args>
 			std::shared_ptr<T> registerSystem(_Args&&... __args) {
 				PROFILE_FUNCTION();
-				const char* typeName = typeid(T).name();
+				size_t id = typeid(T).hash_code();
 
-				RND_ASSERT(mSystems.find(typeName) == mSystems.end(), "Registering system more than once.");
+				RND_ASSERT(mSystems.find(id) == mSystems.end(), "Registering system more than once.");
 
 				// Create a pointer to the system and return it so it can be used externally
 				auto system = std::make_shared<T>(std::forward<_Args>(__args)...);
-				mSystems.insert({typeName, system});
+				mSystems.insert({id, system});
 				return system;
 			}
 
 			template<typename T>
 			void setSignature(Signature signature){
 				PROFILE_FUNCTION();
-				const char* typeName = typeid(T).name();
+				size_t id = typeid(T).hash_code();
 
-				RND_ASSERT(mSystems.find(typeName) != mSystems.end(), "System used before registered.");
+				RND_ASSERT(mSystems.find(id) != mSystems.end(), "System used before registered.");
 
 				// Set the signature for this system
-				mSignatures.insert({typeName, signature});
+				mSignatures.insert({id, signature});
 			}
 
 			void entityDestroyed(Entity entity){
@@ -364,10 +364,10 @@ namespace rnd::ECS{
 
 		private:
 			// Map from system type string pointer to a signature
-			UnorderedMap<const char*, Signature> mSignatures{};
+			UnorderedMap<size_t, Signature> mSignatures{};
 
 			// Map from system type string pointer to a system pointer
-			UnorderedMap<const char*, std::shared_ptr<System>> mSystems{};
+			UnorderedMap<size_t, std::shared_ptr<System>> mSystems{};
 	};
 
 	class Registry{

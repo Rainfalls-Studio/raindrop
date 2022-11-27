@@ -22,7 +22,7 @@
 
 #include "core.hpp"
 #include "render/Renderer.hpp"
-
+#include "ECS/ECS.hpp"
 namespace rnd{
 	// maybe needed for dynamic profiling
 	struct FrameStats{
@@ -32,6 +32,7 @@ namespace rnd{
 	struct FrameData{
 		float dt; // seconds
 		render::Renderer& renderer;
+		ECS::Registry& scene;
 		FrameStats& lastStats;
 	};
 }
