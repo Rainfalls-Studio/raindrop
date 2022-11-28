@@ -21,6 +21,8 @@
 #define __RAINDROP_RENDER_RENDERER_HPP__
 
 #include "core.hpp"
+#include "FrameData.hpp"
+#include "layers/LayerStack.hpp"
 #include "window/Window.hpp"
 #include "vulkan/AllocationCallback.hpp"
 #include "vulkan/Instance.hpp"
@@ -38,7 +40,7 @@ namespace rnd::render{
 			void init(window::Window &window);
 			void shutdown();
 
-			void render();
+			void render(layers::LayerStack& stack, const FrameData& data);
 
 		private:
 			vulkan::AllocationCallback allocCallback;

@@ -31,6 +31,8 @@ namespace rnd::layers{
 			virtual ~Layer() = default;
 
 			virtual void update(const FrameData& data){}
+			virtual void offscreenRender(const FrameData& data){}
+			virtual void render(const FrameData& data){}
 		
 		protected:
 			LUID uid;

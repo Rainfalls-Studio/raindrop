@@ -21,9 +21,15 @@
 #define __RAINDROP_FRAME_DATA_HPP__
 
 #include "core.hpp"
-#include "render/Renderer.hpp"
-#include "ECS/ECS.hpp"
+
 namespace rnd{
+	namespace render{
+		class Renderer;
+	}
+	namespace ECS{
+		class Registry;
+	}
+
 	// maybe needed for dynamic profiling
 	struct FrameStats{
 		// to complete
@@ -31,8 +37,8 @@ namespace rnd{
 
 	struct FrameData{
 		float dt; // seconds
-		render::Renderer& renderer;
-		ECS::Registry& scene;
+		ECS::Registry* scene;
+		render::Renderer* renderer;
 		FrameStats& lastStats;
 	};
 }

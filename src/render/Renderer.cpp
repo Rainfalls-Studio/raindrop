@@ -11,8 +11,6 @@ namespace rnd::render{
 		createPhysicalDevice();
 		createLogicalDevice();
 		createRenderer();
-
-		// renderer.init()
 	}
 
 	void Renderer::createInstance(window::Window &window){
@@ -73,13 +71,15 @@ namespace rnd::render{
 		renderer.shutdown();
 	}
 
-	void Renderer::render(){
+	void Renderer::render(layers::LayerStack& stack, const FrameData& data){
 		PROFILE_FUNCTION();
 
 		VkCommandBuffer commandBuffer = renderer.beginFrame();
 
 		if (commandBuffer){
+			stack.offscreenRender(data);
 			renderer.beginSwapChainRenderPass();
+			stack.render(data);
 			renderer.endSwapChainRenderPass(commandBuffer);
 			renderer.endFrame();
 		}

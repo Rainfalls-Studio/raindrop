@@ -23,6 +23,7 @@ namespace rnd::ECS{
 	using ComponentType = std::uint8_t;
 
 	static constexpr Entity MAX_ENTITIES = 1024; // thoses values are just exemples and can be change
+	static constexpr Entity NONE = -1;
 	static constexpr ComponentType MAX_COMPONENT = 32;
 
 	/**
@@ -41,6 +42,38 @@ namespace rnd::ECS{
 			virtual ~IComponentArray() = default;
 			virtual void entityDestroyed(Entity entity) = 0;
 	};
+
+	// this is 
+
+
+	struct EntityComponent{
+		using Iterator = List<Entity>::iterator;
+
+		Entity parent = NONE;
+		List<Entity> childs;
+		std::string tag;
+
+		bool isChild() const{
+			return parent != NONE;
+		}
+
+		bool hasChild() const{
+			return !childs.empty();
+		}
+
+		Iterator begin(){
+			return childs.begin();
+		}
+
+		Iterator end(){
+			return childs.end();
+		}
+
+		bool isChildOf(Entity parent){
+			return this->parent == parent;
+		}
+	};
+
 
 	template<typename T>
 	class ComponentArray : public IComponentArray{
@@ -380,12 +413,16 @@ namespace rnd::ECS{
 				_componentManager = std::make_unique<ComponentManager>();
 				_entityManager = std::make_unique<EntityManager>();
 				_systemManager = std::make_unique<SystemManager>();
+
+				registerComponent<EntityComponent>();
 			}
 
 			// Entity methods
 			Entity create(){
 				PROFILE_FUNCTION();
-				return _entityManager->create();
+				Entity entity = _entityManager->create();
+				addComponent<EntityComponent>(entity);
+				return entity;
 			}
 
 			void destroy(Entity entity){
@@ -395,6 +432,52 @@ namespace rnd::ECS{
 				_systemManager->entityDestroyed(entity);
 			}
 
+			void setHasChild(Entity parent, Entity child){
+				PROFILE_FUNCTION();
+				RND_ASSERT(parent != NONE, "cannot add the child to an invalid parent");
+				RND_ASSERT(child != NONE, "cannot add an invalid entity to a parent");
+
+				auto &childData = getComponent<EntityComponent>(child);
+				auto &parentData = getComponent<EntityComponent>(parent);
+
+				RND_ASSERT(!childData.isChildOf(parent), "this entity is already the child of the parent");
+
+				if (childData.isChild()){
+					removeChild(childData.parent, child);
+				}
+
+				childData.parent = parent;
+				parentData.childs.push_back(child);
+			}
+
+			void removeChild(Entity parent, Entity child){
+				PROFILE_FUNCTION();
+				RND_ASSERT(parent != NONE, "cannot remove the child from an invalid parent");
+				RND_ASSERT(child != NONE, "cannot remove an invalid entity from a parent");
+
+				auto &childData = getComponent<EntityComponent>(child);
+				auto &parentData = getComponent<EntityComponent>(parent);
+				
+				RND_ASSERT(childData.isChildOf(parent), "cannot remove the child from the parent, the entity is not a child");
+
+				parentData.childs.remove(child);
+				childData.parent = NONE;
+			}
+
+			List<Entity>& getChilds(Entity entity){
+				PROFILE_FUNCTION();
+				return getComponent<EntityComponent>(entity).childs;
+			}
+
+			std::string& getTag(Entity entity){
+				PROFILE_FUNCTION();
+				return getComponent<EntityComponent>(entity).tag;
+			}
+
+			Entity getParent(Entity entity){
+				PROFILE_FUNCTION();
+				return getComponent<EntityComponent>(entity).parent;
+			}
 
 			// Component methods
 			template<typename T>
@@ -404,7 +487,7 @@ namespace rnd::ECS{
 			}
 
 			template<typename T>
-			void addComponent(Entity entity, T component){
+			void addComponent(Entity entity, T component = {}){
 				PROFILE_FUNCTION();
 				_componentManager->addComponent<T>(entity, component);
 
@@ -443,6 +526,16 @@ namespace rnd::ECS{
 			ComponentType getComponentType(){
 				PROFILE_FUNCTION();
 				return _componentManager->getComponentType<T>();
+			}
+
+			bool isChild(Entity entity){
+				PROFILE_FUNCTION();
+				return getComponent<EntityComponent>(entity).isChild();
+			}
+
+			bool hasChild(Entity entity){
+				PROFILE_FUNCTION();
+				return getComponent<EntityComponent>(entity).hasChild();
 			}
 
 			// System methods

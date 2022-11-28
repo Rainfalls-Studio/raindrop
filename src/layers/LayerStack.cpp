@@ -28,4 +28,26 @@ namespace rnd::layers{
 			l.layer->update(data);
 		}
 	}
+	
+	void LayerStack::offscreenRender(const FrameData& data){
+		PROFILE_FUNCTION();
+		for (auto &l : layers){
+			l.layer->offscreenRender(data);
+		}
+	}
+
+	void LayerStack::render(const FrameData& data){
+		PROFILE_FUNCTION();
+		for (auto &l : layers){
+			l.layer->render(data);
+		}
+	}
+
+	bool operator<(const rnd::layers::LayerStack::LayerNode& a, const rnd::layers::LayerStack::LayerNode& b){
+		return a.priority < b.priority;
+	}
+
+	bool operator>(const rnd::layers::LayerStack::LayerNode& a, const rnd::layers::LayerStack::LayerNode& b){
+		return a.priority > b.priority;
+	}
 }

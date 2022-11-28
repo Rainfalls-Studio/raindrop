@@ -58,6 +58,8 @@ namespace rnd::layers{
 			void clear();
 
 			void update(const FrameData& data);
+			void offscreenRender(const FrameData& data);
+			void render(const FrameData& data);
 		
 		private:
 			struct LayerNode{
@@ -73,13 +75,8 @@ namespace rnd::layers{
 			Set<LayerNode, std::greater<LayerNode>> layers;
 	};
 
-	bool operator<(const rnd::layers::LayerStack::LayerNode& a, const rnd::layers::LayerStack::LayerNode& b){
-		return a.priority < b.priority;
-	}
-
-	bool operator>(const rnd::layers::LayerStack::LayerNode& a, const rnd::layers::LayerStack::LayerNode& b){
-		return a.priority > b.priority;
-	}
+	bool operator<(const rnd::layers::LayerStack::LayerNode& a, const rnd::layers::LayerStack::LayerNode& b);
+	bool operator>(const rnd::layers::LayerStack::LayerNode& a, const rnd::layers::LayerStack::LayerNode& b);
 }
 
 
