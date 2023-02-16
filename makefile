@@ -1,72 +1,84 @@
-# project
-VERSION = 0.1.0
-
-# compiler
-CXX = g++
+# project variables
 STD_VERSION = c++17
-LIBSFLAGS = -lmingw32 -lSDL2main -lSDL2 -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -lyaml-cpp -lEFX-Util -lOpenAL32 -lsndfile -lvulkan-1 -lglad
-CFLAGS =
-DEFINES = -D VERSION='"$(VERSION)"'
-INCLUDE = -I include/raindrop/ -I include/libs/
+VERSION = 0.1.0
+EXEC = Raindrop.lib
+CXX = g++
+FLAGS = 
+RAW_LIBS = 
+RAW_DEFINES = RAINDROP_VERSION='"$(VERSION)"' RAINDROP_ASSERTS
 
 # directories
 BIN = out
 SRC = src
 OBJ = .obj
 LIB = libs
-DLL = raindrop
+
+ifeq ($(OS), Windows_NT)
+	RAW_LIBS += mingw32
+endif
+
+# treated variables
+DBG_FLAGS = -g3
+RELEASE_FLAGS = -Wall -O2 -DNDEBUG
+
+LIBS = $(addprefix -l, $(RAW_LIBS))
+DEFINES = $(addprefix -D, $(RAW_DEFINES))
+
+ifeq ($(MAKECMDGOALS), dbg)
+	FLAGS += DBG_FLAGS
+endif
+
+ifeq ($(MAKECMDGOALS), dbgRebuild)
+	FLAGS += DBG_FLAGS
+endif
+
+ifeq ($(MAKECMDGOALS), release)
+	FLAGS += RELEASE_FLAGS
+endif
 
 # source files
 SRCS = $(wildcard $(SRC)/*.cpp) $(wildcard $(SRC)/**/*.cpp) $(wildcard $(SRC)/**/**/*.cpp) $(wildcard $(SRC)/**/**/**/*.cpp)
 OBJS := $(patsubst %.cpp, $(OBJ)/%.o, $(notdir $(SRCS)))
 
-all: $(DLL)
+all: $(EXEC)
 
-release: CFLAGS = -Wall -O2 -D NDEBUG
-release: clean
-release: all
-
-dbg: CFLAGS = -g3
 dbg: all
-
-dbgRebuild: CFLAGS = -g3
 dbgRebuild: rebuild
+release: rebuild
 
-rebuild: clean
-rebuild: $(DLL)
-
-pch:
-	$(CXX) -std=$(STD_VERSION) -c include/raindrop/pch.hpp -o include/raindrop/pch.pch $(INCLUDE)
+rebuild: clean $(EXEC)
 
 clean:
 	@del $(OBJ)\*.o
 
-$(DLL) : $(OBJS)
-	$(CXX) -std=$(STD_VERSION) -shared $(OBJ)/*.o $(INCLUDE) -L $(LIB) -o $(BIN)\$(DLL).dll $(CFLAGS) $(DEFINES) $(LIBSFLAGS) -Wl,--out-implib,$(BIN)\$(DLL).lib
+$(EXEC) : $(OBJS)
+	ar crs $(BIN)/$(EXEC) $(OBJ)/*.o
 
 $(OBJ)/%.o : $(SRC)/%.cpp
-	$(CXX) -fPIC -std=$(STD_VERSION) -shared -o $@ -c $< $(INCLUDE) -L $(LIB) $(DEFINES) $(CFLAGS)
+	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS)
 
 $(OBJ)/%.o : $(SRC)/*/%.cpp
-	$(CXX) -fPIC -std=$(STD_VERSION) -shared -o $@ -c $< $(INCLUDE) -L $(LIB) $(DEFINES) $(CFLAGS)
+	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS)
 
 $(OBJ)/%.o : $(SRC)/*/*/%.cpp
-	$(CXX) -fPIC -std=$(STD_VERSION) -shared -o $@ -c $< $(INCLUDE) -L $(LIB) $(DEFINES) $(CFLAGS)
+	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS)
 	
 $(OBJ)/%.o : $(SRC)/*/*/*/%.cpp
-	$(CXX) -fPIC -std=$(STD_VERSION) -shared -o $@ -c $< $(INCLUDE) -L $(LIB) $(DEFINES) $(CFLAGS)
+	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS)
 
-info:
-	@echo -----------------------------------------------------
-	@echo info :                
-	@echo 	compiler                     : $(CXX)
-	@echo 	compiler standart version    : $(STD_VERSION)
-	@echo 	flags                        : $(CFLAGS)
-	@echo 	defines                      : $(DEFINES)
-	@echo 	lib name                     : $(DLL)
-	@echo 	libs directory               : $(LIB)
-	@echo 	binary directory             : $(BIN)
-	@echo 	source code directory        : $(SRC)
-	@echo 	compiled object directory    : $(OBJ)
-	@echo 	include directory            : $(INCLUDE)
-	@echo -----------------------------------------------------
+help:
+	@echo Targets:
+	@echo   - all             : build the program
+	@echo   - rebuild         : rebuild all the files of the program
+	@echo   - release         : build the program in release mode (without any debug)
+	@echo   - dbg             : build the program in debug mode
+	@echo   - dbgRebuild      : rebuild all the files of the program in debug mode
+	@echo   - clean           : remove the object and output files
+	@echo --------------------------------------------------------------------------
+	@echo Project variables:
+	@echo   - version         : $(VERSION)
+	@echo   - compiler        : $(CXX)
+	@echo   - std version     : $(STD_VERSION)
+	@echo   - flags           : $(FLAGS)
+	@echo   - libs            : $(RAW_LIBS)
+	@echo   - defines         : $(RAW_DEFINES)

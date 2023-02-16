@@ -37,9 +37,3 @@ out/
 
 # Libraries
 libs/
-
-# Test
-*.log
-
-# (profile output files)
-*.json
