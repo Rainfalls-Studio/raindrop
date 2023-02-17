@@ -1,7 +1,7 @@
 #ifndef __TEST_HPP__
 #define __TEST_HPP__
 
-#include "Engine/Raindrop.hpp"
+#include <Raindrop.hpp>
 #include "gtest/gtest.h"
 
 static constexpr Raindrop::usize MEMORY_O = 1;

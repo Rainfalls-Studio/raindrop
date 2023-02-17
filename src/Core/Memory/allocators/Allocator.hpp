@@ -10,7 +10,6 @@
 namespace Raindrop::Core::Memory{
 	class Allocator{
 		public: 
-
 			/**
 			 * @brief constructure of the base allocator class
 			 * 
@@ -46,6 +45,9 @@ namespace Raindrop::Core::Memory{
 			usize usedMemory;
 			usize allocationCount;
 	};
+
+	Allocator& defaultAllocator();
+	#define RAINDROP_default_allocator() ::Raindrop::Core::Memory::defaultAllocator()
 
 	template <typename T, typename... Args>
 	T* allocateNew(Allocator& allocator, Args... args) {
