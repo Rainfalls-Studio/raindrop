@@ -24,7 +24,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_exponential extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_transform
 	/// @{
@@ -58,6 +58,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL qua<T, Q> sqrt(qua<T, Q> const& q);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "quaternion_exponential.inl"

@@ -1,6 +1,6 @@
 /// @ref gtx_polar_coordinates
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<3, T, Q> polar
@@ -33,4 +33,4 @@ namespace Raindrop::Core::Math
 			cos(latitude) * cos(longitude));
 	}
 
-}//namespace Raindrop::Core::Math
+}//namespace glm

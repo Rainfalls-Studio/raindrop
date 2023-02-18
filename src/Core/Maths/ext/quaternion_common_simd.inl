@@ -1,6 +1,6 @@
 #if GLM_ARCH & GLM_ARCH_SSE2_BIT
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 	template<qualifier Q>
@@ -12,7 +12,7 @@ namespace detail
 		}
 	};
 }//namespace detail
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #endif//GLM_ARCH & GLM_ARCH_SSE2_BIT
 

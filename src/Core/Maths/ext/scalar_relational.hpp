@@ -21,7 +21,7 @@
 #	pragma message("GLM: GLM_EXT_scalar_relational extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// Returns the component-wise comparison of |x - y| < epsilon.
 	/// True if this expression is satisfied.
@@ -60,6 +60,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL GLM_CONSTEXPR bool notEqual(genType const& x, genType const& y, int ULPs);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "scalar_relational.inl"

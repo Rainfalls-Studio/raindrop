@@ -27,7 +27,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_rotate_normalized_axis
 	/// @{
@@ -63,6 +63,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& axis);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "rotate_normalized_axis.inl"

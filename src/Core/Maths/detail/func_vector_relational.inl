@@ -1,4 +1,4 @@
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<L, bool, Q> lessThan(vec<L, T, Q> const& x, vec<L, T, Q> const& y)
@@ -80,7 +80,7 @@ namespace Raindrop::Core::Math
 			Result[i] = !v[i];
 		return Result;
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #if GLM_CONFIG_SIMD == GLM_ENABLE
 #	include "func_vector_relational_simd.inl"

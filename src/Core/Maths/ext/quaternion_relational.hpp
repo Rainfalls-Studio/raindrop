@@ -23,7 +23,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_relational extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_relational
 	/// @{
@@ -57,6 +57,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<4, bool, Q> notEqual(qua<T, Q> const& x, qua<T, Q> const& y, T epsilon);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "quaternion_relational.inl"

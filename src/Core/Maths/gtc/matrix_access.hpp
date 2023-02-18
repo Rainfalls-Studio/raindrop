@@ -19,7 +19,7 @@
 #	pragma message("GLM: GLM_GTC_matrix_access extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_matrix_access
 	/// @{
@@ -55,6 +55,6 @@ namespace Raindrop::Core::Math
 		typename genType::col_type const& x);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_access.inl"

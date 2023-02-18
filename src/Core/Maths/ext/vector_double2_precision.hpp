@@ -4,7 +4,7 @@
 #pragma once
 #include "../detail/type_vec2.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_vector_precision
 	/// @{
@@ -28,4 +28,4 @@ namespace Raindrop::Core::Math
 	typedef vec<2, double, lowp>		lowp_dvec2;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

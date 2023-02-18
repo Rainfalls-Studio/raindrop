@@ -26,7 +26,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_float extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_float
 	/// @{
@@ -35,5 +35,5 @@ namespace Raindrop::Core::Math
 	typedef qua<float, defaultp>		quat;
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 

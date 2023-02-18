@@ -1,6 +1,6 @@
 #include "scalar_integer.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<L, bool, Q> isPowerOfTwo(vec<L, T, Q> const& Value)
@@ -82,4 +82,4 @@ namespace Raindrop::Core::Math
 
 		return detail::functor2_vec_int<L, T, Q>::call(findNSB, Source, SignificantBitCount);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

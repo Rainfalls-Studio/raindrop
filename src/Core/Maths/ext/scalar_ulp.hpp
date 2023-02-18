@@ -24,7 +24,7 @@
 #	pragma message("GLM: GLM_EXT_scalar_ulp extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// Return the next ULP value(s) after the input value(s).
 	///
@@ -69,6 +69,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL int64 floatDistance(double x, double y);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "scalar_ulp.inl"

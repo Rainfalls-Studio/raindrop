@@ -1,6 +1,6 @@
 /// @ref gtx_wrap
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 
-}//namespace Raindrop::Core::Math
+}//namespace glm

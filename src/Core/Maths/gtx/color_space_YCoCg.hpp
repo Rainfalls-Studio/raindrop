@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_color_space_YCoCg
 	/// @{
@@ -55,6 +55,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& YCoCgColor);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "color_space_YCoCg.inl"

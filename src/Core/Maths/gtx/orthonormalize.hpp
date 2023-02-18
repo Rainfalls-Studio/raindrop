@@ -26,7 +26,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_orthonormalize
 	/// @{
@@ -44,6 +44,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<3, T, Q> orthonormalize(vec<3, T, Q> const& x, vec<3, T, Q> const& y);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "orthonormalize.inl"

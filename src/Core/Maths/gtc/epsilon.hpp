@@ -21,7 +21,7 @@
 #	pragma message("GLM: GLM_GTC_epsilon extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_epsilon
 	/// @{
@@ -55,6 +55,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL bool epsilonNotEqual(genType const& x, genType const& y, genType const& epsilon);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "epsilon.inl"

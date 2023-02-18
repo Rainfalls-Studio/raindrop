@@ -20,7 +20,7 @@
 #	pragma message("GLM: GLM_EXT_matrix_int4x4_sized extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_matrix_int4x4_sized
 	/// @{
@@ -67,4 +67,4 @@ namespace Raindrop::Core::Math
 	typedef mat<4, 4, int64, defaultp>				i64mat4;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

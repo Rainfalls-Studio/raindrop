@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_matrix_interpolation
 	/// @{
@@ -55,6 +55,6 @@ namespace Raindrop::Core::Math
 		mat<4, 4, T, Q> const& m1, mat<4, 4, T, Q> const& m2, T const Delta);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_interpolation.inl"

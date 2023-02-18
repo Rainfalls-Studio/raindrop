@@ -2,7 +2,7 @@
 
 #include "./compute_vector_relational.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	// -- Implicit basic constructors --
 
@@ -548,4 +548,4 @@ namespace Raindrop::Core::Math
 	{
 		return vec<1, bool, Q>(v1.x || v2.x);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

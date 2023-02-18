@@ -20,7 +20,7 @@
 #	pragma message("GLM: GLM_EXT_matrix_int3x2_sized extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_matrix_int3x2_sized
 	/// @{
@@ -46,4 +46,4 @@ namespace Raindrop::Core::Math
 	typedef mat<3, 2, int64, defaultp>				i64mat3x2;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

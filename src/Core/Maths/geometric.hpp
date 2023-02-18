@@ -14,7 +14,7 @@
 
 #include "detail/type_vec3.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_func_geometric
 	/// @{
@@ -111,6 +111,6 @@ namespace Raindrop::Core::Math
 		T eta);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "detail/func_geometric.inl"

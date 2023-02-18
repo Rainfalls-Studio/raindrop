@@ -62,7 +62,7 @@ typedef union
 		(d) = iw_u.value;					\
 	} while (0)
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 	GLM_FUNC_QUALIFIER float nextafterf(float x, float y)
@@ -180,13 +180,13 @@ namespace detail
 		return x;
 	}
 }//namespace detail
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #if(GLM_COMPILER & GLM_COMPILER_VC)
 #	pragma warning(pop)
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<>
 	GLM_FUNC_QUALIFIER float nextFloat(float x)
@@ -281,4 +281,4 @@ namespace Raindrop::Core::Math
 
 		return abs(a.i - b.i);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

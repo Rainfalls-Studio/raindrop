@@ -1,6 +1,6 @@
 /// @ref gtx_extended_min_max
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T>
 	GLM_FUNC_QUALIFIER T min(
@@ -8,7 +8,7 @@ namespace Raindrop::Core::Math
 		T const& y,
 		T const& z)
 	{
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(x, y), z);
+		return glm::min(glm::min(x, y), z);
 	}
 
 	template<typename T, template<typename> class C>
@@ -19,7 +19,7 @@ namespace Raindrop::Core::Math
 		typename C<T>::T const& z
 	)
 	{
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(x, y), z);
+		return glm::min(glm::min(x, y), z);
 	}
 
 	template<typename T, template<typename> class C>
@@ -30,7 +30,7 @@ namespace Raindrop::Core::Math
 		C<T> const& z
 	)
 	{
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(x, y), z);
+		return glm::min(glm::min(x, y), z);
 	}
 
 	template<typename T>
@@ -42,7 +42,7 @@ namespace Raindrop::Core::Math
 		T const& w
 	)
 	{
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(x, y), Raindrop::Core::Math::min(z, w));
+		return glm::min(glm::min(x, y), glm::min(z, w));
 	}
 
 	template<typename T, template<typename> class C>
@@ -54,7 +54,7 @@ namespace Raindrop::Core::Math
 		typename C<T>::T const& w
 	)
 	{
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(x, y), Raindrop::Core::Math::min(z, w));
+		return glm::min(glm::min(x, y), glm::min(z, w));
 	}
 
 	template<typename T, template<typename> class C>
@@ -66,7 +66,7 @@ namespace Raindrop::Core::Math
 		C<T> const& w
 	)
 	{
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(x, y), Raindrop::Core::Math::min(z, w));
+		return glm::min(glm::min(x, y), glm::min(z, w));
 	}
 
 	template<typename T>
@@ -75,7 +75,7 @@ namespace Raindrop::Core::Math
 		T const& y,
 		T const& z)
 	{
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(x, y), z);
+		return glm::max(glm::max(x, y), z);
 	}
 
 	template<typename T, template<typename> class C>
@@ -86,7 +86,7 @@ namespace Raindrop::Core::Math
 		typename C<T>::T const& z
 	)
 	{
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(x, y), z);
+		return glm::max(glm::max(x, y), z);
 	}
 
 	template<typename T, template<typename> class C>
@@ -97,7 +97,7 @@ namespace Raindrop::Core::Math
 		C<T> const& z
 	)
 	{
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(x, y), z);
+		return glm::max(glm::max(x, y), z);
 	}
 
 	template<typename T>
@@ -109,7 +109,7 @@ namespace Raindrop::Core::Math
 		T const& w
 	)
 	{
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(x, y), Raindrop::Core::Math::max(z, w));
+		return glm::max(glm::max(x, y), glm::max(z, w));
 	}
 
 	template<typename T, template<typename> class C>
@@ -121,7 +121,7 @@ namespace Raindrop::Core::Math
 		typename C<T>::T const& w
 	)
 	{
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(x, y), Raindrop::Core::Math::max(z, w));
+		return glm::max(glm::max(x, y), glm::max(z, w));
 	}
 
 	template<typename T, template<typename> class C>
@@ -133,6 +133,6 @@ namespace Raindrop::Core::Math
 		C<T> const& w
 	)
 	{
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(x, y), Raindrop::Core::Math::max(z, w));
+		return glm::max(glm::max(x, y), glm::max(z, w));
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

@@ -27,7 +27,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_norm
 	/// @{
@@ -83,6 +83,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL T lMaxNorm(vec<3, T, Q> const& x);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "norm.inl"

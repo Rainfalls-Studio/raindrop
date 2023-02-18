@@ -1,6 +1,6 @@
 /// @ref gtx_bit
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	///////////////////
 	// highestBitValue
@@ -89,4 +89,4 @@ namespace Raindrop::Core::Math
 		return detail::functor1<vec, L, T, T, Q>::call(powerOfTwoNearest, v);
 	}
 
-}//namespace Raindrop::Core::Math
+}//namespace glm

@@ -2,7 +2,7 @@
 
 #include "../gtc/constants.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER void axisAngle(mat<4, 4, T, Q> const& m, vec<3, T, Q> & axis, T& angle)
@@ -75,7 +75,7 @@ namespace Raindrop::Core::Math
 			return;
 		}
 		T s = sqrt((m[2][1] - m[1][2]) * (m[2][1] - m[1][2]) + (m[2][0] - m[0][2]) * (m[2][0] - m[0][2]) + (m[1][0] - m[0][1]) * (m[1][0] - m[0][1]));
-		if (Raindrop::Core::Math::abs(s) < T(0.001))
+		if (glm::abs(s) < T(0.001))
 			s = static_cast<T>(1);
 		T const angleCos = (m[0][0] + m[1][1] + m[2][2] - static_cast<T>(1)) * static_cast<T>(0.5);
 		if(angleCos - static_cast<T>(1) < epsilon)
@@ -126,4 +126,4 @@ namespace Raindrop::Core::Math
 		out[3][2] = m1[3][2] + delta * (m2[3][2] - m1[3][2]);
 		return out;
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

@@ -23,7 +23,7 @@
 #	pragma message("GLM: GLM_EXT_scalar_integer extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_scalar_integer
 	/// @{
@@ -87,6 +87,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL int findNSB(genIUType x, int significantBitCount);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "scalar_integer.inl"

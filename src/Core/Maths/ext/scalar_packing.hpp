@@ -20,13 +20,13 @@
 #	pragma message("GLM: GLM_EXT_scalar_packing extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_scalar_packing
 	/// @{
 
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "scalar_packing.inl"

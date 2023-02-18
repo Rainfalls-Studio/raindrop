@@ -1,6 +1,6 @@
 #include <limits>
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	// isfinite
 	template<typename genType>
@@ -59,4 +59,4 @@ namespace Raindrop::Core::Math
 			isfinite(x.w));
 	}
 
-}//namespace Raindrop::Core::Math
+}//namespace glm

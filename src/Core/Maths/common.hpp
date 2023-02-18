@@ -17,7 +17,7 @@
 #include "detail/qualifier.hpp"
 #include "detail/_fixes.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_func_common
 	/// @{
@@ -295,15 +295,15 @@ namespace Raindrop::Core::Math
 	/// ...
 	/// float a;
 	/// bool b;
-	/// Raindrop::Core::Math::dvec3 e;
-	/// Raindrop::Core::Math::dvec3 f;
-	/// Raindrop::Core::Math::vec4 g;
-	/// Raindrop::Core::Math::vec4 h;
+	/// glm::dvec3 e;
+	/// glm::dvec3 f;
+	/// glm::vec4 g;
+	/// glm::vec4 h;
 	/// ...
-	/// Raindrop::Core::Math::vec4 r = Raindrop::Core::Math::mix(g, h, a); // Interpolate with a floating-point scalar two vectors.
-	/// Raindrop::Core::Math::vec4 s = Raindrop::Core::Math::mix(g, h, b); // Returns g or h;
-	/// Raindrop::Core::Math::dvec3 t = Raindrop::Core::Math::mix(e, f, a); // Types of the third parameter is not required to match with the first and the second.
-	/// Raindrop::Core::Math::vec4 u = Raindrop::Core::Math::mix(g, h, r); // Interpolations can be perform per component with a vector for the last parameter.
+	/// glm::vec4 r = glm::mix(g, h, a); // Interpolate with a floating-point scalar two vectors.
+	/// glm::vec4 s = glm::mix(g, h, b); // Returns g or h;
+	/// glm::dvec3 t = glm::mix(e, f, a); // Types of the third parameter is not required to match with the first and the second.
+	/// glm::vec4 u = glm::mix(g, h, r); // Interpolations can be perform per component with a vector for the last parameter.
 	/// @endcode
 	template<typename genTypeT, typename genTypeU>
 	GLM_FUNC_DECL genTypeT mix(genTypeT x, genTypeT y, genTypeU a);
@@ -533,7 +533,7 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<L, T, Q> ldexp(vec<L, T, Q> const& v, vec<L, int, Q> const& exp);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "detail/func_common.inl"
 

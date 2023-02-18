@@ -20,7 +20,7 @@
 #	pragma message("GLM: GLM_EXT_vector_int3_sized extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_vector_int3_sized
 	/// @{
@@ -46,4 +46,4 @@ namespace Raindrop::Core::Math
 	typedef vec<3, int64, defaultp>		i64vec3;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

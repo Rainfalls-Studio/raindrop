@@ -19,7 +19,7 @@
 #	pragma message("GLM: GLM_EXT_matrix_int4x4 extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_matrix_int4x4
 	/// @{
@@ -35,4 +35,4 @@ namespace Raindrop::Core::Math
 	typedef mat<4, 4, int, defaultp>	imat4;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

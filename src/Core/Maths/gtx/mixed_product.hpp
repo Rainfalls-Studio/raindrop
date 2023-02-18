@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_mixed_product
 	/// @{
@@ -36,6 +36,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& v3);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "mixed_product.inl"

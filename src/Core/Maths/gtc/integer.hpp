@@ -25,7 +25,7 @@
 #	pragma message("GLM: GLM_GTC_integer extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_integer
 	/// @{
@@ -60,6 +60,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<L, uint, Q> uround(vec<L, T, Q> const& x);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "integer.inl"

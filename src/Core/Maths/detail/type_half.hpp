@@ -2,7 +2,7 @@
 
 #include "setup.hpp"
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 	typedef short hdata;
@@ -11,6 +11,6 @@ namespace detail
 	GLM_FUNC_DECL hdata toFloat16(float const& value);
 
 }//namespace detail
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "type_half.inl"

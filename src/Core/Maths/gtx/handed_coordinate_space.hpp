@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_handed_coordinate_space
 	/// @{
@@ -45,6 +45,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& normal);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "handed_coordinate_space.inl"

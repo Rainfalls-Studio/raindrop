@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_perpendicular
 	/// @{
@@ -36,6 +36,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL genType perp(genType const& x, genType const& Normal);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "perpendicular.inl"

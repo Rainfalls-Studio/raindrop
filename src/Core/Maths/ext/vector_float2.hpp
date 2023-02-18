@@ -4,7 +4,7 @@
 #pragma once
 #include "../detail/type_vec2.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_vector
 	/// @{
@@ -15,4 +15,4 @@ namespace Raindrop::Core::Math
 	typedef vec<2, float, defaultp>	vec2;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

@@ -1,4 +1,4 @@
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename genType>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR genType identity()
@@ -149,4 +149,4 @@ namespace Raindrop::Core::Math
 		else
 			return lookAtRH(eye, center, up);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

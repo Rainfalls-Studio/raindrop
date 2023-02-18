@@ -2,7 +2,7 @@
 
 #include "../ext/scalar_ulp.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<>
 	GLM_FUNC_QUALIFIER float next_float(float x)
@@ -169,5 +169,5 @@ namespace Raindrop::Core::Math
 			Result[i] = float_distance(x[i], y[i]);
 		return Result;
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 

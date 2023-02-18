@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	///////////////////////////
 	// Signed int vector types
@@ -977,6 +977,6 @@ namespace Raindrop::Core::Math
 #	endif//GLM_FORCE_SINGLE_ONLY
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "type_aligned.inl"

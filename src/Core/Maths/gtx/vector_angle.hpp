@@ -28,7 +28,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_vector_angle
 	/// @{
@@ -52,6 +52,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL T orientedAngle(vec<3, T, Q> const& x, vec<3, T, Q> const& y, vec<3, T, Q> const& ref);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "vector_angle.inl"

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 	// Internal class for implementing swizzle operators
@@ -268,9 +268,9 @@ namespace detail
 	}
 
 }//namespace detail
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	namespace detail
 	{

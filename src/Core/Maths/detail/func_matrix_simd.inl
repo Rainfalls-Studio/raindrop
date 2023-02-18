@@ -5,7 +5,7 @@
 #include "../simd/matrix.h"
 #include <cstring>
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 #	if GLM_CONFIG_ALIGNED_GENTYPES == GLM_ENABLE
@@ -89,11 +89,11 @@ namespace detail
 		return Result;
 	}
 #	endif
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #elif GLM_ARCH & GLM_ARCH_NEON_BIT
 
-namespace Raindrop::Core::Math {
+namespace glm {
 #if GLM_LANG & GLM_LANG_CXX11_FLAG
 	template <qualifier Q>
 	GLM_FUNC_QUALIFIER
@@ -245,5 +245,5 @@ namespace Raindrop::Core::Math {
 			return r;
 		}
 	};
-}//namespace Raindrop::Core::Math
+}//namespace glm
 #endif

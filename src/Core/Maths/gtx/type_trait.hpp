@@ -25,7 +25,7 @@
 #include "../gtc/quaternion.hpp"
 #include "../gtx/dual_quaternion.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_type_trait
 	/// @{
@@ -80,6 +80,6 @@ namespace Raindrop::Core::Math
 	};
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "type_trait.inl"

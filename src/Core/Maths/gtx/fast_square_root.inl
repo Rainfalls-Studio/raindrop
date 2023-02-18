@@ -1,6 +1,6 @@
 /// @ref gtx_fast_square_root
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	// fastSqrt
 	template<typename genType>
@@ -72,4 +72,4 @@ namespace Raindrop::Core::Math
 	{
 		return x * fastInverseSqrt(dot(x, x));
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

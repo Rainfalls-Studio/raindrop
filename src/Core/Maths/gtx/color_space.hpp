@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_color_space
 	/// @{
@@ -67,6 +67,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& color);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "color_space.inl"

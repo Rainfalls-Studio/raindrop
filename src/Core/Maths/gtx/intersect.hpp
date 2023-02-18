@@ -29,7 +29,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_intersect
 	/// @{
@@ -87,6 +87,6 @@ namespace Raindrop::Core::Math
 		genType & intersectionPosition2 = genType(), genType & intersectionNormal2 = genType());
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "intersect.inl"

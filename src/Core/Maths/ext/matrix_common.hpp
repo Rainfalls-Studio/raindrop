@@ -19,7 +19,7 @@
 #	pragma message("GLM: GLM_EXT_matrix_transform extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_matrix_common
 	/// @{
@@ -31,6 +31,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL mat<C, R, T, Q> mix(mat<C, R, T, Q> const& x, mat<C, R, T, Q> const& y, U a);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_common.inl"

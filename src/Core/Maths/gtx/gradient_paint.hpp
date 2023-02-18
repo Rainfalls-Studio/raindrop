@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_gradient_paint
 	/// @{
@@ -48,6 +48,6 @@ namespace Raindrop::Core::Math
 		vec<2, T, Q> const& Position);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "gradient_paint.inl"

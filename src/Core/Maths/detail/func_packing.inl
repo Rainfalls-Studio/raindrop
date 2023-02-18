@@ -4,7 +4,7 @@
 #include "../common.hpp"
 #include "type_half.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	GLM_FUNC_QUALIFIER uint packUnorm2x16(vec2 const& v)
 	{
@@ -113,7 +113,7 @@ namespace Raindrop::Core::Math
 		return u.out;
 	}
 
-	GLM_FUNC_QUALIFIER Raindrop::Core::Math::vec4 unpackSnorm4x8(uint p)
+	GLM_FUNC_QUALIFIER glm::vec4 unpackSnorm4x8(uint p)
 	{
 		union
 		{
@@ -181,7 +181,7 @@ namespace Raindrop::Core::Math
 			detail::toFloat32(u.out[0]),
 			detail::toFloat32(u.out[1]));
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #if GLM_CONFIG_SIMD == GLM_ENABLE
 #	include "func_packing_simd.inl"

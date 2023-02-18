@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_spline
 	/// @{
@@ -60,6 +60,6 @@ namespace Raindrop::Core::Math
 		typename genType::value_type const& s);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "spline.inl"

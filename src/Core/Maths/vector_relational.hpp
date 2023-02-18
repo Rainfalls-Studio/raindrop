@@ -22,7 +22,7 @@
 #include "detail/qualifier.hpp"
 #include "detail/setup.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_func_vector_relational
 	/// @{
@@ -116,6 +116,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL GLM_CONSTEXPR vec<L, bool, Q> not_(vec<L, bool, Q> const& v);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "detail/func_vector_relational.inl"

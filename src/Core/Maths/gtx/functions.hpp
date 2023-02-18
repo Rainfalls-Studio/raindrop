@@ -26,7 +26,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_functions
 	/// @{
@@ -50,7 +50,7 @@ namespace Raindrop::Core::Math
 		vec<2, T, Q> const& StandardDeviation);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "functions.inl"
 

@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_bit
 	/// @{
@@ -91,7 +91,7 @@ namespace Raindrop::Core::Math
 	GLM_DEPRECATED GLM_FUNC_DECL vec<L, T, Q> powerOfTwoNearest(vec<L, T, Q> const& value);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 
 #include "bit.inl"

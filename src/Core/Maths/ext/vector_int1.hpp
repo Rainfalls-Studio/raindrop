@@ -19,7 +19,7 @@
 #	pragma message("GLM: GLM_EXT_vector_int1 extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_vector_int1
 	/// @{
@@ -28,5 +28,5 @@ namespace Raindrop::Core::Math
 	typedef vec<1, int, defaultp>			ivec1;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 

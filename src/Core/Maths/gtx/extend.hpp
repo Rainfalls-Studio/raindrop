@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_extend
 	/// @{
@@ -37,6 +37,6 @@ namespace Raindrop::Core::Math
 		typename genType::value_type const Length);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "extend.inl"

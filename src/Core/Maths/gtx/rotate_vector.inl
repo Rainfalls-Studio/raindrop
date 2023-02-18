@@ -1,6 +1,6 @@
 /// @ref gtx_rotate_vector
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<3, T, Q> slerp
@@ -48,7 +48,7 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& normal
 	)
 	{
-		return mat<3, 3, T, Q>(Raindrop::Core::Math::rotate(angle, normal)) * v;
+		return mat<3, 3, T, Q>(glm::rotate(angle, normal)) * v;
 	}
 	/*
 	template<typename T, qualifier Q>
@@ -184,4 +184,4 @@ namespace Raindrop::Core::Math
 
 		return rotate(Angle, RotationAxis);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

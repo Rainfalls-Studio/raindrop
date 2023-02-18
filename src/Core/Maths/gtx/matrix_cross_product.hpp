@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_matrix_cross_product
 	/// @{
@@ -42,6 +42,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& x);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_cross_product.inl"

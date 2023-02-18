@@ -29,7 +29,7 @@
 #	pragma message("GLM: GLM_EXT_matrix_transform extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_matrix_transform
 	/// @{
@@ -50,7 +50,7 @@ namespace Raindrop::Core::Math
 	/// #include <Core/Maths/glm.hpp>
 	/// #include <Core/Maths/gtc/matrix_transform.hpp>
 	/// ...
-	/// Raindrop::Core::Math::mat4 m = Raindrop::Core::Math::translate(Raindrop::Core::Math::mat4(1.0f), Raindrop::Core::Math::vec3(1.0f));
+	/// glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f));
 	/// // m[0][0] == 1.0f, m[0][1] == 0.0f, m[0][2] == 0.0f, m[0][3] == 0.0f
 	/// // m[1][0] == 0.0f, m[1][1] == 1.0f, m[1][2] == 0.0f, m[1][3] == 0.0f
 	/// // m[2][0] == 0.0f, m[2][1] == 0.0f, m[2][2] == 1.0f, m[2][3] == 0.0f
@@ -139,6 +139,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& eye, vec<3, T, Q> const& center, vec<3, T, Q> const& up);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_transform.inl"

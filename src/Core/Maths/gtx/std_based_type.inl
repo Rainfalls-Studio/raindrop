@@ -1,6 +1,6 @@
 /// @ref gtx_std_based_type
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 
 }

@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_projection
 	/// @{
@@ -38,6 +38,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL genType proj(genType const& x, genType const& Normal);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "projection.inl"

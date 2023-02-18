@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_vector_query
 	/// @{
@@ -61,6 +61,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL bool areOrthonormal(vec<L, T, Q> const& v0, vec<L, T, Q> const& v1, T const& epsilon);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "vector_query.inl"

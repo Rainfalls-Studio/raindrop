@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_matrix_major_storage
 	/// @{
@@ -114,6 +114,6 @@ namespace Raindrop::Core::Math
 		mat<4, 4, T, Q> const& m);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_major_storage.inl"

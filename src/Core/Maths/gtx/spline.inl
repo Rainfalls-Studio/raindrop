@@ -1,6 +1,6 @@
 /// @ref gtx_spline
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType catmullRom
@@ -57,4 +57,4 @@ namespace Raindrop::Core::Math
 	{
 		return ((v1 * s + v2) * s + v3) * s + v4;
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

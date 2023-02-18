@@ -26,7 +26,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_common
 	/// @{
@@ -71,6 +71,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<L, bool, Q> closeBounded(vec<L, T, Q> const& Value, vec<L, T, Q> const& Min, vec<L, T, Q> const& Max);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "common.inl"

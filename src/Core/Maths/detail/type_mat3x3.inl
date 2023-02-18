@@ -1,6 +1,6 @@
 #include "../matrix.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	// -- Constructors --
 
@@ -598,4 +598,4 @@ namespace Raindrop::Core::Math
 	{
 		return (m1[0] != m2[0]) || (m1[1] != m2[1]) || (m1[2] != m2[2]);
 	}
-} //namespace Raindrop::Core::Math
+} //namespace glm

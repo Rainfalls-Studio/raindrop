@@ -1,6 +1,6 @@
 /// @ref gtx_color_space_YCoCg
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<3, T, Q> rgb2YCoCg
@@ -104,4 +104,4 @@ namespace Raindrop::Core::Math
 	{
 		return compute_YCoCgR<T, Q, std::numeric_limits<T>::is_integer>::YCoCgR2rgb(YCoCgRColor);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

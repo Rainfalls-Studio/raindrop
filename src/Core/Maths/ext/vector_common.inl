@@ -1,33 +1,33 @@
 #include "../detail/_vectorize.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<L, T, Q> min(vec<L, T, Q> const& x, vec<L, T, Q> const& y, vec<L, T, Q> const& z)
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'min' only accept floating-point or integer inputs");
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(x, y), z);
+		return glm::min(glm::min(x, y), z);
 	}
 
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<L, T, Q> min(vec<L, T, Q> const& x, vec<L, T, Q> const& y, vec<L, T, Q> const& z, vec<L, T, Q> const& w)
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'min' only accept floating-point or integer inputs");
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(x, y), Raindrop::Core::Math::min(z, w));
+		return glm::min(glm::min(x, y), glm::min(z, w));
 	}
 
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<L, T, Q> max(vec<L, T, Q> const& x, vec<L, T, Q> const& y, vec<L, T, Q> const& z)
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'max' only accept floating-point or integer inputs");
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(x, y), z);
+		return glm::max(glm::max(x, y), z);
 	}
 
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR vec<L, T, Q> max(vec<L, T, Q> const& x, vec<L, T, Q> const& y, vec<L, T, Q> const& z, vec<L, T, Q> const& w)
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'max' only accept floating-point or integer inputs");
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(x, y), Raindrop::Core::Math::max(z, w));
+		return glm::max(glm::max(x, y), glm::max(z, w));
 	}
 
 	template<length_t L, typename T, qualifier Q>
@@ -101,29 +101,29 @@ namespace Raindrop::Core::Math
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<L, T, Q> clamp(vec<L, T, Q> const& Texcoord)
 	{
-		return Raindrop::Core::Math::clamp(Texcoord, vec<L, T, Q>(0), vec<L, T, Q>(1));
+		return glm::clamp(Texcoord, vec<L, T, Q>(0), vec<L, T, Q>(1));
 	}
 
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<L, T, Q> repeat(vec<L, T, Q> const& Texcoord)
 	{
-		return Raindrop::Core::Math::fract(Texcoord);
+		return glm::fract(Texcoord);
 	}
 
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<L, T, Q> mirrorClamp(vec<L, T, Q> const& Texcoord)
 	{
-		return Raindrop::Core::Math::fract(Raindrop::Core::Math::abs(Texcoord));
+		return glm::fract(glm::abs(Texcoord));
 	}
 
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<L, T, Q> mirrorRepeat(vec<L, T, Q> const& Texcoord)
 	{
-		vec<L, T, Q> const Abs = Raindrop::Core::Math::abs(Texcoord);
-		vec<L, T, Q> const Clamp = Raindrop::Core::Math::mod(Raindrop::Core::Math::floor(Abs), vec<L, T, Q>(2));
-		vec<L, T, Q> const Floor = Raindrop::Core::Math::floor(Abs);
+		vec<L, T, Q> const Abs = glm::abs(Texcoord);
+		vec<L, T, Q> const Clamp = glm::mod(glm::floor(Abs), vec<L, T, Q>(2));
+		vec<L, T, Q> const Floor = glm::floor(Abs);
 		vec<L, T, Q> const Rest = Abs - Floor;
 		vec<L, T, Q> const Mirror = Clamp + Rest;
-		return mix(Rest, vec<L, T, Q>(1) - Rest, Raindrop::Core::Math::greaterThanEqual(Mirror, vec<L, T, Q>(1)));
+		return mix(Rest, vec<L, T, Q>(1) - Rest, glm::greaterThanEqual(Mirror, vec<L, T, Q>(1)));
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

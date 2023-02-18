@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_extended_min_max
 	/// @{
@@ -132,6 +132,6 @@ namespace Raindrop::Core::Math
 		C<T> const& w);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "extended_min_max.inl"

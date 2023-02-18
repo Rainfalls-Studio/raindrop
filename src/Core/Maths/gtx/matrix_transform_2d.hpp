@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_matrix_transform_2d
 	/// @{
@@ -76,6 +76,6 @@ namespace Raindrop::Core::Math
 		T x);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_transform_2d.inl"

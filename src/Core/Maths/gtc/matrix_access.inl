@@ -1,6 +1,6 @@
 /// @ref gtc_matrix_access
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType row
@@ -59,4 +59,4 @@ namespace Raindrop::Core::Math
 
 		return m[index];
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

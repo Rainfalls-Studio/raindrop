@@ -20,7 +20,7 @@
 #	pragma message("GLM: GLM_EXT_vector_uint4_sized extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_vector_uint4_sized
 	/// @{
@@ -46,4 +46,4 @@ namespace Raindrop::Core::Math
 	typedef vec<4, uint64, defaultp>	u64vec4;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

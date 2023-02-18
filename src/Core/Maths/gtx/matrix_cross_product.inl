@@ -1,6 +1,6 @@
 /// @ref gtx_matrix_cross_product
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER mat<3, 3, T, Q> matrixCross3
@@ -34,4 +34,4 @@ namespace Raindrop::Core::Math
 		return Result;
 	}
 
-}//namespace Raindrop::Core::Math
+}//namespace glm

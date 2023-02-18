@@ -4,7 +4,7 @@
 #pragma once
 #include "../detail/type_mat3x3.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_matrix_precision
 	/// @{
@@ -46,4 +46,4 @@ namespace Raindrop::Core::Math
 	typedef mat<3, 3, float, highp>		highp_mat3x3;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

@@ -1,6 +1,6 @@
 /// @ref gtx_optimum_pow
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType pow2(genType const& x)
@@ -19,4 +19,4 @@ namespace Raindrop::Core::Math
 	{
 		return (x * x) * (x * x);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

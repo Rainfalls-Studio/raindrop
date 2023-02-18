@@ -35,7 +35,7 @@
 #	pragma message("GLM: GLM_GTC_quaternion extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_quaternion
 	/// @{
@@ -168,6 +168,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& direction,
 		vec<3, T, Q> const& up);
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "quaternion.inl"

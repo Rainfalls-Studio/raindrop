@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_texture
 	/// @{
@@ -40,7 +40,7 @@ namespace Raindrop::Core::Math
 	T levels(vec<L, T, Q> const& Extent);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "texture.inl"
 

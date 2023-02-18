@@ -26,7 +26,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_double extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_double
 	/// @{
@@ -35,5 +35,5 @@ namespace Raindrop::Core::Math
 	typedef qua<double, defaultp>		dquat;
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 

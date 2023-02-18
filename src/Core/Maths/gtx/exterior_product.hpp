@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_exterior_product
 	/// @{
@@ -40,6 +40,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL T cross(vec<2, T, Q> const& v, vec<2, T, Q> const& u);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "exterior_product.inl"

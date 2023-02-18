@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_polar_coordinates
 	/// @{
@@ -43,6 +43,6 @@ namespace Raindrop::Core::Math
 		vec<2, T, Q> const& polar);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "polar_coordinates.inl"

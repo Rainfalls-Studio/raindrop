@@ -24,7 +24,7 @@
 #	pragma message("GLM: GLM_EXT_vector_relational extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_vector_relational
 	/// @{
@@ -102,6 +102,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL GLM_CONSTEXPR vec<L, bool, Q> notEqual(vec<L, T, Q> const& x, vec<L, T, Q> const& y, vec<L, int, Q> const& ULPs);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "vector_relational.inl"

@@ -1,6 +1,6 @@
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 
 }//namespace detail
-}//namespace Raindrop::Core::Math
+}//namespace glm

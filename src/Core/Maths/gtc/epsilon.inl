@@ -4,7 +4,7 @@
 #include "../vector_relational.hpp"
 #include "../common.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<>
 	GLM_FUNC_QUALIFIER bool epsilonEqual
@@ -77,4 +77,4 @@ namespace Raindrop::Core::Math
 		vec<4, T, Q> v(x.x - y.x, x.y - y.y, x.z - y.z, x.w - y.w);
 		return greaterThanEqual(abs(v), vec<4, T, Q>(epsilon));
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

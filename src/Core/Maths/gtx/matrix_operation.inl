@@ -1,6 +1,6 @@
 /// @ref gtx_matrix_operation
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER mat<2, 2, T, Q> diagonal2x2
@@ -173,4 +173,4 @@ namespace Raindrop::Core::Math
 			+m20, -m21, +m22, -m23,
 			-m30, +m31, -m32, +m33);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

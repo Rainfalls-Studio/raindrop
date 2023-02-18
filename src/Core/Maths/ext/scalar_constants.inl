@@ -1,6 +1,6 @@
 #include <limits>
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename genType>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR genType epsilon()
@@ -21,4 +21,4 @@ namespace Raindrop::Core::Math
 	{
 		return genType(0.877582561890372716130286068203503191);
 	}
-} //namespace Raindrop::Core::Math
+} //namespace glm

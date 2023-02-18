@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_matrix_operation
 	/// @{
@@ -98,6 +98,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL mat<4, 4, T, Q> adjugate(mat<4, 4, T, Q> const& m);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_operation.inl"

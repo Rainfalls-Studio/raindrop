@@ -1,6 +1,6 @@
 #include "scalar_constants.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER T angle(qua<T, Q> const& x)
@@ -27,8 +27,8 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_QUALIFIER qua<T, Q> angleAxis(T const& angle, vec<3, T, Q> const& v)
 	{
 		T const a(angle);
-		T const s = Raindrop::Core::Math::sin(a * static_cast<T>(0.5));
+		T const s = glm::sin(a * static_cast<T>(0.5));
 
-		return qua<T, Q>(Raindrop::Core::Math::cos(a * static_cast<T>(0.5)), v * s);
+		return qua<T, Q>(glm::cos(a * static_cast<T>(0.5)), v * s);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 	template<template<length_t L, typename T, qualifier Q> class vec, length_t L, typename R, typename T, qualifier Q>
@@ -159,4 +159,4 @@ namespace detail
 		}
 	};
 }//namespace detail
-}//namespace Raindrop::Core::Math
+}//namespace glm

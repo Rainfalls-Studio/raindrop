@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_std_based_type
 	/// @{
@@ -63,6 +63,6 @@ namespace Raindrop::Core::Math
 	typedef vec<4, std::size_t, defaultp>		size4_t;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "std_based_type.inl"

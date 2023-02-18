@@ -31,7 +31,7 @@
 #	pragma message("GLM: GLM_GTC_noise extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_noise
 	/// @{
@@ -56,6 +56,6 @@ namespace Raindrop::Core::Math
 		vec<L, T, Q> const& p);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "noise.inl"

@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_raw_data
 	/// @{
@@ -46,6 +46,6 @@ namespace Raindrop::Core::Math
 	typedef detail::uint64		qword;
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "raw_data.inl"

@@ -29,7 +29,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math{
+namespace glm{
 	/// @addtogroup gtx_easing
 	/// @{
 
@@ -214,6 +214,6 @@ namespace Raindrop::Core::Math{
 	GLM_FUNC_DECL genType bounceEaseInOut(genType const& a);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "easing.inl"

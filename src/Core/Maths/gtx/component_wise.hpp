@@ -26,7 +26,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_component_wise
 	/// @{
@@ -64,6 +64,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL typename genType::value_type compMax(genType const& v);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "component_wise.inl"

@@ -1,6 +1,6 @@
 /// @ref gtx_closest_point
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER vec<3, T, Q> closestPointOnLine
@@ -42,4 +42,4 @@ namespace Raindrop::Core::Math
 		return a + LineDirection * Distance;
 	}
 
-}//namespace Raindrop::Core::Math
+}//namespace glm

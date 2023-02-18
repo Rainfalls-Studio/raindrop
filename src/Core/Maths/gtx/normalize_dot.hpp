@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_normalize_dot
 	/// @{
@@ -44,6 +44,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL T fastNormalizeDot(vec<L, T, Q> const& x, vec<L, T, Q> const& y);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "normalize_dot.inl"

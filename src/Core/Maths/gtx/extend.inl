@@ -1,6 +1,6 @@
 /// @ref gtx_extend
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType extend
@@ -45,4 +45,4 @@ namespace Raindrop::Core::Math
 	{
 		return Origin + (Source - Origin) * Distance;
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

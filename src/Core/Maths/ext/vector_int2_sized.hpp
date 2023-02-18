@@ -20,7 +20,7 @@
 #	pragma message("GLM: GLM_EXT_vector_int2_sized extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_vector_int2_sized
 	/// @{
@@ -46,4 +46,4 @@ namespace Raindrop::Core::Math
 	typedef vec<2, int64, defaultp>		i64vec2;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

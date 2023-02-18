@@ -17,7 +17,7 @@
 #	pragma message("GLM: GLM_EXT_scalar_constants extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_scalar_constants
 	/// @{
@@ -35,6 +35,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL GLM_CONSTEXPR genType cos_one_over_two();
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "scalar_constants.inl"

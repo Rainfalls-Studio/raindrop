@@ -28,7 +28,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_quaternion
 	/// @{
@@ -169,6 +169,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL GLM_CONSTEXPR T length2(qua<T, Q> const& q);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "quaternion.inl"

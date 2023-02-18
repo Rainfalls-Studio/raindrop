@@ -26,7 +26,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_transform extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_transform
 	/// @{
@@ -42,6 +42,6 @@ namespace Raindrop::Core::Math
 	template<typename T, qualifier Q>
 	GLM_FUNC_DECL qua<T, Q> rotate(qua<T, Q> const& q, T const& angle, vec<3, T, Q> const& axis);
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "quaternion_transform.inl"

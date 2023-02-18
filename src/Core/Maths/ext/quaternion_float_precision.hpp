@@ -17,7 +17,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_float_precision extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_float_precision
 	/// @{
@@ -32,5 +32,5 @@ namespace Raindrop::Core::Math
 	typedef qua<float, highp>		highp_quat;
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 

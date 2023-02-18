@@ -21,7 +21,7 @@
 #include "detail/setup.hpp"
 #include "detail/qualifier.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_func_trigonometric
 	/// @{
@@ -205,6 +205,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<L, T, Q> atanh(vec<L, T, Q> const& x);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "detail/func_trigonometric.inl"

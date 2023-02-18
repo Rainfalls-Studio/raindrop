@@ -28,7 +28,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_dual_quaternion
 	/// @{
@@ -269,6 +269,6 @@ namespace Raindrop::Core::Math
 #endif
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "dual_quaternion.inl"

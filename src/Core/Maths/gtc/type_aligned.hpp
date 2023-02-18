@@ -34,7 +34,7 @@
 #include "../vec3.hpp"
 #include "../vec4.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_type_aligned
 	/// @{
@@ -1312,4 +1312,4 @@ namespace Raindrop::Core::Math
 #endif//GLM_PRECISION
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

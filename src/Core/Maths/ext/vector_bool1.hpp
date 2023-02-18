@@ -18,7 +18,7 @@
 #	pragma message("GLM: GLM_EXT_vector_bool1 extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_vector_bool1
 	/// @{
@@ -27,4 +27,4 @@ namespace Raindrop::Core::Math
 	typedef vec<1, bool, defaultp>		bvec1;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

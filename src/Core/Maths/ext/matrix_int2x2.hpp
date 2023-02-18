@@ -19,7 +19,7 @@
 #	pragma message("GLM: GLM_EXT_matrix_int2x2 extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_matrix_int2x2
 	/// @{
@@ -35,4 +35,4 @@ namespace Raindrop::Core::Math
 	typedef mat<2, 2, int, defaultp>	imat2;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

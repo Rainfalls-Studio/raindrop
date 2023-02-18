@@ -20,7 +20,7 @@
 #include "detail/type_vec4.hpp"
 #include <cmath>
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_func_exponential
 	/// @{
@@ -105,6 +105,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<L, T, Q> inversesqrt(vec<L, T, Q> const& v);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "detail/func_exponential.inl"

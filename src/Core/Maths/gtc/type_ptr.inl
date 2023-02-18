@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_type_ptr
 	/// @{
@@ -382,5 +382,5 @@ namespace Raindrop::Core::Math
 	}
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 

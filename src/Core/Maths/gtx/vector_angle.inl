@@ -1,6 +1,6 @@
 /// @ref gtx_vector_angle
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType angle
@@ -27,7 +27,7 @@ namespace Raindrop::Core::Math
 		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'orientedAngle' only accept floating-point inputs");
 		T const Angle(acos(clamp(dot(x, y), T(-1), T(1))));
 
-		if(all(epsilonEqual(y, Raindrop::Core::Math::rotate(x, Angle), T(0.0001))))
+		if(all(epsilonEqual(y, glm::rotate(x, Angle), T(0.0001))))
 			return Angle;
 		else
 			return -Angle;
@@ -41,4 +41,4 @@ namespace Raindrop::Core::Math
 		T const Angle(acos(clamp(dot(x, y), T(-1), T(1))));
 		return mix(Angle, -Angle, dot(ref, cross(x, y)) < T(0));
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

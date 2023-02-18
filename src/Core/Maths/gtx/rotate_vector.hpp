@@ -27,7 +27,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_rotate_vector
 	/// @{
@@ -118,6 +118,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& Up);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "rotate_vector.inl"

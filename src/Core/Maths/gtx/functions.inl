@@ -2,7 +2,7 @@
 
 #include "../exponential.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T>
 	GLM_FUNC_QUALIFIER T gauss
@@ -26,5 +26,5 @@ namespace Raindrop::Core::Math
 		vec<2, T, Q> const Squared = ((Coord - ExpectedValue) * (Coord - ExpectedValue)) / (static_cast<T>(2) * StandardDeviation * StandardDeviation);
 		return exp(-(Squared.x + Squared.y));
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 

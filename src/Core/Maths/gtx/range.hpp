@@ -26,7 +26,7 @@
 #include "../gtc/type_ptr.hpp"
 #include "../gtc/vec1.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_range
 	/// @{
@@ -95,4 +95,4 @@ namespace Raindrop::Core::Math
 #	endif
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

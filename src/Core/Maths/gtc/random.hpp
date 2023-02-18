@@ -22,7 +22,7 @@
 #	pragma message("GLM: GLM_GTC_random extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_random
 	/// @{
@@ -77,6 +77,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<3, T, defaultp> ballRand(T Radius);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "random.inl"

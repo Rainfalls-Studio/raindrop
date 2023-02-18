@@ -19,7 +19,7 @@
 #	pragma message("GLM: GLM_GTC_constants extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_constants
 	/// @{
@@ -160,6 +160,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL GLM_CONSTEXPR genType golden_ratio();
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "constants.inl"

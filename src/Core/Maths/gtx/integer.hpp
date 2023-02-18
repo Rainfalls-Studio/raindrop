@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_integer
 	/// @{
@@ -71,6 +71,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL uint nlz(uint x);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "integer.inl"

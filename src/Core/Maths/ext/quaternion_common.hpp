@@ -32,7 +32,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_common extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_common
 	/// @{
@@ -130,6 +130,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<4, bool, Q> isinf(qua<T, Q> const& x);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "quaternion_common.inl"

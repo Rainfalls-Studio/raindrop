@@ -20,7 +20,7 @@
 #	pragma message("GLM: GLM_EXT_scalar_common extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_scalar_common
 	/// @{
@@ -152,6 +152,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL genType mirrorRepeat(genType const& Texcoord);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "scalar_common.inl"

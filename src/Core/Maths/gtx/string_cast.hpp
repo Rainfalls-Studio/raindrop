@@ -36,7 +36,7 @@
 #	error "GLM_GTX_string_cast is not supported on CUDA compiler"
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_string_cast
 	/// @{
@@ -47,6 +47,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL std::string to_string(genType const& x);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "string_cast.inl"

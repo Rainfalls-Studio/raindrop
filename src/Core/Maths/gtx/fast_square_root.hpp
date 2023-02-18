@@ -27,7 +27,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_fast_square_root
 	/// @{
@@ -87,6 +87,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL genType fastNormalize(genType const& x);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "fast_square_root.inl"

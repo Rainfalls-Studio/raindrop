@@ -4,7 +4,7 @@
 #pragma once
 #include "../detail/type_mat4x4.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_matrix_precision
 	/// @{
@@ -46,4 +46,4 @@ namespace Raindrop::Core::Math
 	typedef mat<4, 4, double, highp>	highp_dmat4x4;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

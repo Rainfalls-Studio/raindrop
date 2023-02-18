@@ -19,7 +19,7 @@
 #include "./ext/vector_float2.hpp"
 #include "./ext/vector_float4.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_func_packing
 	/// @{
@@ -168,6 +168,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec2 unpackHalf2x16(uint v);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "detail/func_packing.inl"

@@ -7,7 +7,7 @@
 #include <limits>
 #include <cstddef>
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	struct mat<4, 4, T, Q>
@@ -182,7 +182,7 @@ namespace Raindrop::Core::Math
 
 	template<typename T, qualifier Q>
 	GLM_FUNC_DECL bool operator!=(mat<4, 4, T, Q> const& m1, mat<4, 4, T, Q> const& m2);
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #ifndef GLM_EXTERNAL_TEMPLATE
 #include "type_mat4x4.inl"

@@ -3,7 +3,7 @@
 #include "setup.hpp"
 #include <limits>
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 	template<typename genFIType, bool /*signed*/>
@@ -47,4 +47,4 @@ namespace detail
 		}
 	};
 }//namespace detail
-}//namespace Raindrop::Core::Math
+}//namespace glm

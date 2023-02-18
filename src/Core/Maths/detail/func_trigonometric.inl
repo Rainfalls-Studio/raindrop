@@ -2,7 +2,7 @@
 #include <cmath>
 #include <limits>
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	// radians
 	template<typename genType>
@@ -189,7 +189,7 @@ namespace Raindrop::Core::Math
 	{
 		return detail::functor1<vec, L, T, T, Q>::call(atanh, v);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #if GLM_CONFIG_SIMD == GLM_ENABLE
 #	include "func_trigonometric_simd.inl"

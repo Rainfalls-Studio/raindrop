@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace gtx
 {
 	/// @addtogroup gtx_optimum_pow
@@ -49,6 +49,6 @@ namespace gtx
 
 	/// @}
 }//namespace gtx
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "optimum_pow.inl"

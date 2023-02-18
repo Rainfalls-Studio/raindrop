@@ -27,7 +27,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_transform
 	/// @{
@@ -55,6 +55,6 @@ namespace Raindrop::Core::Math
 		vec<3, T, Q> const& v);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "transform.inl"

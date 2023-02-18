@@ -3,7 +3,7 @@
 #include <limits>
 #include "../gtc/constants.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER GLM_CONSTEXPR qua<T, Q> quat_identity()
@@ -115,7 +115,7 @@ namespace Raindrop::Core::Math
 	template<typename T, qualifier Q>
 	GLM_FUNC_QUALIFIER qua<T, Q> fastMix(qua<T, Q> const& x, qua<T, Q> const& y, T const& a)
 	{
-		return Raindrop::Core::Math::normalize(x * (static_cast<T>(1) - a) + (y * a));
+		return glm::normalize(x * (static_cast<T>(1) - a) + (y * a));
 	}
 
 	template<typename T, qualifier Q>
@@ -156,4 +156,4 @@ namespace Raindrop::Core::Math
 			rotationAxis.y * invs,
 			rotationAxis.z * invs);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

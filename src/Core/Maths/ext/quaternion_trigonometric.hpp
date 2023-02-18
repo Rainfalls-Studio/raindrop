@@ -28,7 +28,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_trigonometric extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_trigonometric
 	/// @{
@@ -58,6 +58,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL qua<T, Q> angleAxis(T const& angle, vec<3, T, Q> const& axis);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "quaternion_trigonometric.inl"

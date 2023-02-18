@@ -25,7 +25,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_transform2
 	/// @{
@@ -84,6 +84,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL mat<4, 4, T, Q> scaleBias(mat<4, 4, T, Q> const& m, T scale, T bias);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "transform2.inl"

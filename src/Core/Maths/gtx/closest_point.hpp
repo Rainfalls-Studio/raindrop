@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_closest_point
 	/// @{
@@ -44,6 +44,6 @@ namespace Raindrop::Core::Math
 		vec<2, T, Q> const& b);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "closest_point.inl"

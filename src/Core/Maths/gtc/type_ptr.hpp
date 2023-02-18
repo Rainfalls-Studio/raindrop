@@ -11,7 +11,7 @@
 ///
 /// Handles the interaction between pointers and vector, matrix types.
 ///
-/// This extension defines an overloaded function, Raindrop::Core::Math::value_ptr. It returns
+/// This extension defines an overloaded function, glm::value_ptr. It returns
 /// a pointer to the memory layout of the object. Matrix types store their values
 /// in column-major order.
 ///
@@ -22,11 +22,11 @@
 /// #include <Core/Maths/glm.hpp>
 /// #include <Core/Maths/gtc/type_ptr.hpp>
 ///
-/// Raindrop::Core::Math::vec3 aVector(3);
-/// Raindrop::Core::Math::mat4 someMatrix(1.0);
+/// glm::vec3 aVector(3);
+/// glm::mat4 someMatrix(1.0);
 ///
-/// glUniform3fv(uniformLoc, 1, Raindrop::Core::Math::value_ptr(aVector));
-/// glUniformMatrix4fv(uniformMatrixLoc, 1, GL_FALSE, Raindrop::Core::Math::value_ptr(someMatrix));
+/// glUniform3fv(uniformLoc, 1, glm::value_ptr(aVector));
+/// glUniformMatrix4fv(uniformMatrixLoc, 1, GL_FALSE, glm::value_ptr(someMatrix));
 /// @endcode
 ///
 /// <Core/Maths/gtc/type_ptr.hpp> need to be included to use the features of this extension.
@@ -54,7 +54,7 @@
 #	pragma message("GLM: GLM_GTC_type_ptr extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_type_ptr
 	/// @{
@@ -225,6 +225,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL qua<T, defaultp> make_quat(T const * const ptr);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "type_ptr.inl"

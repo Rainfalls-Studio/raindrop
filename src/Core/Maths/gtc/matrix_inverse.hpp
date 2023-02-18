@@ -23,7 +23,7 @@
 #	pragma message("GLM: GLM_GTC_matrix_inverse extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_matrix_inverse
 	/// @{
@@ -45,6 +45,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL genType inverseTranspose(genType const& m);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_inverse.inl"

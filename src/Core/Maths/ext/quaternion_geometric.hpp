@@ -23,7 +23,7 @@
 #	pragma message("GLM: GLM_EXT_quaternion_geometric extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_quaternion_geometric
 	/// @{
@@ -65,6 +65,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_QUALIFIER qua<T, Q> cross(qua<T, Q> const& q1, qua<T, Q> const& q2);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "quaternion_geometric.inl"

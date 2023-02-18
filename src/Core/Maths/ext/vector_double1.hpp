@@ -19,7 +19,7 @@
 #	pragma message("GLM: GLM_EXT_vector_double1 extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_vector_double1
 	/// @{
@@ -28,4 +28,4 @@ namespace Raindrop::Core::Math
 	typedef vec<1, double, defaultp>		dvec1;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

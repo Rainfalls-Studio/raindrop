@@ -20,7 +20,7 @@
 #include "common.hpp"
 #include "vector_relational.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_func_integer
 	/// @{
@@ -207,6 +207,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<L, int, Q> findMSB(vec<L, T, Q> const& v);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "detail/func_integer.inl"

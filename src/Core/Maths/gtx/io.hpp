@@ -35,7 +35,7 @@
 #include <locale>  // std::locale, std::locale::facet, std::locale::id
 #include <utility> // std::pair<>
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_io
 	/// @{
@@ -196,6 +196,6 @@ namespace Raindrop::Core::Math
                                                          std::pair<mat<4, 4, T, Q> const, mat<4, 4, T, Q> const> const&);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "io.inl"

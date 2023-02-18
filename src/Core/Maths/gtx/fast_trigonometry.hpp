@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_fast_trigonometry
 	/// @{
@@ -74,6 +74,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL T fastAtan(T angle);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "fast_trigonometry.inl"

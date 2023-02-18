@@ -1,27 +1,27 @@
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T>
 	GLM_FUNC_QUALIFIER T min(T a, T b, T c)
 	{
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(a, b), c);
+		return glm::min(glm::min(a, b), c);
 	}
 
 	template<typename T>
 	GLM_FUNC_QUALIFIER T min(T a, T b, T c, T d)
 	{
-		return Raindrop::Core::Math::min(Raindrop::Core::Math::min(a, b), Raindrop::Core::Math::min(c, d));
+		return glm::min(glm::min(a, b), glm::min(c, d));
 	}
 
 	template<typename T>
 	GLM_FUNC_QUALIFIER T max(T a, T b, T c)
 	{
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(a, b), c);
+		return glm::max(glm::max(a, b), c);
 	}
 
 	template<typename T>
 	GLM_FUNC_QUALIFIER T max(T a, T b, T c, T d)
 	{
-		return Raindrop::Core::Math::max(Raindrop::Core::Math::max(a, b), Raindrop::Core::Math::max(c, d));
+		return glm::max(glm::max(a, b), glm::max(c, d));
 	}
 
 #	if GLM_HAS_CXX11_STL
@@ -124,29 +124,29 @@ namespace Raindrop::Core::Math
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType clamp(genType const& Texcoord)
 	{
-		return Raindrop::Core::Math::clamp(Texcoord, static_cast<genType>(0), static_cast<genType>(1));
+		return glm::clamp(Texcoord, static_cast<genType>(0), static_cast<genType>(1));
 	}
 
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType repeat(genType const& Texcoord)
 	{
-		return Raindrop::Core::Math::fract(Texcoord);
+		return glm::fract(Texcoord);
 	}
 
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType mirrorClamp(genType const& Texcoord)
 	{
-		return Raindrop::Core::Math::fract(Raindrop::Core::Math::abs(Texcoord));
+		return glm::fract(glm::abs(Texcoord));
 	}
 
 	template<typename genType>
 	GLM_FUNC_QUALIFIER genType mirrorRepeat(genType const& Texcoord)
 	{
-		genType const Abs = Raindrop::Core::Math::abs(Texcoord);
-		genType const Clamp = Raindrop::Core::Math::mod(Raindrop::Core::Math::floor(Abs), static_cast<genType>(2));
-		genType const Floor = Raindrop::Core::Math::floor(Abs);
+		genType const Abs = glm::abs(Texcoord);
+		genType const Clamp = glm::mod(glm::floor(Abs), static_cast<genType>(2));
+		genType const Floor = glm::floor(Abs);
 		genType const Rest = Abs - Floor;
 		genType const Mirror = Clamp + Rest;
 		return mix(Rest, static_cast<genType>(1) - Rest, Mirror >= static_cast<genType>(1));
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

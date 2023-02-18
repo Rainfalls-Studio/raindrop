@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_log_base
 	/// @{
@@ -43,6 +43,6 @@ namespace Raindrop::Core::Math
 		vec<L, T, Q> const& base);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "log_base.inl"

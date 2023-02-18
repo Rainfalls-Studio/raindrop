@@ -19,7 +19,7 @@
 #	pragma message("GLM: GLM_GTC_reciprocal extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_reciprocal
 	/// @{
@@ -130,6 +130,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL genType acoth(genType x);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "reciprocal.inl"

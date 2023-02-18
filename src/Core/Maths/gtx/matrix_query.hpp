@@ -26,7 +26,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_matrix_query
 	/// @{
@@ -72,6 +72,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL bool isOrthogonal(matType<C, R, T, Q> const& m, T const& epsilon);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "matrix_query.inl"

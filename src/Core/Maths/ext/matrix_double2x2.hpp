@@ -4,7 +4,7 @@
 #pragma once
 #include "../detail/type_mat2x2.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup core_matrix
 	/// @{
@@ -20,4 +20,4 @@ namespace Raindrop::Core::Math
 	typedef mat<2, 2, double, defaultp>		dmat2;
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm

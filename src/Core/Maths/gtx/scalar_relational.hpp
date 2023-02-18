@@ -23,7 +23,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_scalar_relational
 	/// @{
@@ -31,6 +31,6 @@ namespace Raindrop::Core::Math
 
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "scalar_relational.inl"

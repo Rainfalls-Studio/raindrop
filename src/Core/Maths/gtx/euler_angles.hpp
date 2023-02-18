@@ -26,7 +26,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_euler_angles
 	/// @{
@@ -330,6 +330,6 @@ namespace Raindrop::Core::Math
 											T & t3);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "euler_angles.inl"

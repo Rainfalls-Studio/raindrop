@@ -3,7 +3,7 @@
 
 #include "../trigonometric.hpp"
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 
 	template<typename T, qualifier Q>
@@ -65,4 +65,4 @@ namespace Raindrop::Core::Math
 		return m * Result;
 	}
 
-}//namespace Raindrop::Core::Math
+}//namespace glm

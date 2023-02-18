@@ -24,7 +24,7 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_associated_min_max
 	/// @{
@@ -202,6 +202,6 @@ namespace Raindrop::Core::Math
 		vec<L, T, Q> const& w, U d);
 
 	/// @}
-} //namespace Raindrop::Core::Math
+} //namespace glm
 
 #include "associated_min_max.inl"

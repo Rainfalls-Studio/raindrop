@@ -6,7 +6,7 @@
 #if GLM_ARCH & GLM_ARCH_NEON_BIT
 #include <arm_neon.h>
 
-namespace Raindrop::Core::Math {
+namespace glm {
 	namespace neon {
 		static float32x4_t dupq_lane(float32x4_t vsrc, int lane) {
 			switch(lane) {
@@ -151,5 +151,5 @@ namespace Raindrop::Core::Math {
 #endif
 		}
 	} //namespace neon
-} // namespace Raindrop::Core::Math
+} // namespace glm
 #endif // GLM_ARCH & GLM_ARCH_NEON_BIT

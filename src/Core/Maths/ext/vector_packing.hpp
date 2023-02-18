@@ -20,13 +20,13 @@
 #	pragma message("GLM: GLM_EXT_vector_packing extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup ext_vector_packing
 	/// @{
 
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "vector_packing.inl"

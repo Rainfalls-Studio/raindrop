@@ -23,7 +23,7 @@
 #	pragma message("GLM: GLM_EXT_vector_ulp extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// Return the next ULP value(s) after the input value(s).
 	///
@@ -104,6 +104,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL vec<L, int64, Q> floatDistance(vec<L, double, Q> const& x, vec<L, double, Q> const& y);
 
 	/// @}
-}//namespace Raindrop::Core::Math
+}//namespace glm
 
 #include "vector_ulp.inl"

@@ -21,7 +21,7 @@
 #	pragma message("GLM: GLM_GTC_packing extension included")
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtc_packing
 	/// @{
@@ -723,6 +723,6 @@ namespace Raindrop::Core::Math
 	GLM_FUNC_DECL u32vec2 unpackUint2x32(uint64 p);
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "packing.inl"

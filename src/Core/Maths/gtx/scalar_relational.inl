@@ -1,6 +1,6 @@
 /// @ref gtx_scalar_relational
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	template<typename T>
 	GLM_FUNC_QUALIFIER bool lessThan
@@ -85,4 +85,4 @@ namespace Raindrop::Core::Math
 	{
 		return !x;
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

@@ -1,6 +1,6 @@
 /// @ref gtx_fast_trigonometry
 
-namespace Raindrop::Core::Math{
+namespace glm{
 namespace detail
 {
 	template<length_t L, typename T, qualifier Q>
@@ -139,4 +139,4 @@ namespace detail
 	{
 		return detail::functor1<vec, L, T, T, Q>::call(fastAtan, x);
 	}
-}//namespace Raindrop::Core::Math
+}//namespace glm

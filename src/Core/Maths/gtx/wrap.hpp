@@ -26,12 +26,12 @@
 #	endif
 #endif
 
-namespace Raindrop::Core::Math
+namespace glm
 {
 	/// @addtogroup gtx_wrap
 	/// @{
 
 	/// @}
-}// namespace Raindrop::Core::Math
+}// namespace glm
 
 #include "wrap.inl"
