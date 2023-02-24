@@ -11,7 +11,7 @@
 
 namespace Raindrop::Core::IO{
 	#ifdef RAINDROP_WINDOWS
-		DLLReader::DLLReader(const char* filepath){
+		DLLReader::DLLReader(const char* filepath) : _filepath{filepath}{
 			RAINDROP_profile_function();
 			RAINDROP_log(INFO, IO, "loading \"%s\" dll library", filepath);
 			_dll = nullptr;
@@ -35,13 +35,34 @@ namespace Raindrop::Core::IO{
 			return _dll != nullptr;
 		}
 
+		const char* DLLReader::filepath() const{
+			return _filepath;
+		}
+
 		void* DLLReader::getProc(const char* name) const{
 			RAINDROP_profile_function();
-			return (void*)::GetProcAddress((::HMODULE)_dll, (LPCSTR)name);
+			void* proc = (void*)GetProcAddress((::HMODULE)_dll, (LPCSTR)name);
+
+			if (proc == nullptr){
+				::DWORD error_code = ::GetLastError();
+				::LPSTR error_message = NULL;
+
+				::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+					NULL,
+					error_code,
+					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+					(LPSTR)&error_message,
+					0,
+					NULL);
+				
+				RAINDROP_log(ERROR, IO, "failed to get process named \"%s\" in \"%s\" : %s", name, _filepath, error_message);
+				::LocalFree(error_message);
+			}
+			return proc;
 		}
 
 	#else
-		DLLReader::DLLReader(const char* filepath){
+		DLLReader::DLLReader(const char* filepath) : _filepath{filepath}{
 			RAINDROP_profile_function();
 			RAINDROP_log(INFO, IO, "loading \"%s\" dll library", filepath);
 			_dll = nullptr;

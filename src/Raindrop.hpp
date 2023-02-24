@@ -33,5 +33,6 @@
 #include "Core/Time/Duration.hpp"
 #include "Core/Time/Time.hpp"
 #include "Core/Time/Timepoint.hpp"
+#include "Core/Window/Window.hpp"
 
 #endif

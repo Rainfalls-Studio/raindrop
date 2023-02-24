@@ -11,9 +11,11 @@ namespace Raindrop::Core::IO{
 			~DLLReader();
 
 			bool isOpen() const;
+			const char* filepath() const;
 			void* getProc(const char* name) const;
 		
 		private:
+			const char* _filepath;
 			void* _dll;
 	};
 }

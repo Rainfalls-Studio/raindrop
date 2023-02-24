@@ -1,0 +1,1 @@
+g++ -shared window.cpp -o ../out/modules/window.dll -I. -I../../src/ -L../libs/ -lSDL2main -lSDL2 -lmingw32 -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -Wl,--out-implib,../out/modules/window.lib
