@@ -8,7 +8,7 @@ namespace Raindrop::Core::Memory{
 		RAINDROP_assert(objectSize >= sizeof(void*)); 
 		
 		//Calculate adjustment needed to keep object correctly aligned 
-		uint8 adjustment = alignForwardAdjustment(mem, objectAlignment); 
+		uint8 adjustment = alignAdjustment(mem, objectAlignment); 
 		freeList = (void**)((uptr)mem + adjustment); 
 		size_t numObjects = (size-adjustment)/objectSize; 
 		void** p = freeList; 

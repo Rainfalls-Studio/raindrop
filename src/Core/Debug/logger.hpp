@@ -3,6 +3,7 @@
 
 #include "../core.hpp"
 #include "../common.hpp"
+#include "../module.hpp"
 
 #include <cstdio>
 
@@ -14,11 +15,20 @@ namespace Raindrop::Core::Debug::Log{
 		WARNING,
 		ERROR,
 		CRITICAL,
+
+		ERR = ERROR,
 	};
 
 	enum class Cause : uint8{
 		SYSTEM,
 		MEMORY,
+		GRAPHICS,
+		NETWORKING,
+		AI,
+		AUDIO,
+		PHYSICS,
+		TOOLS,
+		UI,
 		API,
 		ARITMETIC,
 		ASSERT,
@@ -70,6 +80,14 @@ namespace Raindrop::Core::Debug::Log{
 
 	// output message
 	void log(const Log &msg);
+	
+	class Logger;
+}
+
+// internal
+extern "C"{
+	void RAINDROP_MODULE __RAINDROP_log_setContext(const Raindrop::Core::Debug::Log::Logger& logger);
+	const Raindrop::Core::Debug::Log::Logger& RAINDROP_MODULE __RAINDROP_log_getContext();
 }
 
 namespace Raindrop::Core::Debug{

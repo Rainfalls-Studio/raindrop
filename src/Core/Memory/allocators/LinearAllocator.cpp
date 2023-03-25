@@ -16,9 +16,12 @@ namespace Raindrop::Core::Memory{
 	void* LinearAllocator::allocate(usize size, uint8 alignment){
 		RAINDROP_profile_function();
 		RAINDROP_assert(size != 0); 
-		uint8 adjustment = alignForwardAdjustment(pos, alignment); 
+		usize adjustment = alignAdjustment(pos, alignment); 
 		
-		if(usedMemory + adjustment + size > this->size) return nullptr; 
+		if(usedMemory + adjustment + size > this->size){
+			RAINDROP_log(ERROR, MEMORY, "not enought memory in the linear allocator");
+			return nullptr; 
+		}
 		
 		uptr aligned_address = (uptr)pos + adjustment; 
 		pos = (void*)(aligned_address + size); 

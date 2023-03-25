@@ -13,6 +13,7 @@ namespace Raindrop::Core::Filesystem{
 			Filebuffer(Memory::Allocator& allocator, Filestream& stream);
 			Filebuffer(Memory::Allocator& allocator, const File& file);
 			Filebuffer(Memory::Allocator& allocator, const Path& path);
+			~Filebuffer() = default;
 
 			const String& content() const;
 			char operator[](usize i) const;

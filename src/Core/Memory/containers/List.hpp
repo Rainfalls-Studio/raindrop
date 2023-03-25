@@ -20,6 +20,8 @@ namespace Raindrop::Core::Memory{
 					Iterator(Iterator &other);
 
 					Iterator& operator++();
+					Iterator operator++(int x);
+
 					operator bool() const;
 					bool operator==(const Iterator &other) const;
 
@@ -53,6 +55,8 @@ namespace Raindrop::Core::Memory{
 
 			template<typename A>
 			friend void swap(List<A>& x, List<A>& y);
+
+			Iterator front();
 		
 		private:
 			Allocator* _allocator;
@@ -138,6 +142,7 @@ namespace Raindrop::Core::Memory{
 			Node* before = _begin;
 			_begin = _begin->next;
 			_size--;
+			deallocateNode(before);
 		}
 	}
 
@@ -150,6 +155,11 @@ namespace Raindrop::Core::Memory{
 
 		// ensure that the size is 0
 		_size = 0;
+	}
+
+	template<typename T>
+	typename List<T>::Iterator List<T>::front(){
+		return Iterator(_begin);
 	}
 
 	template<typename T>
@@ -182,9 +192,16 @@ namespace Raindrop::Core::Memory{
 	}
 
 	template<typename T>
+	List<T>::Iterator::Iterator(Node* node){
+		RAINDROP_profile_function();
+		_node = node;
+	}
+	
+	template<typename T>
 	typename List<T>::Iterator& List<T>::Iterator::operator++(){
 		RAINDROP_profile_function();
 		if (_node) _node = _node->next;
+		return *this;
 	}
 	
 	template<typename T>
@@ -227,6 +244,11 @@ namespace Raindrop::Core::Memory{
 	typename List<T>::Node* List<T>::Iterator::node() const{
 		RAINDROP_profile_function();
 		return _node;
+	}
+
+	template<typename T>
+	typename List<T>::Iterator List<T>::Iterator::operator++(int x){
+		return ++(*this);
 	}
 }
 

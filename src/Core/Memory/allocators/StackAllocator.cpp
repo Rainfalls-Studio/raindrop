@@ -24,7 +24,7 @@ namespace Raindrop::Core::Memory{
 		RAINDROP_profile_function();
 		RAINDROP_assert(size != 0);
 
-		uint8 adjustment = alignForwardAdjustmentWithHeader(pos, alignment, sizeof(AllocationHeader)); 
+		uint8 adjustment = alignAdjustmentHeader(pos, alignment, sizeof(AllocationHeader)); 
   
   		if(usedMemory + adjustment + size > this->size) return nullptr; 
 		
@@ -75,5 +75,4 @@ namespace Raindrop::Core::Memory{
 			previousPos = nullptr;
 		#endif
 	}
-
 }

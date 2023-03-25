@@ -4,6 +4,8 @@
 #include "../allocators/Allocator.hpp"
 #include "../../Debug/logger.hpp"
 #include "../../Debug/profiler.hpp"
+#include "../../Maths/Maths.hpp"
+#include <memory.h>
 
 namespace Raindrop::Core::Memory{
 	template<typename T>
@@ -29,6 +31,13 @@ namespace Raindrop::Core::Memory{
 			 */
 			bool empty() const;
 
+			/**
+			 * @brief 
+			 * 
+			 * @param size 
+			 */
+			void reserve(usize size);
+
 		private:
 
 			union Node{
@@ -43,25 +52,22 @@ namespace Raindrop::Core::Memory{
 	};
 
 	template<typename T>
-	Pool<T>::Pool(usize size, Allocator &allocator){
+	Pool<T>::Pool(usize size, Allocator &allocator) : _allocator{&allocator}, _size{size}{
 		RAINDROP_profile_function();
-		_allocator = &allocator;
-		_size = size;
-
-		_ptr = allocateArray<Node>(allocator, size);
+		_ptr = allocateArray<Node>(*_allocator, size);
 
 		for (usize i=1; i<size; i++){
 			_ptr[i-1]._next = &_ptr[i];
 		}
-		_ptr[size-1]._next = nullptr;
 
+		_ptr[size-1]._next = nullptr;
 		_begin = _ptr;
 	}
 
 	template<typename T>
 	Pool<T>::~Pool(){
 		RAINDROP_profile_function();
-		deallocateArray(*_allocator, _ptr);
+		deallocateArray(*_allocator, _ptr, _size);
 		_allocator = nullptr;
 		_begin = nullptr;
 		_ptr = nullptr;
@@ -101,6 +107,11 @@ namespace Raindrop::Core::Memory{
 	bool Pool<T>::empty() const{
 		RAINDROP_profile_function();
 		return _size == 0;
+	}
+
+	template<typename T>
+	void Pool<T>::reserve(usize size){
+		RAINDROP_log(ERROR, MEMORY, "reserve is not available for now in pool containsers");
 	}
 };
 

@@ -3,6 +3,7 @@
 
 #include "../allocators/Allocator.hpp"
 #include "../../Debug/profiler.hpp"
+#include <utility>
 
 namespace Raindrop::Core::Memory{
 	template<typename T>
@@ -30,9 +31,11 @@ namespace Raindrop::Core::Memory{
 			}
 
 			void push(T value);
+			void push(Array<T>&& arr);
+			void push(Array<T>& arr);
 			void push(usize count, const T* values);
-			void pop();
 
+			void pop();
 			void clear();
 
 			bool reserve(usize new_capacity);
@@ -65,12 +68,11 @@ namespace Raindrop::Core::Memory{
 	}
 
 	template<typename T>
-	Array<T>::Array(const Array<T>& other)
-		: _allocator(other._allocator),
+	Array<T>::Array(const Array<T>& other) : _allocator(other._allocator),
 		  _data(other._capacity > 0 ? (T*)other._allocator->allocate(sizeof(T)*other._capacity, alignof(T)) : nullptr),
 		  _size(other._size), _capacity(other._capacity){
 		RAINDROP_profile_function();
-		std::copy(other._data, other._data + _size, _data);
+		memcpy(_data, other._data, _size);
 	}
 
 	template<typename T>
@@ -135,6 +137,18 @@ namespace Raindrop::Core::Memory{
 
 		_data[_size] = std::move(value);
 		_size++;
+	}
+
+	template<typename T>
+	void Array<T>::push(Array<T>&& arr){
+		RAINDROP_profile_function();
+		push(arr.size(), arr.data());
+	}
+	
+	template<typename T>
+	void Array<T>::push(Array<T>& arr){
+		RAINDROP_profile_function();
+		push(arr.size(), arr.data());
 	}
 
 	template<typename T>

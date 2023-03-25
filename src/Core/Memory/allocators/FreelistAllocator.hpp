@@ -9,28 +9,23 @@ namespace Raindrop::Core::Memory{
 			FreelistAllocator(usize size, void* start);
 			~FreelistAllocator();
 
-			virtual void* allocate(usize size, uint8 alignement = 4) override;
-			virtual void deallocate(void* p) override;
-
-			void clear();
+			virtual void* allocate(usize size, uint8 alignment = 4) override;
+			virtual void deallocate(void* ptr) override;
 
 		private:
-			struct FreeBlock{
-				FreeBlock* _next;
-				usize _size;
+			struct Block {
+				usize size;
+				Block* next;
 			};
 
-			struct Header{
-				usize _size;
+			struct Header {
+				usize size;
+				uint8 alignment;
 			};
 
-			FreeBlock* _begin = nullptr;
-			FreeBlock* _end = nullptr;
-			usize _size;
-
-			FreeBlock* push(void* ptr, usize size);
-			FreeBlock* popBestNode(usize size);
-			bool validateNode(Header* header);
+			void* start_;
+			usize size_;
+			Block* free_list_;
 	};
 }
 

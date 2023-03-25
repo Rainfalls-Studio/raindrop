@@ -12,6 +12,7 @@ BIN = out
 SRC = src
 OBJ = .obj
 LIB = libs
+INCLUDES = -I src/
 
 ifeq ($(OS), Windows_NT)
 	RAW_LIBS += mingw32
@@ -25,15 +26,15 @@ LIBS = $(addprefix -l, $(RAW_LIBS))
 DEFINES = $(addprefix -D, $(RAW_DEFINES))
 
 ifeq ($(MAKECMDGOALS), dbg)
-	FLAGS += DBG_FLAGS
+	FLAGS += $(DBG_FLAGS)
 endif
 
-ifeq ($(MAKECMDGOALS), dbgRebuild)
-	FLAGS += DBG_FLAGS
+ifeq ($(MAKECMDGOALS), dbgrebuild)
+	FLAGS += $(DBG_FLAGS)
 endif
 
 ifeq ($(MAKECMDGOALS), release)
-	FLAGS += RELEASE_FLAGS
+	FLAGS += $(RELEASE_FLAGS)
 endif
 
 # source files
@@ -55,16 +56,16 @@ $(EXEC) : $(OBJS)
 	ar crs $(BIN)/$(EXEC) $(OBJ)/*.o
 
 $(OBJ)/%.o : $(SRC)/%.cpp
-	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS)
+	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS) $(INCLUDES)
 
 $(OBJ)/%.o : $(SRC)/*/%.cpp
-	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS)
+	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS) $(INCLUDES)
 
 $(OBJ)/%.o : $(SRC)/*/*/%.cpp
-	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS)
+	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS) $(INCLUDES)
 	
 $(OBJ)/%.o : $(SRC)/*/*/*/%.cpp
-	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS)
+	$(CXX) -std=$(STD_VERSION) -o $@ -c $< -L $(LIB) $(DEFINES) $(FLAGS) $(INCLUDES)
 
 help:
 	@echo Targets:

@@ -9,6 +9,11 @@ namespace Raindrop::Core::Debug::Log{
 				_size = 0;
 			}
 
+			Logger(const Logger& other){
+				_begin = other._begin;
+				_size = other._size;
+			}
+
 			~Logger(){
 				_begin = nullptr;
 				_size = 0;
@@ -108,8 +113,25 @@ namespace Raindrop::Core::Debug::Log{
 			case Cause::OTHER: return "OTHER";
 			case Cause::SYSTEM: return "SYSTEM";
 			case Cause::THREAD: return "THREAD";
+			case Cause::AI: return "AI";
+			case Cause::AUDIO: return "AUDIO";
+			case Cause::GRAPHICS: return "GRAPHICS";
+			case Cause::NETWORKING: return "NETWORKING";
+			case Cause::PHYSICS: return "PHYSICS";
+			case Cause::TOOLS: return "TOOLS";
+			case Cause::UI: return "UI";
 		}
 		RAINDROP_log(WARNING, OTHER, "cannot convert the given cause value into a string, unknown cause (id : %d)", (int)cause);
 		return "";
+	}
+}
+
+extern "C"{
+	void RAINDROP_MODULE __RAINDROP_log_setContext(const Raindrop::Core::Debug::Log::Logger& __logger){
+		Raindrop::Core::Debug::Log::logger = __logger;
+	}
+
+	const Raindrop::Core::Debug::Log::Logger& RAINDROP_MODULE __RAINDROP_log_getContext(){
+		return Raindrop::Core::Debug::Log::logger;
 	}
 }

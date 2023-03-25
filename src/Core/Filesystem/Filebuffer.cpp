@@ -24,6 +24,7 @@ namespace Raindrop::Core::Filesystem{
 		Filestream* stream = Memory::allocateNew<Filestream>(allocator, file, Filestream::OPEN_BEGIN | Filestream::OPEN_READ);
 		check(stream, file.path().str());
 		copy(stream);
+		Memory::deallocateDelete(allocator, stream);
 	}
 
 	Filebuffer::Filebuffer(Memory::Allocator& allocator, const Path& path) : _content{allocator}{
@@ -31,6 +32,7 @@ namespace Raindrop::Core::Filesystem{
 		Filestream* stream = Memory::allocateNew<Filestream>(allocator, path, Filestream::OPEN_BEGIN | Filestream::OPEN_READ);
 		check(stream, path.str());
 		copy(stream);
+		Memory::deallocateDelete(allocator, stream);
 	}
 
 	void Filebuffer::copy(Filestream* stream){

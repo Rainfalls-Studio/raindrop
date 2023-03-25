@@ -51,6 +51,16 @@ namespace Raindrop::Core::Maths{
 	template<typename T>
 	using mat4x4 = mat<4, 4, T>;
 
+	template<typename T>
+	inline T min(const T& x, const T& y){
+		return glm::min(x, y);
+	}
+
+	template<uint32 L, typename T>
+	inline vec<L, T> max(const vec<L, T>& x, const vec<L, T>& y){
+		return glm::max(x, y);
+	}
+
 	template<uint32 L, typename T>
 	inline vec<L, T> radians(const vec<L, T>& degrees){
 		return glm::radians(degrees);

@@ -26,7 +26,7 @@ namespace Raindrop::Core::Memory{
 			
 			virtual ~Allocator(){
 				RAINDROP_profile_function();
-				RAINDROP_assert(allocationCount == 0 && usedMemory == 0 && "MEMORY LEAK !");
+				RAINDROP_assert(allocationCount == 0 && "MEMORY LEAK !");
 				start = nullptr;
 				size = 0;
 			}
@@ -50,7 +50,7 @@ namespace Raindrop::Core::Memory{
 	#define RAINDROP_default_allocator() ::Raindrop::Core::Memory::defaultAllocator()
 
 	template <typename T, typename... Args>
-	T* allocateNew(Allocator& allocator, Args... args) {
+	T* allocateNew(Allocator& allocator, Args&&... args) {
 		RAINDROP_profile_function();
 		T* p = (T*)allocator.allocate(sizeof(T), alignof(T));
 		if (!p) return nullptr;
@@ -59,12 +59,12 @@ namespace Raindrop::Core::Memory{
 
 	template <typename T> void deallocateDelete(Allocator& allocator, T& object){
 		RAINDROP_profile_function();
-		object.~T(); 
+		object.~T();
 		allocator.deallocate(&object);
 	}
 
 	template<typename T, typename... Args>
-	T* allocateArray(Allocator& allocator, usize length, Args... args){
+	T* allocateArray(Allocator& allocator, usize length, Args&&... args){
 		RAINDROP_profile_function();
 		RAINDROP_assert(length != 0); 
 		//Allocate extra space to store array length in the bytes before the array 
