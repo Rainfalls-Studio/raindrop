@@ -8,6 +8,7 @@
 #include "../Memory/containers/List.hpp"
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
+#include "SignatureManager.hpp"
 #include <typeinfo>
 
 namespace Raindrop::Core::Scene{
@@ -45,12 +46,37 @@ namespace Raindrop::Core::Scene{
 				setComponent(entity, typeid(T).hash_code(), static_cast<void*>(&t));
 			}
 
+			bool hasComponent(ID32 entity, usize componentTypeId) const;
+			void addComponent(ID32 entity, usize componentTypeId, void* component);
+			void eraseComponent(ID32 entity, usize componentTypeId);
+
+			template<typename T>
+			bool hasComponent(ID32 entity) const{
+				return hasComponent(entity, typeid(T).hash_code());
+			}
+
+			template<typename T>
+			void addComponent(ID32 entity, T&& component){
+				addComponent(entity, typeid(T).hash_code(), &component);
+			}
+
+			template<typename T>
+			void addComponent(ID32 entity){
+				addComponent(entity, typeid(T).hash_code(), nullptr);
+			}
+
+			template<typename T>
+			void eraseComponent(ID32 entity){
+				eraseComponent(entity, typeid(T).hash_code());
+			}
+
 		private:
 			Memory::Allocator& _allocator;
 			Memory::Array<ComponentManager*> _managers;
 			Memory::HashMap<usize, usize> _typeToID;
 			Memory::List<ID32> _freeComponentIDs;
 			EntityManager _entityManager;
+			SignatureManager _signatureManager;
 
 			uint32 _capacity;
 

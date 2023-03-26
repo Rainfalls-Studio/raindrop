@@ -40,6 +40,7 @@
 #include "Core/Time/Duration.hpp"
 #include "Core/Time/Time.hpp"
 #include "Core/Time/Timepoint.hpp"
+#include "Core/Scene/Scene.hpp"
 #include "Graphics//Window.hpp"
 #include "Graphics/Context.hpp"
 #include "Graphics/Renderer.hpp"

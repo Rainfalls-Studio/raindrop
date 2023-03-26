@@ -1,7 +1,7 @@
 #include "Scene.hpp"
 
 namespace Raindrop::Core::Scene{
-	Scene::Scene(Memory::Allocator& allocator, usize capacity, usize componentCount) : _allocator{allocator}, _managers{allocator}, _typeToID{allocator}, _freeComponentIDs{allocator}, _entityManager{allocator, capacity}{
+	Scene::Scene(Memory::Allocator& allocator, usize capacity, usize componentCount) : _allocator{allocator}, _managers{allocator}, _typeToID{allocator}, _freeComponentIDs{allocator}, _entityManager{allocator, capacity}, _signatureManager{allocator, capacity, componentCount}{
 		RAINDROP_profile_function();
 
 		_capacity = capacity;
@@ -21,7 +21,7 @@ namespace Raindrop::Core::Scene{
 		
 		for (usize i=0; i<_managers.size(); i++){
 			auto& manager = _managers[i];
-			if (manager) Memory::deallocateDelete(_allocator, manager);
+			if (manager) Memory::deallocateDelete(_allocator, *manager);
 		}
 	}
 
@@ -37,7 +37,7 @@ namespace Raindrop::Core::Scene{
 
 	void Scene::registerComponent(usize typeId, usize typeSize, usize typeAlignement){
 		RAINDROP_profile_function();
-		RAINDROP_assert(_typeToID.has(typeId));
+		RAINDROP_assert(!_typeToID.has(typeId) && "cannot register an already registred component");
 
 		ID32 id = *_freeComponentIDs.front();
 		_freeComponentIDs.pop();
@@ -49,7 +49,7 @@ namespace Raindrop::Core::Scene{
 
 	void Scene::removeComponent(usize typeId){
 		RAINDROP_profile_function();
-		RAINDROP_assert(_typeToID.has(typeId));
+		RAINDROP_assert(_typeToID.has(typeId) && "cannot remove a non registred component");
 
 		ID32 id = *_typeToID.get(typeId);
 		Memory::deallocateDelete(_allocator, _managers[id]);
@@ -61,7 +61,8 @@ namespace Raindrop::Core::Scene{
 
 	void* Scene::getComponent(ID32 entity, usize typeId){
 		RAINDROP_profile_function();
-		RAINDROP_assert(_typeToID.has(typeId));
+		RAINDROP_assert(_typeToID.has(typeId) && "cannot get a non registred component");
+		RAINDROP_assert(hasComponent(entity, typeId));
 
 		ID32 id = *_typeToID.get(typeId);
 		return _managers[id]->get(entity);
@@ -71,7 +72,29 @@ namespace Raindrop::Core::Scene{
 		RAINDROP_profile_function();
 		RAINDROP_assert(_typeToID.has(typeId));
 
-		ID32 id = *_typeToID.get(typeId);
+		ID32 id = _typeToID.lookup(typeId);
 		_managers[id]->set(entity, component);
+	}
+
+	bool Scene::hasComponent(ID32 entity, usize componentTypeId) const{
+		RAINDROP_profile_function();
+		ID32 id = _typeToID.lookup(componentTypeId);
+		return _signatureManager.getComponentState(entity, id);
+	}
+
+	void Scene::addComponent(ID32 entity, usize componentTypeId, void* component){
+		RAINDROP_profile_function();
+		ID32 id = _typeToID.lookup(componentTypeId);
+		_signatureManager.setComponentState(entity, id, true);
+
+		if (component){
+			_managers[id]->set(entity, component);
+		}
+	}
+
+	void Scene::eraseComponent(ID32 entity, usize componentTypeId){
+		RAINDROP_profile_function();
+		ID32 id = _typeToID.lookup(componentTypeId);
+		_signatureManager.setComponentState(entity, id, false);
 	}
 }
