@@ -4,6 +4,7 @@
 #include "../allocators/Allocator.hpp"
 #include "../../Debug/profiler.hpp"
 #include <utility>
+#include <cstring>
 
 namespace Raindrop::Core::Memory{
 	template<typename T>

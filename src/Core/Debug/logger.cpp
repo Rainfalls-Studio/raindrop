@@ -120,6 +120,7 @@ namespace Raindrop::Core::Debug::Log{
 			case Cause::PHYSICS: return "PHYSICS";
 			case Cause::TOOLS: return "TOOLS";
 			case Cause::UI: return "UI";
+			case Cause::SCENE: return "SCENE";
 		}
 		RAINDROP_log(WARNING, OTHER, "cannot convert the given cause value into a string, unknown cause (id : %d)", (int)cause);
 		return "";

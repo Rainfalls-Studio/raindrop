@@ -35,6 +35,7 @@ namespace Raindrop::Core::Debug::Log{
 		THREAD,
 		IO,
 		OTHER,
+		SCENE,
 	};
 
 	const char* severityToStr(Severity severity);

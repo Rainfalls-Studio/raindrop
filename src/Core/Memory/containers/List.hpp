@@ -3,6 +3,7 @@
 
 #include "../allocators/Allocator.hpp"
 #include "../../Debug/profiler.hpp"
+#include <utility>
 
 namespace Raindrop::Core::Memory{
 	template<typename T>
@@ -49,6 +50,7 @@ namespace Raindrop::Core::Memory{
 			void push(const List& other);
 			void pop();
 			void clear();
+			void remove(Iterator node);
 
 			usize size() const;
 			bool empty() const;
@@ -156,6 +158,29 @@ namespace Raindrop::Core::Memory{
 		// ensure that the size is 0
 		_size = 0;
 	}
+
+	template<typename T>
+	void List<T>::remove(Iterator it){
+		RAINDROP_profile_function();
+		Node* curr = _begin;
+		Node* before = nullptr;
+		while (curr){
+
+			if (curr == it._node){
+				if (before){
+					before->next = curr->next;
+				}
+				_begin = curr->next;
+				_size--;
+				deallocateNode(curr);
+				break;
+			}
+			
+			before = curr;
+			curr = curr->next;
+		}
+	}
+
 
 	template<typename T>
 	typename List<T>::Iterator List<T>::front(){
