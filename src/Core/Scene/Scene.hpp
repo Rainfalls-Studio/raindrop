@@ -9,12 +9,15 @@
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "SignatureManager.hpp"
+#include "SystemManager.hpp"
 #include <typeinfo>
 
 namespace Raindrop::Core::Scene{
+	static constexpr uint32 MAX_COMPONENT_COUNT = 64;
+
 	class Scene{
 		public:
-			Scene(Memory::Allocator& allocator, usize capacity, usize componentCount);
+			Scene(Memory::Allocator& allocator, usize capacity);
 			~Scene();
 
 			ID32 createEntity();
@@ -25,6 +28,26 @@ namespace Raindrop::Core::Scene{
 
 			void* getComponent(ID32 entity, usize typeId);
 			void setComponent(ID32 entity, usize typeId, void* component);
+			bool hasComponent(ID32 entity, usize componentTypeId) const;
+			void addComponent(ID32 entity, usize componentTypeId, void* component);
+			void eraseComponent(ID32 entity, usize componentTypeId);
+
+			void pushSystem(System* system, Signature signature);
+			void popSystem(System* system);
+
+			Signature getComponentSignature(usize typeId) const;
+
+			template<typename T>
+			Signature getComponentSignature() const{
+				return getComponentSignature(typeid(T).hash_code());
+			}
+
+			template<typename... Args>
+			Signature getComponentsSignature(){
+				Signature signature;
+				_getComponentsSignature<Args...>(signature);
+				return signature;
+			}
 
 			template<typename T>
 			void registerComponent(){
@@ -46,9 +69,6 @@ namespace Raindrop::Core::Scene{
 				setComponent(entity, typeid(T).hash_code(), static_cast<void*>(&t));
 			}
 
-			bool hasComponent(ID32 entity, usize componentTypeId) const;
-			void addComponent(ID32 entity, usize componentTypeId, void* component);
-			void eraseComponent(ID32 entity, usize componentTypeId);
 
 			template<typename T>
 			bool hasComponent(ID32 entity) const{
@@ -70,17 +90,43 @@ namespace Raindrop::Core::Scene{
 				eraseComponent(entity, typeid(T).hash_code());
 			}
 
+			template<typename T, typename... Args>
+			T* createSystem(Signature signature, Args&&... args){
+				T* system = static_cast<T*>(Memory::allocateNew<T>(_allocator, args...));
+				if (!system) return nullptr;
+				pushSystem(static_cast<System*>(system), signature);
+				return system;
+			}
+
+			template<typename T>
+			void destroySystem(T* t){
+				RAINDROP_assert(t);
+				popSystem(static_cast<System*>(t));
+				Memory::deallocateDelete(_allocator, *t);
+			}
+
 		private:
 			Memory::Allocator& _allocator;
-			Memory::Array<ComponentManager*> _managers;
 			Memory::HashMap<usize, usize> _typeToID;
 			Memory::List<ID32> _freeComponentIDs;
+
+			ComponentManager* _componentManagers[MAX_COMPONENT_COUNT];
 			EntityManager _entityManager;
-			SignatureManager _signatureManager;
+			SignatureManager _entitySignatures;
+			SystemManager _systemManager;
 
 			uint32 _capacity;
 
-			// void removeComponentID(ID32 id);
+			template<typename T, typename A, typename... Args>
+			void _getComponentsSignature(Signature& signature){
+				getComponentsSignature<T>(signature);
+				getComponentsSignature<A, Args...>(signature);
+			}
+
+			template<typename T>
+			void _getComponentsSignature(Signature& signature){
+				signature |= getComponentSignature<T>();
+			}
 	};
 }
 

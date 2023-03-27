@@ -1,5 +1,5 @@
-#ifndef __RAINDROP_CORE_SCENE_ENTITY_MANAGER8HPP__
-#define __RAINDROP_CORE_SCENE_ENTITY_MANAGER8HPP__
+#ifndef __RAINDROP_CORE_SCENE_ENTITY_MANAGER_HPP__
+#define __RAINDROP_CORE_SCENE_ENTITY_MANAGER_HPP__
 
 #include "../core.hpp"
 #include "../common.hpp"

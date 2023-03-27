@@ -31,6 +31,7 @@
 #include "Core/Memory/containers/Pool.hpp"
 #include "Core/Memory/containers/Queue.hpp"
 #include "Core/Memory/containers/Bitset.hpp"
+#include "Core/Memory/containers/DoublyLinkedList.hpp"
 #include "Core/System/CPU.hpp"
 #include "Core/System/RAM.hpp"
 #include "Core/Thread/Barrier.hpp"

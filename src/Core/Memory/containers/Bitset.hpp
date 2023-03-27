@@ -50,6 +50,4 @@ namespace Raindrop::Core::Memory{
 	}
 }
 
-
-
 #endif

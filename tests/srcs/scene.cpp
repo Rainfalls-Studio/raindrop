@@ -6,7 +6,7 @@ TEST(scene, initialization){
 
 	{
 		Raindrop::Core::Memory::FreelistAllocator allocator(memSize, ptr);
-		Raindrop::Core::Scene::Scene scene(allocator, 1024, 32);
+		Raindrop::Core::Scene::Scene scene(allocator, 1024);
 	}
 
 	free(ptr);
@@ -18,7 +18,7 @@ TEST(scene, registerComponents){
 
 	{
 		Raindrop::Core::Memory::FreelistAllocator allocator(memSize, ptr);
-		Raindrop::Core::Scene::Scene scene(allocator, 1024, 32);
+		Raindrop::Core::Scene::Scene scene(allocator, 1024);
 
 		scene.registerComponent<struct32>();
 		scene.registerComponent<struct128>();
@@ -36,7 +36,7 @@ TEST(scene, createEntities){
 
 	{
 		Raindrop::Core::Memory::FreelistAllocator allocator(memSize, ptr);
-		Raindrop::Core::Scene::Scene scene(allocator, 1024, 32);
+		Raindrop::Core::Scene::Scene scene(allocator, 1024);
 		
 		for (int i=0; i<500; i++){
 			entities[i] = scene.createEntity();
@@ -58,7 +58,7 @@ TEST(scene, entitySignatures){
 
 	{
 		Raindrop::Core::Memory::FreelistAllocator allocator(memSize, ptr);
-		Raindrop::Core::Scene::Scene scene(allocator, 1024, 32);
+		Raindrop::Core::Scene::Scene scene(allocator, 1024);
 
 		scene.registerComponent<struct32>();
 		scene.registerComponent<struct128>();

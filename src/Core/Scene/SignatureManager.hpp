@@ -6,21 +6,44 @@
 #include "../Memory/allocators/Allocator.hpp"
 
 namespace Raindrop::Core::Scene{
+	class Signature{
+		public:
+			Signature();
+			~Signature();
+
+			void set(usize i, bool state);
+			bool get(usize i) const;
+			void clear();
+
+			Signature operator&(const Signature& other) const;
+			Signature operator|(const Signature& other) const;
+			Signature operator^(const Signature& other) const;
+			Signature& operator&=(const Signature& other);
+			Signature& operator|=(const Signature& other);
+			Signature& operator^=(const Signature& other);
+			operator bool() const;
+
+		private:
+			uint64 _sig;
+			
+			Signature(uint64 sig);
+	};
 	class SignatureManager{
 		public:
-			SignatureManager(Memory::Allocator& allocator, usize capacity, usize componentCount);
+			SignatureManager(Memory::Allocator& allocator, usize capacity);
 			~SignatureManager();
 
-			void setComponentState(ID32 entity, usize componentID, bool state);
-			bool getComponentState(ID32 entity, usize componentID) const;
+			Signature& get(usize i);
+			const Signature& get(usize i) const;
+			Signature& operator[](usize i);
+
+			void setBit(usize i, usize b, bool state);
+			bool getBit(usize i, usize b) const;
 		
 		private:
 			Memory::Allocator& _allocator;
-			void* _start;
+			Signature* _signatures;
 			usize _capacity;
-			usize _componentCount;
-
-			void resize(usize size, usize componentCount);
 	};
 }
 

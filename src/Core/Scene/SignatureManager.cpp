@@ -1,61 +1,101 @@
 #include "SignatureManager.hpp"
-#include "../Maths/Maths.hpp"
+#include "Scene.hpp"
 #include <cstring>
 
 namespace Raindrop::Core::Scene{
-	SignatureManager::SignatureManager(Memory::Allocator& allocator, usize capacity, usize componentCount) : _allocator{allocator}{
+	SignatureManager::SignatureManager(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}{
 		RAINDROP_profile_function();
-		_start = nullptr;
-		_capacity = 0;
-		_componentCount = 0;
-
-		resize(capacity, componentCount);
+		_signatures = nullptr;
+		_capacity = capacity;
+		_signatures = Memory::allocateArray<Signature>(_allocator, capacity);
 	}
 
 	SignatureManager::~SignatureManager(){
 		RAINDROP_profile_function();
-		if (_start) _allocator.deallocate(_start);
-		_start = nullptr;
+		if (_signatures) _allocator.deallocate(_signatures);
+		_signatures = nullptr;
 	}
 
-	void SignatureManager::resize(usize size, usize componentCount){
+	void SignatureManager::setBit(usize i, usize b, bool state){
 		RAINDROP_profile_function();
-
-		usize componentBytes = glm::ceil(static_cast<float>(componentCount) / 8.f);
-		usize _componentBytes = glm::ceil(static_cast<float>(_componentCount) / 8.f);
-
-		void* newPtr = _allocator.allocate(size * componentBytes, alignof(uint8));
-		if (!newPtr) return;
-
-		if (_start){
-			for (usize i=0; i<_componentCount; i++){
-				memcpy(static_cast<uint8*>(newPtr) + size * componentBytes * i, static_cast<uint8*>(_start) + _capacity * _componentBytes * i, Maths::min(size * componentBytes, _capacity * _componentBytes));
-			}
-			_allocator.deallocate(_start);
-		}
-
-		_start = newPtr;
-		_capacity = size;
-		_componentCount = componentCount;
+		Signature& sig = get(i);
+		sig.set(b, state);
 	}
 
-	void SignatureManager::setComponentState(ID32 entity, usize componentID, bool state){
+	bool SignatureManager::getBit(usize i, usize b) const{
 		RAINDROP_profile_function();
-
-		usize componentBytes = glm::ceil(static_cast<float>(_componentCount) / 8.f);
-		uint8* component = static_cast<uint8*>(_start) + componentBytes * _capacity * componentID;
-
-		uint8& byte = component[entity / 8];
-		byte ^= (-state ^ byte) & (1UL << (entity % 8));
+		const Signature& sig = get(i);
+		return sig.get(i);
 	}
 
-	bool SignatureManager::getComponentState(ID32 entity, usize componentID) const{
+	Signature& SignatureManager::get(usize i){
 		RAINDROP_profile_function();
+		RAINDROP_assert(i < _capacity);
+		return _signatures[i];
+	}
 
-		usize componentBytes = glm::ceil(static_cast<float>(_componentCount) / 8.f);
-		uint8* component = static_cast<uint8*>(_start) + componentBytes * _capacity * componentID;
+	const Signature& SignatureManager::get(usize i) const{
+		RAINDROP_profile_function();
+		RAINDROP_assert(i < _capacity);
+		return _signatures[i];
+	}
 
-		uint8& byte = component[entity / 8];
-		return (byte >> entity % 8) & 1U;
+	Signature& SignatureManager::operator[](usize i){
+		return get(i);
+	}
+
+	Signature::Signature(){
+		clear();
+	}
+
+	Signature::Signature(uint64 sig){
+		_sig = sig;
+	}
+
+	Signature::~Signature(){
+
+	}
+
+	void Signature::clear(){
+		_sig = 0ULL;
+	}
+
+	void Signature::set(usize i, bool state){
+		_sig ^= (-state ^ _sig) & (1ULL << (i % MAX_COMPONENT_COUNT));
+	}
+
+	bool Signature::get(usize i) const{
+		return (_sig >> i % MAX_COMPONENT_COUNT) & 1ULL;
+	}
+
+	Signature Signature::operator&(const Signature& other) const{
+		return Signature(_sig & other._sig);
+	}
+
+	Signature Signature::operator|(const Signature& other) const{
+		return Signature(_sig | other._sig);
+	}
+
+	Signature Signature::operator^(const Signature& other) const{
+		return Signature(_sig ^ other._sig);
+	}
+
+	Signature::operator bool() const{
+		return _sig != 0ULL;
+	}
+	
+	Signature& Signature::operator&=(const Signature& other){
+		_sig &= other._sig;
+		return *this;
+	}
+
+	Signature& Signature::operator|=(const Signature& other){
+		_sig |= other._sig;
+		return *this;
+	}
+
+	Signature& Signature::operator^=(const Signature& other){
+		_sig ^= other._sig;
+		return *this;
 	}
 }

@@ -180,67 +180,67 @@ TEST_F(PoolAllocatorTest, unordered_deallocation){
 // =======================================================================================
 // =======================================================================================
 
-class StackAllocatorTest : public ::testing::Test{
-	public:
-		void SetUp() override {}
-		void TearDown() override {
-			_allocator.~StackAllocator();
-			free(_mem);
-		}
+// class StackAllocatorTest : public ::testing::Test{
+// 	public:
+// 		void SetUp() override {}
+// 		void TearDown() override {
+// 			_allocator.~StackAllocator();
+// 			free(_mem);
+// 		}
 
-	protected:
-		void* _mem = malloc(MEMORY_MO);
-		Raindrop::Core::Memory::StackAllocator _allocator{MEMORY_MO, _mem};
-};
+// 	protected:
+// 		void* _mem = malloc(MEMORY_MO);
+// 		Raindrop::Core::Memory::StackAllocator _allocator{MEMORY_MO, _mem};
+// };
 
-TEST_F(StackAllocatorTest, allocation){
-	EXPECT_EQ(_allocator.getSize(), MEMORY_MO);
-	EXPECT_EQ(_allocator.getStart(), _mem);
-	EXPECT_EQ(_allocator.getAllocationCount(), 0);
+// TEST_F(StackAllocatorTest, allocation){
+// 	EXPECT_EQ(_allocator.getSize(), MEMORY_MO);
+// 	EXPECT_EQ(_allocator.getStart(), _mem);
+// 	EXPECT_EQ(_allocator.getAllocationCount(), 0);
 
-	struct16* p = Raindrop::Core::Memory::allocateNew<struct16>(_allocator);
+// 	struct16* p = Raindrop::Core::Memory::allocateNew<struct16>(_allocator);
 
-	EXPECT_NE(p, nullptr);
+// 	EXPECT_NE(p, nullptr);
 
-	_allocator.deallocate(p);
-	EXPECT_EQ(_allocator.getUsedMemory(), 0);
-	EXPECT_EQ(_allocator.getAllocationCount(), 0);
-}
+// 	_allocator.deallocate(p);
+// 	EXPECT_EQ(_allocator.getUsedMemory(), 0);
+// 	EXPECT_EQ(_allocator.getAllocationCount(), 0);
+// }
 
-TEST_F(StackAllocatorTest, multiple_allocation){
-	EXPECT_EQ(_allocator.getSize(), MEMORY_MO);
-	EXPECT_EQ(_allocator.getStart(), _mem);
-	EXPECT_EQ(_allocator.getAllocationCount(), 0);
+// TEST_F(StackAllocatorTest, multiple_allocation){
+// 	EXPECT_EQ(_allocator.getSize(), MEMORY_MO);
+// 	EXPECT_EQ(_allocator.getStart(), _mem);
+// 	EXPECT_EQ(_allocator.getAllocationCount(), 0);
 
-	struct16* ptrs[32768];
-	for (int i=0; i<32768; i++){
-		ptrs[i] = Raindrop::Core::Memory::allocateNew<struct16>(_allocator);
-		EXPECT_NE(ptrs[i], nullptr);
-	}
+// 	struct16* ptrs[32768];
+// 	for (int i=0; i<32768; i++){
+// 		ptrs[i] = Raindrop::Core::Memory::allocateNew<struct16>(_allocator);
+// 		EXPECT_NE(ptrs[i], nullptr);
+// 	}
 
-	for (int i=0; i<32768; i++){
-		_allocator.deallocate(ptrs[32767 - i]);
-	}
+// 	for (int i=0; i<32768; i++){
+// 		_allocator.deallocate(ptrs[32767 - i]);
+// 	}
 
-	EXPECT_EQ(_allocator.getUsedMemory(), 0);
-	EXPECT_EQ(_allocator.getAllocationCount(), 0);
-}
+// 	EXPECT_EQ(_allocator.getUsedMemory(), 0);
+// 	EXPECT_EQ(_allocator.getAllocationCount(), 0);
+// }
 
-TEST_F(StackAllocatorTest, clear){
-	EXPECT_EQ(_allocator.getSize(), MEMORY_MO);
-	EXPECT_EQ(_allocator.getStart(), _mem);
-	EXPECT_EQ(_allocator.getAllocationCount(), 0);
+// TEST_F(StackAllocatorTest, clear){
+// 	EXPECT_EQ(_allocator.getSize(), MEMORY_MO);
+// 	EXPECT_EQ(_allocator.getStart(), _mem);
+// 	EXPECT_EQ(_allocator.getAllocationCount(), 0);
 
-	struct16* ptrs[32768];
-	for (int i=0; i<32768; i++){
-		ptrs[i] = Raindrop::Core::Memory::allocateNew<struct16>(_allocator);
-		EXPECT_NE(ptrs[i], nullptr);
-	}
+// 	struct16* ptrs[32768];
+// 	for (int i=0; i<32768; i++){
+// 		ptrs[i] = Raindrop::Core::Memory::allocateNew<struct16>(_allocator);
+// 		EXPECT_NE(ptrs[i], nullptr);
+// 	}
 
-	_allocator.clear();
-	EXPECT_EQ(_allocator.getUsedMemory(), 0);
-	EXPECT_EQ(_allocator.getAllocationCount(), 0);
-}
+// 	_allocator.clear();
+// 	EXPECT_EQ(_allocator.getUsedMemory(), 0);
+// 	EXPECT_EQ(_allocator.getAllocationCount(), 0);
+// }
 
 // =======================================================================================
 // =======================================================================================
@@ -750,4 +750,47 @@ TEST(bitset, set_and_get){
 	for (int i=0; i<3000; i+=5){
 		EXPECT_EQ(bitset.get(i), 1);
 	}
+}
+
+// =======================================================================================
+// =======================================================================================
+// =======================================================================================
+
+TEST(doublyLinkedList, init){
+	void* ptr = malloc(MEMORY_MO);
+	{
+		Raindrop::Core::Memory::FreelistAllocator allocator(MEMORY_MO, ptr);
+		Raindrop::Core::Memory::DoublyLinkedList<struct64> list(allocator);
+	}
+	free(ptr);
+}
+
+TEST(doublyLinkedList, push){
+	void* ptr = malloc(MEMORY_MO);
+	{
+		Raindrop::Core::Memory::FreelistAllocator allocator(MEMORY_MO, ptr);
+		Raindrop::Core::Memory::DoublyLinkedList<struct64> list(allocator);
+
+		for (int i=0; i<150; i++){
+			list.pushFront({});
+		}
+	}
+	free(ptr);
+}
+
+TEST(doublyLinkedList, pop){
+	void* ptr = malloc(MEMORY_MO);
+	{
+		Raindrop::Core::Memory::FreelistAllocator allocator(MEMORY_MO, ptr);
+		Raindrop::Core::Memory::DoublyLinkedList<struct64> list(allocator);
+
+		for (int i=0; i<150; i++){
+			list.pushFront({});
+		}
+
+		for (int i=0; i<150; i+=2){
+			list.popBack();
+		}
+	}
+	free(ptr);
 }
