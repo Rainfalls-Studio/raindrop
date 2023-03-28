@@ -86,10 +86,8 @@ namespace Raindrop::Core::Debug::Log{
 }
 
 // internal
-extern "C"{
-	void RAINDROP_MODULE __RAINDROP_log_setContext(const Raindrop::Core::Debug::Log::Logger& logger);
-	const Raindrop::Core::Debug::Log::Logger& RAINDROP_MODULE __RAINDROP_log_getContext();
-}
+RAINDROP_MODULE void __RAINDROP_log_setContext(const Raindrop::Core::Debug::Log::Logger& logger);
+RAINDROP_MODULE const Raindrop::Core::Debug::Log::Logger& __RAINDROP_log_getContext();
 
 namespace Raindrop::Core::Debug{
 	void inline log(const Log::Log &msg){

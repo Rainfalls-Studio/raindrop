@@ -9,8 +9,9 @@
 using namespace Raindrop;
 using namespace Raindrop::Core::Memory;
 namespace gfx = Graphics;
-namespace Maths = Core::Maths;
+namespace maths = Core::Maths;
 namespace dbg = Core::Debug;
+namespace scene = Core::Scene;
 
 SDL_Window* getInitWindow();
 

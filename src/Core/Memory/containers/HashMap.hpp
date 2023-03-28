@@ -4,6 +4,8 @@
 #include "../allocators/Allocator.hpp"
 #include "Array.hpp"
 #include "../../Debug/profiler.hpp"
+#include "../../../Tools/hash.hpp"
+#include "../../../Tools/comparator.hpp"
 
 namespace Raindrop::Core::Memory{
 	template<class K, class V>
@@ -84,8 +86,9 @@ namespace Raindrop::Core::Memory{
 		if (size == 0)
 			return false;
 
-		usize start = key % size;
-		uint8 hash6 = key & 0x3F;
+		ID64 _hash = Tools::hash64<K>(key);
+		usize start = _hash % size;
+		uint8 hash6 = static_cast<uint8>(_hash) & 0b00111111;
 
 		// Search the buckets until we hit an empty one
 		for (usize i = start; i < size; ++i){
@@ -94,7 +97,7 @@ namespace Raindrop::Core::Memory{
 			switch(bucket->state){
 				case State::EMPTY: return false;
 				case State::FILLED:
-					if (hash6 == bucket->hash && _keys[i] == key)
+					if (hash6 == bucket->hash && Tools::equal<K>(_keys[i], key))
 						return true;
 					break;
 				default: break;
@@ -106,7 +109,7 @@ namespace Raindrop::Core::Memory{
 			switch(bucket->state){
 				case State::EMPTY: return false;
 				case State::FILLED:
-					if (hash6 == bucket->hash && _keys[i] == key)
+					if (hash6 == bucket->hash && Tools::equal<K>(_keys[i], key))
 						return true;
 					break;
 				default: break;
@@ -124,9 +127,9 @@ namespace Raindrop::Core::Memory{
 		if (size == 0)
 			return value;
 
-		usize start = key % size;
-
-		uint8 hash6 = key & 0x3F;
+		ID64 _hash = Tools::hash64<K>(key);
+		usize start = _hash % size;
+		uint8 hash6 = static_cast<uint8>(_hash) & 0b00111111;
 
 		// Search the buckets until we hit an empty one
 		for (usize i = start; i < size; ++i){
@@ -135,7 +138,7 @@ namespace Raindrop::Core::Memory{
 			switch(bucket->state){
 				case State::EMPTY: return value;
 				case State::FILLED:
-					if (hash6 == bucket->hash && _keys[i] == key)
+					if (hash6 == bucket->hash && Tools::equal<K>(_keys[i], key))
 						return _values[i];
 					break;
 				default: break;
@@ -148,7 +151,7 @@ namespace Raindrop::Core::Memory{
 			switch(bucket->state){
 				case State::EMPTY: return value;
 				case State::FILLED:
-					if (hash6 == bucket->hash && _keys[i] == key)
+					if (hash6 == bucket->hash && Tools::equal<K>(_keys[i], key))
 						return _values[i];
 					break;
 				default: break;
@@ -166,8 +169,7 @@ namespace Raindrop::Core::Memory{
 		if (size == 0) return nullptr;
 
 		usize start = key % size;
-
-		uint8 hash6 = key & 0x3F;
+		uint8 hash6 = Tools::hash64<K>(key);
 
 		// Search the buckets until we hit an empty one
 		for (usize i = start; i < size; ++i){
@@ -176,7 +178,7 @@ namespace Raindrop::Core::Memory{
 			switch(bucket->state){
 				case State::EMPTY: return nullptr;
 				case State::FILLED:
-					if (hash6 == bucket->hash && _keys[i] == key)
+					if (hash6 == bucket->hash && Tools::equal<K>(_keys[i], key))
 						return &_values[i];
 					break;
 				default: break;
@@ -189,7 +191,7 @@ namespace Raindrop::Core::Memory{
 			switch(bucket->state){
 				case State::EMPTY: return nullptr;
 				case State::FILLED:
-					if (hash6 == bucket->hash && _keys[i] == key)
+					if (hash6 == bucket->hash && Tools::equal<K>(_keys[i], key))
 						return &_values[i];
 					break;
 				default: break;
@@ -211,9 +213,10 @@ namespace Raindrop::Core::Memory{
 			buckets_size = _buckets.size();
 		}
 		
-		usize start = key % buckets_size;
-
-		uint8 hash6 = key & 0x3F;
+		
+		ID64 _hash = Tools::hash64<K>(key);
+		usize start = _hash % buckets_size;
+		uint8 hash6 = static_cast<uint8>(_hash) & 0b00111111;
 
 		// Search for an unused bucket
 		Bucket* bucket      = nullptr;
@@ -259,9 +262,9 @@ namespace Raindrop::Core::Memory{
 
 		if (size == 0) return false;
 
-		usize start = key % size;
-
-		uint8 hash6 = key & 0x3F;
+		ID64 _hash = Tools::hash64<K>(key);
+		usize start = _hash % size;
+		uint8 hash6 = static_cast<uint8>(_hash) & 0b00111111;
 
 		// Search the buckets until we hit an empty one
 		for (usize i = start; i < size; ++i){
@@ -270,7 +273,7 @@ namespace Raindrop::Core::Memory{
 			switch(b->state){
 				case State::EMPTY: return false;
 				case State::FILLED:
-					if (b->hash == hash6 && _keys[i] == key)
+					if (b->hash == hash6 && Tools::equal<K>(_keys[i], key))
 					{
 						b->hash = 0;
 						b->state = State::REMOVED;
@@ -288,7 +291,7 @@ namespace Raindrop::Core::Memory{
 			switch(b->state){
 				case State::EMPTY: return false;
 				case State::FILLED:
-					if (b->hash == hash6 && _keys[i] == key)
+					if (b->hash == hash6 && Tools::equal<K>(_keys[i], key))
 					{
 						b->hash = 0;
 						b->state = State::REMOVED;
@@ -348,9 +351,11 @@ namespace Raindrop::Core::Memory{
 			K key = _keys[i];
 
 			// Hash the key and find the starting bucket
-			usize start = key % size;
+			
+			ID64 _hash = Tools::hash64<K>(key);
 
-			uint8 hash6 = key & 0x3F;
+			usize start = _hash % size;
+			uint8 hash6 = static_cast<uint8>(_hash) & 0b00111111;
 
 			// Search for an unused bucket
 			Bucket* bucket      = nullptr;

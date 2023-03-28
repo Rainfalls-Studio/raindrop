@@ -6,6 +6,7 @@
 #include "Core/IO/Module.hpp"
 #include "Core/Memory/allocators/Allocator.hpp"
 #include "Core/Maths/Maths.hpp"
+#include "Core/Scene/Scene.hpp"
 
 namespace Raindrop::Graphics{
 	class Renderer;
@@ -23,7 +24,7 @@ namespace Raindrop::Graphics{
 			virtual void enableVSync(bool enable) = 0;
 			virtual bool isVSyncEnabled() const = 0;
 
-			Plugin* loadPlugin(Core::Memory::Allocator& allocator, Core::IO::Module& module, const char* name);
+			Plugin* loadPlugin(Core::Memory::Allocator& allocator, Core::IO::Module& module, Core::Scene::Scene& scene, const char* name);
 
 			static Context* create(Core::Memory::Allocator& allocator, Renderer& renderer, Window& window);
 	};

@@ -14,6 +14,7 @@
 
 namespace Raindrop::Core::Scene{
 	static constexpr uint32 MAX_COMPONENT_COUNT = 64;
+	static constexpr ID32 INVALID_ID = -1;
 
 	class Scene{
 		public:
@@ -23,23 +24,26 @@ namespace Raindrop::Core::Scene{
 			ID32 createEntity();
 			void destroyEntity(ID32 entity);
 
-			void registerComponent(usize typeId, usize typeSize, usize typeAlignement);
-			void removeComponent(usize typeId);
+			void registerComponent(const char* name, usize typeSize, usize typeAlignement);
+			void removeComponent(const char* name);
 
-			void* getComponent(ID32 entity, usize typeId);
-			void setComponent(ID32 entity, usize typeId, void* component);
-			bool hasComponent(ID32 entity, usize componentTypeId) const;
-			void addComponent(ID32 entity, usize componentTypeId, void* component);
-			void eraseComponent(ID32 entity, usize componentTypeId);
+			void* getComponent(ID32 entity, ID32 componentID);
+			void setComponent(ID32 entity, ID32 componentID, void* component);
+			bool hasComponent(ID32 entity, ID32 componentID) const;
+			void addComponent(ID32 entity, ID32 componentID, void* component);
+			void eraseComponent(ID32 entity, ID32 componentID);
 
 			void pushSystem(System* system, Signature signature);
 			void popSystem(System* system);
 
-			Signature getComponentSignature(usize typeId) const;
+			Signature getComponentSignature(ID32 componentID) const;
+			ID32 getComponentID(const char* name) const;
+			usize capacity() const;
+
 
 			template<typename T>
 			Signature getComponentSignature() const{
-				return getComponentSignature(typeid(T).hash_code());
+				return getComponentSignature(getComponentID(typeid(T).name()));
 			}
 
 			template<typename... Args>
@@ -50,44 +54,44 @@ namespace Raindrop::Core::Scene{
 			}
 
 			template<typename T>
-			void registerComponent(){
-				registerComponent(typeid(T).hash_code(), sizeof(T), alignof(T));
+			void registerComponent(const char* name = typeid(T).name()){
+				registerComponent(name, sizeof(T), alignof(T));
 			}
 
 			template<typename T>
-			void removeComponent(){
-				removeComponent(typeid(T).hash_code());
+			void removeComponent(const char* name = typeid(T).name()){
+				removeComponent(name);
 			}
 
 			template<typename T>
 			T& getComponent(ID32 entity){
-				return *reinterpret_cast<T*>(getComponent(entity, typeid(T).hash_code()));
+				return *reinterpret_cast<T*>(getComponent(entity, getComponentID(typeid(T).name())));
 			}
 
 			template<typename T>
 			void setComponent(ID32 entity, T&& t){
-				setComponent(entity, typeid(T).hash_code(), static_cast<void*>(&t));
+				setComponent(entity, getComponentID(typeid(T).name()), static_cast<void*>(&t));
 			}
 
 
 			template<typename T>
 			bool hasComponent(ID32 entity) const{
-				return hasComponent(entity, typeid(T).hash_code());
+				return hasComponent(entity, getComponentID(typeid(T).name()));
 			}
 
 			template<typename T>
 			void addComponent(ID32 entity, T&& component){
-				addComponent(entity, typeid(T).hash_code(), &component);
+				addComponent(entity, getComponentID(typeid(T).name()), &component);
 			}
 
 			template<typename T>
 			void addComponent(ID32 entity){
-				addComponent(entity, typeid(T).hash_code(), nullptr);
+				addComponent(entity, getComponentID(typeid(T).name()), nullptr);
 			}
 
 			template<typename T>
 			void eraseComponent(ID32 entity){
-				eraseComponent(entity, typeid(T).hash_code());
+				eraseComponent(entity, getComponentID(typeid(T).name()));
 			}
 
 			template<typename T, typename... Args>
@@ -107,7 +111,7 @@ namespace Raindrop::Core::Scene{
 
 		private:
 			Memory::Allocator& _allocator;
-			Memory::HashMap<usize, usize> _typeToID;
+			Memory::HashMap<const char*, ID32> _nameToID;
 			Memory::List<ID32> _freeComponentIDs;
 
 			ComponentManager* _componentManagers[MAX_COMPONENT_COUNT];
@@ -116,6 +120,8 @@ namespace Raindrop::Core::Scene{
 			SystemManager _systemManager;
 
 			uint32 _capacity;
+
+			static bool isIDValid(ID32 id);
 
 			template<typename T, typename A, typename... Args>
 			void _getComponentsSignature(Signature& signature){

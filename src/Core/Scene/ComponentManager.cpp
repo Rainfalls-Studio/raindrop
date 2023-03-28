@@ -5,6 +5,7 @@ namespace Raindrop::Core::Scene{
 	ComponentManager::ComponentManager(Memory::Allocator& allocator, usize componentSize, usize componentAlignement, uint32 size) : _allocator{allocator}, _componentSize{componentSize}, _componentAlignement{componentAlignement}{
 		RAINDROP_profile_function();
 		_start = nullptr;
+		_capacity = 0;
 		allocate(size);
 	}
 
@@ -34,11 +35,14 @@ namespace Raindrop::Core::Scene{
 
 	void* ComponentManager::get(ID32 id){
 		RAINDROP_profile_function();
+		RAINDROP_assert(id < _capacity);
 		return static_cast<void*>(static_cast<char*>(_start) + _componentSize * id);
 	}
 
 	void ComponentManager::set(ID32 id, void* component){
 		RAINDROP_profile_function();
+		RAINDROP_assert(id < _capacity);
+		RAINDROP_assert(component != nullptr);
 		void* ptr = get(id);
 		memcpy(ptr, component, _componentSize);
 	}

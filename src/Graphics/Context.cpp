@@ -13,9 +13,9 @@ namespace Raindrop::Graphics{
 		return renderer.createContext(allocator, window);
 	}
 
-	Plugin* Context::loadPlugin(Core::Memory::Allocator& allocator, Core::IO::Module& module, const char* name){
+	Plugin* Context::loadPlugin(Core::Memory::Allocator& allocator, Core::IO::Module& module, Core::Scene::Scene& scene, const char* name){
 		RAINDROP_profile_function();
-		return Plugin::create(allocator, module, *this, name);
+		return Plugin::create(allocator, module, *this, scene, name);
 	}
 
 }

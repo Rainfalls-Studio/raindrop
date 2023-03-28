@@ -14,7 +14,7 @@ class Swapchain{
 		void setBufferCount(uint32 bufferCount);
 		void enableVSync(bool enable = true);
 		void requireDepthBuffer(bool require = true);
-		void setRenderQuality(Maths::vec2<float32> quality);
+		void setRenderQuality(maths::vec2<float32> quality);
 		void setRequiredColorFormat(VkFormat colorFormat);
 		void setRequiredDepthFormat(VkFormat depthFormat);
 		void setRequiredColorSpace(VkColorSpaceKHR colorSpace);
@@ -28,10 +28,10 @@ class Swapchain{
 		uint32 currentBuffer() const;
 		VkFormat depthFormat() const;
 		VkFormat colorFormat() const;
-		Maths::vec2<float32> renderQuality() const;
-		Maths::vec4<float32> clearColor() const;
+		maths::vec2<float32> renderQuality() const;
+		maths::vec4<float32> clearColor() const;
 
-		void setClearColor(Maths::vec4<float32> color);
+		void setClearColor(maths::vec4<float32> color);
 
 		void beginRenderPass(VkCommandBuffer commandBuffer);
 		void endRenderPass(VkCommandBuffer commandBuffer);
@@ -74,8 +74,8 @@ class Swapchain{
 		bool _vsync;
 		bool _depthBufferRequired;
 		bool _loaded;
-		Maths::vec2<float32> _renderQuality;
-		Maths::vec4<float32> _clearColor;
+		maths::vec2<float32> _renderQuality;
+		maths::vec4<float32> _clearColor;
 
 		void defaultSettings();
 		VkFormat findSupportedDepthFormat();

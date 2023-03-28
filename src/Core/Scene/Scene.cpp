@@ -1,7 +1,8 @@
 #include "Scene.hpp"
+#include <typeinfo>
 
 namespace Raindrop::Core::Scene{
-	Scene::Scene(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}, _typeToID{allocator}, _freeComponentIDs{allocator}, _entityManager{allocator, capacity}, _entitySignatures{allocator, capacity}, _systemManager{allocator}{
+	Scene::Scene(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}, _nameToID{allocator}, _freeComponentIDs{allocator}, _entityManager{allocator, capacity}, _entitySignatures{allocator, capacity}, _systemManager{allocator}{
 		RAINDROP_profile_function();
 
 		_capacity = capacity;
@@ -33,78 +34,81 @@ namespace Raindrop::Core::Scene{
 
 	void Scene::destroyEntity(ID32 entity){
 		RAINDROP_profile_function();
+		RAINDROP_assert(isIDValid(entity));
 		_entityManager.destroy(entity);
 		Signature signature = _entitySignatures.get(entity);
 		_systemManager.entityRemoved(entity, signature);
 	}
 
-	void Scene::registerComponent(usize typeId, usize typeSize, usize typeAlignement){
+	void Scene::registerComponent(const char* name, usize typeSize, usize typeAlignement){
 		RAINDROP_profile_function();
-		RAINDROP_assert(!_typeToID.has(typeId) && "cannot register an already registred component");
+		RAINDROP_assert(!_nameToID.has(name) && "cannot register an already registred component");
 
 		ID32 id = *_freeComponentIDs.front();
 		_freeComponentIDs.pop();
 
-		_typeToID.insert(typeId, id);
+		_nameToID.insert(name, id);
 		
 		_componentManagers[id] = Memory::allocateNew<ComponentManager>(_allocator, _allocator, typeSize, typeAlignement, _capacity);
-
 	}
 
-	void Scene::removeComponent(usize typeId){
+	void Scene::removeComponent(const char* name){
 		RAINDROP_profile_function();
-		RAINDROP_assert(_typeToID.has(typeId) && "cannot remove a non registred component");
+		RAINDROP_assert(_nameToID.has(name) && "cannot remove a non registred component");
 
-		ID32 id = *_typeToID.get(typeId);
+		const ID32& id = _nameToID.lookup(name);
 		Memory::deallocateDelete(_allocator, _componentManagers[id]);
 		_componentManagers[id] = nullptr;
 
 		_freeComponentIDs.push(id);
-		_typeToID.remove(typeId);
+		_nameToID.remove(name);
 	}
 
-	void* Scene::getComponent(ID32 entity, usize typeId){
+	void* Scene::getComponent(ID32 entity, ID32 componentID){
 		RAINDROP_profile_function();
-		RAINDROP_assert(_typeToID.has(typeId) && "cannot get a non registred component");
-		RAINDROP_assert(hasComponent(entity, typeId));
+		RAINDROP_assert(isIDValid(componentID));
+		RAINDROP_assert(isIDValid(entity));
+		RAINDROP_assert(hasComponent(entity, componentID));
 
-		ID32 id = *_typeToID.get(typeId);
-		return _componentManagers[id]->get(entity);
+		return _componentManagers[componentID]->get(entity);
 	}
 
-	void Scene::setComponent(ID32 entity, usize typeId, void* component){
+	void Scene::setComponent(ID32 entity, ID32 componentID, void* component){
 		RAINDROP_profile_function();
-		RAINDROP_assert(_typeToID.has(typeId));
-
-		ID32 id = _typeToID.lookup(typeId);
-		_componentManagers[id]->set(entity, component);
+		RAINDROP_assert(isIDValid(componentID));
+		RAINDROP_assert(isIDValid(entity));
+		_componentManagers[componentID]->set(entity, component);
 	}
 
-	bool Scene::hasComponent(ID32 entity, usize componentTypeId) const{
+	bool Scene::hasComponent(ID32 entity, ID32 componentID) const{
 		RAINDROP_profile_function();
-		ID32 id = _typeToID.lookup(componentTypeId);
-		return _entitySignatures.getBit(entity, id);
+		RAINDROP_assert(isIDValid(componentID));
+		RAINDROP_assert(isIDValid(entity));
+
+		return _entitySignatures.getBit(entity, componentID);
 	}
 
-	void Scene::addComponent(ID32 entity, usize componentTypeId, void* component){
+	void Scene::addComponent(ID32 entity, ID32 componentID, void* component){
 		RAINDROP_profile_function();
-		ID32 id = _typeToID.lookup(componentTypeId);
+		RAINDROP_assert(isIDValid(componentID));
+		RAINDROP_assert(isIDValid(entity));
+
 		if (component){
-			_componentManagers[id]->set(entity, component);
+			_componentManagers[componentID]->set(entity, component);
 		}
 
 		Signature oldSignature = _entitySignatures.get(entity);
-		_entitySignatures.setBit(entity, id, true);
+		_entitySignatures.setBit(entity, componentID, true);
 		Signature newSignature = _entitySignatures.get(entity);
 
 		_systemManager.entitySignatureUpdate(entity, oldSignature, newSignature);
 	}
 
-	void Scene::eraseComponent(ID32 entity, usize componentTypeId){
+	void Scene::eraseComponent(ID32 entity, ID32 componentID){
 		RAINDROP_profile_function();
-		ID32 id = _typeToID.lookup(componentTypeId);
+		RAINDROP_assert(isIDValid(componentID));
 		Signature oldSignature = _entitySignatures.get(entity);
-		_entitySignatures.setBit(entity, id, false);
+		_entitySignatures.setBit(entity, componentID, false);
 		Signature newSignature = _entitySignatures.get(entity);
 
 		_systemManager.entitySignatureUpdate(entity, oldSignature, newSignature);
@@ -120,10 +124,22 @@ namespace Raindrop::Core::Scene{
 		_systemManager.popSystem(system);
 	}
 
-	Signature Scene::getComponentSignature(usize typeId) const{
+	Signature Scene::getComponentSignature(ID32 componentID) const{
 		Signature signature{};
-		ID32 id = _typeToID.lookup(typeId);
-		signature.set(id, true);
+		RAINDROP_assert(isIDValid(componentID));
+		signature.set(componentID, true);
 		return signature;
+	}
+
+	usize Scene::capacity() const{
+		return _capacity;
+	}
+
+	ID32 Scene::getComponentID(const char* name) const{
+		return _nameToID.lookup(name);
+	}
+
+	bool Scene::isIDValid(ID32 id){
+		return id != INVALID_ID;
 	}
 }

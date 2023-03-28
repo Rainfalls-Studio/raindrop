@@ -46,9 +46,7 @@ bool Renderer::loaded() const{
 	return _loaded;
 }
 
-extern "C"{
-	gfx::Renderer* RAINDROP_MODULE createRenderer(Allocator& allocator){
-		RAINDROP_profile_function();
-		return allocateNew<Renderer>(allocator, allocator);
-	}
+RAINDROP_MODULE gfx::Renderer* createRenderer(Allocator& allocator){
+	RAINDROP_profile_function();
+	return allocateNew<Renderer>(allocator, allocator);
 }

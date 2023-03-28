@@ -74,7 +74,7 @@ void Swapchain::requireDepthBuffer(bool require){
 	_depthBufferRequired = require;
 }
 
-void Swapchain::setRenderQuality(Maths::vec2<float32> quality){
+void Swapchain::setRenderQuality(maths::vec2<float32> quality){
 	RAINDROP_profile_function();
 	_renderQuality = quality;
 }
@@ -463,7 +463,7 @@ uint32 Swapchain::currentBuffer() const{
 	return _currentFrame;
 }
 
-Maths::vec2<float32> Swapchain::renderQuality() const{
+maths::vec2<float32> Swapchain::renderQuality() const{
 	RAINDROP_profile_function();
 	return _renderQuality;
 }
@@ -598,12 +598,12 @@ VkResult Swapchain::acquireNextImage(){
 	return result;
 }
 
-Maths::vec4<float32> Swapchain::clearColor() const{
+maths::vec4<float32> Swapchain::clearColor() const{
 	RAINDROP_profile_function();
 	return _clearColor;
 }
 
-void Swapchain::setClearColor(Maths::vec4<float32> color){
+void Swapchain::setClearColor(maths::vec4<float32> color){
 	RAINDROP_profile_function();
 	_clearColor = color;
 }

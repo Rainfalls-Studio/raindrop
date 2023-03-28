@@ -127,12 +127,10 @@ namespace Raindrop::Core::Debug::Log{
 	}
 }
 
-extern "C"{
-	void RAINDROP_MODULE __RAINDROP_log_setContext(const Raindrop::Core::Debug::Log::Logger& __logger){
-		Raindrop::Core::Debug::Log::logger = __logger;
-	}
+RAINDROP_MODULE void  __RAINDROP_log_setContext(const Raindrop::Core::Debug::Log::Logger& __logger){
+	Raindrop::Core::Debug::Log::logger = __logger;
+}
 
-	const Raindrop::Core::Debug::Log::Logger& RAINDROP_MODULE __RAINDROP_log_getContext(){
-		return Raindrop::Core::Debug::Log::logger;
-	}
+RAINDROP_MODULE const Raindrop::Core::Debug::Log::Logger&  __RAINDROP_log_getContext(){
+	return Raindrop::Core::Debug::Log::logger;
 }

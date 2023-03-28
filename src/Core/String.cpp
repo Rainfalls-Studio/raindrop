@@ -89,4 +89,16 @@ namespace Raindrop::Core{
 		RAINDROP_profile_function();
 		return other._string == _string;
 	}
+
+	ID64 String::hash64() const{
+		std::hash<std::string> hash;
+		return static_cast<ID64>(hash(_string));
+	}
+}
+
+namespace Raindrop::Tools{
+	template<>
+	ID64 Tools::hash64<Core::String>(const Core::String& string){
+		return string.hash64();
+	}
 }

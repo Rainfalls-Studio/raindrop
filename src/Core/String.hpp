@@ -4,6 +4,7 @@
 #include <string>
 #include "common.hpp"
 #include "Memory/allocators/Allocator.hpp"
+#include "../Tools/hash.hpp"
 
 namespace Raindrop::Core{
 	class String{
@@ -145,6 +146,8 @@ namespace Raindrop::Core{
 			 * @return true if equal, false otherwise
 			 */
 			bool operator==(const String &other) const;
+
+			ID64 hash64() const;
 
 		private:
 			std::string _string;
