@@ -54,7 +54,7 @@ namespace Raindrop::Core::Debug::Log{
 	};
 
 	class LogModule{
-		friend class Logger;
+		friend class __Logger;
 		public:
 			LogModule() = default;
 			virtual ~LogModule() = default;
@@ -80,14 +80,16 @@ namespace Raindrop::Core::Debug::Log{
 	};
 
 	// output message
+	void initialize();
+	void shutdownLog();
 	void log(const Log &msg);
 	
-	class Logger;
+	class __Logger;
 }
 
 // internal
-RAINDROP_MODULE void __RAINDROP_log_setContext(const Raindrop::Core::Debug::Log::Logger& logger);
-RAINDROP_MODULE const Raindrop::Core::Debug::Log::Logger& __RAINDROP_log_getContext();
+RAINDROP_MODULE void __RAINDROP_log_setContext(Raindrop::Core::Debug::Log::__Logger* logger);
+RAINDROP_MODULE Raindrop::Core::Debug::Log::__Logger* __RAINDROP_log_getContext();
 
 namespace Raindrop::Core::Debug{
 	void inline log(const Log::Log &msg){

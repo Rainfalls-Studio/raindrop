@@ -2,18 +2,27 @@
 #include "Core/Debug/profiler.hpp"
 #include "Core/Debug/logger.hpp"
 
+#define RAINDROP_submodule_get(fnc) __RAINDROP_##fnc##_getContext
+#define RAINDROP_submodule_set(fnc) __RAINDROP_##fnc##_setContext
+#define str(a) #a
+#define to_str(a) str(a)
+
+#define RAINDROP_set_context(type, submodule){																	\
+	using __FncType = void(*)(type*);     																		\
+	__FncType __fnc = (__FncType)_dll.getProc(to_str(RAINDROP_submodule_set(submodule)));						\
+	if (__fnc){																									\
+		__fnc(RAINDROP_submodule_get(submodule)());																								\
+	} else {																									\
+		RAINDROP_log(ERROR, IO, "missing module function : %s", to_str(RAINDROP_submodule_set(submodule)));		\
+	}																											\
+}
+
 namespace Raindrop::Core::IO{
 	Module::Module(const char* path) : _dll(path){
 		RAINDROP_profile_function();
 
-		using SetLogContextFnc = void(*)(const ::Raindrop::Core::Debug::Log::Logger&);
-		SetLogContextFnc setLogContext = (SetLogContextFnc)_dll.getProc("__RAINDROP_log_setContext");
-		
-		if (setLogContext){
-			setLogContext(__RAINDROP_log_getContext());
-		} else {
-			RAINDROP_log(WARNING, IO, "invalid module : raindrop is not properly included, the use of logs might not work \"%s\"", _dll.filepath());
-		}
+		RAINDROP_set_context(::Raindrop::Core::Debug::Log::__Logger, log);
+		RAINDROP_set_context(::Raindrop::Core::Debug::Profiler::__Profiler, profile);
 
 		_loaded = init();
 

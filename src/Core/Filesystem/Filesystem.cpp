@@ -47,7 +47,7 @@ namespace Raindrop::Core::Filesystem{
 		#if defined(RAINDROP_WINDOWS)
 			// with the windows API
 
-			HANDLE hFile = CreateFile(reinterpret_cast<LPCWSTR>(path.str()), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			HANDLE hFile = CreateFile(reinterpret_cast<LPCSTR>(path.str()), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 			if (hFile==INVALID_HANDLE_VALUE){
 				DWORD err = ::GetLastError();
@@ -97,7 +97,7 @@ namespace Raindrop::Core::Filesystem{
 		RAINDROP_profile_function();
 		#ifdef RAINDROP_WINDOWS
 			TCHAR szDir[MAX_PATH];
-			StringCchCopy(szDir, MAX_PATH, reinterpret_cast<STRSAFE_LPCWSTR>(path.str()));
+			StringCchCopy(szDir, MAX_PATH, reinterpret_cast<STRSAFE_LPCSTR>(path.str()));
 			StringCchCat(szDir, MAX_PATH, TEXT("\\*"));
 			
 			HANDLE hFind = INVALID_HANDLE_VALUE;

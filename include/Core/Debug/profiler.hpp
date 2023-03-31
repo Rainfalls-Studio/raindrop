@@ -3,6 +3,7 @@
 
 #include "Core/core.hpp"
 #include "Core/common.hpp"
+#include "Core/module.hpp"
 
 namespace Raindrop::Core::Debug::Profiler{
 	struct Profile{
@@ -13,7 +14,16 @@ namespace Raindrop::Core::Debug::Profiler{
 	void beginProfile(const char* name, const char* filepath);
 	void endProfile();
 	void profile(bool profile = true);
+
+	void init();
+	void shutdown();
+
+	class __Profiler;
 }
+
+// internal
+RAINDROP_MODULE void __RAINDROP_profile_setContext(Raindrop::Core::Debug::Profiler::__Profiler* profiler);
+RAINDROP_MODULE Raindrop::Core::Debug::Profiler::__Profiler* __RAINDROP_profile_getContext();
 
 #define RAINDROP_COMBINE1(X,Y) X##Y  // helper macro
 #define RAINDROP_COMBINE(X,Y) RAINDROP_COMBINE1(X,Y)

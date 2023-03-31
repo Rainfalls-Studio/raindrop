@@ -2,19 +2,19 @@
 #include "Core/Debug/debug.hpp"
 
 namespace Raindrop::Core::Debug::Log{
-	class Logger{
+	class __Logger{
 		public:
-			Logger(){
+			__Logger(){
 				_begin = nullptr;
 				_size = 0;
 			}
 
-			Logger(const Logger& other){
+			__Logger(const __Logger& other){
 				_begin = other._begin;
 				_size = other._size;
 			}
 
-			~Logger(){
+			~__Logger(){
 				_begin = nullptr;
 				_size = 0;
 			}
@@ -76,18 +76,30 @@ namespace Raindrop::Core::Debug::Log{
 			uint32 _size;
 	};
 
-	static Logger logger;
+	static __Logger* __logger;
+
+	void initialize(){
+		__logger = new __Logger();
+	}
+
+	void shutdownLog(){
+		delete __logger;
+		__logger = nullptr;
+	}
 
 	void LogModule::push(){
-		logger.pushModule(this);
+		if (!__logger) return;
+		__logger->pushModule(this);
 	}
 
 	void LogModule::pop(){
-		logger.popModule(this);
+		if (!__logger) return;
+		__logger->popModule(this);
 	}
 	
 	void log(const Log &msg){
-		logger.log(msg);
+		if (!__logger) return;
+		__logger->log(msg);
 	}
 	
 	const char* severityToStr(Severity severity){
@@ -127,10 +139,10 @@ namespace Raindrop::Core::Debug::Log{
 	}
 }
 
-RAINDROP_MODULE void  __RAINDROP_log_setContext(const Raindrop::Core::Debug::Log::Logger& __logger){
-	Raindrop::Core::Debug::Log::logger = __logger;
+RAINDROP_MODULE void  __RAINDROP_log_setContext(Raindrop::Core::Debug::Log::__Logger* logger){
+	Raindrop::Core::Debug::Log::__logger = logger;
 }
 
-RAINDROP_MODULE const Raindrop::Core::Debug::Log::Logger&  __RAINDROP_log_getContext(){
-	return Raindrop::Core::Debug::Log::logger;
+RAINDROP_MODULE Raindrop::Core::Debug::Log::__Logger* __RAINDROP_log_getContext(){
+	return Raindrop::Core::Debug::Log::__logger;
 }

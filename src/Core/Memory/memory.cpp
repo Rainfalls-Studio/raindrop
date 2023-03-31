@@ -1,5 +1,5 @@
-#include "memory.hpp"
-#include "../Debug/debug.hpp"
+#include "Core/Memory/memory.hpp"
+#include "Core/Debug/debug.hpp"
 #include <stdlib.h>
 
 namespace Raindrop::Core::Memory{

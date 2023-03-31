@@ -7,44 +7,69 @@
 #include <fstream>
 
 namespace Raindrop::Core::Debug::Profiler{
-	struct Profiler_t{
+	struct __Profiler{
 		std::ofstream out;
 		uint32_t profileCount;
 		std::mutex mutex;
 		bool profile = false;
 	};
 
-	static Profiler_t __profiler;
+	static __Profiler* __profiler = nullptr;
+	
+	void init(){
+		__profiler = new __Profiler();
+	}
+
+	void shutdown(){
+		delete __profiler;
+		__profiler = nullptr;
+	}
 
 	Profile::Profile(const char* scope){
-		__profiler.mutex.lock();
-		if (__profiler.profile && __profiler.out.is_open()){
-			__profiler.out << "s," << scope << "," << std::this_thread::get_id() << "," << std::chrono::steady_clock::now().time_since_epoch().count() << '\n';
-			__profiler.out.flush();
+		if (!__profiler) return;
+
+		__profiler->mutex.lock();
+		if (__profiler->profile && __profiler->out.is_open()){
+			__profiler->out << "s," << scope << "," << std::this_thread::get_id() << "," << std::chrono::steady_clock::now().time_since_epoch().count() << '\n';
+			__profiler->out.flush();
 		}
-		__profiler.mutex.unlock();
+		__profiler->mutex.unlock();
 	}
 
 	Profile::~Profile(){
-		__profiler.mutex.lock();
-		if (__profiler.profile && __profiler.out.is_open()){
-			__profiler.out << "e," << std::this_thread::get_id() << "," << std::chrono::steady_clock::now().time_since_epoch().count() << ",\n";
-			__profiler.out.flush();
+		if (!__profiler) return;
+
+		__profiler->mutex.lock();
+		if (__profiler->profile && __profiler->out.is_open()){
+			__profiler->out << "e," << std::this_thread::get_id() << "," << std::chrono::steady_clock::now().time_since_epoch().count() << ",\n";
+			__profiler->out.flush();
 		}
-		__profiler.mutex.unlock();
+		__profiler->mutex.unlock();
 	}
 
 	void beginProfile(const char* name, const char* filepath){
-		__profiler.out.open(filepath);
-		__profiler.out << name << ",,,\n";
-		__profiler.out.flush();
+		if (!__profiler) return;
+
+		__profiler->out.open(filepath);
+		__profiler->out << name << ",,,\n";
+		__profiler->out.flush();
 	}
 
 	void endProfile(){
-		__profiler.out.close();
+		if (!__profiler) return;
+		__profiler->out.close();
 	}
 
 	void profile(bool profile){
-		__profiler.profile = profile;
+		if (!__profiler) return;
+		__profiler->profile = profile;
 	}
+}
+
+RAINDROP_MODULE void __RAINDROP_profile_setContext(Raindrop::Core::Debug::Profiler::__Profiler* profiler){
+	Raindrop::Core::Debug::Profiler::__profiler = profiler;
+}
+
+RAINDROP_MODULE Raindrop::Core::Debug::Profiler::__Profiler* __RAINDROP_profile_getContext(){
+	return Raindrop::Core::Debug::Profiler::__profiler;
 }
