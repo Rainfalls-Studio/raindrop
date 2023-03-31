@@ -1,9 +1,9 @@
 #ifndef __RAINDROP_CORE_MATHS_MATHS_HPP__
 #define __RAINDROP_CORE_MATHS_MATHS_HPP__
 
-#include "glm.hpp"
-#include "../common.hpp"
-#include "../core.hpp"
+#include <glm/glm.hpp>
+#include "Core/common.hpp"
+#include "Core/core.hpp"
 
 namespace Raindrop::Core::Maths{
 	template<uint32 L, typename T>

@@ -1,5 +1,5 @@
-#include "Filebuffer.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/Filesystem/Filebuffer.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Filesystem{
 

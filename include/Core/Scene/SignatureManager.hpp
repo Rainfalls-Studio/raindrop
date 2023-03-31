@@ -1,9 +1,9 @@
 #ifndef __RAINDROP_CORE_SCENE_SIGNATURE_MANAGER_HPP__
 #define __RAINDROP_CORE_SCENE_SIGNATURE_MANAGER_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
-#include "../Memory/allocators/Allocator.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
 
 namespace Raindrop::Core::Scene{
 	class Signature{

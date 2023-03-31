@@ -1,5 +1,5 @@
-#include "logger.hpp"
-#include "debug.hpp"
+#include "Core/Debug/logger.hpp"
+#include "Core/Debug/debug.hpp"
 
 namespace Raindrop::Core::Debug::Log{
 	class Logger{

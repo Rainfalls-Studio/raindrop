@@ -1,9 +1,9 @@
 #ifndef __RAINDROP_CORE_DEBUG_LOGGER_HPP__
 #define __RAINDROP_CORE_DEBUG_LOGGER_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
-#include "../module.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
+#include "Core/module.hpp"
 
 #include <cstdio>
 

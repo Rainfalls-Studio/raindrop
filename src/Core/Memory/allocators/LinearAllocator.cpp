@@ -1,6 +1,6 @@
-#include "LinearAllocator.hpp"
-#include "../memory.hpp"
-#include "../../Debug/profiler.hpp"
+#include "Core/Memory/allocators/LinearAllocator.hpp"
+#include "Core/Memory/memory.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
 	LinearAllocator::LinearAllocator(usize size, void* start) : Allocator(size, start){

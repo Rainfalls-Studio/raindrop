@@ -1,6 +1,6 @@
-#include "CSVReader.hpp"
-#include "../Debug/debug.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/IO/CSVReader.hpp"
+#include "Core/Debug/debug.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::IO{
 	CSVReader::CSVReader(Memory::Allocator &allocator, const Filesystem::Filebuffer &buffer) : _allocator{&allocator}, _content{allocator}{

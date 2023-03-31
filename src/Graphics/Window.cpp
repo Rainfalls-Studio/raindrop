@@ -1,6 +1,6 @@
-#include "Window.hpp"
 #include "Core/Debug/logger.hpp"
 #include "Core/Debug/profiler.hpp"
+#include "Graphics/Window.hpp"
 
 namespace Raindrop::Graphics{
 	Window::Window(){}

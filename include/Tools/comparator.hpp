@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_UTILS_COMPArATOR_HPP__
 #define __RAINDROP_UTILS_COMPArATOR_HPP__
 
-#include "../Core/core.hpp"
-#include "../Core/common.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
 
 namespace Raindrop::Tools{
 	template<typename T>

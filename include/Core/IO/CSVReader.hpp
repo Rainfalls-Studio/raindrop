@@ -1,10 +1,10 @@
 #ifndef __RAINDROP_CORE_IO_CSV_HPP__
 #define __RAINDROP_CORE_IO_CSV_HPP__
 
-#include "../Filesystem/Filebuffer.hpp"
-#include "../Memory/allocators/Allocator.hpp"
-#include "../Memory/containers/Array.hpp"
-#include "../String.hpp"
+#include "Core/Filesystem/Filebuffer.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Memory/containers/Array.hpp"
+#include "Core/String.hpp"
 
 namespace Raindrop::Core::IO{
 	class CSVReader{

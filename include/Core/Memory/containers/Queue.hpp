@@ -1,10 +1,10 @@
 #ifndef __RAINDROP_CORE_MEMORY_QUEUE_HPP__
 #define __RAINDROP_CORE_MEMORY_QUEUE_HPP__
 
-#include "Array.hpp"
-#include "../allocators/Allocator.hpp"
-#include "../../Debug/logger.hpp"
-#include "../../Debug/profiler.hpp"
+#include "Core/Memory/containers/Array.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Debug/logger.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
 	template<class T>

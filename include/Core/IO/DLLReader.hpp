@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_IO_DLL_READFER_HPP__
 #define __RAINDROP_CORE_IO_DLL_READFER_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
 
 namespace Raindrop::Core::IO{
 	class DLLReader{

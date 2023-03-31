@@ -1,5 +1,5 @@
-#include "Timepoint.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/Time/Timepoint.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Time{	
 	Timepoint::Timepoint(const Timepoint &other) : _time{other._time}{

@@ -1,5 +1,5 @@
-#include "Barrier.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/Thread/Barrier.hpp"
+#include "Core/Debug/profiler.hpp"
 #include <pthread.h>
 
 namespace Raindrop::Core::Thread{

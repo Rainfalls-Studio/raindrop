@@ -1,7 +1,7 @@
 #ifndef __RAINDROP_CORE_TIME_DURATION_HPP__
 #define __RAINDROP_CORE_TIME_DURATION_HPP__
 
-#include "Time.hpp"
+#include "Core/Time/Time.hpp"
 
 namespace Raindrop::Core::Time{
 	class Duration{

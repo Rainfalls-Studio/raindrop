@@ -2,9 +2,9 @@
 #define __RAINDROP_CORE_STRING_HPP__
 
 #include <string>
-#include "common.hpp"
-#include "Memory/allocators/Allocator.hpp"
-#include "../Tools/hash.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Tools/hash.hpp"
 
 namespace Raindrop::Core{
 	class String{

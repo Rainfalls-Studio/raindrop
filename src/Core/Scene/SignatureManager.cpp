@@ -1,5 +1,5 @@
-#include "SignatureManager.hpp"
-#include "Scene.hpp"
+#include "Core/Scene/SignatureManager.hpp"
+#include "Core/Scene/Scene.hpp"
 #include <cstring>
 
 namespace Raindrop::Core::Scene{

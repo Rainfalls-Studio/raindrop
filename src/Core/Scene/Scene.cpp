@@ -1,4 +1,4 @@
-#include "Scene.hpp"
+#include "Core/Scene/Scene.hpp"
 #include <typeinfo>
 
 namespace Raindrop::Core::Scene{

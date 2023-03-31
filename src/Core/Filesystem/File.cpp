@@ -1,9 +1,9 @@
-#include "File.hpp"
-#include "Filestream.hpp"
+#include "Core/Filesystem/File.hpp"
+#include "Core/Filesystem/Filestream.hpp"
+#include "Core/Debug/profiler.hpp"
 #include <stdio.h>
 #include <filesystem>
 
-#include "../debug/profiler.hpp"
 
 namespace Raindrop::Core::Filesystem{
 	File::File(const File& other) : _path(other._path){

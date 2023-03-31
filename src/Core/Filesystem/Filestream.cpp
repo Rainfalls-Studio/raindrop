@@ -1,13 +1,12 @@
-#include "../core.hpp"
-#include "Filestream.hpp"
-#include "File.hpp"
-#include "Filesystem.hpp"
+#include "Core/core.hpp"
+#include "Core/Filesystem/Filestream.hpp"
+#include "Core/Filesystem/File.hpp"
+#include "Core/Filesystem/Filesystem.hpp"
+#include "Core/Debug/profiler.hpp"
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-
-#include "../Debug/profiler.hpp"
 
 namespace Raindrop::Core::Filesystem{
 	Filestream::Filestream(){

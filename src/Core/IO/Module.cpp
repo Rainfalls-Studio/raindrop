@@ -1,6 +1,6 @@
-#include "Module.hpp"
-#include "../Debug/profiler.hpp"
-#include "../Debug/logger.hpp"
+#include "Core/IO/Module.hpp"
+#include "Core/Debug/profiler.hpp"
+#include "Core/Debug/logger.hpp"
 
 namespace Raindrop::Core::IO{
 	Module::Module(const char* path) : _dll(path){

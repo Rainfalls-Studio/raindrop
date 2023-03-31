@@ -1,9 +1,9 @@
 #ifndef __RAINDROP_CORE_FILESYSTEM_FILE_HPP__
 #define __RAINDROP_CORE_FILESYSTEM_FILE_HPP__
 
-#include "Filesystem.hpp"
-#include "Filestream.hpp"
-#include "../Memory/allocators/Allocator.hpp"
+#include "Core/Filesystem/Filesystem.hpp"
+#include "Core/Filesystem/Filestream.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
 
 namespace Raindrop::Core::Filesystem{
 	class File{

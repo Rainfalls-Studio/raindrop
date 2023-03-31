@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_SYSTEM_CPU_HPP__
 #define __RAINDROP_CORE_SYSTEM_CPU_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
 
 namespace Raindrop::Core::System{
 	class CPU{

@@ -1,9 +1,9 @@
 #ifndef __RAINDROP_CORE_FILESYSTEM_HPP__
 #define __RAINDROP_CORE_FILESYSTEM_HPP__
 
-#include "../String.hpp"
-#include "../common.hpp"
-#include "../Memory/containers/Array.hpp"
+#include "Core/String.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/containers/Array.hpp"
 
 namespace Raindrop::Core::Filesystem{
 	using Path = String;

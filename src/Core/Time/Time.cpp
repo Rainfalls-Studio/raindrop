@@ -1,7 +1,6 @@
-#include "Time.hpp"
-#include "../Debug/profiler.hpp"
-
-#include "../System/CPU.hpp"
+#include "Core/Time/Time.hpp"
+#include "Core/Debug/profiler.hpp"
+#include "Core/System/CPU.hpp"
 
 namespace Raindrop::Core::Time{
 	utime64 getTicks(){

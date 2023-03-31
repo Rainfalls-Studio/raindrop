@@ -1,10 +1,10 @@
 #ifndef __RAINDROP_CORE_MEMORY_DYNAMIC_BITSET_HPP__
 #define __RAINDROP_CORE_MEMORY_DYNAMIC_BITSET_HPP__
 
-#include "../../core.hpp"
-#include "../../common.hpp"
-#include "../allocators/Allocator.hpp"
-#include "../../Maths/Maths.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Maths/Maths.hpp"
 #include <cstring>
 
 namespace Raindrop::Core::Memory{

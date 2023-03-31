@@ -1,9 +1,8 @@
-#include "Context.hpp"
-#include "Renderer.hpp"
 #include "Core/Debug/logger.hpp"
 #include "Core/Debug/profiler.hpp"
-#include "Renderer.hpp"
-#include "GraphicsPlugin.hpp"
+#include "Graphics/Renderer.hpp"
+#include "Graphics/Context.hpp"
+#include "Graphics/GraphicsPlugin.hpp"
 
 namespace Raindrop::Graphics{
 	Context::Context(){}

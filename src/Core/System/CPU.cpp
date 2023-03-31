@@ -1,5 +1,5 @@
-#include "CPU.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/System/CPU.hpp"
+#include "Core/Debug/profiler.hpp"
 #include <time.h>
 
 #if defined(RAINDROP_WINDOWS)

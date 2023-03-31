@@ -1,11 +1,11 @@
 #ifndef __RAINDROP_CORE_MEMORY_HASH_MAP_HPP__
 #define __RAINDROP_CORE_MEMORY_HASH_MAP_HPP__
 
-#include "../allocators/Allocator.hpp"
-#include "Array.hpp"
-#include "../../Debug/profiler.hpp"
-#include "../../../Tools/hash.hpp"
-#include "../../../Tools/comparator.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Memory/containers/Array.hpp"
+#include "Core/Debug/profiler.hpp"
+#include "Tools/hash.hpp"
+#include "Tools/comparator.hpp"
 
 namespace Raindrop::Core::Memory{
 	template<class K, class V>

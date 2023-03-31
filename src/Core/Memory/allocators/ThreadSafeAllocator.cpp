@@ -1,5 +1,5 @@
-#include "ThreadSafeAllocator.hpp"
-#include "../../Debug/profiler.hpp"
+#include "Core/Memory/allocators/ThreadSafeAllocator.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
 	ThreadSafeAllocator::ThreadSafeAllocator(Allocator& allocator) : Allocator(allocator.getSize(), allocator.getStart()), _allocator(&allocator), _mutex(allocator){

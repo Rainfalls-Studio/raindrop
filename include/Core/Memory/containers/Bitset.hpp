@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_MEMORY_BITSET_HPP__
 #define __RAINDROP_CORE_MEMORY_BITSET_HPP__
 
-#include "../../core.hpp"
-#include "../../common.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
 
 namespace Raindrop::Core::Memory{
 	template<uint32 lenght>

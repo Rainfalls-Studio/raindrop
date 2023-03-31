@@ -1,15 +1,15 @@
 #ifndef __RAINDROP_CORE_SCENE_SCENE_HPP__
 #define __RAINDROP_CORE_SCENE_SCENE_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
-#include "../Memory/allocators/Allocator.hpp"
-#include "../Memory/containers/Array.hpp"
-#include "../Memory/containers/List.hpp"
-#include "ComponentManager.hpp"
-#include "EntityManager.hpp"
-#include "SignatureManager.hpp"
-#include "SystemManager.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Memory/containers/Array.hpp"
+#include "Core/Memory/containers/List.hpp"
+#include "Core/Scene/ComponentManager.hpp"
+#include "Core/Scene/EntityManager.hpp"
+#include "Core/Scene/SignatureManager.hpp"
+#include "Core/Scene/SystemManager.hpp"
 #include <typeinfo>
 
 namespace Raindrop::Core::Scene{

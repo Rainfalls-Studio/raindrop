@@ -1,6 +1,6 @@
-#include "DirectoryView.hpp"
-#include "Folder.hpp"
-#include "../debug/profiler.hpp"
+#include "Core/Filesystem/DirectoryView.hpp"
+#include "Core/Filesystem/Folder.hpp"
+#include "Core/debug/profiler.hpp"
 
 namespace Raindrop::Core::Filesystem{
 	DirectoryView::DirectoryView(const Folder &folder, Memory::Allocator& allocator) : DirectoryView(folder.path(), allocator){

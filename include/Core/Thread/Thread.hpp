@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_THREAD_THREAD_HPP__
 #define __RAINDROP_CORE_THREAD_THREAD_HPP__
 
-#include "../common.hpp"
-#include "../String.hpp"
+#include "Core/common.hpp"
+#include "Core/String.hpp"
 
 namespace Raindrop::Core::Thread{
 	typedef ID64 ThreadID;

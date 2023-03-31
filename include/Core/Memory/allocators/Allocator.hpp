@@ -1,9 +1,9 @@
 #ifndef __RAINDROP_CORE_MEMORY_ALLOCATE_HPP__
 #define __RAINDROP_CORE_MEMORY_ALLOCATE_HPP__
 
-#include "../../common.hpp"
-#include "../../Debug/debug.hpp"
-#include "../../Debug/profiler.hpp"
+#include "Core/common.hpp"
+#include "Core/Debug/debug.hpp"
+#include "Core/Debug/profiler.hpp"
 
 #include <new>
 

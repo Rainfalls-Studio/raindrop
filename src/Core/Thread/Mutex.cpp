@@ -1,5 +1,5 @@
-#include "Mutex.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/Thread/Mutex.hpp"
+#include "Core/Debug/profiler.hpp"
 #include <pthread.h>
 
 /**

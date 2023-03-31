@@ -1,10 +1,10 @@
 #ifndef __RAINDROP_CORE_SCENE_ENTITY_MANAGER_HPP__
 #define __RAINDROP_CORE_SCENE_ENTITY_MANAGER_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
-#include "../Memory/allocators/Allocator.hpp"
-#include "../Memory/containers/List.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Memory/containers/List.hpp"
 
 namespace Raindrop::Core::Scene{
 	class EntityManager{

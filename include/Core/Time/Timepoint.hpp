@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_TIME_TIMEPOINT_HPP__
 #define __RAINDROP_CORE_TIME_TIMEPOINT_HPP__
 
-#include "Time.hpp"
-#include "Duration.hpp"
+#include "Core/Time/Time.hpp"
+#include "Core/Time/Duration.hpp"
 
 namespace Raindrop::Core::Time{
 	class Timepoint{

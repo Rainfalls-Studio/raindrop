@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_MEMORY_LINEAR_ALLOCATOR_HPP__
 #define __RAINDROP_CORE_MEMORY_LINEAR_ALLOCATOR_HPP__
 
-#include "Allocator.hpp"
-#include "../../common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/common.hpp"
 
 namespace Raindrop::Core::Memory{
 	class LinearAllocator : public Allocator{

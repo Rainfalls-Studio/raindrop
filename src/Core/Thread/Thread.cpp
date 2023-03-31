@@ -1,6 +1,6 @@
-#include "../Debug/debug.hpp"
-#include "../Debug/profiler.hpp"
-#include "Thread.hpp"
+#include "Core/Debug/debug.hpp"
+#include "Core/Debug/profiler.hpp"
+#include "Core/Thread/Thread.hpp"
 #include <pthread.h>
 
 namespace Raindrop::Core::Thread{

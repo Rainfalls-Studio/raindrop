@@ -1,5 +1,5 @@
-#include "ConditionalVariable.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/Thread/ConditionalVariable.hpp"
+#include "Core/Debug/profiler.hpp"
 #include <pthread.h>
 
 namespace Raindrop::Core::Thread{

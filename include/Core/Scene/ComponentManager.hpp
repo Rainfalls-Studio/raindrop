@@ -1,11 +1,11 @@
 #ifndef __RAINDROP_CORE_SCENE_COMPONENT_MANAGER_HPP__
 #define __RAINDROP_CORE_SCENE_COMPONENT_MANAGER_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
-#include "../Memory/allocators/Allocator.hpp"
-#include "../Memory/containers/Array.hpp"
-#include "../Memory/containers/HashMap.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Memory/containers/Array.hpp"
+#include "Core/Memory/containers/HashMap.hpp"
 
 namespace Raindrop::Core::Scene{
 	class ComponentManager{

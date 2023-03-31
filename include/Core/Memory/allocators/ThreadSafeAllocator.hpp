@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_MEMORY_ALLOCATOR_THREAD_SAFE_ALLOCATOR_HPP__
 #define __RAINDROP_CORE_MEMORY_ALLOCATOR_THREAD_SAFE_ALLOCATOR_HPP__
 
-#include "Allocator.hpp"
-#include "../../Thread/Mutex.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Thread/Mutex.hpp"
 
 
 namespace Raindrop::Core::Memory{

@@ -1,7 +1,7 @@
-#include "FreelistAllocator.hpp"
-#include "../memory.hpp"
-#include "../../Debug/debug.hpp"
-#include "../../Debug/profiler.hpp"
+#include "Core/Memory/allocators/FreelistAllocator.hpp"
+#include "Core/Memory/memory.hpp"
+#include "Core/Debug/debug.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
 	FreelistAllocator::FreelistAllocator(usize size, void* start) :

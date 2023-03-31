@@ -1,5 +1,5 @@
-#include "String.hpp"
-#include "Debug/profiler.hpp"
+#include "Core/String.hpp"
+#include "Core/Debug/profiler.hpp"
 #include <cstring>
 
 namespace Raindrop::Core{

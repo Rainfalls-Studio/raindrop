@@ -1,12 +1,12 @@
 #ifndef __RAINDROP_CORE_SCENE_SYSTEM_MANAGER_HPP__
 #define __RAINDROP_CORE_SCENE_SYSTEM_MANAGER_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
-#include "../Memory/allocators/Allocator.hpp"
-#include "SignatureManager.hpp"
-#include "../Memory/containers/List.hpp"
-#include "../Memory/containers/DoublyLinkedList.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Scene/SignatureManager.hpp"
+#include "Core/Memory/containers/List.hpp"
+#include "Core/Memory/containers/DoublyLinkedList.hpp"
 
 namespace Raindrop::Core::Scene{
 	class System{

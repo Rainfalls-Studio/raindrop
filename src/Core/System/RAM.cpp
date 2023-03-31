@@ -1,5 +1,5 @@
-#include "RAM.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/System/RAM.hpp"
+#include "Core/Debug/profiler.hpp"
 
 #ifdef RAINDROP_WINDOWS
 	#include "windows.h"

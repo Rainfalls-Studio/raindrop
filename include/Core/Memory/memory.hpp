@@ -1,9 +1,9 @@
 #ifndef __RAINDROP_CORE_MEMORY_HPP__
 #define __RAINDROP_CORE_MEMORY_HPP__
 
-#include "../core.hpp"
-#include "../common.hpp"
-#include "../Debug/debug.hpp"
+#include "Core/core.hpp"
+#include "Core/common.hpp"
+#include "Core/Debug/debug.hpp"
 
 namespace Raindrop::Core::Memory{
 

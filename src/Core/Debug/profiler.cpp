@@ -1,4 +1,4 @@
-#include "profiler.hpp"
+#include "Core/Debug/profiler.hpp"
 
 #include <mutex>
 #include <thread>

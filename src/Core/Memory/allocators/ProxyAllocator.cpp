@@ -1,5 +1,5 @@
-#include "ProxyAllocator.hpp"
-#include "../../Debug/profiler.hpp"
+#include "Core/Memory/allocators/ProxyAllocator.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
 	ProxyAllocator::ProxyAllocator(Allocator& allocator) : Allocator(allocator.getSize(), allocator.getStart()), allocator(allocator){

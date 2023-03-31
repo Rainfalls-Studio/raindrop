@@ -1,9 +1,9 @@
 #ifndef __RAINDROP_CORE_THREAD_CONDITIONAL_VARIABLE_HPP__
 #define __RAINDROP_CORE_THREAD_CONDITIONAL_VARIABLE_HPP__
 
-#include "../common.hpp"
-#include "../Memory/allocators/Allocator.hpp"
-#include "Mutex.hpp"
+#include "Core/common.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Thread/Mutex.hpp"
 
 namespace Raindrop::Core::Thread{
 	class ConditionalVariable{

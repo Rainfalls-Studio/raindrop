@@ -1,4 +1,4 @@
-#include "ComponentManager.hpp"
+#include "Core/Scene/ComponentManager.hpp"
 #include <cstring>
 
 namespace Raindrop::Core::Scene{

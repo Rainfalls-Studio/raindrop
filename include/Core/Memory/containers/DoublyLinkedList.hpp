@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_MEMORY_DOUBLY_LINKED_LIST_HPP__
 #define __RAINDROP_CORE_MEMORY_DOUBLY_LINKED_LIST_HPP__
 
-#include "../allocators/Allocator.hpp"
-#include "../../Debug/profiler.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Debug/profiler.hpp"
 #include <utility>
 
 namespace Raindrop::Core::Memory{

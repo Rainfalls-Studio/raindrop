@@ -1,4 +1,4 @@
-#include "EntityManager.hpp"
+#include "Core/Scene/EntityManager.hpp"
 
 namespace Raindrop::Core::Scene{
 	EntityManager::EntityManager(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}, _freeEntities{allocator}{

@@ -1,7 +1,7 @@
 #ifndef __RAINDROP_CORE_COMMON_HPP__
 #define __RAINDROP_CORE_COMMON_HPP__
 
-#include "core.hpp"
+#include "Core/core.hpp"
 
 #if! defined(__SIZEOF_INT128__)
 	#warning int 128 is not defined, may cause issues.

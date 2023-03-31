@@ -1,6 +1,6 @@
-#include "DLLReader.hpp"
-#include "../Debug/profiler.hpp"
-#include "../Debug/logger.hpp"
+#include "Core/IO/DLLReader.hpp"
+#include "Core/Debug/profiler.hpp"
+#include "Core/Debug/logger.hpp"
 
 #if defined(RAINDROP_WINDOWS)
 	#include <windows.h>

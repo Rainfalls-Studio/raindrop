@@ -1,6 +1,6 @@
-#include "PoolAllocator.hpp"
-#include "../memory.hpp"
-#include "../../Debug/profiler.hpp"
+#include "Core/Memory/allocators/PoolAllocator.hpp"
+#include "Core/Memory/memory.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
 	PoolAllocator::PoolAllocator(size_t objectSize, uint8 objectAlignment, usize size, void* mem) : Allocator(size, mem), _objectSize(objectSize), _objectAlignment(objectAlignment){

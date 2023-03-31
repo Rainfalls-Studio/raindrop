@@ -1,5 +1,5 @@
-#include "DefaultAllocator.hpp"
-#include "../memory.hpp"
+#include "Core/Memory/allocators/DefaultAllocator.hpp"
+#include "Core/Memory/memory.hpp"
 
 namespace Raindrop::Core::Memory{
 	DefaultAllocator::DefaultAllocator() : Allocator{0, nullptr}{}

@@ -1,10 +1,10 @@
 #ifndef __RAINDROP_CORE_MEMORY_POOL_HPP__
 #define __RAINDROP_CORE_MEMORY_POOL_HPP__
 
-#include "../allocators/Allocator.hpp"
-#include "../../Debug/logger.hpp"
-#include "../../Debug/profiler.hpp"
-#include "../../Maths/Maths.hpp"
+#include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Debug/logger.hpp"
+#include "Core/Debug/profiler.hpp"
+#include "Core/Maths/Maths.hpp"
 #include <memory.h>
 
 namespace Raindrop::Core::Memory{

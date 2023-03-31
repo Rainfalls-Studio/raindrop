@@ -1,5 +1,5 @@
-#include "Duration.hpp"
-#include "../Debug/profiler.hpp"
+#include "Core/Time/Duration.hpp"
+#include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Time{
 	Duration::Duration(time64 duration) : _duration{duration}{

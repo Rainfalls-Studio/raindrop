@@ -1,7 +1,7 @@
 #ifndef __RAINDROP_CORE_DEBUG_DEBUG_HPP__
 #define __RAINDROP_CORE_DEBUG_DEBUG_HPP__
 
-#include "logger.hpp"
+#include "Core/Debug/logger.hpp"
 #include "stdlib.h"
 
 #ifdef RAINDROP_ASSERTS
