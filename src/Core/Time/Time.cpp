@@ -2,7 +2,24 @@
 #include "Core/Debug/profiler.hpp"
 #include "Core/System/CPU.hpp"
 
+#if defined(RAINDROP_WINDOWS)
+	#include <windows.h>
+#elif defined(RAINDROP_LINUX)
+	#include <unistd.h>
+#endif
+
 namespace Raindrop::Core::Time{
+	
+	#if defined(RAINDROP_WINDOWS)
+		void sleep(utime64 time){
+			::Sleep(static_cast<DWORD>(time));
+		}
+	#elif defined(RAINDROP_LINUX)
+		void sleep(uint64 time){
+			::usleep(time * 100);
+		}
+	#endif
+
 	utime64 getTicks(){
 		RAINDROP_profile_function();
 		return (utime64)System::CPU::getTicks();
@@ -58,7 +75,7 @@ namespace Raindrop::Core::Time{
 		return time * getTicksPerSeconds() * 1e-6;
 	}
 
-	time64 operator ""_mls(timef64 time){
+	time64 operator ""_ms(timef64 time){
 		RAINDROP_profile_function();
 		return time * getTicksPerSeconds() * 1e-3;
 	}
