@@ -1,6 +1,7 @@
-[submodule "glm"]
-	path = glm
-	url = https://github.com/g-truc/glm.git
-[submodule "unittest-cpp"]
-	path = unittest-cpp
+[submodule "libs/unittest-cpp"]
+	path = libs/unittest-cpp
 	url = https://github.com/unittest-cpp/unittest-cpp.git
+
+[submodule "libs/glm"]
+	path = libs/glm
+	url = https://github.com/g-truc/glm.git
