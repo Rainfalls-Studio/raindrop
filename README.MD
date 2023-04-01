@@ -6,14 +6,11 @@ The engine is made for all sorts of games and should be the most modular possibl
 [TODO list](https://linear.app/rainfalls-studios/project/raindrop-9ac0fc621b17)
 
 ### Features
+<!-- todo -->
 
 ### Dependencies
 
 - [GLM](https://github.com/g-truc/glm) (MIT)
-
-#### Tests
-
-- [gtest](https://github.com/google/googletest) (BSD-3-Clause)
 
 ### Resources
 
