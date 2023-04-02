@@ -3,7 +3,6 @@
 #include "Core/Debug/profiler.hpp"
 #include <filesystem>
 
-
 #ifdef RAINDROP_WINDOWS
 	#include <windows.h>
 	#include <tchar.h> 
