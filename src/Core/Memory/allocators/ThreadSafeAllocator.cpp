@@ -2,7 +2,7 @@
 #include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
-	ThreadSafeAllocator::ThreadSafeAllocator(Allocator& allocator) : Allocator(allocator.getSize(), allocator.getStart()), _allocator(&allocator), _mutex(allocator){
+	ThreadSafeAllocator::ThreadSafeAllocator(Allocator& allocator) : Allocator(allocator.getSize(), allocator.getStart()), _allocator(&allocator){
 		RAINDROP_profile_function();
 	}
 

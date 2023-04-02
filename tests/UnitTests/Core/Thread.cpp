@@ -54,3 +54,80 @@ TEST(thread, cancel){
 	Thread thread(&foo, &arg);
 	thread.cancel();
 }
+
+// Mutex
+
+TEST(mutex, initialization){
+	Mutex mutex;
+}
+
+TEST(mutex, lock){
+	Mutex mutex;
+	mutex.lock();
+}
+
+TEST(mutex, invalidUnlock){
+	Mutex mutex;
+	mutex.unlock();
+}
+
+TEST(mutex, validUnlock){
+	Mutex mutex;
+	mutex.lock();
+	mutex.unlock();
+}
+
+TEST(mutex, tryLock){
+	Mutex mutex;
+	EXPECT_TRUE(mutex.tryLock());
+}
+
+// conditional variables
+
+void* sendSignalFnc(void* ptr){
+	ConditionalVariable& cond = *reinterpret_cast<ConditionalVariable*>(ptr);
+
+	// wait to ensure that the main thread hit the condition
+	Raindrop::Core::Time::sleep(1);
+	cond.signal();
+	return nullptr;
+}
+
+TEST(conditionalVariable, initialization){
+	ConditionalVariable cond;
+}
+
+TEST(conditionalVariable, signal){
+	ConditionalVariable cond;
+	cond.signal();
+}
+
+TEST(conditionalVariable, broadcast){
+	ConditionalVariable cond;
+	cond.broadcast();
+}
+
+TEST(conditionalVariable, wait){
+	ConditionalVariable cond;
+	Mutex mutex;
+	Thread thread(&sendSignalFnc, &cond);
+
+	cond.wait(mutex);
+	thread.join();
+}
+
+// barrier
+
+TEST(barrier, initialization){
+	Barrier barrier(1);
+}
+
+TEST(barrier, wait){
+	Barrier barrier(1);
+	barrier.wait();
+}
+
+TEST(barrier, count){
+	Barrier barrier(2);
+	EXPECT_EQ(barrier.count(), 2);
+}

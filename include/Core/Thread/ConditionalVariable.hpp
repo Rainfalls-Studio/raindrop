@@ -8,7 +8,7 @@
 namespace Raindrop::Core::Thread{
 	class ConditionalVariable{
 		public:
-			ConditionalVariable(Memory::Allocator& allocator);
+			ConditionalVariable();
 			~ConditionalVariable();
 			
 			void signal();
@@ -17,7 +17,6 @@ namespace Raindrop::Core::Thread{
 			void timedWait(Mutex &mutex, float64 duration);
 
 		private:
-			Memory::Allocator* _allocator;
 			void* _conditionalVariable;
 	};
 }

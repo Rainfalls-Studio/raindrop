@@ -16,7 +16,7 @@ namespace Raindrop::Core::Time{
 	};
 	
 	/**
-	 * @brief stop the current thread for 'time' microseconds;
+	 * @brief stop the current thread for 'time' milliseconds;
 	 * @param time the time to stop for
 	 */
 	void sleep(utime64 time);

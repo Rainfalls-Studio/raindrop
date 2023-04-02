@@ -3,7 +3,7 @@
 #include <pthread.h>
 
 namespace Raindrop::Core::Thread{
-	Barrier::Barrier(Memory::Allocator& allocator, uint32 count) : _allocator(&allocator), _count(count){
+	Barrier::Barrier(uint32 count) : _count(count){
 		RAINDROP_profile_function();
 		pthread_barrier_init((pthread_barrier_t*)&_barrier, nullptr, count);
 	}
@@ -18,4 +18,9 @@ namespace Raindrop::Core::Thread{
 		RAINDROP_profile_function();
 		pthread_barrier_wait((pthread_barrier_t*)&_barrier);
 	}
+
+	uint32 Barrier::count() const{
+		return _count;
+	}
+
 }

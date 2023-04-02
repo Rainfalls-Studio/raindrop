@@ -3,7 +3,7 @@
 #include <pthread.h>
 
 namespace Raindrop::Core::Thread{
-	ConditionalVariable::ConditionalVariable(Memory::Allocator& allocator){
+	ConditionalVariable::ConditionalVariable(){
 		RAINDROP_profile_function();
 		pthread_cond_init((pthread_cond_t*)&_conditionalVariable, nullptr);
 	}
@@ -25,7 +25,7 @@ namespace Raindrop::Core::Thread{
 
 	void ConditionalVariable::wait(Mutex &mutex){
 		RAINDROP_profile_function();
-		pthread_cond_wait((pthread_cond_t*)&_conditionalVariable, (pthread_mutex_t*)mutex._mutex);
+		pthread_cond_wait((pthread_cond_t*)&_conditionalVariable, (pthread_mutex_t*)&mutex._mutex);
 	}
 
 	void ConditionalVariable::timedWait(Mutex &mutex, float64 duration){

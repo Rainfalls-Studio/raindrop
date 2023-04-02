@@ -7,9 +7,14 @@
  */
 
 namespace Raindrop::Core::Thread{
-	Mutex::Mutex(Memory::Allocator& allocator) : _allocator(&allocator){
+	Mutex::Mutex(){
 		RAINDROP_profile_function();
 		int result = pthread_mutex_init((pthread_mutex_t*)&_mutex, nullptr);
+	}
+
+	Mutex::Mutex(const Mutex& other){
+		RAINDROP_profile_function();
+		_mutex = other._mutex;
 	}
 
 	Mutex::~Mutex(){
