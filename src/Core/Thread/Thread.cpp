@@ -1,3 +1,4 @@
+#include "Core/core.hpp"
 #include "Core/Debug/debug.hpp"
 #include "Core/Debug/profiler.hpp"
 #include "Core/Thread/Thread.hpp"
@@ -20,6 +21,10 @@ namespace Raindrop::Core::Thread{
 
 	Thread::Thread(void* (*fnc)(void*), void* args){
 		RAINDROP_profile_function();
+		if (!fnc){
+			throw std::invalid_argument("the argument fnc is not valid");
+		}
+
 		pthread_create((pthread_t*)&_thread, nullptr, fnc, args);
 	}
 
@@ -31,7 +36,7 @@ namespace Raindrop::Core::Thread{
 		RAINDROP_profile_function();
 	}
 	
-	void Thread::detatch(){
+	void Thread::detach(){
 		RAINDROP_profile_function();
 		pthread_detach((pthread_t)_thread);
 	}
@@ -60,4 +65,10 @@ namespace Raindrop::Core::Thread{
 		RAINDROP_profile_function();
 		return Thread((void*)pthread_self());
 	}
+
+	bool Thread::operator==(const Thread& other){
+		RAINDROP_profile_function();
+		return other._thread == _thread;
+	}
+
 }

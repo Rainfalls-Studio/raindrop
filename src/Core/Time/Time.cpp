@@ -62,7 +62,7 @@ namespace Raindrop::Core::Time{
 
 	timef64 toDays(time64 time){
 		RAINDROP_profile_function();
-		return ((timef64)time / (timef64)getTicksPerSeconds()) * (1.f/183600.f);
+		return ((timef64)time / (timef64)getTicksPerSeconds()) * (1.f/86400.f);
 	}
 
 	time64 operator ""_ns(timef64 time){

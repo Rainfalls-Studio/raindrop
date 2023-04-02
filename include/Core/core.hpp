@@ -5,6 +5,9 @@
 // ppbrbrprbrpb
 // ! /!\ DO NOT DELETE /!\
 
+#include <stdexcept>
+#include <typeinfo>
+
 #define RAINDROP_PROFILE
 
 #define RAINDROP_VERSION_MAJOR 0

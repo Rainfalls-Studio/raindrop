@@ -21,13 +21,15 @@ namespace Raindrop::Core::Thread{
 			Thread(void* (*fnc)(void*), void* args);
 			~Thread();
 
-			void detatch();
+			void detach();
 			void join(void* res = nullptr);
 			void kill(Signal signal);
 			void cancel();
 
 			ThreadID id() const;
 			static Thread self();
+
+			bool operator==(const Thread& other);
 
 		private:
 			Thread(void *thread);
