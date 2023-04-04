@@ -107,7 +107,7 @@ namespace Raindrop::Core::Memory{
 		}
 
 		_end = newNode;
-		_lenght--;
+		_lenght++;
 	}
 
 	template<typename T>

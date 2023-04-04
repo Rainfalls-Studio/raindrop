@@ -27,6 +27,9 @@ namespace Raindrop::Core::Scene{
 			uint64 _sig;
 			
 			Signature(uint64 sig);
+			inline static bool inRange(const usize& i){
+				return i < (sizeof(Signature::_sig) * 8);
+			}
 	};
 	class SignatureManager{
 		public:
@@ -39,11 +42,18 @@ namespace Raindrop::Core::Scene{
 
 			void setBit(usize i, usize b, bool state);
 			bool getBit(usize i, usize b) const;
+
+			usize capacity() const;
+			static usize bitesPerSignature();
 		
 		private:
 			Memory::Allocator& _allocator;
 			Signature* _signatures;
 			usize _capacity;
+
+			inline bool inRange(const usize& i) const{
+				return i < _capacity;
+			}
 	};
 }
 

@@ -35,14 +35,14 @@ namespace Raindrop::Core::Scene{
 
 	void* ComponentManager::get(ID32 id){
 		RAINDROP_profile_function();
-		RAINDROP_assert(id < _capacity);
+		if (id >= _capacity) throw std::out_of_range("the given component id is out of the bounds of the component manager");
 		return static_cast<void*>(static_cast<char*>(_start) + _componentSize * id);
 	}
 
 	void ComponentManager::set(ID32 id, void* component){
 		RAINDROP_profile_function();
-		RAINDROP_assert(id < _capacity);
-		RAINDROP_assert(component != nullptr);
+		if (id >= _capacity) throw std::out_of_range("the given component id is out of the bounds of the component manager");
+		if (!component) throw std::invalid_argument("the given component pointer in null, cannot copy");
 		void* ptr = get(id);
 		memcpy(ptr, component, _componentSize);
 	}

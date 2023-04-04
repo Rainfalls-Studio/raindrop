@@ -47,7 +47,6 @@ namespace Raindrop::Core::Memory{
 	};
 
 	Allocator& defaultAllocator();
-	#define RAINDROP_default_allocator() ::Raindrop::Core::Memory::defaultAllocator()
 
 	template <typename T, typename... Args>
 	T* allocateNew(Allocator& allocator, Args&&... args) {
@@ -85,5 +84,7 @@ namespace Raindrop::Core::Memory{
 		allocator.deallocate(array); 
 	}
 }
+
+#define RAINDROP_default_allocator ::Raindrop::Core::Memory::defaultAllocator()
 
 #endif

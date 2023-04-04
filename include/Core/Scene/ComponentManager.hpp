@@ -10,7 +10,7 @@
 namespace Raindrop::Core::Scene{
 	class ComponentManager{
 		public:
-			ComponentManager(Memory::Allocator& allocator, usize componentSize, usize componentAlignement, uint32 size = 4096);
+			ComponentManager(Memory::Allocator& allocator, usize componentSize, usize componentAlignement, uint32 size = 1024);
 			~ComponentManager();
 
 			void* get(ID32 id);
