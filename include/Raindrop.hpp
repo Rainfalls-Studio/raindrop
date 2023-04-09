@@ -19,6 +19,7 @@
 #include "Core/Maths/Maths.hpp"
 #include "Core/Memory/memory.hpp"
 #include "Core/Memory/allocators/Allocator.hpp"
+#include "Core/Memory/allocators/DefaultAllocator.hpp"
 #include "Core/Memory/allocators/FreelistAllocator.hpp"
 #include "Core/Memory/allocators/LinearAllocator.hpp"
 #include "Core/Memory/allocators/PoolAllocator.hpp"

@@ -151,6 +151,11 @@ namespace Raindrop::Core::Maths{
 		return glm::dot(x, y);
 	}
 
+	template<typename T>
+	inline bool isPowerOfTwo(const T& x){
+		return !(x == 0) && !(x & (x - 1));
+	}
+
 	template<uint32 L, typename T>
 	inline vec<L, T> cross(const vec<L, T>& x, const vec<L, T>& y){
 		return glm::cross(x, y);
@@ -180,6 +185,7 @@ namespace Raindrop::Core::Maths{
 	inline mat<W, L, T> inverse(const mat<W, L, T>& x){
 		return glm::inverse(x);
 	}
+
 }
 
 #endif

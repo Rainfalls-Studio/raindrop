@@ -54,6 +54,7 @@ namespace Raindrop::Core::Memory{
 	}
 
 	inline usize alignAdjustmentHeader(const void* ptr, usize align, usize header_size) {
+		RAINDROP_assert(align > 0 && "Alignment must be greater than zero");
 		usize adjustment = align - (reinterpret_cast<usize>(ptr) + header_size) % align;
 		if (adjustment == align) {
 			return 0;

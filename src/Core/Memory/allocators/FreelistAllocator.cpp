@@ -2,6 +2,7 @@
 #include "Core/Memory/memory.hpp"
 #include "Core/Debug/debug.hpp"
 #include "Core/Debug/profiler.hpp"
+#include "Core/Maths/Maths.hpp"
 
 namespace Raindrop::Core::Memory{
 	FreelistAllocator::FreelistAllocator(usize size, void* start) :
@@ -22,7 +23,10 @@ namespace Raindrop::Core::Memory{
 	}
 
 	void* FreelistAllocator::allocate(usize size, uint8 alignment) {
-		RAINDROP_assert(size != 0 && alignment != 0);
+		if (size == 0) throw std::invalid_argument("cannot allocate an element with a null size");
+		if (alignment == 0) throw std::invalid_argument("cannot allocate an element without a valid alignement");
+		if (!Maths::isPowerOfTwo(alignment)) throw std::invalid_argument("the alignement has to be a power of two");
+
 
 		Block* prev_free_block = nullptr;
 		Block* free_block = free_list_;
@@ -85,12 +89,11 @@ namespace Raindrop::Core::Memory{
 		}
 
 		RAINDROP_log(ERROR, GRAPHICS, "failed to find suitable free memory block");
-		// If no suitable free block was found, return null
-		return nullptr;
+		throw std::bad_alloc();
 	}
 
 	void FreelistAllocator::deallocate(void* ptr){
-		RAINDROP_assert(ptr != nullptr);
+		if (ptr == nullptr) throw std::invalid_argument("cannot deallocate a null pointer");
 
 		Header* header = (Header*)((uptr)ptr - sizeof(Header));
 		uptr block_start = (uptr)ptr - header->alignment - sizeof(Header);
