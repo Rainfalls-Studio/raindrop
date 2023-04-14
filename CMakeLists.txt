@@ -10,13 +10,15 @@ add_subdirectory(libs/glm)
 add_subdirectory(libs/gtest)
 
 # submodules includes
-set(GLM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/glm/)
+set(GLM_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libs/glm/)
 set(GTEST_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libs/gtest/googleTest/include ${CMAKE_CURRENT_SOURCE_DIR}/libs/gtest/googlemock/include)
+
+set(RAINDROP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${GLM_INCLUDE_DIRS})
 
 set(CURRENT_SCOPE ${CMAKE_PROJECT_NAME})
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${GLM_INCLUDE_DIR})
+include_directories(${GLM_INCLUDE_DIRS})
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_subdirectory(src)
