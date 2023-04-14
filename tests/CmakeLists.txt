@@ -1,0 +1,3 @@
+set(CURRENT_SCOPE "${CURRENT_SCOPE}Test")
+
+add_subdirectory(UnitTests)
