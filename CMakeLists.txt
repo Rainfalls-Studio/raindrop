@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.0.0)
 project(Raindrop VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -16,7 +16,7 @@ set(GTEST_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libs/gtest/googleTest/include
 set(RAINDROP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/ ${GLM_INCLUDE_DIRS}")
 set(CURRENT_SCOPE ${CMAKE_PROJECT_NAME})
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/include/Raindrop/)
 include_directories(${GLM_INCLUDE_DIRS})
 include_directories(${GTEST_INCLUDE_DIRS})
 

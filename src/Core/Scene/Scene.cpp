@@ -140,6 +140,6 @@ namespace Raindrop::Core::Scene{
 	}
 
 	bool Scene::isIDValid(ID32 id){
-		return id != INVALID_ID;
+		return id != INVALID_ENTITY;
 	}
 }

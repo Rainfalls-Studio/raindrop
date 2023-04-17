@@ -50,7 +50,7 @@ namespace Raindrop::Core::System{
 			return (uint64)::GetTickCount64();
 		}
 
-		uint64 CPU::getClockSpeed(){
+		uint64 CPU::getTicksPerSeconds(){
 			RAINDROP_profile_function();
 			::LARGE_INTEGER liFrequency;
 			::QueryPerformanceFrequency(&liFrequency);

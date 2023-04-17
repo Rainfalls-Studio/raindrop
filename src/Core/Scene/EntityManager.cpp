@@ -12,7 +12,6 @@ namespace Raindrop::Core::Scene{
 
 	EntityManager::~EntityManager(){
 		RAINDROP_profile_function();
-
 	}
 
 	ID32 EntityManager::create(){
