@@ -13,7 +13,7 @@ namespace Raindrop::Graphics{
 			virtual ~Plugin() = default;
 
 			virtual const char* getName() const = 0;
-			virtual version getVersion() const = 0;
+			virtual Version getVersion() const = 0;
 
 			static Plugin* create(Core::Memory::Allocator& allocator, Core::IO::Module& module, Context& context, Core::Scene::Scene& scene, const char* name);
 		

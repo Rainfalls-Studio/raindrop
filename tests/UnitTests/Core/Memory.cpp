@@ -1,8 +1,5 @@
-#include <typeinfo>
-#include <stdexcept>
-
 #include <gtest/gtest.h>
-#include <Raindrop.hpp>
+#include <Raindrop/Raindrop.hpp>
 
 using namespace Raindrop::Core::Memory;
 

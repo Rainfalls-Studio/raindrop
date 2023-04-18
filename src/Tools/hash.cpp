@@ -1,7 +1,6 @@
-#include "Tools/hash.hpp"
+#include <Tools/hash.hpp>
 
 namespace Raindrop::Tools{
-	
 	template<typename T>
 	ID64 hash64(const T& t){
 		return static_cast<ID64>(t);

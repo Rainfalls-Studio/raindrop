@@ -94,6 +94,11 @@ namespace Raindrop::Core{
 		std::hash<std::string> hash;
 		return static_cast<ID64>(hash(_string));
 	}
+
+	String& String::operator=(const char* str){
+		_string = str;
+		return *this;
+	}
 }
 
 namespace Raindrop::Tools{

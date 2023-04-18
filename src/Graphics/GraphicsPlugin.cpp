@@ -1,4 +1,4 @@
-#include "Graphics/GraphicsPlugin.hpp"
+#include <Graphics/GraphicsPlugin.hpp>
 
 namespace Raindrop::Graphics{
 	Plugin* Plugin::create(Core::Memory::Allocator& allocator, Core::IO::Module& module, Context& context, Core::Scene::Scene& scene, const char* name){

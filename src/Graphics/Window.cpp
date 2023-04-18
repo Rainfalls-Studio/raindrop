@@ -1,6 +1,6 @@
-#include "Core/Debug/logger.hpp"
-#include "Core/Debug/profiler.hpp"
-#include "Graphics/Window.hpp"
+#include <Core/Debug/logger.hpp>
+#include <Core/Debug/profiler.hpp>
+#include <Graphics/Window.hpp>
 
 namespace Raindrop::Graphics{
 	Window::Window(){}
@@ -11,7 +11,7 @@ namespace Raindrop::Graphics{
 		CreateWindowFnc createWindow = (CreateWindowFnc)module.getFnc(fncName);
 		
 		if (!createWindow){
-			RAINDROP_log(ERROR,GRAPHICS, "failed to found \"%s\" function for creating a window in \"%s\" module", fncName, module.filepath());
+			RAINDROP_log(ERROR, GRAPHICS, "failed to found \"%s\" function for creating a window in \"%s\" module", fncName, module.filepath());
 			return nullptr;
 		}
 		

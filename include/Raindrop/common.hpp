@@ -59,7 +59,7 @@
 
 #define RAINDROP_MODULE extern "C" __declspec(dllexport) __stdcall
 
-#define RAINDROP_CreateVersion(major, minor, patch) ::Raindrop::version{major, minor, patch};
+#define RAINDROP_CreateVersion(major, minor, patch) ::Raindrop::Version{major, minor, patch}
 #define RAINDROP_VERSION RAINDROP_CreateVersion(RAINDROP_VERSION_MAJOR, RAINDROP_VERSION_MINOR, RAINDROP_VERSION_PATCH)
 
 #define RAINDROP_PACKED __attribute__((__packed__))
@@ -101,7 +101,7 @@ namespace Raindrop{
 	static constexpr ID32 INVALID_ID32 = static_cast<ID32>(~(0U));
 	static constexpr ID64 INVALID_ID64 = static_cast<ID64>(~(0ULL));
 
-	struct RAINDROP_PACKED version{
+	struct RAINDROP_PACKED Version{
 		uint16 major;
 		uint16 minor;
 		uint16 patch;

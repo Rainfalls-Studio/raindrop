@@ -2,6 +2,8 @@
 #define __RAINDROP_HPP__
 
 #include <common.hpp>
+#include <Application.hpp>
+
 #include <Core/String.hpp>
 #include <Core/Debug/debug.hpp>
 #include <Core/Debug/logger.hpp>

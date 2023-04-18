@@ -52,6 +52,15 @@ namespace Raindrop::Core{
 			 */
 			String& operator=(const String &other);
 
+			
+			/**
+			 * @brief copy <str> into the string
+			 * 
+			 * @param str the string to copy
+			 * @return String& 
+			 */
+			String& operator=(const char* str);
+
 			/**
 			 * @brief return the lenght of the string
 			 * @return usize 
@@ -147,6 +156,10 @@ namespace Raindrop::Core{
 			 */
 			bool operator==(const String &other) const;
 
+			/**
+			 * @brief return an hash value to the content of the string
+			 * @return ID64 
+			 */
 			ID64 hash64() const;
 
 		private:

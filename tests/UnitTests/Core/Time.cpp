@@ -1,5 +1,5 @@
-// #include <gtest/gtest.h>
-// #include <Raindrop.hpp>
+#include <gtest/gtest.h>
+#include <Raindrop/Raindrop.hpp>
 
 // using namespace Raindrop::Core::Time;
 
