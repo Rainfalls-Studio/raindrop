@@ -18,6 +18,8 @@ namespace Raindrop::Core::Scene{
 
 	Scene::~Scene(){
 		RAINDROP_profile_function();
+
+		// TODO: remove systems
 		
 		for (usize i=0; i<MAX_COMPONENT_COUNT; i++){
 			auto& manager = _componentManagers[i];
