@@ -36,4 +36,15 @@ namespace Raindrop::Core::Scene{
 
 		_freeEntities.push(entity);
 	}
+
+	bool EntityManager::exists(ID32 entity) const{
+		RAINDROP_profile_function();
+		auto& list = const_cast<Memory::List<ID32>&>(_freeEntities);
+		auto it = list.front();
+		while (it){
+			if (*it == entity) return false;
+			it++;
+		}
+		return true;
+	}
 }

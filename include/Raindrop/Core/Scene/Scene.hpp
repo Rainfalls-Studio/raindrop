@@ -16,6 +16,7 @@ namespace Raindrop::Core::Scene{
 
 			ID32 createEntity();
 			void destroyEntity(ID32 entity);
+			bool exists(ID32 entity) const;
 
 			void registerComponent(const char* name, usize typeSize, usize typeAlignement);
 			void removeComponent(const char* name);

@@ -27,6 +27,15 @@ namespace Raindrop::Core::Scene{
 			 */
 			void destroy(ID32 entity);
 
+			/**
+			 * @brief get if the entity is used or released
+			 * 
+			 * @param entity the entity to check
+			 * @return true 
+			 * @return false 
+			 */
+			bool exists(ID32 entity) const;
+
 		private:
 			Memory::Allocator& _allocator;
 			Memory::List<ID32> _freeEntities;

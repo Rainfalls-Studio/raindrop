@@ -5,6 +5,7 @@
 #include <Core/String.hpp>
 #include <Core/Memory/allocators/Allocator.hpp>
 #include <Managers/SceneManager.hpp>
+#include <Wrappers/wrappers.hpp>
 
 namespace Raindrop{
 	class RAINDROP_API Application{
@@ -15,8 +16,8 @@ namespace Raindrop{
 			const char* name() const;
 			Version version() const;
 
-			ScenePtr createScene(usize capacity);
-			void destroySceen(ScenePtr scene);
+			Scene createScene(usize capacity);
+			void destroySceen(Scene scene);
 		
 		private:
 			Core::Memory::Allocator& _allocator;

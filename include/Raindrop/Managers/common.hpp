@@ -4,7 +4,7 @@
 #include <common.hpp>
 #include <Core/Scene/Scene.hpp>
 
-namespace Raindrop{
+namespace Raindrop::Managers{
 	typedef Core::Scene::Scene* ScenePtr;
 	static constexpr ScenePtr INVALID_SCENE_PTR = nullptr;
 }

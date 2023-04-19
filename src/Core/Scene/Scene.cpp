@@ -40,6 +40,12 @@ namespace Raindrop::Core::Scene{
 		_systemManager.entityRemoved(entity, signature);
 	}
 
+	bool Scene::exists(ID32 entity) const{
+		RAINDROP_profile_function();
+		return _entityManager.exists(entity);
+	}
+
+
 	void Scene::registerComponent(const char* name, usize typeSize, usize typeAlignement){
 		RAINDROP_profile_function();
 		RAINDROP_assert(!_nameToID.has(name) && "cannot register an already registred component");

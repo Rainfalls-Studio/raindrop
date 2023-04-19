@@ -22,7 +22,7 @@ namespace Raindrop::Managers{
 		RAINDROP_profile_function();
 		ScenePtr scene = Core::Memory::allocateNew<Core::Scene::Scene>(_allocator, _allocator, capacity);
 		_scenes.push(scene);
-		return static_cast<ScenePtr>(scene);
+		return scene;
 	}
 
 	void SceneManager::destroyScene(ScenePtr scene){

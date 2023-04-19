@@ -3,6 +3,7 @@
 
 #include <common.hpp>
 #include <Application.hpp>
+#include <Wrappers/wrappers.hpp>
 
 #include <Core/String.hpp>
 #include <Core/Debug/debug.hpp>
