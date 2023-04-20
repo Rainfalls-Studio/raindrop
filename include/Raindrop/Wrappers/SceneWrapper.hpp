@@ -76,11 +76,43 @@ namespace Raindrop::Wrappers{
 			 */
 			Managers::ScenePtr getScenePtr() const;
 
+			/**
+			 * @brief Returns the signature of a component
+			 * @return Signature 
+			 */
+			template<typename T>
+			Signature getComponentSignature(const char* name = typeid(T).name()) const{
+				return _getComponentSignature(name);
+			}
+
+			template<typename... ComponentsNames, typename... ComponentsTypes>
+			Signature getComponentsSignature(ComponentsNames... names){
+				Signature sig;
+				const char* names_str[] = {names...};
+				for (uint32 i=0; i<sizeof...(ComponentsNames); i++){
+					sig |= getComponentSignature(names_str[i]);
+				}
+				_getComponentsSignature<ComponentsTypes...>(sig);
+				return sig;
+			}
+
 		private:
 			Managers::ScenePtr _scene;
 
 			void _registerComponent(const char* name, usize size, usize alignement);
 			void _removeComponent(const char* name);
+			Signature _getComponentSignature(const char* name) const;
+
+			template<typename T, typename U, typename... Args>
+			void _getComponentsSignature(Signature& sig){
+				_getComponentsSignature<T>(sig);
+				_getComponentsSignature<U, Args...>(sig);
+			}
+
+			template<typename T>
+			void _getComponentsSignature(Signature& sig){
+				sig |= getComponentSignature<T>();
+			}
 	};
 }
 

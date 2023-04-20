@@ -127,6 +127,8 @@ namespace Raindrop::Core::Scene{
 			void _getComponentsSignature(Signature& signature){
 				signature |= getComponentSignature<T>();
 			}
+
+			void deleteSystems();
 	};
 }
 

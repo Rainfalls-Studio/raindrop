@@ -23,6 +23,7 @@ namespace Raindrop::Core::Scene{
 	};
 
 	class SystemManager{
+		friend class Scene;
 		public:
 			SystemManager(Memory::Allocator& allocator);
 			~SystemManager();

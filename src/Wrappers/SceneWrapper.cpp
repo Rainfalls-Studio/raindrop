@@ -39,4 +39,8 @@ namespace Raindrop::Wrappers{
 	void SceneWrapper::_removeComponent(const char* name){
 		_scene->removeComponent(name);
 	}
+
+	Signature SceneWrapper::_getComponentSignature(const char* name) const{
+		return _scene->getComponentSignature(getComponentID(name));
+	}
 }

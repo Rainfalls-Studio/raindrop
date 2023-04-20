@@ -7,6 +7,7 @@ namespace Raindrop::Wrappers{
 	class EntityWrapper{
 		friend class SceneWrapper;
 		public:
+			EntityWrapper(Scene* scene, EntityID ID);
 			EntityWrapper();
 			~EntityWrapper();
 
@@ -44,7 +45,6 @@ namespace Raindrop::Wrappers{
 			bool operator!=(const EntityWrapper& other) const;
 
 		private:
-			EntityWrapper(Scene* scene, EntityID ID);
 
 			Scene* _scene;
 			EntityID _ID;

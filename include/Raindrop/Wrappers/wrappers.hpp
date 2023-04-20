@@ -4,10 +4,13 @@
 #include <Wrappers/common.hpp>
 #include <Wrappers/EntityWrapper.hpp>
 #include <Wrappers/SceneWrapper.hpp>
+#include <Wrappers/SystemWrapper.hpp>
 
 namespace Raindrop{
-	typedef Wrappers::EntityWrapper Entity;
 	typedef Wrappers::SceneWrapper Scene;
+	typedef Wrappers::EntityWrapper Entity;
+	typedef Wrappers::SystemWrapper System;
+	typedef Wrappers::Signature Signature;
 
 	using Wrappers::INVALID_COMPONENT;
 	using Wrappers::INVALID_ENTITY;

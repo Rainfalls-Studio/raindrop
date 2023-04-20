@@ -19,11 +19,20 @@ namespace Raindrop::Core::Scene{
 	Scene::~Scene(){
 		RAINDROP_profile_function();
 
-		// TODO: remove systems
+		deleteSystems();
 		
 		for (usize i=0; i<MAX_COMPONENT_COUNT; i++){
 			auto& manager = _componentManagers[i];
 			if (manager) Memory::deallocateDelete(_allocator, *manager);
+		}
+	}
+
+	void Scene::deleteSystems(){
+		RAINDROP_profile_function();
+		auto it = _systemManager._systems.front();
+		while (it){
+			Memory::deallocateDelete(_allocator, *it->_system);
+			it++;
 		}
 	}
 
