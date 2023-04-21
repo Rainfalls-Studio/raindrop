@@ -85,6 +85,14 @@ namespace Raindrop::Wrappers{
 				return _getComponentSignature(name);
 			}
 
+			/**
+			 * @brief get the signature of all the required components
+			 * 
+			 * @tparam ComponentsNames the required components types.
+			 * @tparam ComponentsTypes 
+			 * @param names components name. Components signatures can be retrived using there name.
+			 * @return Signature 
+			 */
 			template<typename... ComponentsNames, typename... ComponentsTypes>
 			Signature getComponentsSignature(ComponentsNames... names){
 				Signature sig;

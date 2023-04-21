@@ -38,6 +38,13 @@ namespace Raindrop::Wrappers{
 				return getComponent<T>(typeid(T).name());
 			}
 
+			template<typename T>
+			T& addComponent(T&& t = T{}, const char* name = typeid(T).name()){
+				ComponentID componentID = _scene->getComponentID(name);
+				_scene->addComponent(_ID, componentID, static_cast<void*>(&t));
+				return getComponent<T>(componentID);
+			}
+
 			bool operator==(EntityID ID) const;
 			bool operator==(const EntityWrapper& other) const;
 
