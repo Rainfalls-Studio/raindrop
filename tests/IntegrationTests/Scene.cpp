@@ -35,3 +35,45 @@ TEST(SceneWrapper, valid_component_register){
 	TestComponent& component2 = entity.getComponent<TestComponent>();
 	EXPECT_EQ(component.position, component2.position);
 }
+
+class TestSystem : public Raindrop::SystemBase{
+	public:
+		TestSystem() :  SystemBase(){
+			constructor = true;
+		}
+
+		~TestSystem(){}
+
+		virtual void OnEntityCreate(Raindrop::Entity entity) override{
+			entityCreate = true;
+		}
+
+		virtual void OnEntityDestroy(Raindrop::Entity entity) override{
+			entityDestroy = true;
+		}
+
+		bool constructor = false;
+		bool entityCreate = false;
+		bool entityDestroy = false;
+};
+
+TEST(sceneWrapper, valid_system_creation){
+	Raindrop::Core::Scene::Scene scene_ptr(RAINDROP_default_allocator, 1000);
+	Raindrop::Scene scene(&scene_ptr);
+
+	EXPECT_NO_THROW(scene.registerComponent<TestComponent>());
+	EXPECT_NE(scene.getComponentSignature<TestComponent>(), Raindrop::INVALID_COMPONENT);
+
+	Raindrop::Signature signature = scene.getComponentsSignature<TestComponent>();
+	TestSystem& system = scene.createSystem<TestSystem>(signature);
+	EXPECT_TRUE(system.constructor);
+
+	Raindrop::Entity entity = scene.createEntity();
+	TestComponent& component = entity.addComponent<TestComponent>();
+	EXPECT_TRUE(system.entityCreate);
+
+	scene.destroyEntity(entity);
+	EXPECT_TRUE(system.entityDestroy);
+
+	scene.destoySystem(system);
+}

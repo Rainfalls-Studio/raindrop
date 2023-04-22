@@ -5,7 +5,7 @@
 #include <Wrappers/EntityWrapper.hpp>
 
 namespace Raindrop::Wrappers{
-	class SystemBase : private System{
+	class SystemBase : public System{
 		friend class SceneWrapper;
 		public:
 			SystemBase(Core::Memory::Allocator& allocator = RAINDROP_default_allocator) : System(allocator){}
@@ -28,6 +28,10 @@ namespace Raindrop::Wrappers{
 
 			virtual void onEntityDestroyed(EntityID id) override final{
 				OnEntityDestroy(EntityWrapper(_scene, id));
+			}
+
+			System* getSystem(){
+				return static_cast<System*>(this);
 			}
 	};
 }

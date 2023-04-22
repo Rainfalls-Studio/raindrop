@@ -92,15 +92,15 @@ namespace Raindrop::Core::Scene{
 			T* createSystem(Signature signature, Args&&... args){
 				T* system = static_cast<T*>(Memory::allocateNew<T>(_allocator, args...));
 				if (!system) return nullptr;
-				pushSystem(static_cast<System*>(system), signature);
+				pushSystem(dynamic_cast<System*>(system), signature);
 				return system;
 			}
 
 			template<typename T>
-			void destroySystem(T* t){
+			void destroySystem(T& t){
 				RAINDROP_assert(t);
-				popSystem(static_cast<System*>(t));
-				Memory::deallocateDelete(_allocator, *t);
+				popSystem(&static_cast<System&>(t));
+				Memory::deallocateDelete(_allocator, t);
 			}
 
 		private:

@@ -47,6 +47,7 @@ namespace Raindrop::Core::Scene{
 			if (!(oldSignature & sig)){
 				if (signature & sig){
 					system->_entities.pushBack(entity);
+					system->onEntityCreated(entity);
 				}
 			} else if (!(signature & sig)){
 				removeEntity(system, entity);
@@ -81,6 +82,7 @@ namespace Raindrop::Core::Scene{
 		while (curr){
 			if (curr->_data == entity){
 				system->_entities.erase(curr);
+				system->onEntityDestroyed(entity);
 				break;
 			}
 			curr++;

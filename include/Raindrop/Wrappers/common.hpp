@@ -18,7 +18,7 @@ namespace Raindrop::Wrappers{
 
 	class EntityWrapper;
 	class SceneWrapper;
-	class SystemWrapper;
+	class SystemBase;
 }
 
 #endif

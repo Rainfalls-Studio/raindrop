@@ -3,6 +3,7 @@
 
 #include <Wrappers/common.hpp>
 #include <Managers/common.hpp>
+#include <Wrappers/SystemWrapper.hpp>
 
 namespace Raindrop::Wrappers{
 	class SceneWrapper{
@@ -88,12 +89,12 @@ namespace Raindrop::Wrappers{
 			/**
 			 * @brief get the signature of all the required components
 			 * 
-			 * @tparam ComponentsNames the required components types.
-			 * @tparam ComponentsTypes 
+			 * @tparam ComponentsNames
+			 * @tparam ComponentsTypes the required components types. 
 			 * @param names components name. Components signatures can be retrived using there name.
 			 * @return Signature 
 			 */
-			template<typename... ComponentsNames, typename... ComponentsTypes>
+			template<typename... ComponentsTypes, typename... ComponentsNames>
 			Signature getComponentsSignature(ComponentsNames... names){
 				Signature sig;
 				const char* names_str[] = {names...};
@@ -103,12 +104,58 @@ namespace Raindrop::Wrappers{
 				_getComponentsSignature<ComponentsTypes...>(sig);
 				return sig;
 			}
+
+			/**
+			 * @brief get the signature of all the required components
+			 * 
+			 * @tparam ComponentsTypes the required components types.
+			 * @return Signature 
+			 */
+			template<typename... ComponentsTypes>
+			Signature getComponentsSignature(){
+				Signature sig;
+				_getComponentsSignature<ComponentsTypes...>(sig);
+				return sig;
+			}
 			
+			/**
+			 * @brief create a system and registers it in the scene.
+			 * 
+			 * @tparam T the type if the system. Has to be a derived class of SystemBase
+			 * @tparam Args the required arguments of the system constructor
+			 * @param signature the required components of the system. Create a signature using 'getComponentsSignature'
+			 * @param args the arguments required by the system constuctore
+			 * @return T& a reference to the freshly created system
+			 */
 			template<typename T, typename... Args>
 			T& createSystem(Signature signature, Args&&... args){
-				if constexpr (!std::is_base_of<SystemWrapper, T>::value) throw std::invalid_argument("cannot create a system with a class that is not derived from the Raindrop System class");
+				if constexpr (!std::is_base_of<SystemBase, T>::value) throw std::invalid_argument("cannot create a system with a class that is not derived from the Raindrop Base System class");
 				T* system = _scene->createSystem<T, Args...>(signature, args...);
+				SystemBase* base = static_cast<SystemBase*>(system);
+				base->_scene = _scene;
 				return *system;
+			}
+
+			/**
+			 * @brief create a system and registers it in the scene.
+			 * 
+			 * @tparam T the type if the system. Has to be a derived class of SystemBase
+			 * @param signature the required components of the system. Create a signature using 'getComponentsSignature'
+			 * @return T& a reference to the freshly created system
+			 */
+			template<typename T>
+			T& createSystem(Signature signature){
+				if constexpr (!std::is_base_of<SystemBase, T>::value) throw std::invalid_argument("cannot create a system with a class that is not derived from the Raindrop Base System class");
+				T* system = _scene->createSystem<T>(signature);
+				SystemBase* base = static_cast<SystemBase*>(system);
+				base->_scene = _scene;
+				return *system;
+			}
+
+			template<typename T>
+			void destoySystem(T& t){
+				if constexpr (!std::is_base_of<SystemBase, T>::value) throw std::invalid_argument("cannot destroy a system with a class that is not derived from the Raindrop Base System class");
+				_scene->destroySystem<T>(t);
 			}
 
 		private:
