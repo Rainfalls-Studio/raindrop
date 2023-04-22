@@ -5,7 +5,7 @@
 #include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Core::Scene{
-	class Signature{
+	class RAINDROP_API Signature{
 		public:
 			Signature();
 			~Signature();
@@ -30,7 +30,7 @@ namespace Raindrop::Core::Scene{
 				return i < (sizeof(Signature::_sig) * 8);
 			}
 	};
-	class SignatureManager{
+	class RAINDROP_API SignatureManager{
 		public:
 			SignatureManager(Memory::Allocator& allocator, usize capacity);
 			~SignatureManager();

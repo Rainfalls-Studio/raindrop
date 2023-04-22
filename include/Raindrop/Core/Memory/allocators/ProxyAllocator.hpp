@@ -4,7 +4,7 @@
 #include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Core::Memory{
-	class ProxyAllocator : public Allocator {
+	class RAINDROP_API ProxyAllocator : public Allocator {
 		public: 
 			ProxyAllocator(Allocator& allocator); 
 			~ProxyAllocator(); 

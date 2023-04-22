@@ -2,45 +2,45 @@
 #include <Wrappers/EntityWrapper.hpp>
 
 namespace Raindrop::Wrappers{
-	SceneWrapper::SceneWrapper(Managers::ScenePtr scene) : _scene{scene}{}
-	SceneWrapper::SceneWrapper(const SceneWrapper& other) : _scene{other._scene}{}
+	RAINDROP_API SceneWrapper::SceneWrapper(Managers::ScenePtr scene) : _scene{scene}{}
+	RAINDROP_API SceneWrapper::SceneWrapper(const SceneWrapper& other) : _scene{other._scene}{}
 
-	SceneWrapper::~SceneWrapper(){}
+	RAINDROP_API SceneWrapper::~SceneWrapper(){}
 
-	SceneWrapper& SceneWrapper::operator=(const SceneWrapper& other){
+	RAINDROP_API SceneWrapper& SceneWrapper::operator=(const SceneWrapper& other){
 		_scene = other._scene;
 		return *this;
 	}
 
-	EntityWrapper SceneWrapper::createEntity(){
+	RAINDROP_API EntityWrapper SceneWrapper::createEntity(){
 		return EntityWrapper(_scene, _scene->createEntity());
 	}
 
-	void SceneWrapper::destroyEntity(EntityWrapper entity){
+	RAINDROP_API void SceneWrapper::destroyEntity(EntityWrapper entity){
 		_scene->destroyEntity(entity._ID);
 	}
 
-	usize SceneWrapper::capacity(){
+	RAINDROP_API usize SceneWrapper::capacity(){
 		return _scene->capacity();
 	}
 
-	ComponentID SceneWrapper::getComponentID(const char* name) const{
+	RAINDROP_API ComponentID SceneWrapper::getComponentID(const char* name) const{
 		return _scene->getComponentID(name);
 	}
 
-	Managers::ScenePtr SceneWrapper::getScenePtr() const{
+	RAINDROP_API Managers::ScenePtr SceneWrapper::getScenePtr() const{
 		return _scene;
 	}
 
-	void SceneWrapper::_registerComponent(const char* name, usize size, usize alignement){
+	RAINDROP_API void SceneWrapper::_registerComponent(const char* name, usize size, usize alignement){
 		_scene->registerComponent(name, size, alignement);
 	}
 
-	void SceneWrapper::_removeComponent(const char* name){
+	RAINDROP_API void SceneWrapper::_removeComponent(const char* name){
 		_scene->removeComponent(name);
 	}
 
-	Signature SceneWrapper::_getComponentSignature(const char* name) const{
+	RAINDROP_API Signature SceneWrapper::_getComponentSignature(const char* name) const{
 		return _scene->getComponentSignature(getComponentID(name));
 	}
 }

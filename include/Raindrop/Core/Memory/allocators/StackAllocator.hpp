@@ -4,7 +4,7 @@
 #include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Core::Memory{
-	class StackAllocator : public Allocator{
+	class RAINDROP_API StackAllocator : public Allocator{
 		public:
 			StackAllocator(usize size, void* start);
 			~StackAllocator();

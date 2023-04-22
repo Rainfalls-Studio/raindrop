@@ -4,17 +4,17 @@
 #include <common.hpp>
 
 namespace Raindrop::Core::Debug::Profiler{
-	struct Profile{
+	struct RAINDROP_API Profile{
 		Profile(const char* scope);
 		~Profile();
 	};
 
-	void beginProfile(const char* name, const char* filepath);
-	void endProfile();
-	void profile(bool profile = true);
+	RAINDROP_API void beginProfile(const char* name, const char* filepath);
+	RAINDROP_API void endProfile();
+	RAINDROP_API void profile(bool profile = true);
 
-	void init();
-	void shutdown();
+	RAINDROP_API void init();
+	RAINDROP_API void shutdown();
 
 	class __Profiler;
 }

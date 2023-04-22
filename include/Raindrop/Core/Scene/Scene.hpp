@@ -9,7 +9,7 @@
 #include <Core/Memory/containers/HashMap.hpp>
 
 namespace Raindrop::Core::Scene{
-	class Scene{
+	class RAINDROP_API Scene{
 		public:
 			Scene(Memory::Allocator& allocator, usize capacity);
 			~Scene();

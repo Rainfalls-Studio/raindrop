@@ -1,15 +1,15 @@
 #include "Core/Scene/SystemManager.hpp"
 
 namespace Raindrop::Core::Scene{
-	SystemManager::SystemManager(Memory::Allocator& allocator) : _systems{allocator}{
+	RAINDROP_API SystemManager::SystemManager(Memory::Allocator& allocator) : _systems{allocator}{
 		RAINDROP_profile_function();
 	}
 
-	SystemManager::~SystemManager(){
+	RAINDROP_API SystemManager::~SystemManager(){
 		RAINDROP_profile_function();
 	}
 
-	void SystemManager::pushSystem(System* system, Signature signature){
+	RAINDROP_API void SystemManager::pushSystem(System* system, Signature signature){
 		RAINDROP_profile_function();
 		if (!system) throw std::invalid_argument("cannot push a null system");
 		SystemData data;
@@ -19,7 +19,7 @@ namespace Raindrop::Core::Scene{
 		_systems.push(data);
 	}
 
-	void SystemManager::popSystem(System* system){
+	RAINDROP_API void SystemManager::popSystem(System* system){
 		RAINDROP_profile_function();
 		if (!system) throw std::invalid_argument("cannot pop a null system");
 		auto curr = _systems.front();
@@ -35,7 +35,7 @@ namespace Raindrop::Core::Scene{
 		throw std::invalid_argument("cannot pop a non regsitred system");
 	}
 	
-	void SystemManager::entitySignatureUpdate(ID32 entity, Signature oldSignature, Signature signature){
+	RAINDROP_API void SystemManager::entitySignatureUpdate(ID32 entity, Signature oldSignature, Signature signature){
 		RAINDROP_profile_function();
 
 		auto curr = _systems.front();
@@ -57,7 +57,7 @@ namespace Raindrop::Core::Scene{
 		}
 	}
 
-	void SystemManager::entityRemoved(ID32 entity, Signature signature){
+	void RAINDROP_API SystemManager::entityRemoved(ID32 entity, Signature signature){
 		RAINDROP_profile_function();
 
 		auto curr = _systems.front();

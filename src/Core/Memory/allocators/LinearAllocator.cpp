@@ -3,17 +3,17 @@
 #include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
-	LinearAllocator::LinearAllocator(usize size, void* start) : Allocator(size, start){
+	RAINDROP_API LinearAllocator::LinearAllocator(usize size, void* start) : Allocator(size, start){
 		RAINDROP_profile_function();
 		pos = start;
 	}
 
-	LinearAllocator::~LinearAllocator(){
+	RAINDROP_API LinearAllocator::~LinearAllocator(){
 		RAINDROP_profile_function();
 		pos = nullptr;
 	}
 
-	void* LinearAllocator::allocate(usize size, uint8 alignment){
+	RAINDROP_API void* LinearAllocator::allocate(usize size, uint8 alignment){
 		RAINDROP_profile_function();
 		RAINDROP_assert(size != 0); 
 		usize adjustment = alignAdjustment(pos, alignment); 
@@ -31,12 +31,12 @@ namespace Raindrop::Core::Memory{
 		return (void*)aligned_address;
 	}
 
-	void LinearAllocator::deallocate(void* p){
+	RAINDROP_API void LinearAllocator::deallocate(void* p){
 		RAINDROP_profile_function();
 		// RAINDROP_log(WARNING, MEMORY, "linear allocator does not support deallocate, use clear instead", "");
 	}
 
-	void LinearAllocator::clear(){
+	RAINDROP_API void LinearAllocator::clear(){
 		RAINDROP_profile_function();
 		allocationCount = 0;
 		usedMemory = 0;

@@ -6,7 +6,7 @@
 #include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Core::Filesystem{
-	class File{
+	class RAINDROP_API File{
 		public:
 			File(const File& other);
 			File(const Path& path);

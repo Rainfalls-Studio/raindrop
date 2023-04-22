@@ -6,7 +6,7 @@
 #include <Core/Memory/containers/List.hpp>
 
 namespace Raindrop::Core::Scene{
-	class EntityManager{
+	class RAINDROP_API EntityManager{
 		public:
 			EntityManager(Memory::Allocator& allocator, usize capacity = 1024);
 			~EntityManager();

@@ -6,7 +6,7 @@
 
 namespace Raindrop::Core::Filesystem{
 	class DirectoryView;
-	class Folder{
+	class RAINDROP_API Folder{
 		public:
 			Folder(const Path &path);
 			Folder(const Folder &other);

@@ -2,15 +2,15 @@
 #include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
-	ThreadSafeAllocator::ThreadSafeAllocator(Allocator& allocator) : Allocator(allocator.getSize(), allocator.getStart()), _allocator(&allocator){
+	RAINDROP_API ThreadSafeAllocator::ThreadSafeAllocator(Allocator& allocator) : Allocator(allocator.getSize(), allocator.getStart()), _allocator(&allocator){
 		RAINDROP_profile_function();
 	}
 
-	ThreadSafeAllocator::~ThreadSafeAllocator(){
+	RAINDROP_API ThreadSafeAllocator::~ThreadSafeAllocator(){
 		RAINDROP_profile_function();
 	}
 
-	void* ThreadSafeAllocator::allocate(usize size, uint8 alignment){
+	RAINDROP_API void* ThreadSafeAllocator::allocate(usize size, uint8 alignment){
 		RAINDROP_profile_function();
 		RAINDROP_assert(size != 0);
 		_mutex.lock();
@@ -19,7 +19,7 @@ namespace Raindrop::Core::Memory{
 		return p;
 	}
 
-	void ThreadSafeAllocator::deallocate(void* p){
+	RAINDROP_API void ThreadSafeAllocator::deallocate(void* p){
 		RAINDROP_profile_function();
 		RAINDROP_assert(p != nullptr);
 		_mutex.lock();

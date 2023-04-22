@@ -3,7 +3,7 @@
 #include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::IO{
-	CSVReader::CSVReader(Memory::Allocator &allocator, const Filesystem::Filebuffer &buffer) : _allocator{&allocator}, _content{allocator}{
+	RAINDROP_API CSVReader::CSVReader(Memory::Allocator &allocator, const Filesystem::Filebuffer &buffer) : _allocator{&allocator}, _content{allocator}{
 		RAINDROP_profile_function();
 		_columns = 0;
 		_rows = 0;
@@ -11,7 +11,7 @@ namespace Raindrop::Core::IO{
 		read(buffer);
 	}
 
-	CSVReader::~CSVReader(){
+	RAINDROP_API CSVReader::~CSVReader(){
 		RAINDROP_profile_function();
 		usize size = _content.size();
 		for (usize i=0; i<size; i++){
@@ -20,7 +20,7 @@ namespace Raindrop::Core::IO{
 		}
 	}
 
-	void CSVReader::read(const Filesystem::Filebuffer &buffer){
+	RAINDROP_API void CSVReader::read(const Filesystem::Filebuffer &buffer){
 		RAINDROP_profile_function();
 		_columns = getCommaPerLine(buffer) + 1;
 		_rows = getLineCount(buffer);
@@ -54,7 +54,7 @@ namespace Raindrop::Core::IO{
 		}
 	}
 
-	usize CSVReader::getCommaPerLine(const Filesystem::Filebuffer &buffer){
+	RAINDROP_API usize CSVReader::getCommaPerLine(const Filesystem::Filebuffer &buffer){
 		RAINDROP_profile_function();
 		usize count = 0;
 		usize size = buffer.size();
@@ -72,7 +72,7 @@ namespace Raindrop::Core::IO{
 		return count;
 	}
 	
-	usize CSVReader::getLineCount(const Filesystem::Filebuffer &buffer){
+	RAINDROP_API usize CSVReader::getLineCount(const Filesystem::Filebuffer &buffer){
 		RAINDROP_profile_function();
 		usize count = 0;
 		usize size = buffer.size();
@@ -85,22 +85,22 @@ namespace Raindrop::Core::IO{
 		return count;
 	}
 
-	uint32 CSVReader::columns() const{
+	RAINDROP_API uint32 CSVReader::columns() const{
 		RAINDROP_profile_function();
 		return _columns;
 	}
 
-	uint32 CSVReader::rows() const{
+	RAINDROP_API uint32 CSVReader::rows() const{
 		RAINDROP_profile_function();
 		return _rows;
 	}
 
-	const String& CSVReader::get(uint32 column, uint32 row) const{
+	RAINDROP_API const String& CSVReader::get(uint32 column, uint32 row) const{
 		RAINDROP_profile_function();
 		return *_content[(column * _columns) + row];
 	}
 
-	const String& CSVReader::operator()(uint32 column, uint32 row) const{
+	RAINDROP_API const String& CSVReader::operator()(uint32 column, uint32 row) const{
 		RAINDROP_profile_function();
 		return this->get(column, row);
 	}

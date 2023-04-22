@@ -4,7 +4,7 @@
 #include <Core/IO/DLLReader.hpp>
 
 namespace Raindrop::Core::IO{
-	class Module{
+	class RAINDROP_API Module{
 		public:
 			Module(const char* path);
 			~Module();

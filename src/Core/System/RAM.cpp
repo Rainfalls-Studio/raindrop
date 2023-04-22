@@ -8,7 +8,7 @@
 
 namespace Raindrop::Core::System{
 	#ifdef RAINDROP_WINDOWS
-		uint64 RAM::getTotalVirtualMemory(){  
+		RAINDROP_API uint64 RAM::getTotalVirtualMemory(){  
 			RAINDROP_profile_function();
 			MEMORYSTATUSEX memInfo;
 			memInfo.dwLength = sizeof(MEMORYSTATUSEX);
@@ -16,7 +16,7 @@ namespace Raindrop::Core::System{
 			return (uint64)memInfo.ullAvailExtendedVirtual;
 		}
 
-		uint64 RAM::getTotalVirtualMemoryUsed(){
+		RAINDROP_API uint64 RAM::getTotalVirtualMemoryUsed(){
 			RAINDROP_profile_function();
 			MEMORYSTATUSEX memInfo;
 			memInfo.dwLength = sizeof(MEMORYSTATUSEX);
@@ -24,14 +24,14 @@ namespace Raindrop::Core::System{
 			return (uint64)(memInfo.ullTotalPageFile - memInfo.ullAvailPageFile);
 		}
 
-		uint64 RAM::getTotalVirtualMemoryUsedByProcess(){
+		RAINDROP_API uint64 RAM::getTotalVirtualMemoryUsedByProcess(){
 			RAINDROP_profile_function();
 			PROCESS_MEMORY_COUNTERS_EX pmc;
 			GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
 			return (uint64)pmc.PrivateUsage;
 		}
 
-		uint64 RAM::getTotalPhysicalMemory(){
+		RAINDROP_API uint64 RAM::getTotalPhysicalMemory(){
 			RAINDROP_profile_function();
 			MEMORYSTATUSEX memInfo;
 			memInfo.dwLength = sizeof(MEMORYSTATUSEX);
@@ -39,7 +39,7 @@ namespace Raindrop::Core::System{
 			return memInfo.ullTotalPhys;
 		}
 
-		uint64 RAM::getTotalPhysicalMemoryUsed(){
+		RAINDROP_API uint64 RAM::getTotalPhysicalMemoryUsed(){
 			RAINDROP_profile_function();
 			MEMORYSTATUSEX memInfo;
 			memInfo.dwLength = sizeof(MEMORYSTATUSEX);
@@ -47,7 +47,7 @@ namespace Raindrop::Core::System{
 			return memInfo.ullTotalPhys - memInfo.ullAvailPhys;
 		}
 
-		uint64 RAM::getTotalPhysicalMemoryUsedByProcess(){
+		RAINDROP_API uint64 RAM::getTotalPhysicalMemoryUsedByProcess(){
 			RAINDROP_profile_function();
 			PROCESS_MEMORY_COUNTERS_EX pmc;
 			GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));

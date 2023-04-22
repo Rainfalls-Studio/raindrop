@@ -8,7 +8,7 @@
 #include <Core/Memory/containers/Array.hpp>
 
 namespace Raindrop::Core::Filesystem{
-	class Filebuffer{
+	class RAINDROP_API Filebuffer{
 		public:
 			Filebuffer(Memory::Allocator& allocator, Filestream& stream);
 			Filebuffer(Memory::Allocator& allocator, const File& file);

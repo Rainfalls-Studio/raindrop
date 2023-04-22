@@ -45,33 +45,33 @@ namespace Raindrop::Core::System{
 			// memcpy(&lastUserCPU, &fuser, sizeof(FILETIME));
 		};
 
-		uint64 CPU::getTicks(){
+		RAINDROP_API uint64 CPU::getTicks(){
 			RAINDROP_profile_function();
 			return (uint64)::GetTickCount64();
 		}
 
-		uint64 CPU::getTicksPerSeconds(){
+		RAINDROP_API uint64 CPU::getTicksPerSeconds(){
 			RAINDROP_profile_function();
 			::LARGE_INTEGER liFrequency;
 			::QueryPerformanceFrequency(&liFrequency);
 			return (uint64)liFrequency.QuadPart;
 		}
 
-		uint32 CPU::getCoreCount(){
+		RAINDROP_API uint32 CPU::getCoreCount(){
 			RAINDROP_profile_function();
 			::SYSTEM_INFO info;
 			::GetSystemInfo(&info);
 			return (uint32)info.dwNumberOfProcessors;
 		}
 
-		uint32 CPU::getLevel(){
+		RAINDROP_API uint32 CPU::getLevel(){
 			RAINDROP_profile_function();
 			::SYSTEM_INFO info;
 			::GetNativeSystemInfo(&info);
 			return (uint32)info.wProcessorLevel;
 		}
 
-		const char* CPU::getArchitecture(){
+		RAINDROP_API const char* CPU::getArchitecture(){
 			RAINDROP_profile_function();
 			::SYSTEM_INFO info;
 			::GetNativeSystemInfo(&info);
@@ -87,7 +87,7 @@ namespace Raindrop::Core::System{
 			return "unknown architecture";
 		}
 
-		float32 CPU::getUsage(){
+		RAINDROP_API float32 CPU::getUsage(){
 			RAINDROP_profile_function();
 			// ::PDH_FMT_COUNTERVALUE counterVal;
 
@@ -96,7 +96,7 @@ namespace Raindrop::Core::System{
 			// return counterVal.doubleValue;
 		}
 
-		float32 CPU::getUsageByProcess(){
+		RAINDROP_API float32 CPU::getUsageByProcess(){
 			RAINDROP_profile_function();
 			// ::FILETIME ftime, fsys, fuser;
 			// ::ULARGE_INTEGER now, sys, user;

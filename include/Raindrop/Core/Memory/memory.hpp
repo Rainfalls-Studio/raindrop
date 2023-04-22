@@ -11,17 +11,17 @@ namespace Raindrop::Core::Memory{
 	 * @param size the size of the chunk to allocate
 	 * @return return the pointer to the allocated chunk of memory. Return nullptr on error
 	 */
-	void* allocate(usize size);
+	RAINDROP_API void* allocate(usize size);
 
 	/**
 	 * @brief deallocate a chunk of heap memory. Has to be a valid pointer or the app might crash
 	 * @param mem a pointer to the memory chunk to deallocate
 	 */
-	void deallocate(void* mem);
+	RAINDROP_API void deallocate(void* mem);
 
 	#ifdef RAINDROP_MEMORY_DEBUG
-		uint32 getAllocationCount();
-		uint32 getDeallocationCount();
+		RAINDROP_API uint32 getAllocationCount();
+		RAINDROP_API uint32 getDeallocationCount();
 	#endif
 
 	inline usize alignSize(usize size, usize align) {

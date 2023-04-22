@@ -7,7 +7,7 @@
 #include <Core/String.hpp>
 
 namespace Raindrop::Core::IO{
-	class CSVReader{
+	class RAINDROP_API CSVReader{
 		public:
 			CSVReader(Memory::Allocator &allocator, const Filesystem::Filebuffer &buffer);
 			~CSVReader();

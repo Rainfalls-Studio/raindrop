@@ -7,7 +7,7 @@
 #include <Graphics/Renderer.hpp>
 
 namespace Raindrop::Graphics{
-	class Plugin{
+	class RAINDROP_API Plugin{
 		public:
 			Plugin(Context& context, Core::Scene::Scene& scene){};
 			virtual ~Plugin() = default;

@@ -11,7 +11,7 @@
 
 namespace Raindrop::Core::IO{
 	#ifdef RAINDROP_WINDOWS
-		DLLReader::DLLReader(const char* filepath) : _filepath{filepath}{
+		RAINDROP_API DLLReader::DLLReader(const char* filepath) : _filepath{filepath}{
 			RAINDROP_profile_function();
 			RAINDROP_log(INFO, IO, "loading \"%s\" dll library", filepath);
 			_dll = nullptr;
@@ -23,23 +23,23 @@ namespace Raindrop::Core::IO{
 			}
 		}
 
-		DLLReader::~DLLReader(){
+		RAINDROP_API DLLReader::~DLLReader(){
 			RAINDROP_profile_function();
 			if (_dll){
 				::FreeLibrary((::HMODULE)_dll);
 			}
 		}
 
-		bool DLLReader::isOpen() const{
+		RAINDROP_API bool DLLReader::isOpen() const{
 			RAINDROP_profile_function();
 			return _dll != nullptr;
 		}
 
-		const char* DLLReader::filepath() const{
+		RAINDROP_API const char* DLLReader::filepath() const{
 			return _filepath;
 		}
 
-		void* DLLReader::getProc(const char* name) const{
+		RAINDROP_API void* DLLReader::getProc(const char* name) const{
 			RAINDROP_profile_function();
 			void* proc = (void*)GetProcAddress((::HMODULE)_dll, (LPCSTR)name);
 
@@ -62,7 +62,7 @@ namespace Raindrop::Core::IO{
 		}
 
 	#else
-		DLLReader::DLLReader(const char* filepath) : _filepath{filepath}{
+		RAINDROP_API DLLReader::DLLReader(const char* filepath) : _filepath{filepath}{
 			RAINDROP_profile_function();
 			RAINDROP_log(INFO, IO, "loading \"%s\" dll library", filepath);
 			_dll = nullptr;
@@ -74,19 +74,19 @@ namespace Raindrop::Core::IO{
 			}
 		}
 
-		DLLReader::~DLLReader(){
+		RAINDROP_API DLLReader::~DLLReader(){
 			RAINDROP_profile_function();
 			if (_dll){
 				::dlclose((::HMODULE)_dll);
 			}
 		}
 
-		bool DLLReader::isOpen() const{
+		RAINDROP_API bool DLLReader::isOpen() const{
 			RAINDROP_profile_function();
 			return _dll != nullptr;
 		}
 
-		void* DLLReader::getProc(const char* name) const{
+		RAINDROP_API void* DLLReader::getProc(const char* name) const{
 			RAINDROP_profile_function();
 			return (void*)::dlsym((::HMODULE)_dll, (LPCSTR)name);
 		}

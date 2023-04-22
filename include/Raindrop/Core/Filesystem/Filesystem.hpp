@@ -16,7 +16,7 @@ namespace Raindrop::Core::Filesystem{
 	 * @return true 
 	 * @return false 
 	 */
-	bool exist(const Path& path);
+	RAINDROP_API bool exist(const Path& path);
 
 	/**
 	 * @brief get the extention of a file, return an empty extention of none
@@ -24,7 +24,7 @@ namespace Raindrop::Core::Filesystem{
 	 * @param path the 
 	 * @return Extention 
 	 */
-	Extention getExtention(const Path& path, Memory::Allocator& allocator);
+	RAINDROP_API Extention getExtention(const Path& path, Memory::Allocator& allocator);
 	
 	/**
 	 * @brief get the size of a file
@@ -32,7 +32,7 @@ namespace Raindrop::Core::Filesystem{
 	 * @param path the file to get the size from
 	 * @return usize 
 	 */
-	usize getSize(const Path& path);
+	RAINDROP_API usize getSize(const Path& path);
 	
 	/**
 	 * @brief get the name of the file / folder from the path
@@ -40,7 +40,7 @@ namespace Raindrop::Core::Filesystem{
 	 * @param path the path to the file / folder
 	 * @return String 
 	 */
-	String getName(const Path& path, Memory::Allocator& allocator);
+	RAINDROP_API String getName(const Path& path, Memory::Allocator& allocator);
 	
 	/**
 	 * @brief get the content of a folder as an array of files names
@@ -49,7 +49,7 @@ namespace Raindrop::Core::Filesystem{
 	 * @param path the path to the folder to open
 	 * @return Memory::Array<String> 
 	 */
-	Memory::Array<String> getFolderContent(Memory::Allocator& allocator, const Path& path);
+	RAINDROP_API Memory::Array<String> getFolderContent(Memory::Allocator& allocator, const Path& path);
 	
 	/**
 	 * @brief copy the 'src' file and create / overwrite 'dst' file wit 'src's content
@@ -58,7 +58,7 @@ namespace Raindrop::Core::Filesystem{
 	 * @param dst the destination of the copy 
 	 * @return true on success, false otherwise
 	 */
-	bool copy(const Path& src, const Path& dst);
+	RAINDROP_API bool copy(const Path& src, const Path& dst);
 
 	/**
 	 * @brief move the 'src' file to the 'dst' path, same as copy and remove
@@ -67,14 +67,14 @@ namespace Raindrop::Core::Filesystem{
 	 * @param dst the new path of the file 
 	 * @return true on success, false otherwise
 	 */
-	bool move(const Path& src, const Path& dst);
+	RAINDROP_API bool move(const Path& src, const Path& dst);
 
 	/**
 	 * @brief remove 'path' file / folder from the disk
 	 * 
 	 * @param path the file / folder to remove
 	 */
-	bool remove(const Path& path);
+	RAINDROP_API bool remove(const Path& path);
 }
 
 #endif

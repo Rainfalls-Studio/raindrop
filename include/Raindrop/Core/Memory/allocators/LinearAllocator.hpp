@@ -4,7 +4,7 @@
 #include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Core::Memory{
-	class LinearAllocator : public Allocator{
+	class RAINDROP_API LinearAllocator : public Allocator{
 		public:
 			LinearAllocator(usize size, void* start);
 			~LinearAllocator();

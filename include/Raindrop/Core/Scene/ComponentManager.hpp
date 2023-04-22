@@ -7,7 +7,7 @@
 #include <Core/Memory/containers/HashMap.hpp>
 
 namespace Raindrop::Core::Scene{
-	class ComponentManager{
+	class RAINDROP_API ComponentManager{
 		public:
 			ComponentManager(Memory::Allocator& allocator, usize componentSize, usize componentAlignement, uint32 size = 1024);
 			~ComponentManager();

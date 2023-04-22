@@ -7,7 +7,7 @@
 #include "Tools/hash.hpp"
 
 namespace Raindrop::Core{
-	class String{
+	class RAINDROP_API String{
 		public:
 			/**
 			 * @brief create a string of character from 'chr'

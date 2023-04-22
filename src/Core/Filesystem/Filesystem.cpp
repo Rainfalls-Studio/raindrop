@@ -30,17 +30,17 @@
 #endif
 
 namespace Raindrop::Core::Filesystem{
-	bool exist(const Path& path){
+	RAINDROP_API bool exist(const Path& path){
 		RAINDROP_profile_function();
 		return access(path.str(), F_OK) == 0;
 	}
 
-	Extention getExtention(const Path& path, Memory::Allocator& allocator){
+	RAINDROP_API Extention getExtention(const Path& path, Memory::Allocator& allocator){
 		RAINDROP_profile_function();
 		return (Extention)String{allocator, ((std::filesystem::path)path.str()).extension().string().c_str()};
 	}
 
-	usize getSize(const Path& path){
+	RAINDROP_API usize getSize(const Path& path){
 		RAINDROP_profile_function();
 		#if defined(RAINDROP_WINDOWS)
 			// with the windows API
@@ -86,12 +86,12 @@ namespace Raindrop::Core::Filesystem{
 		#endif
 	}
 
-	String getName(const Path& path, Memory::Allocator& allocator){
+	RAINDROP_API String getName(const Path& path, Memory::Allocator& allocator){
 		RAINDROP_profile_function();
 		return String{allocator, std::filesystem::path(path.str()).filename().string().c_str()};
 	}
 
-	Memory::Array<String> getFolderContent(Memory::Allocator& allocator, const Path& path){		
+	RAINDROP_API Memory::Array<String> getFolderContent(Memory::Allocator& allocator, const Path& path){		
 		RAINDROP_profile_function();
 		#ifdef RAINDROP_WINDOWS
 			TCHAR szDir[MAX_PATH];
@@ -154,7 +154,7 @@ namespace Raindrop::Core::Filesystem{
 		#endif
 	}
 
-	bool copy(const Path& src, const Path& dst){
+	RAINDROP_API bool copy(const Path& src, const Path& dst){
 		RAINDROP_profile_function();
 		try{
 			std::filesystem::copy(src.str(), dst.str());
@@ -165,7 +165,7 @@ namespace Raindrop::Core::Filesystem{
 		return true;
 	}
 
-	bool move(const Path& src, const Path& dst){
+	RAINDROP_API bool move(const Path& src, const Path& dst){
 		RAINDROP_profile_function();
 		#ifdef RAINDROP_WINDOWS
 			return (bool)MoveFileA((LPCSTR)src.str(), (LPCSTR)dst.str());
@@ -174,7 +174,7 @@ namespace Raindrop::Core::Filesystem{
 		#endif
 	}
 
-	bool remove(const Path& path){
+	RAINDROP_API bool remove(const Path& path){
 		RAINDROP_profile_function();
 		#ifdef RAINDROP_WINDOWS
 			return (bool)DeleteFileA((LPCSTR)path.str());

@@ -4,7 +4,7 @@
 #include <Wrappers/common.hpp>
 
 namespace Raindrop::Wrappers{
-	class EntityWrapper{
+	class RAINDROP_API EntityWrapper{
 		friend class SceneWrapper;
 		public:
 			EntityWrapper(Scene* scene, EntityID ID);

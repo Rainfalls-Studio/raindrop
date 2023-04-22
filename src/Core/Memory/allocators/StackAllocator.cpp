@@ -3,7 +3,7 @@
 #include "Core/Debug/logger.hpp"
 
 namespace Raindrop::Core::Memory{
-	StackAllocator::StackAllocator(usize size, void* start) : Allocator(size, start){
+	RAINDROP_API StackAllocator::StackAllocator(usize size, void* start) : Allocator(size, start){
 		RAINDROP_profile_function();
 		pos = start;
 		
@@ -12,7 +12,7 @@ namespace Raindrop::Core::Memory{
 		#endif
 	}
 
-	StackAllocator::~StackAllocator(){
+	RAINDROP_API StackAllocator::~StackAllocator(){
 		pos = nullptr;
 		
 		#ifdef _DEBUG
@@ -20,7 +20,7 @@ namespace Raindrop::Core::Memory{
 		#endif
 	}
 
-	void* StackAllocator::allocate(usize size, uint8 alignment){
+	RAINDROP_API void* StackAllocator::allocate(usize size, uint8 alignment){
 		RAINDROP_profile_function();
 		RAINDROP_assert(size != 0);
 
@@ -47,7 +47,7 @@ namespace Raindrop::Core::Memory{
 		return aligned_address; 
 	}
 
-	void StackAllocator::deallocate(void* p){
+	RAINDROP_API void StackAllocator::deallocate(void* p){
 		RAINDROP_profile_function();
 		#if _DEBUG
 			RAINDROP_assert(p != previousPos); 
@@ -65,7 +65,7 @@ namespace Raindrop::Core::Memory{
 		allocationCount--;
 	}
 
-	void StackAllocator::clear(){
+	RAINDROP_API void StackAllocator::clear(){
 		RAINDROP_profile_function();
 		allocationCount = 0;
 		usedMemory = 0;

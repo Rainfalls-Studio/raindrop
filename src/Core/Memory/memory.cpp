@@ -8,7 +8,7 @@ namespace Raindrop::Core::Memory{
 		static uint32 deallocationCount = 0;
 	#endif
 
-	void* allocate(usize size){
+	RAINDROP_API void* allocate(usize size){
 		#ifdef RAINDROP_MEMORY_DEBUG
 			allocationCount++;
 		#endif
@@ -17,7 +17,7 @@ namespace Raindrop::Core::Memory{
 		return ptr;
 	}
 
-	void deallocate(void* mem){
+	RAINDROP_API void deallocate(void* mem){
 		#ifdef RAINDROP_MEMORY_DEBUG
 			deallocationCount++;
 		#endif
@@ -25,11 +25,11 @@ namespace Raindrop::Core::Memory{
 	}
 	
 	#ifdef RAINDROP_MEMORY_DEBUG
-		uint32 getAllocationCount(){
+		RAINDROP_API uint32 getAllocationCount(){
 			return allocationCount;
 		}
 
-		uint32 getDeallocationCount(){
+		RAINDROP_API uint32 getDeallocationCount(){
 			return deallocationCount;
 		}
 	#endif

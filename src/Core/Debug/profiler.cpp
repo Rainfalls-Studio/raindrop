@@ -16,16 +16,16 @@ namespace Raindrop::Core::Debug::Profiler{
 
 	static __Profiler* __profiler = nullptr;
 	
-	void init(){
+	RAINDROP_API void init(){
 		__profiler = new __Profiler();
 	}
 
-	void shutdown(){
+	RAINDROP_API void shutdown(){
 		delete __profiler;
 		__profiler = nullptr;
 	}
 
-	Profile::Profile(const char* scope){
+	RAINDROP_API Profile::Profile(const char* scope){
 		if (!__profiler) return;
 
 		__profiler->mutex.lock();
@@ -36,7 +36,7 @@ namespace Raindrop::Core::Debug::Profiler{
 		__profiler->mutex.unlock();
 	}
 
-	Profile::~Profile(){
+	RAINDROP_API Profile::~Profile(){
 		if (!__profiler) return;
 
 		__profiler->mutex.lock();
@@ -47,7 +47,7 @@ namespace Raindrop::Core::Debug::Profiler{
 		__profiler->mutex.unlock();
 	}
 
-	void beginProfile(const char* name, const char* filepath){
+	RAINDROP_API void beginProfile(const char* name, const char* filepath){
 		if (!__profiler) return;
 
 		__profiler->out.open(filepath);
@@ -55,12 +55,12 @@ namespace Raindrop::Core::Debug::Profiler{
 		__profiler->out.flush();
 	}
 
-	void endProfile(){
+	RAINDROP_API void endProfile(){
 		if (!__profiler) return;
 		__profiler->out.close();
 	}
 
-	void profile(bool profile){
+	RAINDROP_API void profile(bool profile){
 		if (!__profiler) return;
 		__profiler->profile = profile;
 	}

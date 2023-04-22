@@ -22,7 +22,7 @@ namespace Raindrop::Core::Scene{
 			Memory::DoublyLinkedList<ID32> _entities;
 	};
 
-	class SystemManager{
+	class RAINDROP_API SystemManager{
 		friend class Scene;
 		public:
 			SystemManager(Memory::Allocator& allocator);

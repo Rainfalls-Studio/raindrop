@@ -5,10 +5,10 @@
 
 namespace Raindrop::Tools{
 	template<typename T>
-	bool equal(const T& a, const T& b);
+	RAINDROP_API bool equal(const T& a, const T& b);
 
 	template<>
-	bool equal<const char*>(const char* const& a, const char* const& b);
+	RAINDROP_API bool equal<const char*>(const char* const& a, const char* const& b);
 }
 
 #endif

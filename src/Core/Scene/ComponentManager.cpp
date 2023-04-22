@@ -2,20 +2,20 @@
 #include <cstring>
 
 namespace Raindrop::Core::Scene{
-	ComponentManager::ComponentManager(Memory::Allocator& allocator, usize componentSize, usize componentAlignement, uint32 size) : _allocator{allocator}, _componentSize{componentSize}, _componentAlignement{componentAlignement}{
+	RAINDROP_API ComponentManager::ComponentManager(Memory::Allocator& allocator, usize componentSize, usize componentAlignement, uint32 size) : _allocator{allocator}, _componentSize{componentSize}, _componentAlignement{componentAlignement}{
 		RAINDROP_profile_function();
 		_start = nullptr;
 		_capacity = 0;
 		allocate(size);
 	}
 
-	ComponentManager::~ComponentManager(){
+	RAINDROP_API ComponentManager::~ComponentManager(){
 		RAINDROP_profile_function();
 		if (_start) _allocator.deallocate(_start);
 		_start = nullptr;
 	}
 
-	void ComponentManager::allocate(usize size){
+	RAINDROP_API void ComponentManager::allocate(usize size){
 		RAINDROP_profile_function();
 
 		void* newStart = _allocator.allocate(size * _componentSize, _componentAlignement);
@@ -33,13 +33,13 @@ namespace Raindrop::Core::Scene{
 		_start = newStart;
 	}
 
-	void* ComponentManager::get(ID32 id){
+	RAINDROP_API void* ComponentManager::get(ID32 id){
 		RAINDROP_profile_function();
 		if (id >= _capacity) throw std::out_of_range("the given component id is out of the bounds of the component manager");
 		return static_cast<void*>(static_cast<char*>(_start) + _componentSize * id);
 	}
 
-	void ComponentManager::set(ID32 id, void* component){
+	RAINDROP_API void ComponentManager::set(ID32 id, void* component){
 		RAINDROP_profile_function();
 		if (id >= _capacity) throw std::out_of_range("the given component id is out of the bounds of the component manager");
 		if (!component) throw std::invalid_argument("the given component pointer in null, cannot copy");
@@ -47,7 +47,7 @@ namespace Raindrop::Core::Scene{
 		memcpy(ptr, component, _componentSize);
 	}
 
-	usize ComponentManager::capacity() const{
+	RAINDROP_API usize ComponentManager::capacity() const{
 		RAINDROP_profile_function();
 		return _capacity;
 	}

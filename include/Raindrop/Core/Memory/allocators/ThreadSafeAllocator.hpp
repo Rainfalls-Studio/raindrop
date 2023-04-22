@@ -5,7 +5,7 @@
 #include <Core/Thread/Mutex.hpp>
 
 namespace Raindrop::Core::Memory{
-	class ThreadSafeAllocator : public Allocator{
+	class RAINDROP_API ThreadSafeAllocator : public Allocator{
 		public:
 			ThreadSafeAllocator(Allocator& allocator);
 			~ThreadSafeAllocator();

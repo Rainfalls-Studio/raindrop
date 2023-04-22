@@ -9,7 +9,7 @@
 #include <Core/String.hpp>
 
 namespace Raindrop::Managers{
-	class SceneManager{
+	class RAINDROP_API SceneManager{
 		public:
 			SceneManager(Core::Memory::Allocator& allocator);
 			~SceneManager();

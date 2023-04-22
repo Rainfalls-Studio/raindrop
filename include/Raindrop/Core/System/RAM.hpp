@@ -4,7 +4,7 @@
 #include <common.hpp>
 
 namespace Raindrop::Core::System{
-	class RAM{
+	class RAINDROP_API RAM{
 		public:
 			static uint64 getTotalVirtualMemory();
 			static uint64 getTotalVirtualMemoryUsed();

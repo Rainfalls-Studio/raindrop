@@ -3,7 +3,7 @@
 #include "Core/Debug/profiler.hpp"
 
 namespace Raindrop::Core::Memory{
-	PoolAllocator::PoolAllocator(size_t objectSize, uint8 objectAlignment, usize size, void* mem) : Allocator(size, mem), _objectSize(objectSize), _objectAlignment(objectAlignment){
+	RAINDROP_API PoolAllocator::PoolAllocator(size_t objectSize, uint8 objectAlignment, usize size, void* mem) : Allocator(size, mem), _objectSize(objectSize), _objectAlignment(objectAlignment){
 		RAINDROP_profile_function();
 		RAINDROP_assert(objectSize >= sizeof(void*)); 
 		
@@ -22,14 +22,14 @@ namespace Raindrop::Core::Memory{
 		*p = nullptr;
 	}
 
-	PoolAllocator::~PoolAllocator(){
+	RAINDROP_API PoolAllocator::~PoolAllocator(){
 		RAINDROP_profile_function();
 		freeList = nullptr;
 		_objectAlignment = 0;
 		_objectSize = 0;
 	}
 
-	void* PoolAllocator::allocate(usize size, uint8 alignment){
+	RAINDROP_API void* PoolAllocator::allocate(usize size, uint8 alignment){
 		RAINDROP_profile_function();
 		RAINDROP_assert(size == _objectSize); 
 		RAINDROP_assert(alignment == _objectAlignment);
@@ -42,7 +42,7 @@ namespace Raindrop::Core::Memory{
 		return p; 
 	}
 
-	void PoolAllocator::deallocate(void* p){
+	RAINDROP_API void PoolAllocator::deallocate(void* p){
 		RAINDROP_profile_function();
 		*((void**)p) = freeList; 
 		freeList = (void**)p; 

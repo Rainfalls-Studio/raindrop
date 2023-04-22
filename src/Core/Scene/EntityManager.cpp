@@ -1,7 +1,7 @@
 #include "Core/Scene/EntityManager.hpp"
 
 namespace Raindrop::Core::Scene{
-	EntityManager::EntityManager(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}, _freeEntities{allocator}{
+	RAINDROP_API EntityManager::EntityManager(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}, _freeEntities{allocator}{
 		RAINDROP_profile_function();
 		_capacity = capacity;
 
@@ -10,11 +10,11 @@ namespace Raindrop::Core::Scene{
 		}
 	}
 
-	EntityManager::~EntityManager(){
+	RAINDROP_API EntityManager::~EntityManager(){
 		RAINDROP_profile_function();
 	}
 
-	ID32 EntityManager::create(){
+	RAINDROP_API ID32 EntityManager::create(){
 		RAINDROP_profile_function();
 		auto next = _freeEntities.front();
 		if (!next) throw std::overflow_error("overflow entites, cannot create more entites with this scene");
@@ -22,7 +22,7 @@ namespace Raindrop::Core::Scene{
 		return *next;
 	}
 
-	void EntityManager::destroy(ID32 entity){
+	RAINDROP_API void EntityManager::destroy(ID32 entity){
 		RAINDROP_profile_function();
 		#ifndef NDEBUG
 			auto curr = _freeEntities.front();
@@ -37,7 +37,7 @@ namespace Raindrop::Core::Scene{
 		_freeEntities.push(entity);
 	}
 
-	bool EntityManager::exists(ID32 entity) const{
+	RAINDROP_API bool EntityManager::exists(ID32 entity) const{
 		RAINDROP_profile_function();
 		auto& list = const_cast<Memory::List<ID32>&>(_freeEntities);
 		auto it = list.front();

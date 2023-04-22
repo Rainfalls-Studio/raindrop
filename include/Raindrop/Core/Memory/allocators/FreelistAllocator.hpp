@@ -4,7 +4,7 @@
 #include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Core::Memory{
-	class FreelistAllocator : public Allocator{
+	class RAINDROP_API FreelistAllocator : public Allocator{
 		public:
 			FreelistAllocator(usize size, void* start);
 			~FreelistAllocator();

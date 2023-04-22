@@ -35,8 +35,8 @@ namespace Raindrop::Core::Debug::Log{
 		SCENE,
 	};
 
-	const char* severityToStr(Severity severity);
-	const char* causeToStr(Cause cause);
+	RAINDROP_API  char* severityToStr(Severity severity);
+	RAINDROP_API const char* causeToStr(Cause cause);
 
 	struct Log{
 		Log(){}
@@ -50,7 +50,7 @@ namespace Raindrop::Core::Debug::Log{
 		const char* condition;
 	};
 
-	class LogModule{
+	class RAINDROP_API LogModule{
 		friend class __Logger;
 		public:
 			LogModule() = default;
@@ -77,9 +77,9 @@ namespace Raindrop::Core::Debug::Log{
 	};
 
 	// output message
-	void initialize();
-	void shutdownLog();
-	void log(const Log &msg);
+	RAINDROP_API void initialize();
+	RAINDROP_API void shutdownLog();
+	RAINDROP_API void log(const Log &msg);
 	
 	class __Logger;
 }

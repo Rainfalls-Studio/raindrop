@@ -5,7 +5,7 @@
 #include "Core/Maths/Maths.hpp"
 
 namespace Raindrop::Core::Memory{
-	FreelistAllocator::FreelistAllocator(usize size, void* start) :
+	RAINDROP_API FreelistAllocator::FreelistAllocator(usize size, void* start) :
 		Allocator(size, start),
 		start_(start),
 		size_(size),
@@ -16,13 +16,13 @@ namespace Raindrop::Core::Memory{
 		free_list_->next = nullptr;
 	}
 
-	FreelistAllocator::~FreelistAllocator(){
+	RAINDROP_API FreelistAllocator::~FreelistAllocator(){
 		free_list_ = nullptr;
 		start_ = nullptr;
 		size_ = 0;
 	}
 
-	void* FreelistAllocator::allocate(usize size, uint8 alignment) {
+	RAINDROP_API void* FreelistAllocator::allocate(usize size, uint8 alignment) {
 		if (size == 0) throw std::invalid_argument("cannot allocate an element with a null size");
 		if (alignment == 0) throw std::invalid_argument("cannot allocate an element without a valid alignement");
 		if (!Maths::isPowerOfTwo(alignment)) throw std::invalid_argument("the alignement has to be a power of two");
@@ -92,7 +92,7 @@ namespace Raindrop::Core::Memory{
 		throw std::bad_alloc();
 	}
 
-	void FreelistAllocator::deallocate(void* ptr){
+	RAINDROP_API void FreelistAllocator::deallocate(void* ptr){
 		if (ptr == nullptr) throw std::invalid_argument("cannot deallocate a null pointer");
 
 		Header* header = (Header*)((uptr)ptr - sizeof(Header));

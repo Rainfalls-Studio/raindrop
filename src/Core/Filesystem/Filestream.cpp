@@ -8,40 +8,40 @@
 #include <stdarg.h>
 
 namespace Raindrop::Core::Filesystem{
-	Filestream::Filestream(){
+	RAINDROP_API Filestream::Filestream(){
 		RAINDROP_profile_function();
 		_file = nullptr;
 		_openMode = 0;
 	}
 
-	Filestream::Filestream(const File& file, OpenModeFlag openMode){
+	RAINDROP_API Filestream::Filestream(const File& file, OpenModeFlag openMode){
 		RAINDROP_profile_function();
 		_file = nullptr;
 		open(file, openMode);
 	}
 
-	Filestream::Filestream(const Path& path, OpenModeFlag openMode){
+	RAINDROP_API Filestream::Filestream(const Path& path, OpenModeFlag openMode){
 		RAINDROP_profile_function();
 		_file = nullptr;
 		open(path, openMode);
 	}
 
-	Filestream::~Filestream(){
+	RAINDROP_API Filestream::~Filestream(){
 		RAINDROP_profile_function();
 		close();
 	}
 
-	bool Filestream::open(const File& file, OpenModeFlag openMode){
+	RAINDROP_API bool Filestream::open(const File& file, OpenModeFlag openMode){
 		RAINDROP_profile_function();
 		return open(file.path(), openMode);
 	}
 
-	bool Filestream::open(const Path& path, OpenModeFlag openMode){
+	RAINDROP_API bool Filestream::open(const Path& path, OpenModeFlag openMode){
 		RAINDROP_profile_function();
 		return open(path.str(), openMode);
 	}
 
-	void openModeToStrMode(Filestream::OpenModeFlag mode, char* str){
+	RAINDROP_API void openModeToStrMode(Filestream::OpenModeFlag mode, char* str){
 		RAINDROP_profile_function();
 		uint8 i = 0;
 
@@ -82,7 +82,7 @@ namespace Raindrop::Core::Filesystem{
 	}
 
 
-	bool Filestream::open(const char* path, OpenModeFlag openMode){
+	RAINDROP_API bool Filestream::open(const char* path, OpenModeFlag openMode){
 		RAINDROP_profile_function();
 		_openMode = openMode;
 
@@ -106,7 +106,7 @@ namespace Raindrop::Core::Filesystem{
 		return true;
 	}
 
-	void Filestream::close(){
+	RAINDROP_API void Filestream::close(){
 		RAINDROP_profile_function();
 		if (_file){
 			fclose((FILE*)_file);
@@ -115,12 +115,12 @@ namespace Raindrop::Core::Filesystem{
 		}
 	}
 
-	void Filestream::flush(){
+	RAINDROP_API void Filestream::flush(){
 		RAINDROP_profile_function();
 		fflush((FILE*)_file);
 	}
 
-	unsigned char Filestream::readChar(bool *end) const{
+	RAINDROP_API unsigned char Filestream::readChar(bool *end) const{
 		RAINDROP_profile_function();
 		RAINDROP_assert(_openMode & OPEN_READ);
 		int out = fgetc((FILE*)_file);
@@ -142,7 +142,7 @@ namespace Raindrop::Core::Filesystem{
 		return (unsigned char)out;
 	}
 
-	String Filestream::readString(Memory::Allocator& allocator, usize lenght) const{
+	RAINDROP_API String Filestream::readString(Memory::Allocator& allocator, usize lenght) const{
 		RAINDROP_profile_function();
 		RAINDROP_assert(_openMode & OPEN_READ);
 		String str(allocator);
@@ -160,7 +160,7 @@ namespace Raindrop::Core::Filesystem{
 		return str;
 	}
 
-	bool Filestream::read(char* ptr, usize lenght){
+	RAINDROP_API bool Filestream::read(char* ptr, usize lenght){
 		RAINDROP_profile_function();
 		RAINDROP_assert(ptr);
 
@@ -175,7 +175,7 @@ namespace Raindrop::Core::Filesystem{
 		return true;
 	}
 
-	bool Filestream::read(String& string, usize lenght){
+	RAINDROP_API bool Filestream::read(String& string, usize lenght){
 		RAINDROP_profile_function();
 		if (lenght == (usize)-1){
 			lenght = string.size();
@@ -191,7 +191,7 @@ namespace Raindrop::Core::Filesystem{
 		return true;
 	}
 	
-	void Filestream::writeChar(unsigned char c){
+	RAINDROP_API void Filestream::writeChar(unsigned char c){
 		RAINDROP_profile_function();
 		RAINDROP_assert(_openMode & OPEN_WRITE);
 		int out = fputc(c, (FILE*)_file);
@@ -201,12 +201,12 @@ namespace Raindrop::Core::Filesystem{
 		}
 	}
 
-	void Filestream::writeString(const String &str){
+	RAINDROP_API void Filestream::writeString(const String &str){
 		RAINDROP_profile_function();
 		writeString(str.str());
 	}
 	
-	void Filestream::writeString(const char *str){
+	RAINDROP_API void Filestream::writeString(const char *str){
 		RAINDROP_profile_function();
 		RAINDROP_assert(_openMode & OPEN_WRITE);
 		int out = fputs(str, (FILE*)_file);
@@ -216,39 +216,39 @@ namespace Raindrop::Core::Filesystem{
 		}
 	}
 
-	void Filestream::write(int64 i){
+	RAINDROP_API void Filestream::write(int64 i){
 		RAINDROP_profile_function();
 		char buf[255];
 		_i64toa(i, buf, 10);
 		writeString(buf);
 	}
 
-	void Filestream::write(uint64 ui){
+	RAINDROP_API void Filestream::write(uint64 ui){
 		RAINDROP_profile_function();
 		char buf[255];
 		_ui64toa(ui, buf, 10);
 		writeString(buf);
 	}
 
-	void Filestream::write(float64 f){
+	RAINDROP_API void Filestream::write(float64 f){
 		RAINDROP_profile_function();
 		char buf[255];
 		gcvt(f, 9, buf);
 		writeString(buf);
 	}
 
-	void Filestream::write(const char* str){
+	RAINDROP_API void Filestream::write(const char* str){
 		RAINDROP_profile_function();
 		writeString(str);
 	}
 
-	void Filestream::write(const char c){
+	RAINDROP_API void Filestream::write(const char c){
 		RAINDROP_profile_function();
 		char buf[2] = {c, '\0'};
 		writeString(buf);
 	}
 
-	uint32 Filestream::getPos() const{
+	RAINDROP_API uint32 Filestream::getPos() const{
 		RAINDROP_profile_function();
 		int pos = ftell((FILE*)_file);
 
@@ -260,7 +260,7 @@ namespace Raindrop::Core::Filesystem{
 		return (uint32)pos;
 	}
 
-	int filePosToSeek(Filestream::FilePos origin){
+	RAINDROP_API int filePosToSeek(Filestream::FilePos origin){
 		RAINDROP_profile_function();
 		switch (origin){
 			case Filestream::POS_BEGIN: return SEEK_SET;
@@ -271,7 +271,7 @@ namespace Raindrop::Core::Filesystem{
 		return SEEK_SET;
 	}
 
-	void Filestream::setPos(int32 pos, FilePos origin){
+	RAINDROP_API void Filestream::setPos(int32 pos, FilePos origin){
 		RAINDROP_profile_function();
 		int out = fseek((FILE*)_file, (long)pos, filePosToSeek(origin));
 
@@ -280,17 +280,17 @@ namespace Raindrop::Core::Filesystem{
 		}
 	}
 
-	void Filestream::jump(int32 offset){
+	RAINDROP_API void Filestream::jump(int32 offset){
 		RAINDROP_profile_function();
 		setPos(offset, POS_CURRENT);
 	}
 
-	bool Filestream::isOpen() const{
+	RAINDROP_API bool Filestream::isOpen() const{
 		RAINDROP_profile_function();
 		return _file != nullptr;
 	}
 
-	Filestream::OpenModeFlag Filestream::getOpenMode() const{
+	RAINDROP_API Filestream::OpenModeFlag Filestream::getOpenMode() const{
 		RAINDROP_profile_function();
 		return _openMode;
 	}

@@ -6,7 +6,7 @@
 #include <Wrappers/SystemWrapper.hpp>
 
 namespace Raindrop::Wrappers{
-	class SceneWrapper{
+	class RAINDROP_API SceneWrapper{
 		public:
 			SceneWrapper(const SceneWrapper& other);
 			SceneWrapper(Managers::ScenePtr scene);

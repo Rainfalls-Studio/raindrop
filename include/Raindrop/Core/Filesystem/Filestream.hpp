@@ -7,7 +7,7 @@
 
 namespace Raindrop::Core::Filesystem{
 	class File;
-	class Filestream{
+	class RAINDROP_API Filestream{
 		public:
 			enum OpenMode{
 				OPEN_READ   = 1 << 0,

@@ -10,7 +10,7 @@ namespace Raindrop::Graphics{
 	class Context;
 	class Window;
 
-	class Renderer{
+	class RAINDROP_API Renderer{
 		public:
 			Renderer();
 			virtual ~Renderer() = default;

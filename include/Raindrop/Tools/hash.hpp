@@ -6,13 +6,13 @@
 namespace Raindrop::Tools{
 	
 	template<typename T>
-	ID64 hash64(const T& t);
+	RAINDROP_API ID64 hash64(const T& t);
 
 	template<>
-	ID64 hash64<const unsigned char*>(const unsigned char* const& t);
+	RAINDROP_API ID64 hash64<const unsigned char*>(const unsigned char* const& t);
 
 	template<>
-	ID64 hash64<const char*>(const char* const& t);
+	RAINDROP_API ID64 hash64<const char*>(const char* const& t);
 }
 
 #endif

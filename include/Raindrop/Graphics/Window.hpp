@@ -7,7 +7,7 @@
 #include <Core/Maths/Maths.hpp>
 
 namespace Raindrop::Graphics{
-	class Window{
+	class RAINDROP_API Window{
 		public:
 			Window();
 			virtual ~Window();

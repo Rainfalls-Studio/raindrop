@@ -15,11 +15,11 @@ namespace Raindrop::Core::Filesystem{
 		}																								\
 	}
 
-	Filebuffer::Filebuffer(Memory::Allocator& allocator, Filestream& stream) : _content{allocator}{
+	RAINDROP_API Filebuffer::Filebuffer(Memory::Allocator& allocator, Filestream& stream) : _content{allocator}{
 		RAINDROP_profile_function();
 	}
 
-	Filebuffer::Filebuffer(Memory::Allocator& allocator, const File& file) : _content{allocator}{
+	RAINDROP_API Filebuffer::Filebuffer(Memory::Allocator& allocator, const File& file) : _content{allocator}{
 		RAINDROP_profile_function();
 		Filestream* stream = Memory::allocateNew<Filestream>(allocator, file, Filestream::OPEN_BEGIN | Filestream::OPEN_READ);
 		check(stream, file.path().str());
@@ -27,7 +27,7 @@ namespace Raindrop::Core::Filesystem{
 		Memory::deallocateDelete(allocator, stream);
 	}
 
-	Filebuffer::Filebuffer(Memory::Allocator& allocator, const Path& path) : _content{allocator}{
+	RAINDROP_API Filebuffer::Filebuffer(Memory::Allocator& allocator, const Path& path) : _content{allocator}{
 		RAINDROP_profile_function();
 		Filestream* stream = Memory::allocateNew<Filestream>(allocator, path, Filestream::OPEN_BEGIN | Filestream::OPEN_READ);
 		check(stream, path.str());
@@ -35,7 +35,7 @@ namespace Raindrop::Core::Filesystem{
 		Memory::deallocateDelete(allocator, stream);
 	}
 
-	void Filebuffer::copy(Filestream* stream){
+	RAINDROP_API void Filebuffer::copy(Filestream* stream){
 		RAINDROP_profile_function();
 		usize size = 0;
 
@@ -47,17 +47,17 @@ namespace Raindrop::Core::Filesystem{
 		stream->read(_content);
 	}
 
-	const String& Filebuffer::content() const{
+	RAINDROP_API const String& Filebuffer::content() const{
 		RAINDROP_profile_function();
 		return _content;
 	}
 
-	char Filebuffer::operator[](usize i) const{
+	RAINDROP_API char Filebuffer::operator[](usize i) const{
 		RAINDROP_profile_function();
 		return _content[i];
 	}
 
-	usize Filebuffer::size() const{
+	RAINDROP_API usize Filebuffer::size() const{
 		RAINDROP_profile_function();
 		return _content.size();
 	}

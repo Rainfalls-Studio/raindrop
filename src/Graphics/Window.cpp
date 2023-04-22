@@ -3,10 +3,10 @@
 #include <Graphics/Window.hpp>
 
 namespace Raindrop::Graphics{
-	Window::Window(){}
-	Window::~Window(){}
+	RAINDROP_API Window::Window(){}
+	RAINDROP_API Window::~Window(){}
 
-	Window* Window::create(Core::Memory::Allocator& allocator, Core::IO::Module& module, const char* fncName){
+	RAINDROP_API Window* Window::create(Core::Memory::Allocator& allocator, Core::IO::Module& module, const char* fncName){
 		using CreateWindowFnc = Window*(*)(Core::Memory::Allocator&);
 		CreateWindowFnc createWindow = (CreateWindowFnc)module.getFnc(fncName);
 		

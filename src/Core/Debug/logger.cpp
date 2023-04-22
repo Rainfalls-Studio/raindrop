@@ -78,31 +78,31 @@ namespace Raindrop::Core::Debug::Log{
 
 	static __Logger* __logger;
 
-	void initialize(){
+	RAINDROP_API void initialize(){
 		__logger = new __Logger();
 	}
 
-	void shutdownLog(){
+	RAINDROP_API void shutdownLog(){
 		delete __logger;
 		__logger = nullptr;
 	}
 
-	void LogModule::push(){
+	RAINDROP_API void LogModule::push(){
 		if (!__logger) return;
 		__logger->pushModule(this);
 	}
 
-	void LogModule::pop(){
+	RAINDROP_API void LogModule::pop(){
 		if (!__logger) return;
 		__logger->popModule(this);
 	}
 	
-	void log(const Log &msg){
+	RAINDROP_API void log(const Log &msg){
 		if (!__logger) return;
 		__logger->log(msg);
 	}
 	
-	const char* severityToStr(Severity severity){
+	RAINDROP_API const char* severityToStr(Severity severity){
 		switch (severity){
 			case Severity::CRITICAL: return "CRITICAL";
 			case Severity::DEBUG: return "DEBUG";
@@ -115,7 +115,7 @@ namespace Raindrop::Core::Debug::Log{
 		return "";
 	}
 
-	const char* causeToStr(Cause cause){
+	RAINDROP_API const char* causeToStr(Cause cause){
 		switch (cause){
 			case Cause::API: return "API";
 			case Cause::ARITMETIC: return "ARITHEMETIC";

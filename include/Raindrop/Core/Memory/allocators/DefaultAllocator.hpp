@@ -4,7 +4,7 @@
 #include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Core::Memory{
-	class DefaultAllocator : public Allocator{
+	RAINDROP_API class DefaultAllocator : public Allocator{
 		public:
 			DefaultAllocator();
 			~DefaultAllocator();

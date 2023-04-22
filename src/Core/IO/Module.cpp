@@ -18,7 +18,7 @@
 }
 
 namespace Raindrop::Core::IO{
-	Module::Module(const char* path) : _dll(path){
+	RAINDROP_API Module::Module(const char* path) : _dll(path){
 		RAINDROP_profile_function();
 
 		RAINDROP_set_context(::Raindrop::Core::Debug::Log::__Logger, log);
@@ -31,7 +31,7 @@ namespace Raindrop::Core::IO{
 		}
 	}
 	
-	bool Module::init(){
+	RAINDROP_API bool Module::init(){
 		RAINDROP_profile_function();
 		using InitModuleFnc = bool(*)(void);
 		InitModuleFnc initModule = (InitModuleFnc)_dll.getProc("initialize");
@@ -43,7 +43,7 @@ namespace Raindrop::Core::IO{
 		return false;
 	}
 
-	void Module::shutdown(){
+	RAINDROP_API void Module::shutdown(){
 		RAINDROP_profile_function();
 		using ShutdownModuleFnc = bool(*)(void);
 		ShutdownModuleFnc shutdownModule = (ShutdownModuleFnc)_dll.getProc("shutdown");
@@ -55,22 +55,22 @@ namespace Raindrop::Core::IO{
 		}
 	}
 
-	Module::~Module(){
+	RAINDROP_API Module::~Module(){
 		RAINDROP_profile_function();
 		shutdown();
 	}
 
-	bool Module::isOpen() const{
+	RAINDROP_API bool Module::isOpen() const{
 		RAINDROP_profile_function();
 		return _dll.isOpen() && _loaded;
 	}
 
-	const char* Module::filepath() const{
+	RAINDROP_API const char* Module::filepath() const{
 		RAINDROP_profile_function();
 		return _dll.filepath();
 	}
 
-	void* Module::getFnc(const char* name) const{
+	RAINDROP_API void* Module::getFnc(const char* name) const{
 		RAINDROP_profile_function();
 		return _dll.getProc(name);
 	}

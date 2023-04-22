@@ -4,7 +4,7 @@
 #include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Core::Memory{
-	class PoolAllocator : public Allocator{
+	class RAINDROP_API PoolAllocator : public Allocator{
 		public: 
 			PoolAllocator(size_t objectSize, uint8 objectAlignment, usize size, void* mem);
 			~PoolAllocator();

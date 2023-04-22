@@ -4,7 +4,7 @@
 #include <common.hpp>
 
 namespace Raindrop::Core::System{
-	class CPU{
+	class RAINDROP_API CPU{
 		public:
 			static uint64 getTicks();
 			static uint64 getTicksPerSeconds();

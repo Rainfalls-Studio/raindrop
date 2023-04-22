@@ -12,7 +12,7 @@ namespace Raindrop::Graphics{
 	class Window;
 	class Plugin;
 
-	class Context{
+	class RAINDROP_API Context{
 		public:
 			Context();
 			virtual ~Context() = default;

@@ -26,11 +26,11 @@ namespace Raindrop{
 		return _version;
 	}
 
-	Scene Application::createScene(usize capacity){
+	RAINDROP_API Scene Application::createScene(usize capacity){
 		return Scene(_sceneManager->createScene(capacity));
 	}
 
-	void Application::destroySceen(Scene scene){
+	RAINDROP_API void Application::destroySceen(Scene scene){
 		_sceneManager->destroyScene(scene.getScenePtr());
 	}
 }

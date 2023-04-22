@@ -2,7 +2,7 @@
 #include <typeinfo>
 
 namespace Raindrop::Core::Scene{
-	Scene::Scene(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}, _nameToID{allocator}, _freeComponentIDs{allocator}, _entityManager{allocator, capacity}, _entitySignatures{allocator, capacity}, _systemManager{allocator}{
+	RAINDROP_API Scene::Scene(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}, _nameToID{allocator}, _freeComponentIDs{allocator}, _entityManager{allocator, capacity}, _entitySignatures{allocator, capacity}, _systemManager{allocator}{
 		RAINDROP_profile_function();
 
 		_capacity = capacity;
@@ -16,7 +16,7 @@ namespace Raindrop::Core::Scene{
 		}
 	}
 
-	Scene::~Scene(){
+	RAINDROP_API Scene::~Scene(){
 		RAINDROP_profile_function();
 
 		deleteSystems();
@@ -27,7 +27,7 @@ namespace Raindrop::Core::Scene{
 		}
 	}
 
-	void Scene::deleteSystems(){
+	RAINDROP_API void Scene::deleteSystems(){
 		RAINDROP_profile_function();
 		auto it = _systemManager._systems.front();
 		while (it){
@@ -36,14 +36,14 @@ namespace Raindrop::Core::Scene{
 		}
 	}
 
-	ID32 Scene::createEntity(){
+	RAINDROP_API ID32 Scene::createEntity(){
 		RAINDROP_profile_function();
 		ID32 entity = _entityManager.create();
 		_entitySignatures.get(entity).clear();
 		return entity;
 	}
 
-	void Scene::destroyEntity(ID32 entity){
+	RAINDROP_API void Scene::destroyEntity(ID32 entity){
 		RAINDROP_profile_function();
 		RAINDROP_assert(isIDValid(entity));
 		_entityManager.destroy(entity);
@@ -51,13 +51,13 @@ namespace Raindrop::Core::Scene{
 		_systemManager.entityRemoved(entity, signature);
 	}
 
-	bool Scene::exists(ID32 entity) const{
+	RAINDROP_API bool Scene::exists(ID32 entity) const{
 		RAINDROP_profile_function();
 		return _entityManager.exists(entity);
 	}
 
 
-	void Scene::registerComponent(const char* name, usize typeSize, usize typeAlignement){
+	RAINDROP_API void Scene::registerComponent(const char* name, usize typeSize, usize typeAlignement){
 		RAINDROP_profile_function();
 		RAINDROP_assert(!_nameToID.has(name) && "cannot register an already registred component");
 
@@ -69,7 +69,7 @@ namespace Raindrop::Core::Scene{
 		_componentManagers[id] = Memory::allocateNew<ComponentManager>(_allocator, _allocator, typeSize, typeAlignement, _capacity);
 	}
 
-	void Scene::removeComponent(const char* name){
+	RAINDROP_API void Scene::removeComponent(const char* name){
 		RAINDROP_profile_function();
 		RAINDROP_assert(_nameToID.has(name) && "cannot remove a non registred component");
 
@@ -81,7 +81,7 @@ namespace Raindrop::Core::Scene{
 		_nameToID.remove(name);
 	}
 
-	void* Scene::getComponent(ID32 entity, ID32 componentID){
+	RAINDROP_API void* Scene::getComponent(ID32 entity, ID32 componentID){
 		RAINDROP_profile_function();
 		RAINDROP_assert(isIDValid(componentID));
 		RAINDROP_assert(isIDValid(entity));
@@ -90,14 +90,14 @@ namespace Raindrop::Core::Scene{
 		return _componentManagers[componentID]->get(entity);
 	}
 
-	void Scene::setComponent(ID32 entity, ID32 componentID, void* component){
+	RAINDROP_API void Scene::setComponent(ID32 entity, ID32 componentID, void* component){
 		RAINDROP_profile_function();
 		RAINDROP_assert(isIDValid(componentID));
 		RAINDROP_assert(isIDValid(entity));
 		_componentManagers[componentID]->set(entity, component);
 	}
 
-	bool Scene::hasComponent(ID32 entity, ID32 componentID) const{
+	RAINDROP_API bool Scene::hasComponent(ID32 entity, ID32 componentID) const{
 		RAINDROP_profile_function();
 		RAINDROP_assert(isIDValid(componentID));
 		RAINDROP_assert(isIDValid(entity));
@@ -105,7 +105,7 @@ namespace Raindrop::Core::Scene{
 		return _entitySignatures.getBit(entity, componentID);
 	}
 
-	void Scene::addComponent(ID32 entity, ID32 componentID, void* component){
+	RAINDROP_API void Scene::addComponent(ID32 entity, ID32 componentID, void* component){
 		RAINDROP_profile_function();
 		RAINDROP_assert(isIDValid(componentID));
 		RAINDROP_assert(isIDValid(entity));
@@ -121,7 +121,7 @@ namespace Raindrop::Core::Scene{
 		_systemManager.entitySignatureUpdate(entity, oldSignature, newSignature);
 	}
 
-	void Scene::eraseComponent(ID32 entity, ID32 componentID){
+	RAINDROP_API void Scene::eraseComponent(ID32 entity, ID32 componentID){
 		RAINDROP_profile_function();
 		RAINDROP_assert(isIDValid(componentID));
 		Signature oldSignature = _entitySignatures.get(entity);
@@ -131,32 +131,32 @@ namespace Raindrop::Core::Scene{
 		_systemManager.entitySignatureUpdate(entity, oldSignature, newSignature);
 	}
 
-	void Scene::pushSystem(System* system, Signature signature){
+	RAINDROP_API void Scene::pushSystem(System* system, Signature signature){
 		RAINDROP_profile_function();
 		_systemManager.pushSystem(system, signature);
 	}
 
-	void Scene::popSystem(System* system){
+	RAINDROP_API void Scene::popSystem(System* system){
 		RAINDROP_profile_function();
 		_systemManager.popSystem(system);
 	}
 
-	Signature Scene::getComponentSignature(ID32 componentID) const{
+	RAINDROP_API Signature Scene::getComponentSignature(ID32 componentID) const{
 		Signature signature{};
 		RAINDROP_assert(isIDValid(componentID));
 		signature.set(componentID, true);
 		return signature;
 	}
 
-	usize Scene::capacity() const{
+	RAINDROP_API usize Scene::capacity() const{
 		return _capacity;
 	}
 
-	ID32 Scene::getComponentID(const char* name) const{
+	RAINDROP_API ID32 Scene::getComponentID(const char* name) const{
 		return _nameToID.lookup(name);
 	}
 
-	bool Scene::isIDValid(ID32 id){
+	RAINDROP_API bool Scene::isIDValid(ID32 id){
 		return id != INVALID_ENTITY;
 	}
 }

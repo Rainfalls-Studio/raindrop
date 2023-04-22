@@ -3,9 +3,9 @@
 #include <Graphics/Renderer.hpp>
 
 namespace Raindrop::Graphics{
-	Renderer::Renderer(){}
+	RAINDROP_API Renderer::Renderer(){}
 	
-	Renderer* Renderer::create(Core::Memory::Allocator& allocator, Core::IO::Module& module, const char* fncName){
+	RAINDROP_API Renderer* Renderer::create(Core::Memory::Allocator& allocator, Core::IO::Module& module, const char* fncName){
 		using CreateRendererFnc = Renderer*(*)(Core::Memory::Allocator&);
 		CreateRendererFnc createRenderer = (CreateRendererFnc)module.getFnc(fncName);
 		

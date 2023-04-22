@@ -4,7 +4,7 @@
 #include <common.hpp>
 
 namespace Raindrop::Core::IO{
-	class DLLReader{
+	class RAINDROP_API DLLReader{
 		public:
 			DLLReader(const char* filepath);
 			~DLLReader();
