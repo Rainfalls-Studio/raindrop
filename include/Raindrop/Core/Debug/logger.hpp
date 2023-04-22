@@ -35,7 +35,7 @@ namespace Raindrop::Core::Debug::Log{
 		SCENE,
 	};
 
-	RAINDROP_API  char* severityToStr(Severity severity);
+	RAINDROP_API const char* severityToStr(Severity severity);
 	RAINDROP_API const char* causeToStr(Cause cause);
 
 	struct Log{
