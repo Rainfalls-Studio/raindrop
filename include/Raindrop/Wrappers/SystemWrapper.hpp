@@ -3,27 +3,31 @@
 
 #include <Wrappers/common.hpp>
 #include <Wrappers/EntityWrapper.hpp>
-#include <Managers/common.hpp>
 
 namespace Raindrop::Wrappers{
-	class SystemWrapper : private Core::Scene::System{
+	class SystemBase : private System{
+		friend class SceneWrapper;
 		public:
-			SystemWrapper(Core::Memory::Allocator& allocator = RAINDROP_default_allocator) : Core::Scene::System(allocator){}
-			virtual ~SystemWrapper() override = default;
+			SystemBase(Core::Memory::Allocator& allocator = RAINDROP_default_allocator) : System(allocator){}
+			virtual ~SystemBase() override = default;
 
 		protected:
-			virtual void OnEntityCreated(EntityWrapper entity){}
-			virtual void OnEntityDestroyed(EntityWrapper entity){}
+			virtual void OnEntityCreate(EntityWrapper entity){};
+			virtual void OnEntityDestroy(EntityWrapper entity){};
 
-		private:
-			Managers::ScenePtr _scene;
-
-			virtual void onEntityCreated(ID32 entity) override final{
-				OnEntityCreated(EntityWrapper(_scene, entity));
+			const Core::Memory::DoublyLinkedList<EntityID> getEntities() const{
+				return _entities;
 			}
 
-			virtual void onEntityDestroyed(ID32 entity) override final{
-				OnEntityDestroyed(EntityWrapper(_scene, entity));
+		private:
+			ScenePtr _scene;
+
+			virtual void onEntityCreated(EntityID id) override final{
+				OnEntityCreate(EntityWrapper(_scene, id));
+			}
+
+			virtual void onEntityDestroyed(EntityID id) override final{
+				OnEntityDestroy(EntityWrapper(_scene, id));
 			}
 	};
 }

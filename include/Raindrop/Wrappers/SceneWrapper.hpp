@@ -103,6 +103,13 @@ namespace Raindrop::Wrappers{
 				_getComponentsSignature<ComponentsTypes...>(sig);
 				return sig;
 			}
+			
+			template<typename T, typename... Args>
+			T& createSystem(Signature signature, Args&&... args){
+				if constexpr (!std::is_base_of<SystemWrapper, T>::value) throw std::invalid_argument("cannot create a system with a class that is not derived from the Raindrop System class");
+				T* system = _scene->createSystem<T, Args...>(signature, args...);
+				return *system;
+			}
 
 		private:
 			Managers::ScenePtr _scene;

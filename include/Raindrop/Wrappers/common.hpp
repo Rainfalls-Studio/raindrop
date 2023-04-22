@@ -10,8 +10,11 @@ namespace Raindrop::Wrappers{
 	using Raindrop::Core::Scene::EntityID;
 	using Raindrop::Core::Scene::ComponentID;
 	using Raindrop::Core::Scene::Signature;
+	using Raindrop::Core::Scene::System;
 	using Raindrop::Core::Scene::INVALID_ENTITY;
 	using Raindrop::Core::Scene::INVALID_COMPONENT;
+	
+	typedef Scene* ScenePtr;
 
 	class EntityWrapper;
 	class SceneWrapper;

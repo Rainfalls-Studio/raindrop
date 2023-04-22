@@ -9,8 +9,8 @@
 namespace Raindrop{
 	typedef Wrappers::SceneWrapper Scene;
 	typedef Wrappers::EntityWrapper Entity;
-	typedef Wrappers::SystemWrapper System;
 	typedef Wrappers::Signature Signature;
+	typedef Wrappers::SystemBase SystemBase;
 
 	using Wrappers::INVALID_COMPONENT;
 	using Wrappers::INVALID_ENTITY;
