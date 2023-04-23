@@ -5,6 +5,7 @@
 #include <Core/String.hpp>
 #include <Core/Memory/allocators/Allocator.hpp>
 #include <Managers/SceneManager.hpp>
+#include <Managers/AssetManager.hpp>
 #include <Wrappers/wrappers.hpp>
 
 namespace Raindrop{
@@ -25,6 +26,7 @@ namespace Raindrop{
 			Version _version;
 
 			Managers::SceneManager* _sceneManager;
+			Managers::AssetManager* _assetManager;
 	};
 }
 

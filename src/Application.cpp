@@ -8,12 +8,14 @@ namespace Raindrop{
 		_version = version;
 
 		_sceneManager = Core::Memory::allocateNew<Managers::SceneManager>(_allocator, _allocator);
+		_assetManager = Core::Memory::allocateNew<Managers::AssetManager>(_allocator, _allocator);
 	}
 
 	RAINDROP_API Application::~Application(){
 		RAINDROP_profile_function();
 
 		Core::Memory::deallocateDelete(_allocator, *_sceneManager);
+		Core::Memory::deallocateDelete(_allocator, *_assetManager);
 	}
 
 	RAINDROP_API const char* Application::name() const{

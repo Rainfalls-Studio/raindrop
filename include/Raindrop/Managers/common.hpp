@@ -6,6 +6,8 @@
 
 namespace Raindrop::Managers{
 	typedef Core::Scene::Scene* ScenePtr;
+	typedef void* AssetPtr;
+
 	static constexpr ScenePtr INVALID_SCENE_PTR = nullptr;
 }
 

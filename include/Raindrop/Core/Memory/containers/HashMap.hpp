@@ -168,8 +168,9 @@ namespace Raindrop::Core::Memory{
 
 		if (size == 0) return nullptr;
 
-		usize start = key % size;
-		uint8 hash6 = Tools::hash64<K>(key);
+		ID64 _hash = Tools::hash64<K>(key);
+		usize start = _hash % size;
+		uint8 hash6 = static_cast<uint8>(_hash) & 0b00111111;
 
 		// Search the buckets until we hit an empty one
 		for (usize i = start; i < size; ++i){
