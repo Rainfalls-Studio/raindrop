@@ -3,7 +3,6 @@
 
 #include <common.hpp>
 #include <Core/Scene/Scene.hpp>
-#include <Core/Memory/allocators/Allocator.hpp>
 
 namespace Raindrop::Wrappers{
 	using Raindrop::Core::Scene::Scene;
@@ -14,7 +13,7 @@ namespace Raindrop::Wrappers{
 	using Raindrop::Core::Scene::INVALID_ENTITY;
 	using Raindrop::Core::Scene::INVALID_COMPONENT;
 	
-	typedef Scene* ScenePtr;
+	typedef std::weak_ptr<Scene> ScenePtr;
 
 	class EntityWrapper;
 	class SceneWrapper;

@@ -1,24 +1,18 @@
 #ifndef __RAINDROP_GRAPHICS_PLUGIN_HPP__
 #define __RAINDROP_GRAPHICS_PLUGIN_HPP__
 
-#include <Core/Memory/allocators/Allocator.hpp>
-#include <Core/Scene/Scene.hpp>
-#include <Graphics/Context.hpp>
-#include <Graphics/Renderer.hpp>
+#include <Graphics/common.hpp>
 
 namespace Raindrop::Graphics{
-	class RAINDROP_API Plugin{
+	class RAINDROP_API GraphicsPlugin{
 		public:
-			Plugin(Context& context, Core::Scene::Scene& scene){};
-			virtual ~Plugin() = default;
+			GraphicsPlugin(const std::filesystem::path& path);
 
-			virtual const char* getName() const = 0;
-			virtual Version getVersion() const = 0;
+			std::shared_ptr<Renderer> createRenderer();
+			std::shared_ptr<Window> createWindow();
 
-			static Plugin* create(Core::Memory::Allocator& allocator, Core::IO::Module& module, Context& context, Core::Scene::Scene& scene, const char* name);
-		
-		protected:
-			Plugin() = default;
+		private:
+			Module _module;
 	};
 }
 

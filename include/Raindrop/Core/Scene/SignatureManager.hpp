@@ -1,8 +1,8 @@
 #ifndef __RAINDROP_CORE_SCENE_SIGNATURE_MANAGER_HPP__
 #define __RAINDROP_CORE_SCENE_SIGNATURE_MANAGER_HPP__
 
-#include <common.hpp>
-#include <Core/Memory/allocators/Allocator.hpp>
+#include <Core/Scene/common.hpp>
+#include <Core/Memory/memory.hpp>
 
 namespace Raindrop::Core::Scene{
 	class RAINDROP_API Signature{
@@ -32,7 +32,7 @@ namespace Raindrop::Core::Scene{
 	};
 	class RAINDROP_API SignatureManager{
 		public:
-			SignatureManager(Memory::Allocator& allocator, usize capacity);
+			SignatureManager(usize capacity);
 			~SignatureManager();
 
 			Signature& get(usize i);
@@ -46,8 +46,7 @@ namespace Raindrop::Core::Scene{
 			static usize bitesPerSignature();
 		
 		private:
-			Memory::Allocator& _allocator;
-			Signature* _signatures;
+			std::unique_ptr<Signature[]> _signatures;
 			usize _capacity;
 
 			inline bool inRange(const usize& i) const{

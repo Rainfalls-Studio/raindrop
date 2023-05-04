@@ -7,25 +7,29 @@
 namespace Raindrop::Managers{
 	class AssetManager{
 		public:
-			AssetManager(Raindrop::Core::Memory::Allocator& allocator = RAINDROP_default_allocator);
+			AssetManager();
 			~AssetManager();
 
 			template<typename T>
-			T& getOrCreate(Core::Memory::Allocator& allocator, const char* path){
-				AssetPtr asset = _getOrCreate(allocator, path);
-				return *static_cast<T*>(asset);
+			std::weak_ptr<T> getOrCreate(const std::filesystem::path& path){
+				{
+					auto it = _pathToAssetsMap.find(path);
+					if (it != _pathToAssetsMap.end()) return std::dynamic_pointer_cast<T>(*it);
+				}
+
+				std::shared_ptr<Asset> asset = _getFactory(path)->create(path);
+				_pathToAssetsMap[path] = asset;
+
+				return asset;
 			}
 
-			bool exists(const char* path);
+			bool exists(const std::filesystem::path& path);
 
 		private:
-			Core::Memory::Allocator& _allocator;
-			Core::Memory::HashMap<const char*, AssetFactory*> _extensionToFactoryMap{_allocator};
-			Core::Memory::HashMap<const char*, AssetPtr> _pathToAssetsMap{_allocator};
+			std::unordered_map<std::filesystem::path, std::shared_ptr<AssetFactory>> _extensionToFactoryMap;
+			std::unordered_map<std::filesystem::path, std::shared_ptr<Asset>> _pathToAssetsMap;
 
-			AssetPtr _getOrCreate(Core::Memory::Allocator& allocator, const char* path);
-			AssetFactory* _getFactory(const char* extension) const;
-			AssetFactory* _getFactoryFromPath(const char* extension) const;
+			std::shared_ptr<AssetFactory> _getFactory(const std::filesystem::path& path) const;
 
 	};
 }

@@ -5,16 +5,15 @@
 
 namespace Raindrop::Managers{
 	class AssetFactory{
+		friend class Asset;
 		public:
 			AssetFactory() = default;
 			virtual ~AssetFactory() = default;
 
-			virtual AssetPtr create(Core::Memory::Allocator& allocator, const char* path) = 0;
-			virtual void destroy(AssetPtr asset) = 0;
-			virtual usize getTypeID() const = 0;
+			virtual std::shared_ptr<Asset> create(const std::filesystem::path& path) = 0;
 
-		private:
-
+		protected:
+			virtual void destroy(Asset* asset) = 0;
 	};
 }
 

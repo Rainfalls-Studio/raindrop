@@ -6,15 +6,15 @@
 namespace Raindrop::Core::IO{
 	class RAINDROP_API DLLReader{
 		public:
-			DLLReader(const char* filepath);
+			DLLReader(const std::filesystem::path& filepath);
 			~DLLReader();
 
 			bool isOpen() const;
-			const char* filepath() const;
+			const std::filesystem::path& filepath() const;
 			void* getProc(const char* name) const;
 		
 		private:
-			const char* _filepath;
+			std::filesystem::path _filepath;
 			void* _dll;
 	};
 }

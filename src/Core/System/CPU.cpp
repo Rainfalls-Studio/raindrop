@@ -94,6 +94,7 @@ namespace Raindrop::Core::System{
 			// ::PdhCollectQueryData(utils.cpuQuery);
 			// ::PdhGetFormattedCounterValue(utils.cpuTotal, PDH_FMT_DOUBLE, NULL, &counterVal);
 			// return counterVal.doubleValue;
+			return -1.f;
 		}
 
 		RAINDROP_API float32 CPU::getUsageByProcess(){
@@ -116,6 +117,7 @@ namespace Raindrop::Core::System{
 			// utils.lastSysCPU = sys;
 
 			// return percent * 100;
+			return -1.f;
 		}
 	#endif
 }

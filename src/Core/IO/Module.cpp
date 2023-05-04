@@ -18,7 +18,7 @@
 }
 
 namespace Raindrop::Core::IO{
-	RAINDROP_API Module::Module(const char* path) : _dll(path){
+	RAINDROP_API Module::Module(const std::filesystem::path& path) : _dll(path){
 		RAINDROP_profile_function();
 
 		RAINDROP_set_context(::Raindrop::Core::Debug::Log::__Logger, log);
@@ -65,7 +65,7 @@ namespace Raindrop::Core::IO{
 		return _dll.isOpen() && _loaded;
 	}
 
-	RAINDROP_API const char* Module::filepath() const{
+	RAINDROP_API const std::filesystem::path& Module::filepath() const{
 		RAINDROP_profile_function();
 		return _dll.filepath();
 	}

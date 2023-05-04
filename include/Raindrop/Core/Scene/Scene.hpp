@@ -5,35 +5,31 @@
 #include <Core/Scene/SystemManager.hpp>
 #include <Core/Scene/ComponentManager.hpp>
 #include <Core/Scene/EntityManager.hpp>
-#include <Core/Memory/allocators/Allocator.hpp>
-#include <Core/Memory/containers/HashMap.hpp>
 
 namespace Raindrop::Core::Scene{
 	class RAINDROP_API Scene{
 		public:
-			Scene(Memory::Allocator& allocator, usize capacity);
+			Scene(usize capacity);
 			~Scene();
 
-			ID32 createEntity();
-			void destroyEntity(ID32 entity);
-			bool exists(ID32 entity) const;
+			EntityID createEntity();
+			void destroyEntity(EntityID entity);
 
 			void registerComponent(const char* name, usize typeSize, usize typeAlignement);
 			void removeComponent(const char* name);
 
-			void* getComponent(ID32 entity, ID32 componentID);
-			void setComponent(ID32 entity, ID32 componentID, void* component);
-			bool hasComponent(ID32 entity, ID32 componentID) const;
-			void addComponent(ID32 entity, ID32 componentID, void* component);
-			void eraseComponent(ID32 entity, ID32 componentID);
+			void* getComponent(EntityID entity, ID32 componentID);
+			void setComponent(EntityID entity, ID32 componentID, void* component);
+			bool hasComponent(EntityID entity, ID32 componentID) const;
+			void addComponent(EntityID entity, ID32 componentID, void* component);
+			void eraseComponent(EntityID entity, ID32 componentID);
 
-			void pushSystem(System* system, Signature signature);
-			void popSystem(System* system);
+			void pushSystem(std::shared_ptr<System> system, Signature signature);
+			void popSystem(std::shared_ptr<System> system);
 
 			Signature getComponentSignature(ID32 componentID) const;
 			ID32 getComponentID(const char* name) const;
 			usize capacity() const;
-
 
 			template<typename T>
 			Signature getComponentSignature() const{
@@ -58,57 +54,53 @@ namespace Raindrop::Core::Scene{
 			}
 
 			template<typename T>
-			T& getComponent(ID32 entity){
+			T& getComponent(EntityID entity){
 				return *reinterpret_cast<T*>(getComponent(entity, getComponentID(typeid(T).name())));
 			}
 
 			template<typename T>
-			void setComponent(ID32 entity, T&& t){
+			void setComponent(EntityID entity, T&& t){
 				setComponent(entity, getComponentID(typeid(T).name()), static_cast<void*>(&t));
 			}
 
 
 			template<typename T>
-			bool hasComponent(ID32 entity) const{
+			bool hasComponent(EntityID entity) const{
 				return hasComponent(entity, getComponentID(typeid(T).name()));
 			}
 
 			template<typename T>
-			void addComponent(ID32 entity, T&& component){
+			void addComponent(EntityID entity, T&& component){
 				addComponent(entity, getComponentID(typeid(T).name()), &component);
 			}
 
 			template<typename T>
-			void addComponent(ID32 entity){
+			void addComponent(EntityID entity){
 				addComponent(entity, getComponentID(typeid(T).name()), nullptr);
 			}
 
 			template<typename T>
-			void eraseComponent(ID32 entity){
+			void eraseComponent(EntityID entity){
 				eraseComponent(entity, getComponentID(typeid(T).name()));
 			}
 
 			template<typename T, typename... Args>
-			T* createSystem(Signature signature, Args&&... args){
-				T* system = static_cast<T*>(Memory::allocateNew<T>(_allocator, args...));
-				if (!system) return nullptr;
-				pushSystem(dynamic_cast<System*>(system), signature);
+			std::shared_ptr<T> createSystem(Signature signature, Args&&... args){
+				std::shared_ptr<T> system = std::make_shared<T>(args...);
+				pushSystem(system, signature);
 				return system;
 			}
 
 			template<typename T>
-			void destroySystem(T& t){
-				RAINDROP_assert(t);
-				popSystem(&static_cast<System&>(t));
-				Memory::deallocateDelete(_allocator, t);
+			void destroySystem(std::shared_ptr<T> t){
+				_systemManager.popSystem(t);
 			}
 
 		private:
-			Memory::Allocator& _allocator;
-			Memory::HashMap<const char*, ID32> _nameToID;
-			Memory::List<ID32> _freeComponentIDs;
+			std::unordered_map<const char*, ID32> _nameToID;
+			std::queue<ID32> _freeComponentIDs;
 
-			ComponentManager* _componentManagers[MAX_COMPONENT_COUNT];
+			std::unique_ptr<ComponentManager> _componentManagers[MAX_COMPONENT_COUNT];
 			EntityManager _entityManager;
 			SignatureManager _entitySignatures;
 			SystemManager _systemManager;
@@ -127,8 +119,6 @@ namespace Raindrop::Core::Scene{
 			void _getComponentsSignature(Signature& signature){
 				signature |= getComponentSignature<T>();
 			}
-
-			void deleteSystems();
 	};
 }
 

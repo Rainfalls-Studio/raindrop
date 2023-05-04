@@ -7,14 +7,13 @@ namespace Raindrop::Wrappers{
 	class RAINDROP_API EntityWrapper{
 		friend class SceneWrapper;
 		public:
-			EntityWrapper(Scene* scene, EntityID ID);
+			EntityWrapper(ScenePtr scene, EntityID ID);
 			EntityWrapper();
 			~EntityWrapper();
 
 			EntityWrapper(const EntityWrapper& other);
 			EntityWrapper& operator=(const EntityWrapper& other);
-
-			bool exists() const;
+			
 			bool hasComponent(const char* name) const;
 			bool hasComponent(ComponentID ID) const;
 
@@ -25,12 +24,12 @@ namespace Raindrop::Wrappers{
 
 			template<typename T>
 			T& getComponent(ComponentID ID){
-				return *static_cast<T*>(_scene->getComponent(_ID, ID));
+				return *static_cast<T*>(_scene.lock()->getComponent(_ID, ID));
 			}
 
 			template<typename T>
 			T& getComponent(const char* name){
-				return *static_cast<T*>(_scene->getComponent(_ID, _scene->getComponentID(name)));
+				return *static_cast<T*>(_scene.lock()->getComponent(_ID, _scene.lock()->getComponentID(name)));
 			}
 
 			template<typename T>
@@ -40,8 +39,8 @@ namespace Raindrop::Wrappers{
 
 			template<typename T>
 			T& addComponent(T&& t = T{}, const char* name = typeid(T).name()){
-				ComponentID componentID = _scene->getComponentID(name);
-				_scene->addComponent(_ID, componentID, static_cast<void*>(&t));
+				ComponentID componentID = _scene.lock()->getComponentID(name);
+				_scene.lock()->addComponent(_ID, componentID, static_cast<void*>(&t));
 				return getComponent<T>(componentID);
 			}
 
@@ -53,7 +52,7 @@ namespace Raindrop::Wrappers{
 
 		private:
 
-			Scene* _scene;
+			ScenePtr _scene;
 			EntityID _ID;
 	};
 }

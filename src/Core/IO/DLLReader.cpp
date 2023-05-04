@@ -1,6 +1,7 @@
-#include "Core/IO/DLLReader.hpp"
-#include "Core/Debug/profiler.hpp"
-#include "Core/Debug/logger.hpp"
+#include <Core/IO/DLLReader.hpp>
+#include <Core/Debug/profiler.hpp>
+#include <Core/Debug/logger.hpp>
+#include <fstream>
 
 #if defined(RAINDROP_WINDOWS)
 	#include <windows.h>
@@ -11,15 +12,13 @@
 
 namespace Raindrop::Core::IO{
 	#ifdef RAINDROP_WINDOWS
-		RAINDROP_API DLLReader::DLLReader(const char* filepath) : _filepath{filepath}{
+		RAINDROP_API DLLReader::DLLReader(const std::filesystem::path& filepath) : _filepath{filepath}{
 			RAINDROP_profile_function();
 			RAINDROP_log(INFO, IO, "loading \"%s\" dll library", filepath);
-			_dll = nullptr;
-			_dll = (void*)::LoadLibraryA(filepath);
+			_dll = static_cast<void*>(::LoadLibraryW(filepath.c_str()));
 
 			if (_dll == nullptr){
-				RAINDROP_log(ERROR, IO, "failed to load \"%s\" dll file", filepath);
-				return;
+				throw std::ifstream::failure("failed to open dynamic library file");
 			}
 		}
 
@@ -35,7 +34,7 @@ namespace Raindrop::Core::IO{
 			return _dll != nullptr;
 		}
 
-		RAINDROP_API const char* DLLReader::filepath() const{
+		RAINDROP_API const std::filesystem::path& DLLReader::filepath() const{
 			return _filepath;
 		}
 

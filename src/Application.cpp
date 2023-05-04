@@ -2,25 +2,22 @@
 #include <Core/Debug/profiler.hpp>
 
 namespace Raindrop{
-	RAINDROP_API Application::Application(const char* name, Version version, Core::Memory::Allocator& allocator) : _allocator{allocator}{
+	RAINDROP_API Application::Application(const char* name, Version version){
 		RAINDROP_profile_function();
 		_name = name;
 		_version = version;
 
-		_sceneManager = Core::Memory::allocateNew<Managers::SceneManager>(_allocator, _allocator);
-		_assetManager = Core::Memory::allocateNew<Managers::AssetManager>(_allocator, _allocator);
+		_sceneManager = std::make_unique<Managers::SceneManager>();
+		_assetManager = std::make_unique<Managers::AssetManager>();
 	}
 
 	RAINDROP_API Application::~Application(){
 		RAINDROP_profile_function();
-
-		Core::Memory::deallocateDelete(_allocator, *_sceneManager);
-		Core::Memory::deallocateDelete(_allocator, *_assetManager);
 	}
 
 	RAINDROP_API const char* Application::name() const{
 		RAINDROP_profile_function();
-		return _name.str();
+		return _name.c_str();
 	}
 
 	RAINDROP_API Version Application::version() const{

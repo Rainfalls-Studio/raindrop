@@ -186,4 +186,8 @@ namespace Raindrop::Core::Maths{
 	}
 }
 
+namespace Raindrop{
+	using namespace Core::Maths;
+}
+
 #endif

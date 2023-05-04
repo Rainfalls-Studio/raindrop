@@ -5,10 +5,15 @@
 #include <Core/Scene/Scene.hpp>
 
 namespace Raindrop::Managers{
-	typedef Core::Scene::Scene* ScenePtr;
-	typedef void* AssetPtr;
+	class Asset;
+	class AssetFactory;
 
-	static constexpr ScenePtr INVALID_SCENE_PTR = nullptr;
+	using Raindrop::Core::Scene::Scene;
+	using Raindrop::Core::Scene::EntityID;
+
+
+	using AssetPtr = std::weak_ptr<Asset>;
+	using ScenePtr = std::weak_ptr<Scene>;
 }
 
 #endif

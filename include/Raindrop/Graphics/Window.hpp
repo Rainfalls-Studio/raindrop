@@ -2,15 +2,14 @@
 #define __RAINDROP_GRAPHICS_WINDOW_HPP__
 
 #include <common.hpp>
-#include <Core/Memory/allocators/Allocator.hpp>
 #include <Core/IO/Module.hpp>
 #include <Core/Maths/Maths.hpp>
 
 namespace Raindrop::Graphics{
 	class RAINDROP_API Window{
 		public:
-			Window();
-			virtual ~Window();
+			Window() = default;
+			virtual ~Window() = default;
 
 			virtual void setTitle(const char* title) = 0;
 			virtual void setSize(Core::Maths::vec2<uint32> size) = 0;
@@ -21,7 +20,7 @@ namespace Raindrop::Graphics{
 			virtual const char* getAPI() const = 0;
 			virtual bool loaded() const = 0;
 
-			static Window* create(Core::Memory::Allocator& allocator, Core::IO::Module& module, const char* fnc = "createWindow");
+			static Window* create(Core::IO::Module& module, const char* fnc = "createWindow");
 	};
 }
 

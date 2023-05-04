@@ -1,15 +1,17 @@
 #include <Graphics/GraphicsPlugin.hpp>
 
 namespace Raindrop::Graphics{
-	RAINDROP_API Plugin* Plugin::create(Core::Memory::Allocator& allocator, Core::IO::Module& module, Context& context, Core::Scene::Scene& scene, const char* name){
-		using LoadModuleFnc = Plugin*(*)(Core::Memory::Allocator&, Context&, Core::Scene::Scene&);
-		LoadModuleFnc loadModule = (LoadModuleFnc)module.getFnc(name);
+	GraphicsPlugin::GraphicsPlugin(const std::filesystem::path& path) : _module{path}{}
 
-		if (loadModule){
-			RAINDROP_log(ERROR, GRAPHICS, "cannot found %s graphics plugin in %s module", name, module.filepath());
-			return nullptr;
-		}
+	std::shared_ptr<Renderer> GraphicsPlugin::createRenderer(){
+		using CreateRendererFnc = std::shared_ptr<Renderer>(*)(void);
+		CreateRendererFnc fnc = (CreateRendererFnc)_module.getFnc("create_renderer");
+		return fnc();
+	}
 
-		return loadModule(allocator, context, scene);
+	std::shared_ptr<Window> GraphicsPlugin::createWindow(){
+		using CreateWindowFnc = std::shared_ptr<Window>(*)(void);
+		CreateWindowFnc fnc = (CreateWindowFnc)_module.getFnc("create_window");
+		return fnc();
 	}
 }

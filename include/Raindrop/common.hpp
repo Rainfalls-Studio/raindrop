@@ -1,7 +1,9 @@
 #ifndef __RAINDROP_COMMON_HPP__
 #define __RAINDROP_COMMON_HPP__
 
+#include <filesystem>
 #include <stdexcept>
+#include <algorithm>
 #include <typeinfo>
 #include <utility>
 #include <cstring>

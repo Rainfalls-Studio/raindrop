@@ -8,15 +8,70 @@ namespace Raindrop::Wrappers{
 	class SystemBase : public System{
 		friend class SceneWrapper;
 		public:
-			SystemBase(Core::Memory::Allocator& allocator = RAINDROP_default_allocator) : System(allocator){}
+			SystemBase() : System(){}
 			virtual ~SystemBase() override = default;
 
 		protected:
-			virtual void OnEntityCreate(EntityWrapper entity){};
-			virtual void OnEntityDestroy(EntityWrapper entity){};
+			class Iterator{
+				public:
+					using value_type = std::list<EntityID>::const_iterator;
+					using pointer = std::list<EntityID>::const_iterator*;
+					using reference = std::list<EntityID>::const_iterator&;
+					using iterator_category = std::forward_iterator_tag;
+					using difference_type = std::ptrdiff_t;
 
-			const Core::Memory::DoublyLinkedList<EntityID> getEntities() const{
-				return _entities;
+					Iterator(value_type val, ScenePtr scene) : _val(val), _scene{scene}{}
+
+					EntityWrapper operator*() const {
+						return EntityWrapper(_scene, *_val);
+					}
+
+					Iterator& operator++() {
+						++_val;
+						return *this;
+					}
+
+					Iterator operator++(int) {
+						Iterator tmp(*this);
+						++_val;
+						return tmp;
+					}
+
+					bool operator==(const Iterator& other) const {
+						return _val == other._val;
+					}
+
+					bool operator!=(const Iterator& other) const {
+						return !(*this == other);
+					}
+
+				private:
+					ScenePtr _scene;
+					value_type _val;
+			};
+		
+			class EntityList{
+				public:
+					EntityList(std::list<EntityID>& entities, ScenePtr scene) : _entities{entities}, _scene{scene}{}
+
+					Iterator begin(){
+						return Iterator(_entities.begin(), _scene);
+					}
+
+					Iterator end(){
+						return Iterator(_entities.end(), _scene);
+					}
+
+				private:
+					ScenePtr _scene;
+					std::list<EntityID>& _entities;
+			};
+
+			virtual void OnEntityCreate(EntityWrapper entity){}
+			virtual void OnEntityDestroy(EntityWrapper entity){}
+
+			EntityList entities(){
+				return EntityList(_entities, _scene);
 			}
 
 		private:

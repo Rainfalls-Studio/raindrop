@@ -1,19 +1,18 @@
-#include "Core/Scene/SignatureManager.hpp"
-#include "Core/Scene/Scene.hpp"
+#include <Core/Scene/SignatureManager.hpp>
+#include <Core/Scene/Scene.hpp>
+#include <Core/Debug/profiler.hpp>
 #include <cstring>
 
 namespace Raindrop::Core::Scene{
-	RAINDROP_API SignatureManager::SignatureManager(Memory::Allocator& allocator, usize capacity) : _allocator{allocator}{
+	RAINDROP_API SignatureManager::SignatureManager(usize capacity){
 		RAINDROP_profile_function();
-		_signatures = nullptr;
 		_capacity = capacity;
-		_signatures = Memory::allocateArray<Signature>(_allocator, capacity);
+		_signatures = std::make_unique<Signature[]>(capacity);
 	}
 
 	RAINDROP_API SignatureManager::~SignatureManager(){
 		RAINDROP_profile_function();
-		if (_signatures) _allocator.deallocate(_signatures);
-		_signatures = nullptr;
+		_signatures.release();
 	}
 
 	RAINDROP_API void SignatureManager::setBit(usize i, usize b, bool state){

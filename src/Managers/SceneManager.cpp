@@ -1,47 +1,29 @@
 #include <Managers/SceneManager.hpp>
+#include <Core/Debug/profiler.hpp>
 
 namespace Raindrop::Managers{
-	RAINDROP_API SceneManager::SceneManager(Core::Memory::Allocator& allocator) : _allocator{allocator}{
+	RAINDROP_API SceneManager::SceneManager(){
 		RAINDROP_profile_function();
 	}
 
 	RAINDROP_API SceneManager::~SceneManager(){
 		RAINDROP_profile_function();
-		auto it = _scenes.front();
-
-		// remove remaining undestroyed scenes
-		while (it){
-			ScenePtr scene = *it;
-			_scenes.remove(it);
-			Core::Memory::deallocateDelete(_allocator, static_cast<Core::Scene::Scene&>(*scene));
-			it++;
-		}
+		_scenes.clear();
 	}
 
 	RAINDROP_API ScenePtr SceneManager::createScene(usize capacity){
 		RAINDROP_profile_function();
-		ScenePtr scene = Core::Memory::allocateNew<Core::Scene::Scene>(_allocator, _allocator, capacity);
-		_scenes.push(scene);
-		return scene;
+		SceneData data;
+
+		data._scene = std::make_shared<Scene>(capacity);
+
+		_scenes.push_back(data);
+		return data._scene;
 	}
 
 	RAINDROP_API void SceneManager::destroyScene(ScenePtr scene){
 		RAINDROP_profile_function();
-		if (scene == INVALID_SCENE_PTR) throw std::invalid_argument("cannot destroy this scene. In valid scene");
-
-		removeScene(scene);
-		Core::Memory::deallocateDelete(_allocator, static_cast<Core::Scene::Scene&>(*scene));
+		if (scene.expired()) throw std::invalid_argument("cannot destroy this scene. In valid scene");
+		_scenes.erase(std::find(_scenes.begin(), _scenes.end(), scene));
 	}
-
-	RAINDROP_API void SceneManager::removeScene(ScenePtr scene){
-		RAINDROP_profile_function();
-		auto it = _scenes.front();
-		while (it){
-			if (*it == scene){
-				_scenes.remove(it);
-				break;
-			}
-			it++;
-		}
-	}
-} 
+}

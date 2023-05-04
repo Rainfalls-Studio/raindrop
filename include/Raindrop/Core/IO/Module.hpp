@@ -6,11 +6,11 @@
 namespace Raindrop::Core::IO{
 	class RAINDROP_API Module{
 		public:
-			Module(const char* path);
+			Module(const std::filesystem::path& path);
 			~Module();
 
 			bool isOpen() const;
-			const char* filepath() const;
+			const std::filesystem::path& filepath() const;
 			void* getFnc(const char* name) const;
 		
 		private:
