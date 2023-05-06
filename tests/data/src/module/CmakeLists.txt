@@ -1,0 +1,6 @@
+if(WIN32)
+	set(CMAKE_SHARED_LIBRARY_PREFIX "")
+endif()
+
+add_library(module SHARED module.c)
+set_target_properties(module PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${DATA_OUTPUT_DIRECTORY})
