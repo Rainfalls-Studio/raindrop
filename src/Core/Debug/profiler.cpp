@@ -66,7 +66,7 @@ namespace Raindrop::Core::Debug::Profiler{
 	}
 }
 
-RAINDROP_MODULE void __RAINDROP_profile_setContext(Raindrop::Core::Debug::Profiler::__Profiler* profiler){
+RAINDROP_MODULE  void __RAINDROP_profile_setContext(Raindrop::Core::Debug::Profiler::__Profiler* profiler){
 	Raindrop::Core::Debug::Profiler::__profiler = profiler;
 }
 

@@ -8,30 +8,30 @@ using TestFloatParamaterFunction_t = float(*)(float);
 
 static std::filesystem::path module_path = std::filesystem::path(TEST_DATA_DIR) / "module.dll";
 
-class DLLReaderFixture : public ::testing::Test{
+class ModuleFixture : public ::testing::Test{
 	public:
-		DLLReaderFixture() : Test(){}
+		ModuleFixture() : Test(){}
 	
 		virtual void SetUp() override{}
 		virtual void TearDown() override{}
 
-		DLLReader _dll{module_path};
+		Module _module{module_path};
 };
 
-TEST_F(DLLReaderFixture, initialization){
-	EXPECT_TRUE(_dll.isOpen());
-	EXPECT_EQ(_dll.filepath(), module_path);
+TEST_F(ModuleFixture, intialization){
+	EXPECT_TRUE(_module.isOpen());
+	EXPECT_EQ(_module.filepath(), module_path);
 }
 
-TEST_F(DLLReaderFixture, valid_get_proc){
+TEST_F(ModuleFixture, valid_get_proc){
 	TestVoidFunction_t fnc = nullptr;
-	EXPECT_NO_THROW(fnc = (TestVoidFunction_t)_dll.getProc("testVoidFunction"));
+	EXPECT_NO_THROW(fnc = (TestVoidFunction_t)_module.getFnc("testVoidFunction"));
 	
 	EXPECT_NE(fnc, nullptr);
 	EXPECT_NO_FATAL_FAILURE(fnc());
 }
 
-TEST_F(DLLReaderFixture, invalid_get_proc){
+TEST_F(ModuleFixture, invalid_get_proc){
 	TestVoidFunction_t fnc = nullptr;
-	EXPECT_ANY_THROW(fnc = (TestVoidFunction_t)_dll.getProc("nonexistantFonction"));
+	EXPECT_ANY_THROW(fnc = (TestVoidFunction_t)_module.getFnc("nonexistantFonction"));
 }
