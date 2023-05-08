@@ -27,4 +27,8 @@ namespace Raindrop::Core::Scene{
 		if (entity >= _capacity) throw std::out_of_range("cannot destroy the entity, the ID is out of the bounding of the manager");
 		_freeEntities.push(entity);
 	}
+
+	usize RAINDROP_API EntityManager::capacity() const{
+		return _capacity;
+	}
 }

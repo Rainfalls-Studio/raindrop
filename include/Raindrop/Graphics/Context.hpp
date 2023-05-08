@@ -1,16 +1,11 @@
 #ifndef __RAINDROP_GRAPHCICS_CONTEXT_HPP__
 #define __RAINDROP_GRAPHCICS_CONTEXT_HPP__
 
-#include <common.hpp>
-#include <Core/IO/Module.hpp>
+#include <Graphics/common.hpp>
 #include <Core/Maths/Maths.hpp>
 #include <Core/Scene/Scene.hpp>
 
 namespace Raindrop::Graphics{
-	class Renderer;
-	class Window;
-	class Plugin;
-
 	class RAINDROP_API Context{
 		public:
 			Context() = default;

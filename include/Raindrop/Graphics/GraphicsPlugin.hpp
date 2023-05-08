@@ -4,15 +4,19 @@
 #include <Graphics/common.hpp>
 
 namespace Raindrop::Graphics{
-	class RAINDROP_API GraphicsPlugin{
+	class RAINDROP_API GraphicsPlugin : public Core::IO::Plugin{
 		public:
-			GraphicsPlugin(const std::filesystem::path& path);
+			GraphicsPlugin() = default;
+			virtual ~GraphicsPlugin() = default;
 
-			std::shared_ptr<Renderer> createRenderer();
-			std::shared_ptr<Window> createWindow();
+			GraphicsPlugin(const GraphicsPlugin& other) = delete;
+			GraphicsPlugin& operator=(const GraphicsPlugin& other) = delete;
 
-		private:
-			Module _module;
+			virtual Version version() const override = 0;
+			virtual const char* name() const override = 0;
+
+			virtual std::shared_ptr<Renderer> createRenderer() = 0;
+			virtual std::shared_ptr<Window> createWindow() = 0;
 	};
 }
 

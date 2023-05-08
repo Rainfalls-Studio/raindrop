@@ -2,7 +2,7 @@
 #define __RAINDROP_GRAPHICS_COMMON_HPP__
 
 #include <common.hpp>
-#include <Core/IO/Module.hpp>
+#include <Core/IO/Plugin.hpp>
 
 namespace Raindrop::Graphics{
 	class Renderer;
@@ -10,7 +10,7 @@ namespace Raindrop::Graphics{
 	class Window;
 	class GraphicsPlugin;
 
-	using Core::IO::Module;
+	using Core::IO::Plugin;
 }
 
 #endif

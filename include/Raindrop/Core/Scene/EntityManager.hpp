@@ -21,10 +21,15 @@ namespace Raindrop::Core::Scene{
 			/**
 			 * @brief release the ID has an ID that can be used again
 			 * @param entity the ID to release
-			 * 
-			 * @exception std::invalid_argument (ONLY IN DEBUG MODE) whene the user release an ID that is already released
+			 * @warning the engine does not check if the ID is already released
 			 */
 			void destroy(EntityID entity);
+
+			/**
+			 * @brief get the total capacity of the entity manager
+			 * @return usize 
+			 */
+			usize capacity() const;
 
 		private:
 			std::queue<EntityID> _freeEntities;

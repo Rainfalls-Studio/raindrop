@@ -19,8 +19,6 @@ namespace Raindrop::Graphics{
 			virtual Core::Maths::vec2<uint32> getPosition() const = 0;
 			virtual const char* getAPI() const = 0;
 			virtual bool loaded() const = 0;
-
-			static Window* create(Core::IO::Module& module, const char* fnc = "createWindow");
 	};
 }
 
