@@ -19,6 +19,9 @@ namespace Raindrop::Graphics{
 			virtual Core::Maths::vec2<uint32> getPosition() const = 0;
 			virtual const char* getAPI() const = 0;
 			virtual bool loaded() const = 0;
+			
+			virtual void enableVSync(bool enable) = 0;
+			virtual bool isVSyncEnabled() const = 0;
 	};
 }
 

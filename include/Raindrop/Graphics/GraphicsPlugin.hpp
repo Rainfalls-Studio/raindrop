@@ -16,7 +16,6 @@ namespace Raindrop::Graphics{
 			virtual const char* name() const override = 0;
 
 			virtual std::shared_ptr<Renderer> createRenderer() = 0;
-			virtual std::shared_ptr<Window> createWindow() = 0;
 	};
 }
 

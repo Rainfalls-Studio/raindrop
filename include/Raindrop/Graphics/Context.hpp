@@ -14,8 +14,6 @@ namespace Raindrop::Graphics{
 			virtual bool begin() = 0;
 			virtual void end() = 0;
 			virtual void setClearColor(Core::Maths::vec4<float32> color) = 0;
-			virtual void enableVSync(bool enable) = 0;
-			virtual bool isVSyncEnabled() const = 0;
 	};
 }
 

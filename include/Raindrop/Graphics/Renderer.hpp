@@ -14,6 +14,7 @@ namespace Raindrop::Graphics{
 
 			virtual const char* name() const = 0;
 			virtual std::shared_ptr<Context> createContext(std::shared_ptr<Window> window) = 0;
+			virtual std::shared_ptr<Window> createWindow() = 0;
 
 	};
 }
