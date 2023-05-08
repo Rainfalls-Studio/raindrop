@@ -11,6 +11,13 @@ namespace Raindrop::Core::IO{
 
 			virtual Version version() const = 0;
 			virtual const char* name() const = 0;
+
+			template<typename... Args>
+			static std::shared_ptr<Plugin> createPlugin(Module& module, const char* name, Args... args){
+				using LoadFnc = std::shared_ptr<Plugin>(*)(Args...);
+				LoadFnc fnc = reinterpret_cast<LoadFnc>(module.getFnc(name));
+				return fnc(args...);
+			}
 	};
 }
 

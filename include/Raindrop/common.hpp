@@ -111,6 +111,13 @@ namespace Raindrop{
 		uint16 major;
 		uint16 minor;
 		uint16 patch;
+
+		Version() = default;
+		Version(uint16 major, uint16 minor, uint16 patch) : major{major}, minor{minor}, patch{patch}{}
+		
+		bool operator==(const Version& other) const{
+			return major == other.major && minor == other.minor && patch == other.patch;
+		}
 	};
 
 	template <typename... Args>
