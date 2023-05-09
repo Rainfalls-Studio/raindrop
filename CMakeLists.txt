@@ -16,7 +16,8 @@ set(GTEST_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libs/gtest/googleTest/include
 set(RAINDROP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/ ${GLM_INCLUDE_DIRS}")
 set(CURRENT_SCOPE ${CMAKE_PROJECT_NAME})
 
-include_directories(${CMAKE_SOURCE_DIR}/include/Raindrop/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/Raindrop/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/)
 include_directories(${GLM_INCLUDE_DIRS})
 include_directories(${GTEST_INCLUDE_DIRS})
 
