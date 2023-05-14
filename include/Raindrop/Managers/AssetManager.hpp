@@ -10,6 +10,13 @@ namespace Raindrop::Managers{
 			AssetManager();
 			~AssetManager();
 
+			/**
+			 * @brief load or create an asset from a path. Depending of the asset type. A new file can be created. An execption can be thrown if the file does not exists. Follow the asset types documentation to properly use the asset manager
+			 * 
+			 * @tparam T 
+			 * @param path 
+			 * @return std::weak_ptr<T> 
+			 */
 			template<typename T>
 			std::weak_ptr<T> getOrCreate(const std::filesystem::path& path){
 				{

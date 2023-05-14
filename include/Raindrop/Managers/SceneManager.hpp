@@ -1,9 +1,7 @@
 #ifndef __RAINDROP_MANAGERS_SCENE_MANAGER_HPP__
 #define __RAINDROP_MANAGERS_SCENE_MANAGER_HPP__
 
-#include <common.hpp>
 #include <Managers/common.hpp>
-#include <Core/Scene/Scene.hpp>
 
 namespace Raindrop::Managers{
 	class RAINDROP_API SceneManager{

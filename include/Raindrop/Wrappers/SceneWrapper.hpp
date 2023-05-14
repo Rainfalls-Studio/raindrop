@@ -130,10 +130,15 @@ namespace Raindrop::Wrappers{
 			template<typename T, typename... Args>
 			T& createSystem(Signature signature, Args&&... args){
 				if constexpr (!std::is_base_of<SystemBase, T>::value) throw std::invalid_argument("cannot create a system with a class that is not derived from the Raindrop Base System class");
-				T* system = _scene.lock()->createSystem<T, Args...>(signature, args...);
-				SystemBase* base = static_cast<SystemBase*>(system);
-				base->_scene = _scene;
-				return *system;
+
+				if (auto scene = _scene.lock()){
+					T* system = scene->createSystem<T, Args...>(signature, args...);
+					SystemBase* base = static_cast<SystemBase*>(system);
+					base->_scene = _scene;
+					return *system;
+				} else {
+					throw std::runtime_error("the scene is expired");
+				}
 			}
 
 			/**
@@ -146,17 +151,28 @@ namespace Raindrop::Wrappers{
 			template<typename T>
 			T& createSystem(Signature signature){
 				if constexpr (!std::is_base_of<SystemBase, T>::value) throw std::invalid_argument("cannot create a system with a class that is not derived from the Raindrop Base System class");
-				T* system = _scene.lock()->createSystem<T>(signature);
-				SystemBase* base = static_cast<SystemBase*>(system);
-				base->_scene = _scene;
-				return *system;
+
+				if (auto scene = _scene.lock()){
+					T* system = scene->createSystem<T>(signature);
+					SystemBase* base = static_cast<SystemBase*>(system);
+					base->_scene = _scene;
+					return *system;
+				} else {
+					throw std::runtime_error("the scene is expired");
+				}
 			}
 
 			template<typename T>
 			void destoySystem(T& t){
 				if constexpr (!std::is_base_of<SystemBase, T>::value) throw std::invalid_argument("cannot destroy a system with a class that is not derived from the Raindrop Base System class");
-				_scene.lock()->destroySystem<T>(t);
+				if (auto scene = _scene.lock()){
+					scene->destroySystem<T>(t);
+				} else {
+					throw std::runtime_error("the scene is expired");
+				}
 			}
+
+			bool expired() const;
 
 		private:
 			Managers::ScenePtr _scene;

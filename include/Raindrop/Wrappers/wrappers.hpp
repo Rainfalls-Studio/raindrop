@@ -5,12 +5,14 @@
 #include <Wrappers/EntityWrapper.hpp>
 #include <Wrappers/SceneWrapper.hpp>
 #include <Wrappers/SystemWrapper.hpp>
+#include <Wrappers/ModuleWrapper.hpp>
 
 namespace Raindrop{
-	typedef Wrappers::SceneWrapper Scene;
-	typedef Wrappers::EntityWrapper Entity;
-	typedef Wrappers::Signature Signature;
-	typedef Wrappers::SystemBase SystemBase;
+	using Scene = Wrappers::SceneWrapper;
+	using Entity = Wrappers::EntityWrapper;
+	using Signature = Wrappers::Signature;
+	using SystemBase = Wrappers::SystemBase;
+	using Module = Wrappers::ModuleWrapper;
 
 	using Wrappers::INVALID_COMPONENT;
 	using Wrappers::INVALID_ENTITY;

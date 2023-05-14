@@ -8,4 +8,6 @@
 	#error "cannot compile the tests without a valid data directory"
 #endif
 
+static std::filesystem::path data = TEST_DATA_DIR;
+
 #endif

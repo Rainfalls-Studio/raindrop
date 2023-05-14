@@ -17,15 +17,27 @@ namespace Raindrop::Wrappers{
 	}
 
 	RAINDROP_API void SceneWrapper::destroyEntity(EntityWrapper entity){
-		_scene.lock()->destroyEntity(entity._ID);
+		if (auto scene = _scene.lock()){
+			scene->destroyEntity(entity._ID);
+		} else {
+			throw std::runtime_error("the scene is expired");
+		}
 	}
 
 	RAINDROP_API usize SceneWrapper::capacity(){
-		return _scene.lock()->capacity();
+		if (auto scene = _scene.lock()){
+			return scene->capacity();
+		} else {
+			throw std::runtime_error("the scene is expired");
+		}
 	}
 
 	RAINDROP_API ComponentID SceneWrapper::getComponentID(const char* name) const{
-		return _scene.lock()->getComponentID(name);
+		if (auto scene = _scene.lock()){
+			return scene->getComponentID(name);
+		} else {
+			throw std::runtime_error("the scene is expired");
+		}
 	}
 
 	RAINDROP_API Managers::ScenePtr SceneWrapper::getScenePtr() const{
@@ -33,14 +45,30 @@ namespace Raindrop::Wrappers{
 	}
 
 	RAINDROP_API void SceneWrapper::_registerComponent(const char* name, usize size, usize alignement){
-		_scene.lock()->registerComponent(name, size, alignement);
+		if (auto scene = _scene.lock()){
+			scene->registerComponent(name, size, alignement);
+		} else {
+			throw std::runtime_error("the scene is expired");
+		}
 	}
 
 	RAINDROP_API void SceneWrapper::_removeComponent(const char* name){
-		_scene.lock()->removeComponent(name);
+		if (auto scene = _scene.lock()){
+			scene->removeComponent(name);
+		} else {
+			throw std::runtime_error("the scene is expired");
+		}
 	}
 
 	RAINDROP_API Signature SceneWrapper::_getComponentSignature(const char* name) const{
-		return _scene.lock()->getComponentSignature(getComponentID(name));
+		if (auto scene = _scene.lock()){
+			return scene->getComponentSignature(getComponentID(name));
+		} else {
+			throw std::runtime_error("the scene is expired");
+		}
+	}
+
+	RAINDROP_API bool SceneWrapper::expired() const{
+		return _scene.expired();
 	}
 }

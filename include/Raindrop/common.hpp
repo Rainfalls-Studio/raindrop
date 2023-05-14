@@ -2,6 +2,7 @@
 #define __RAINDROP_COMMON_HPP__
 
 #include <filesystem>
+#include <functional>
 #include <stdexcept>
 #include <algorithm>
 #include <typeinfo>

@@ -14,7 +14,7 @@ class Plugin : public ::Raindrop::Core::IO::Plugin{
 		}
 };
 
-RAINDROP_MODULE std::shared_ptr<Plugin> testPlugin(){
+RAINDROP_MODULE std::shared_ptr<Plugin> create_TestPlugin(){
 	return std::make_shared<Plugin>();
 }
 

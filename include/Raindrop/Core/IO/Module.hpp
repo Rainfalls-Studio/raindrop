@@ -2,6 +2,7 @@
 #define __RAINDROP_CORE_IO_MODULE_HPP__
 
 #include <Core/IO/common.hpp>
+#include <Core/IO/DLLReader.hpp>
 
 namespace Raindrop::Core::IO{
 	class RAINDROP_API Module{
