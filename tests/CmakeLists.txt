@@ -1,9 +1,6 @@
 include_directories(${RAINDROP_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory(data)
-
-add_definitions(-DTEST_DATA_DIR="${CMAKE_CURRENT_BINARY_DIR}/data")
-
 add_subdirectory(UnitTests)
 add_subdirectory(IntegrationTests)
+

@@ -1,14 +1,15 @@
-#ifndef __RAINDORP_CORE_SCENE_COMPONENTS_HPP__
-#define __RAINDORP_CORE_SCENE_COMPONENTS_HPP__
+#ifndef __RAINDROP_CORE_SCENE_COMPONENTS_HPP__
+#define __RAINDROP_CORE_SCENE_COMPONENTS_HPP__
 
-#include <common.hpp>
-#include <Core/Maths/Maths.hpp>
+#include <Raindrop/Core/Scene/common.hpp>
 
 namespace Raindrop::Core::Scene::Components{
+	using Tag = std::string;
+
 	struct Transform{
-		Maths::vec3<float> translation;
-		Maths::vec3<float> rotation;
-		Maths::vec3<float> scale;
+		glm::vec3 translation;
+		glm::vec3 scale;
+		glm::vec3 rotation;
 	};
 }
 

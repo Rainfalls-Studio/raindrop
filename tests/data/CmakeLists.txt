@@ -1,2 +1,0 @@
-set(DATA_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-add_subdirectory(src)

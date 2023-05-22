@@ -1,27 +1,39 @@
 #ifndef __RAINDROP_GRAPHICS_WINDOW_HPP__
 #define __RAINDROP_GRAPHICS_WINDOW_HPP__
 
-#include <common.hpp>
-#include <Core/IO/Module.hpp>
-#include <Core/Maths/Maths.hpp>
+#include <Raindrop/Graphics/common.hpp>
 
 namespace Raindrop::Graphics{
-	class RAINDROP_API Window{
+	class Window{
 		public:
-			Window() = default;
-			virtual ~Window() = default;
+			Window(Core::Event::EventManager& eventManager);
+			virtual ~Window();
 
-			virtual void setTitle(const char* title) = 0;
-			virtual void setSize(Core::Maths::vec2<uint32> size) = 0;
-			virtual void setPosition(Core::Maths::vec2<uint32> position) = 0;
-			virtual const char* getTitle() const = 0;
-			virtual Core::Maths::vec2<uint32> getSize() const = 0;
-			virtual Core::Maths::vec2<uint32> getPosition() const = 0;
-			virtual const char* getAPI() const = 0;
-			virtual bool loaded() const = 0;
+			void setTitle(const char* title);
+			void setSize(glm::u32vec2 size);
+			void setPosition(glm::u32vec2 position);
+			const char* getTitle() const;
+			glm::u32vec2 getSize() const;
+			glm::u32vec2 getPosition() const;
+			bool loaded() const;
+			SDL_Window* get() const;
+
+			void events();
 			
-			virtual void enableVSync(bool enable) = 0;
-			virtual bool isVSyncEnabled() const = 0;
+			bool resized() const;
+			void resetResizedFlag();
+		
+		private:
+			Core::Event::EventManager& _eventManager;
+			SDL_Window* _window;
+
+			void quitEvent();
+			void windowEvent(SDL_Event& e);
+			void windowResizedEvent(SDL_WindowEvent& e);
+			void mouseMotionEvent(SDL_Event& e);
+			void mouseClicked(SDL_Event& e);
+
+			bool _resized = false;
 	};
 }
 
