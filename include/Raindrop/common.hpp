@@ -7,6 +7,7 @@
 #include <functional>
 #include <algorithm>
 #include <utility>
+#include <filesystem>
 
 #include <vector>
 #include <list>

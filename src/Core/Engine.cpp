@@ -21,6 +21,10 @@ namespace Raindrop::Core{
 	Scene::Scene& Engine::scene(){
 		return _scene;
 	}
+
+	Asset::AssetManager& Engine::assetManager(){
+		return _assetManager;
+	}
 	
 	void Engine::mainloop(){
 		launched = true;
