@@ -2,6 +2,7 @@
 #define __RAINDROP_COMMON_HPP__
 
 #include <glm/glm.hpp>
+#include <easylogging++.h>
 
 #include <memory>
 #include <functional>

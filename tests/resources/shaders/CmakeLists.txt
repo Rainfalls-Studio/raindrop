@@ -1,0 +1,4 @@
+find_package(Vulkan REQUIRED COMPONENT glslc)
+find_program(glslc_executable NAMES glslc HINT Vulkan::glslc)
+
+add_subdirectory(default)

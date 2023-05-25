@@ -15,10 +15,10 @@ namespace Raindrop::Graphics::Factory{
 		private:
 			VkAllocationCallbacks* _allocationCallbacks = nullptr;
 			std::shared_ptr<Device> _device;
+			std::list<std::shared_ptr<Shader>> _shaders;
 
 			std::shared_ptr<Shader> loadSPV(const std::filesystem::path& path);
 
-			std::list<std::shared_ptr<Shader>> _shaders;
 	};
 }
 

@@ -1,0 +1,13 @@
+file(GLOB shaders *.glsl.*)
+
+foreach(source IN LISTS shaders)
+	get_filename_component(FILENAME ${source} NAME)
+	add_custom_command(
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.spv
+		COMMAND ${glslc_executable} -o ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.spv ${source}
+		DEPENDS ${source} ${CMAKE_CURRENT_BINARY_DIR}
+		COMMENT "Compiling ${FILENAME}"
+	)
+	list(APPEND SPV_shaders ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.spv)
+endforeach()
+add_custom_target(shaders ALL DEPENDS ${SPV_shaders})
