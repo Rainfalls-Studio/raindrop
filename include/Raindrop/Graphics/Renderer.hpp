@@ -4,11 +4,12 @@
 #include <Raindrop/Graphics/common.hpp>
 #include <Raindrop/Graphics/builders/InstanceBuilder.hpp>
 #include <Raindrop/Graphics/PhysicalDeviceManager.hpp>
+#include <Raindrop/Graphics/factory/ShaderFactory.hpp>
 
 namespace Raindrop::Graphics{
 	class Renderer{
 		public:
-			Renderer(Core::Event::EventManager& eventManager);
+			Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager);
 			~Renderer();
 
 			std::shared_ptr<Instance> instance() const;
@@ -18,6 +19,7 @@ namespace Raindrop::Graphics{
 		
 		private:
 			Core::Event::EventManager& _eventManager;
+			Core::Asset::AssetManager& _assetManager;
 			std::shared_ptr<Instance> _instance;
 			std::shared_ptr<PhysicalDeviceManager> _physicalDeviceManager;
 			std::shared_ptr<Device> _device;
@@ -27,6 +29,7 @@ namespace Raindrop::Graphics{
 			std::vector<VkCommandBuffer> _graphicsCommandBuffers;
 			VkSurfaceKHR _surface = VK_NULL_HANDLE;
 			VkCommandPool _graphicsCommandPool = VK_NULL_HANDLE;
+			std::shared_ptr<Factory::ShaderFactory> _shaderFactory; 
 
 			VkQueue _graphicsQueue;
 			VkQueue _presentQueue;
@@ -42,10 +45,13 @@ namespace Raindrop::Graphics{
 			
 			void destroyGraphicsCommandBuffers();
 			void destroyGraphicsCommandPool();
+
+			void registerFactories();
+			void registerShaderFactory();
+			void eraseFactories();
 			
 			std::shared_ptr<PhysicalDevice> findSuitablePhysicalDevice();
 			VkCommandBuffer getCurrentGraphicsCommandBuffer();
-
 
 			VkCommandBuffer beginFrame();
 			void endFrame();

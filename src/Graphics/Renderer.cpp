@@ -5,16 +5,18 @@
 #include <Raindrop/Graphics/PhysicalDevice.hpp>
 #include <Raindrop/Graphics/Device.hpp>
 #include <Raindrop/Graphics/Swapchain.hpp>
+#include <Raindrop/Core/Asset/AssetManager.hpp>
 #include <SDL2/SDL_vulkan.h>
 
 namespace Raindrop::Graphics{
-	Renderer::Renderer(Core::Event::EventManager& eventManager) : _eventManager{eventManager}{
+	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager) : _eventManager{eventManager}, _assetManager{assetManager}{
 		createInstance();
 		createPhysicalDeviceManager();
 
 		createWindow();
 		createSurface();
 		createDevice();
+		registerFactories();
 		createSwapchain();
 		createGraphicsCommandPool();
 		createGraphicsCommandBuffers();
@@ -22,6 +24,7 @@ namespace Raindrop::Graphics{
 
 	Renderer::~Renderer(){
 		_device->waitIdle();
+		eraseFactories();
 		_swapchain.reset();
 		if (_surface) vkDestroySurfaceKHR(_instance->get(), _surface, nullptr);
 		destroyGraphicsCommandBuffers();
@@ -184,4 +187,16 @@ namespace Raindrop::Graphics{
 		vkDestroyCommandPool(_device->get(), _graphicsCommandPool, nullptr);
 	}
 
+	void Renderer::registerFactories(){
+		registerShaderFactory();
+	}
+
+	void Renderer::registerShaderFactory(){
+		_shaderFactory = std::make_shared<Factory::ShaderFactory>(_device);
+		_assetManager.linkFactory(".spv", _shaderFactory);
+	}
+
+	void Renderer::eraseFactories(){
+		_shaderFactory.reset();
+	}
 }
