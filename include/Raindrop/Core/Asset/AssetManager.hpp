@@ -10,18 +10,20 @@ namespace Raindrop::Core::Asset{
 			~AssetManager();
 
 			void linkFactory(const std::filesystem::path& extension, std::shared_ptr<AssetFactory> factory);
-			std::shared_ptr<Asset> loadOrGet(const std::filesystem::path& path);
+			void destroyLink(const std::filesystem::path& extension);
+
+			std::weak_ptr<Asset> loadOrGet(const std::filesystem::path& path);
 
 			template<typename T>
-			std::shared_ptr<T> loadOrGet(const std::filesystem::path& path){
-				return std::static_pointer_cast<T>(loadOrGet(path));
+			std::weak_ptr<T> loadOrGet(const std::filesystem::path& path){
+				return std::static_pointer_cast<T>(loadOrGet(path).lock());
 			}
 
 		private:
-			std::unordered_map<std::filesystem::path, std::shared_ptr<AssetFactory>> _extensionToFactory;
-			std::unordered_map<std::filesystem::path, std::shared_ptr<Asset>> _pathToAsset;
+			std::unordered_map<std::filesystem::path, std::weak_ptr<AssetFactory>> _extensionToFactory;
+			std::unordered_map<std::filesystem::path, std::weak_ptr<Asset>> _pathToAsset;
 
-			std::shared_ptr<AssetFactory> findFactory(const std::filesystem::path& extension);
+			AssetFactory* findFactory(const std::filesystem::path& extension);
 	};
 }
 

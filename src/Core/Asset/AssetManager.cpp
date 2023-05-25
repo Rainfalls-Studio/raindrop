@@ -3,36 +3,47 @@
 
 namespace Raindrop::Core::Asset{
 	AssetManager::AssetManager(){}
-
-	AssetManager::~AssetManager(){
-		for (auto& s : _pathToAsset){
-			auto factory = findFactory(s.first.extension());
-			if (factory){
-				factory->destroyAsset(s.second);
-			}
-		}
-	}
+	AssetManager::~AssetManager(){}
 
 	void AssetManager::linkFactory(const std::filesystem::path& extension, std::shared_ptr<AssetFactory> factory){
 		_extensionToFactory[extension] = factory;
 	}
 
-	std::shared_ptr<Asset> AssetManager::loadOrGet(const std::filesystem::path& path){
-		std::shared_ptr<AssetFactory> factory = findFactory(path.extension());
+	void AssetManager::destroyLink(const std::filesystem::path& extension){
+		_extensionToFactory.erase(extension);
+	}
+
+	std::weak_ptr<Asset> AssetManager::loadOrGet(const std::filesystem::path& path){
+		auto it = _pathToAsset.find(path);
+		if (it != _pathToAsset.end()){
+			if (!it->second.expired()){
+				return it->second;
+			}
+			_pathToAsset.erase(it);
+		}
+
+		AssetFactory* factory = findFactory(path.extension());
 		if (!factory){
 			std::stringstream err;
 			err << "Failed to find the asset factory corresponding to " << path.extension() << " extension : " << path;
 			throw std::runtime_error(err.str());
 		}
-		return factory->createAsset(path);
+		auto asset = factory->createAsset(path);
+		_pathToAsset[path] = asset;
+		return asset;
 	}
 
-	std::shared_ptr<AssetFactory> AssetManager::findFactory(const std::filesystem::path& extension){
+	AssetFactory* AssetManager::findFactory(const std::filesystem::path& extension){
 		auto it = _extensionToFactory.find(extension);
 		if (it == _extensionToFactory.end()){
 			return nullptr;
 		}
-		return it->second;
-	}
 
+		if (auto factory = it->second.lock()){
+			return factory.get();
+		}
+
+		_extensionToFactory.erase(extension);
+		return nullptr;
+	}
 }

@@ -5,14 +5,7 @@
 
 using namespace Raindrop::Core::Asset;
 
-class AssetManagerTest : public ::testing::Test{
-	public:
-		virtual ~AssetManagerTest() override = default;
 
-		static AssetManager _assetManager;
-};
-
-AssetManager AssetManagerTest::_assetManager;
 
 class AssetTest : public Asset{
 	public:
@@ -37,12 +30,28 @@ class AssetFactoryTest : public AssetFactory{
 		}
 };
 
+class AssetManagerTest : public ::testing::Test{
+	public:
+		virtual ~AssetManagerTest() override = default;
+
+		static AssetManager _assetManager;
+		static std::shared_ptr<AssetFactoryTest> _factory;
+};
+
+AssetManager AssetManagerTest::_assetManager;
+std::shared_ptr<AssetFactoryTest> AssetManagerTest::_factory;
+
 TEST_F(AssetManagerTest, valid_factory_linking){
-	std::shared_ptr<AssetFactoryTest> factory = std::make_unique<AssetFactoryTest>();
-	_assetManager.linkFactory(".txt", std::static_pointer_cast<AssetFactory>(factory));
+	_factory = std::make_unique<AssetFactoryTest>();
+	_assetManager.linkFactory(".txt", std::static_pointer_cast<AssetFactory>(_factory));
 }
 
 TEST_F(AssetManagerTest, load_valid_asset){
 	auto asset = _assetManager.loadOrGet<AssetTest>("asset.txt");
-	EXPECT_EQ(asset->get1(), 1);
+	EXPECT_EQ(asset.lock()->get1(), 1);
+}
+
+TEST_F(AssetManagerTest, factory_reset){
+	_factory.reset();
+	EXPECT_ANY_THROW(_assetManager.loadOrGet<AssetTest>("asset.txt"));
 }
