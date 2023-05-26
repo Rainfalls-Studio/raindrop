@@ -10,6 +10,11 @@
 
 namespace Raindrop::Graphics{
 	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager) : _eventManager{eventManager}, _assetManager{assetManager}{
+		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics");
+		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
+
+		
+		CLOG(INFO, "Engine.Graphics") << "Creating renderer ...";
 		createInstance();
 		createPhysicalDeviceManager();
 
@@ -20,9 +25,11 @@ namespace Raindrop::Graphics{
 		createSwapchain();
 		createGraphicsCommandPool();
 		createGraphicsCommandBuffers();
+		CLOG(INFO, "Engine.Graphics") << "Created renderer with success !";
 	}
 
 	Renderer::~Renderer(){
+		CLOG(INFO, "Engine.Graphics") << "Destroying renderer ...";
 		_device->waitIdle();
 		eraseFactories();
 		_swapchain.reset();
@@ -32,6 +39,7 @@ namespace Raindrop::Graphics{
 		_device.reset();
 		_physicalDeviceManager.reset();
 		_instance.reset();
+		CLOG(INFO, "Engine.Graphics") << "Destroyed renderer with success !";
 	}
 
 	void Renderer::update(){
@@ -46,10 +54,13 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::createSurface(){
+		CLOG(INFO, "Engine.Graphics") << "Creating renderer vulkan surface ...";
 		SDL_Vulkan_CreateSurface(_window->get(), _instance->get(), &_surface);
+		CLOG(INFO, "Engine.Graphics") << "Created renderer vulkan surface with success !";
 	}
 
 	void Renderer::createInstance(){
+		CLOG(INFO, "Engine.Graphics") << "Creating renderer vulkan instance ...";
 		Builders::InstanceBuilder builder;
 
 		builder.setEngineName("Raindrop");
@@ -62,13 +73,17 @@ namespace Raindrop::Graphics{
 		builder.requireValidationLayer("VK_LAYER_KHRONOS_validation");
 
 		_instance = builder.build();
+		CLOG(INFO, "Engine.Graphics") << "created Renderer vulkan instance created with success !";
 	}
 
 	void Renderer::createPhysicalDeviceManager(){
+		CLOG(INFO, "Engine.Graphics") << "Creating renderer physical device manager ...";
 		_physicalDeviceManager = std::make_shared<PhysicalDeviceManager>(_instance);
+		CLOG(INFO, "Engine.Graphics") << "created Renderer vulkan instance created with success !";
 	}
 
 	void Renderer::createDevice(){
+		CLOG(INFO, "Engine.Graphics") << "Creating renderer device ...";
 		Builders::DeviceBuilder builder;
 
 		builder.setPhysicalDevice(findSuitablePhysicalDevice());
@@ -78,6 +93,7 @@ namespace Raindrop::Graphics{
 
 		_graphicsQueue = _device->families()[_device->graphicsFamily()].queues[0];
 		_presentQueue = _device->families()[_device->presentFamily(_surface)].queues[0];
+		CLOG(INFO, "Engine.Graphics") << "Created renderer vulkan device with success !";
 	}
 
 	std::shared_ptr<PhysicalDevice> Renderer::findSuitablePhysicalDevice(){
@@ -89,14 +105,18 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::createWindow(){
+		CLOG(INFO, "Engine.Graphics") << "Creating renderer window ...";
 		_window = std::make_shared<Window>(_eventManager);
+		CLOG(INFO, "Engine.Graphics") << "Created renderer window with success !";
 	}
 
 	void Renderer::createSwapchain(){
+		CLOG(INFO, "Engine.Graphics") << "Creating renderer swapchain ...";
 		auto size = _window->getSize();
 		_swapchain = std::make_unique<Swapchain>(_device, _surface, VkExtent2D{size.x, size.y});
 		_swapchain->setGraphicsQueue(_graphicsQueue);
 		_swapchain->setPresentQueue(_presentQueue);
+		CLOG(INFO, "Engine.Graphics") << "Created renderer swapchain with success !";
 	}
 
 	std::shared_ptr<Instance> Renderer::instance() const{
@@ -188,7 +208,9 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::registerFactories(){
+		CLOG(INFO, "Engine.Graphics") << "registering renderer asset factories ...";
 		registerShaderFactory();
+		CLOG(INFO, "Engine.Graphics") << "registred renderer asset factories with success !";
 	}
 
 	void Renderer::registerShaderFactory(){

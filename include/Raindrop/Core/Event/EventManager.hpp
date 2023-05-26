@@ -14,19 +14,11 @@ namespace Raindrop::Core::Event{
 
 	class EventManager{
 		public:
-			EventManager() = default;
-			~EventManager() = default;
+			EventManager();
+			~EventManager();
 
-			void subscribe(const std::string& name, Callback callback){
-				_nameToCallbacksMap[name].push_back(callback);
-			}
-
-			void trigger(const std::string& name){
-				auto& callbacks = _nameToCallbacksMap[name];
-				for (auto &c : callbacks){
-					c();
-				}
-			}
+			void subscribe(const std::string& name, Callback callback);
+			void trigger(const std::string& name);
 
 		private:
 			std::unordered_map<std::string, std::list<Callback>> _nameToCallbacksMap;

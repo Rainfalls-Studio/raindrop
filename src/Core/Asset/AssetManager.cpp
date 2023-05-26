@@ -2,8 +2,15 @@
 #include <Raindrop/Core/Asset/AssetFactory.hpp>
 
 namespace Raindrop::Core::Asset{
-	AssetManager::AssetManager(){}
-	AssetManager::~AssetManager(){}
+	AssetManager::AssetManager(){
+		el::Logger* customLogger = el::Loggers::getLogger("AssetManager");
+		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
+		CLOG(INFO, "AssetManager") << "New Asset Manager";
+	}
+
+	AssetManager::~AssetManager(){
+		CLOG(INFO, "AssetManager") << "Destroying Asset Manager";
+	}
 
 	void AssetManager::linkFactory(const std::filesystem::path& extension, std::shared_ptr<AssetFactory> factory){
 		_extensionToFactory[extension] = factory;
@@ -14,9 +21,12 @@ namespace Raindrop::Core::Asset{
 	}
 
 	std::weak_ptr<Asset> AssetManager::loadOrGet(const std::filesystem::path& path){
+		CLOG(INFO, "AssetManager") << "requirering file : " << path;
+
 		auto it = _pathToAsset.find(path);
 		if (it != _pathToAsset.end()){
 			if (!it->second.expired()){
+				CLOG(TRACE, "AssetManager") << "Succefuly found asset file : " << path;
 				return it->second;
 			}
 			_pathToAsset.erase(it);
