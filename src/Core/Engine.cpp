@@ -11,6 +11,7 @@ namespace Raindrop::Core{
 
 		_eventManager = std::make_unique<Core::Event::EventManager>();
 		_assetManager = std::make_unique<Core::Asset::AssetManager>();
+		_registryManager = std::make_unique<Core::Registry::RegistryManager>();
 		_scene = std::make_unique<Core::Scene::Scene>();
 
 		_renderer = std::make_unique<Graphics::Renderer>(eventManager(), assetManager());
@@ -29,6 +30,10 @@ namespace Raindrop::Core{
 
 	Event::EventManager& Engine::eventManager(){
 		return *_eventManager.get();
+	}
+
+	Registry::RegistryManager& Engine::registryManager(){
+		return *_registryManager.get();
 	}
 
 	Scene::Scene& Engine::scene(){
