@@ -8,4 +8,9 @@ namespace Raindrop::Core::Scene{
 	class Scene;
 }
 
+namespace Raindrop::Core::Registry{
+	class Registry;
+	class RegistryManager;
+}
+
 #endif

@@ -6,14 +6,16 @@
 namespace Raindrop::Core::Scene{
 	class Scene{
 		public:
-			Scene();
+			Scene(Registry::RegistryManager& manager);
 			~Scene();
 
 			Entity& root();
+			Registry::Registry& registry() const;
 
 			void tree();
 
 		private:
+			Registry::Registry& _registry;
 			std::unique_ptr<Entity> _root;
 
 	};

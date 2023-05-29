@@ -6,18 +6,15 @@
 namespace Raindrop::Core::Registry{
 	class Registry{
 		public:
-			Registry() = default;
+			Registry(RegistryManager& manager) : _manager{manager}{};
 			~Registry() = default;
 
-			template<typename T = std::wstring>
-			T& operator[](const std::wstring& name){
-				std::wistringstream stream = _nameToValue[name];
-				T value;
-				stream >> value;
-				return value;
+			std::wstring& get(const std::wstring& name){
+				return _nameToValue[name];
 			}
 
 		private:
+			RegistryManager& _manager;
 			std::unordered_map<std::wstring, std::wstring> _nameToValue;
 	};
 }

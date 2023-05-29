@@ -12,7 +12,8 @@ namespace Raindrop::Core{
 		_eventManager = std::make_unique<Core::Event::EventManager>();
 		_assetManager = std::make_unique<Core::Asset::AssetManager>();
 		_registryManager = std::make_unique<Core::Registry::RegistryManager>();
-		_scene = std::make_unique<Core::Scene::Scene>();
+		
+		_scene = std::make_unique<Core::Scene::Scene>(registryManager());
 
 		_renderer = std::make_unique<Graphics::Renderer>(eventManager(), assetManager());
 

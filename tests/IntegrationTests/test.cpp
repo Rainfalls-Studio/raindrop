@@ -11,5 +11,4 @@ int main(int argc, char **argv){
 
 	engine.mainloop();
 	return 0;
-	return 0;
 }

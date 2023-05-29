@@ -1,8 +1,9 @@
 #include <Raindrop/Core/Scene/Scene.hpp>
 #include <Raindrop/Core/Scene/Entity.hpp>
+#include <Raindrop/Core/Registry/RegistryManager.hpp>
 
 namespace Raindrop::Core::Scene{
-	Scene::Scene(){
+	Scene::Scene(Registry::RegistryManager& manager) : _registry{manager.get(this)}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Core.Scene");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 		CLOG(INFO, "Engine.Core.Scene") << "New Scene created";
@@ -26,5 +27,9 @@ namespace Raindrop::Core::Scene{
 
 	void Scene::tree(){
 		drawChilds(root());
+	}
+
+	Registry::Registry& Scene::registry() const{
+		return _registry;
 	}
 }
