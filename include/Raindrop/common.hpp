@@ -10,6 +10,7 @@
 #include <utility>
 #include <filesystem>
 #include <fstream>
+#include <regex>
 
 #include <vector>
 #include <list>

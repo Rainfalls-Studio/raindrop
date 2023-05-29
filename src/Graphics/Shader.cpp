@@ -2,7 +2,7 @@
 #include <Raindrop/Graphics/Device.hpp>
 
 namespace Raindrop::Graphics{
-	Shader::Shader(std::shared_ptr<Device> device, const std::vector<char>& code, VkAllocationCallbacks* callbacks) : _allocationCallbacks{callbacks}, _device{device}{
+	Shader::Shader(std::shared_ptr<Device> device, const std::vector<char>& code, VkShaderStageFlagBits stage, VkAllocationCallbacks* callbacks) : _allocationCallbacks{callbacks}, _device{device}, _stage{stage}{
 		createShaderModule(code);
 	}
 
@@ -20,4 +20,13 @@ namespace Raindrop::Graphics{
 			throw "Failed to create shader module";
 		}
 	}
+
+	VkShaderModule Shader::get() const{
+		return _shader;
+	}
+
+	VkShaderStageFlagBits Shader::stage() const{
+		return _stage;
+	}
+
 }

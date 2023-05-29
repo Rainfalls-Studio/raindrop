@@ -2,6 +2,7 @@
 #define __RAINDROP_GRAPHICS_COMMON_HPP__
 
 #include <vulkan/vulkan.h>
+#include <vulkan/vk_enum_string_helper.h>
 #include <SDL2/SDL.h>
 
 #include <Raindrop/common.hpp>
@@ -20,6 +21,7 @@ namespace Raindrop::Graphics{
 	class Renderer;
 	class Window;
 	class Shader;
+	class GraphicsPipeline;
 }
 
 #endif

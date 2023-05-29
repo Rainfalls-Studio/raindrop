@@ -19,6 +19,9 @@ namespace Raindrop::Graphics::Factory{
 
 			std::shared_ptr<Shader> loadSPV(const std::filesystem::path& path);
 
+			VkShaderStageFlagBits getStage(const std::filesystem::path& path);
+			VkShaderStageFlagBits getExtentionStage(const std::wstring extension);
+
 	};
 }
 
