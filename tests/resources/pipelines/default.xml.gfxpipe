@@ -1,0 +1,5 @@
+<shaders>
+	<shader source="${Engine.Resources.Directory}/shaders/default/default.glsl.frag.spv"/>
+	<shader source="${Engine.Resources.Directory}/shaders/default/default.glsl.vert.spv"/>
+</shaders>
+

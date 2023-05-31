@@ -13,6 +13,7 @@ namespace Raindrop::Graphics::Builders{
 
 			void setDevice(const std::shared_ptr<Device>& device);
 			void addShader(const std::shared_ptr<Shader>& shader);
+			void setRenderPass(VkRenderPass renderPass);
 
 		private:
 			std::shared_ptr<Device> _device;

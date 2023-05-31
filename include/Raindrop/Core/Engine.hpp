@@ -5,7 +5,7 @@
 #include <Raindrop/Core/Event/EventManager.hpp>
 #include <Raindrop/Core/Scene/Scene.hpp>
 #include <Raindrop/Core/Asset/AssetManager.hpp>
-#include <Raindrop/Core/Registry/RegistryManager.hpp>
+#include <Raindrop/Core/Registry/Registry.hpp>
 #include <Raindrop/Graphics/Renderer.hpp>
 
 namespace Raindrop::Core{
@@ -18,13 +18,13 @@ namespace Raindrop::Core{
 
 			Event::EventManager& eventManager();
 			Asset::AssetManager& assetManager();
-			Registry::RegistryManager& registryManager();
+			Registry::Registry& registry();
 			Scene::Scene& scene();
 
 		private:
 			std::unique_ptr<Event::EventManager> _eventManager;
 			std::unique_ptr<Asset::AssetManager> _assetManager;
-			std::unique_ptr<Registry::RegistryManager> _registryManager;
+			std::unique_ptr<Registry::Registry> _registry;
 			std::unique_ptr<Scene::Scene> _scene;
 
 			std::unique_ptr<Graphics::Renderer> _renderer;

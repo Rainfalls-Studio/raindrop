@@ -11,6 +11,7 @@
 #include <Raindrop/Core/Event/EventManager.hpp>
 #include <Raindrop/Core/Asset/Asset.hpp>
 #include <Raindrop/Core/Asset/AssetFactory.hpp>
+#include <Raindrop/Core/Registry/Registry.hpp>
 
 namespace Raindrop::Graphics{
 	class Instance;

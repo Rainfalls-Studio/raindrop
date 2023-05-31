@@ -3,7 +3,7 @@
 #include <Raindrop/Graphics/Device.hpp>
 
 namespace Raindrop::Graphics{
-	Swapchain::Swapchain(const std::shared_ptr<Device>& device, VkSurfaceKHR surface, VkExtent2D extent, VkAllocationCallbacks* allocationCallbacks) : _device{device}, _surface{surface}, _allocationCallbacks{allocationCallbacks}, _wantedExtent{extent}{
+	Swapchain::Swapchain(const std::shared_ptr<Device>& device, VkSurfaceKHR surface, VkExtent2D extent, Core::Registry::Registry& registry, VkAllocationCallbacks* allocationCallbacks) : _device{device}, _surface{surface}, _allocationCallbacks{allocationCallbacks}, _wantedExtent{extent}, _registry{registry}{
 		_swapchainSupport = _device->physicalDevice()->getSwapchainSupport(surface);
 
 		findSurfaceFormat();
@@ -186,6 +186,8 @@ namespace Raindrop::Graphics{
 		if (vkCreateRenderPass(_device->get(), &renderPassInfo, _allocationCallbacks, &_renderPass) != VK_SUCCESS){
 			throw std::runtime_error("Failed to create swapchain's render pass");
 		}
+		
+		_registry["Engine.Graphics.Swapchain.RenderPass"] = _renderPass;
 	}
 
 	void Swapchain::createImageViews(){

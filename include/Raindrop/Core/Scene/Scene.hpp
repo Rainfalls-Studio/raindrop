@@ -6,7 +6,7 @@
 namespace Raindrop::Core::Scene{
 	class Scene{
 		public:
-			Scene(Registry::RegistryManager& manager);
+			Scene(Registry::Registry& manager);
 			~Scene();
 
 			Entity& root();

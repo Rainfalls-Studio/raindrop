@@ -9,7 +9,7 @@
 #include <SDL2/SDL_vulkan.h>
 
 namespace Raindrop::Graphics{
-	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager) : _eventManager{eventManager}, _assetManager{assetManager}{
+	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry) : _eventManager{eventManager}, _assetManager{assetManager}, _registry{registry}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
@@ -48,6 +48,9 @@ namespace Raindrop::Graphics{
 		VkCommandBuffer commandBuffer = beginFrame();
 		if (commandBuffer){
 			_swapchain->beginRenderPass(commandBuffer);
+
+			
+
 			_swapchain->endRenderPass(commandBuffer);
 			endFrame();
 		}
@@ -113,7 +116,7 @@ namespace Raindrop::Graphics{
 	void Renderer::createSwapchain(){
 		CLOG(INFO, "Engine.Graphics") << "Creating renderer swapchain ...";
 		auto size = _window->getSize();
-		_swapchain = std::make_unique<Swapchain>(_device, _surface, VkExtent2D{size.x, size.y});
+		_swapchain = std::make_unique<Swapchain>(_device, _surface, VkExtent2D{size.x, size.y}, _registry);
 		_swapchain->setGraphicsQueue(_graphicsQueue);
 		_swapchain->setPresentQueue(_presentQueue);
 		CLOG(INFO, "Engine.Graphics") << "Created renderer swapchain with success !";
@@ -210,6 +213,7 @@ namespace Raindrop::Graphics{
 	void Renderer::registerFactories(){
 		CLOG(INFO, "Engine.Graphics") << "registering renderer asset factories ...";
 		registerShaderFactory();
+		registerGraphicsPipelineFactory();
 		CLOG(INFO, "Engine.Graphics") << "registred renderer asset factories with success !";
 	}
 
@@ -218,7 +222,13 @@ namespace Raindrop::Graphics{
 		_assetManager.linkFactory(".spv", _shaderFactory);
 	}
 
+	void Renderer::registerGraphicsPipelineFactory(){
+		_graphicsPipelineFactory = std::make_unique<Factory::GraphicsPipelineFactory>(_device, _assetManager, _registry, nullptr);
+		_graphicsPipelineFactory->registerExtensions(_graphicsPipelineFactory);
+	}
+
 	void Renderer::eraseFactories(){
 		_shaderFactory.reset();
+		_graphicsPipelineFactory.reset();
 	}
 }

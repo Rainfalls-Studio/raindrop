@@ -136,7 +136,7 @@ namespace Raindrop::Graphics::Builders{
 		createInfo.basePipelineIndex = -1;
 
 		try{
-			std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(createInfo, _shaders, callbacks);
+			std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(_device, createInfo, _shaders, callbacks);
 			destroyPipelineLayout(layout, callbacks);
 			return pipeline;
 		} catch (const std::runtime_error& e){
@@ -153,6 +153,10 @@ namespace Raindrop::Graphics::Builders{
 
 	void PipelineBuilder::setDevice(const std::shared_ptr<Device>& device){
 		_device = device;
+	}
+
+	void PipelineBuilder::setRenderPass(VkRenderPass renderPass){
+		_renderPass = renderPass;
 	}
 	
 	VkPipelineLayout PipelineBuilder::createPipelineLayout(VkAllocationCallbacks* callbacks){

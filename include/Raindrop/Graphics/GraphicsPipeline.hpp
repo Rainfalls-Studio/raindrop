@@ -4,14 +4,16 @@
 #include <Raindrop/Graphics/common.hpp>
 
 namespace Raindrop::Graphics{
-	class GraphicsPipeline{
+	class GraphicsPipeline : public Core::Asset::Asset{
 		public:
-			GraphicsPipeline(const VkGraphicsPipelineCreateInfo& info, std::vector<std::shared_ptr<Shader>> shaders, VkAllocationCallbacks* allocationCallbacks = nullptr);
-			~GraphicsPipeline();
+			GraphicsPipeline(const std::shared_ptr<Device>& device, const VkGraphicsPipelineCreateInfo& info, std::vector<std::shared_ptr<Shader>> shaders, VkAllocationCallbacks* allocationCallbacks = nullptr);
+			virtual ~GraphicsPipeline() override;
 
 		private:
 			VkAllocationCallbacks* _allocationCallbacks;
+			std::shared_ptr<Device> _device;
 			std::vector<std::shared_ptr<Shader>> _shaders;
+			VkPipeline _pipeline = VK_NULL_HANDLE;
 	};
 }
 

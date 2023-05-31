@@ -7,11 +7,8 @@ namespace Raindrop::Core::Registry{
 	class Registry{
 		public:
 			Registry() = default;
-			Registry(const std::string& val) : _value{val}{}
+			Registry(const std::any& val) : _value{val}{}
 			~Registry() = default;
-
-			std::string& value();
-			const std::string& value() const;
 
 			Registry& get(std::string name);
 			const Registry& get(std::string name) const;
@@ -27,18 +24,20 @@ namespace Raindrop::Core::Registry{
 			void remove(std::string name);
 			std::string formatString(std::string str);
 
-			Registry& operator=(const std::string& value){
-				_value = value;
-				return *this;
+			template<typename T>
+			T& as(){
+				return std::any_cast<T&>(_value);
 			}
 
-			operator const std::string&(){
-				return _value;
+			template<typename T>
+			Registry& operator=(const T& t){
+				_value = t;
+				return *this;
 			}
 
 		private:
 			std::unordered_map<std::string, Registry> _nameToRegistry;
-			std::string _value;
+			std::any _value;
 	};
 }
 

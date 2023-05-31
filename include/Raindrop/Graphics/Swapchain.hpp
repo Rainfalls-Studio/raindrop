@@ -7,7 +7,7 @@
 namespace Raindrop::Graphics{
 	class Swapchain{
 		public:
-			Swapchain(const std::shared_ptr<Device>& device, VkSurfaceKHR surface, VkExtent2D extent, VkAllocationCallbacks* allocationCallbacks = nullptr);
+			Swapchain(const std::shared_ptr<Device>& device, VkSurfaceKHR surface, VkExtent2D extent, Core::Registry::Registry& registry, VkAllocationCallbacks* allocationCallbacks = nullptr);
 			~Swapchain();
 
 			void rebuildSwapchain();
@@ -34,6 +34,7 @@ namespace Raindrop::Graphics{
 
 		private:
 			VkAllocationCallbacks* _allocationCallbacks;
+			Core::Registry::Registry& _registry;
 			VkSurfaceKHR _surface;
 			std::shared_ptr<Device> _device;
 			PhysicalDevice::SwapchainSupport _swapchainSupport;

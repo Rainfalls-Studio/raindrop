@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <easylogging++.h>
+#include <tinyxml2.h>
 
 #include <memory>
 #include <functional>
@@ -24,6 +25,7 @@
 #include <queue>
 #include <deque>
 #include <bitset>
+#include <any>
 
 #include <thread>
 #include <mutex>

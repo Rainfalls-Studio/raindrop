@@ -2,24 +2,24 @@
 #include <Raindrop/Graphics/Shader.hpp>
 
 struct CaseInsensitiveHash {
-    std::size_t operator()(const std::wstring& str) const {
-        std::wstring lowercaseStr;
-        lowercaseStr.reserve(str.length());
-        for (wchar_t ch : str) {
-            lowercaseStr.push_back(std::tolower(ch, std::locale()));
-        }
-        return std::hash<std::wstring>()(lowercaseStr);
-    }
+	std::size_t operator()(const std::wstring& str) const {
+		std::wstring lowercaseStr;
+		lowercaseStr.reserve(str.length());
+		for (wchar_t ch : str) {
+			lowercaseStr.push_back(std::tolower(ch, std::locale()));
+		}
+		return std::hash<std::wstring>()(lowercaseStr);
+	}
 };
 
 struct CaseInsensitiveEqual {
-    bool operator()(const std::wstring& str1, const std::wstring& str2) const {
-        return std::equal(str1.begin(), str1.end(), str2.begin(), str2.end(),
-            [](wchar_t ch1, wchar_t ch2) {
-                return std::tolower(ch1, std::locale()) == std::tolower(ch2, std::locale());
-            }
-        );
-    }
+	bool operator()(const std::wstring& str1, const std::wstring& str2) const {
+		return std::equal(str1.begin(), str1.end(), str2.begin(), str2.end(),
+			[](wchar_t ch1, wchar_t ch2) {
+				return std::tolower(ch1, std::locale()) == std::tolower(ch2, std::locale());
+			}
+		);
+	}
 };
 
 namespace Raindrop::Graphics::Factory{
@@ -95,6 +95,7 @@ namespace Raindrop::Graphics::Factory{
 			if (flagBits != 0) return flagBits;
 			searchStart = extensionsMatch.suffix().first;
 		}
+		return static_cast<VkShaderStageFlagBits>(0);
 	}
 
 	class ExtensionToFlag{

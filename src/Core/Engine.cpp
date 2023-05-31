@@ -11,11 +11,9 @@ namespace Raindrop::Core{
 
 		_eventManager = std::make_unique<Core::Event::EventManager>();
 		_assetManager = std::make_unique<Core::Asset::AssetManager>();
-		_registryManager = std::make_unique<Core::Registry::RegistryManager>();
-		
-		_scene = std::make_unique<Core::Scene::Scene>(registryManager());
-
-		_renderer = std::make_unique<Graphics::Renderer>(eventManager(), assetManager());
+		_registry = std::make_unique<Core::Registry::Registry>();
+		_scene = std::make_unique<Core::Scene::Scene>(registry());
+		_renderer = std::make_unique<Graphics::Renderer>(eventManager(), assetManager(), registry());
 
 		setupEvents();
 		_eventManager->subscribe("engine.window.quit", [&](){
@@ -33,16 +31,16 @@ namespace Raindrop::Core{
 		return *_eventManager.get();
 	}
 
-	Registry::RegistryManager& Engine::registryManager(){
-		return *_registryManager.get();
+	Registry::Registry& Engine::registry(){
+		return *_registry;
 	}
 
 	Scene::Scene& Engine::scene(){
-		return *_scene.get();
+		return *_scene;
 	}
 
 	Asset::AssetManager& Engine::assetManager(){
-		return *_assetManager.get();
+		return *_assetManager;
 	}
 	
 	void Engine::mainloop(){
