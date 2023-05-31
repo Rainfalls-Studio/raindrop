@@ -6,16 +6,39 @@
 namespace Raindrop::Core::Registry{
 	class Registry{
 		public:
-			Registry(RegistryManager& manager) : _manager{manager}{};
+			Registry() = default;
+			Registry(const std::string& val) : _value{val}{}
 			~Registry() = default;
 
-			std::wstring& get(const std::wstring& name){
-				return _nameToValue[name];
+			std::string& value();
+			const std::string& value() const;
+
+			Registry& get(std::string name);
+			const Registry& get(std::string name) const;
+
+			Registry& operator[](const std::string& name){
+				return get(name);
+			}
+
+			const Registry& operator[](const std::string& name) const{
+				return get(name);
+			}
+
+			void remove(std::string name);
+			std::string formatString(std::string str);
+
+			Registry& operator=(const std::string& value){
+				_value = value;
+				return *this;
+			}
+
+			operator const std::string&(){
+				return _value;
 			}
 
 		private:
-			RegistryManager& _manager;
-			std::unordered_map<std::wstring, std::wstring> _nameToValue;
+			std::unordered_map<std::string, Registry> _nameToRegistry;
+			std::string _value;
 	};
 }
 

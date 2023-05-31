@@ -5,7 +5,6 @@
 
 namespace Raindrop::Core::Registry{
 	class Registry;
-	class RegistryManager;
 }
 
 #endif
