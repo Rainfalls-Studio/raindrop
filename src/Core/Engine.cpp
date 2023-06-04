@@ -13,7 +13,7 @@ namespace Raindrop::Core{
 		_assetManager = std::make_unique<Core::Asset::AssetManager>();
 		_registry = std::make_unique<Core::Registry::Registry>();
 		_scene = std::make_unique<Core::Scene::Scene>(registry());
-		_renderer = std::make_unique<Graphics::Renderer>(eventManager(), assetManager(), registry());
+		_renderer = std::make_unique<Graphics::Renderer>(*_eventManager, *_assetManager, *_registry, *_scene);
 
 		setupEvents();
 		_eventManager->subscribe("engine.window.quit", [&](){

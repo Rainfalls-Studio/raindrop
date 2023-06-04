@@ -6,13 +6,21 @@
 namespace Raindrop::Graphics{
 	class GraphicsPipeline : public Core::Asset::Asset{
 		public:
-			GraphicsPipeline(const std::shared_ptr<Device>& device, const VkGraphicsPipelineCreateInfo& info, std::vector<std::shared_ptr<Shader>> shaders, VkAllocationCallbacks* allocationCallbacks = nullptr);
+			GraphicsPipeline(const std::shared_ptr<Device>& device, VkGraphicsPipelineCreateInfo info, VkPipelineLayoutCreateInfo layoutInfo, std::vector<std::shared_ptr<Shader>> shaders, VkAllocationCallbacks* allocationCallbacks = nullptr);
 			virtual ~GraphicsPipeline() override;
+
+			void bind(VkCommandBuffer commandBuffer);
+			
+
+			VkPipeline pipeline() const;
+			VkPipelineLayout layout() const;
 
 		private:
 			VkAllocationCallbacks* _allocationCallbacks;
 			std::shared_ptr<Device> _device;
 			std::vector<std::shared_ptr<Shader>> _shaders;
+
+			VkPipelineLayout _pipelineLayout = VK_NULL_HANDLE;
 			VkPipeline _pipeline = VK_NULL_HANDLE;
 	};
 }

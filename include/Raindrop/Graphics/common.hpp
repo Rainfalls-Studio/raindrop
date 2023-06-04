@@ -12,6 +12,7 @@
 #include <Raindrop/Core/Asset/Asset.hpp>
 #include <Raindrop/Core/Asset/AssetFactory.hpp>
 #include <Raindrop/Core/Registry/Registry.hpp>
+#include <Raindrop/Core/Scene/Scene.hpp>
 
 namespace Raindrop::Graphics{
 	class Instance;
@@ -23,6 +24,8 @@ namespace Raindrop::Graphics{
 	class Window;
 	class Shader;
 	class GraphicsPipeline;
+	class GUI;
+	class SingleUseCommandBuffer;
 }
 
 #endif

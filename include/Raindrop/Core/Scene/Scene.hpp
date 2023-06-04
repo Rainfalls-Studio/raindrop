@@ -17,7 +17,6 @@ namespace Raindrop::Core::Scene{
 		private:
 			Registry::Registry& _registry;
 			std::unique_ptr<Entity> _root;
-
 	};
 }
 

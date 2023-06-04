@@ -4,17 +4,28 @@
 
 namespace Raindrop::Graphics{
 	Swapchain::Swapchain(const std::shared_ptr<Device>& device, VkSurfaceKHR surface, VkExtent2D extent, Core::Registry::Registry& registry, VkAllocationCallbacks* allocationCallbacks) : _device{device}, _surface{surface}, _allocationCallbacks{allocationCallbacks}, _wantedExtent{extent}, _registry{registry}{
+		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics.Swapchain");
+		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
+
+		CLOG(INFO, "Engine.Graphics.Swapchain") << "Creating swapchain...";
+
 		_swapchainSupport = _device->physicalDevice()->getSwapchainSupport(surface);
 
 		findSurfaceFormat();
 		createRenderPass();	
 		rebuildSwapchain();
+
+		CLOG(INFO, "Engine.Graphics.Swapchain") << "Created swapchain with success !";
 	}
 
 	Swapchain::~Swapchain(){
+		CLOG(INFO, "Engine.Graphics.Swapchain") << "Destroying swapchain...";
+		
 		destroyFrames();
 		if (_swapchain) vkDestroySwapchainKHR(_device->get(), _swapchain, _allocationCallbacks);
 		if (_renderPass) vkDestroyRenderPass(_device->get(), _renderPass, _allocationCallbacks);
+
+		CLOG(INFO, "Engine.Graphics.Swapchain") << "Swapchain destroyed with success !";
 	}
 	
 	void Swapchain::setExtent(VkExtent2D extent){
@@ -34,6 +45,7 @@ namespace Raindrop::Graphics{
 	}
 
 	void Swapchain::rebuildSwapchain(){
+		CLOG(INFO, "Engine.Graphics.Swapchain") << "Building/Rebuilding swapchain...";
 		findPresentMode();
 		findFrameCount();
 		findExtent();
@@ -68,6 +80,8 @@ namespace Raindrop::Graphics{
 		createImageViews();
 		createFramebuffers();
 		createSyncObjects();
+
+		CLOG(INFO, "Engine.Graphics.Swapchain") << "Swapchain Built/Rebuilt with success !";
 	}
 
 	void Swapchain::updateFrameArray(){
@@ -141,6 +155,7 @@ namespace Raindrop::Graphics{
 	}
 
 	void Swapchain::destroyFrames(){
+		CLOG(INFO, "Engine.Graphics.Swapchain") << "Destroying frames : (" << _frames.size() << ")";
 		for (auto &f : _frames){
 			destroyFrame(f);
 		}

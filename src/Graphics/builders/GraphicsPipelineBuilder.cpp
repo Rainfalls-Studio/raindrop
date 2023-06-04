@@ -2,6 +2,7 @@
 #include <Raindrop/Graphics/GraphicsPipeline.hpp>
 #include <Raindrop/Graphics/Shader.hpp>
 #include <Raindrop/Graphics/Device.hpp>
+#include <Raindrop/Graphics/Renderer.hpp>
 
 namespace Raindrop::Graphics::Builders{
 	PipelineBuilder::PipelineBuilder(){
@@ -127,24 +128,24 @@ namespace Raindrop::Graphics::Builders{
 		createInfo.pColorBlendState = &colorBlendInfo;
 		createInfo.pDynamicState = &dynamicStateInfo;
 
-		VkPipelineLayout layout = createPipelineLayout(callbacks);
-
-		createInfo.layout = layout;
+		createInfo.layout = VK_NULL_HANDLE; // Set by the pipeline itself
 		createInfo.renderPass = _renderPass;
 		createInfo.subpass = _subpass;
-
 		createInfo.basePipelineIndex = -1;
 
-		try{
-			std::shared_ptr<GraphicsPipeline> pipeline = std::make_shared<GraphicsPipeline>(_device, createInfo, _shaders, callbacks);
-			destroyPipelineLayout(layout, callbacks);
-			return pipeline;
-		} catch (const std::runtime_error& e){
-			destroyPipelineLayout(layout, callbacks);
-			throw e;
-		}
+		VkPushConstantRange pushConstantRange{};
+		pushConstantRange.offset = 0;
+		pushConstantRange.size = sizeof(PushConstant);
+		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-		return 0;
+		VkPipelineLayoutCreateInfo layoutInfo = {};
+		layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		layoutInfo.pushConstantRangeCount = 1;
+		layoutInfo.pPushConstantRanges = &pushConstantRange;
+		layoutInfo.setLayoutCount = 0;
+		layoutInfo.flags = 0;
+
+		return std::make_shared<GraphicsPipeline>(_device, createInfo, layoutInfo, _shaders, callbacks);
 	}
 
 	void PipelineBuilder::addShader(const std::shared_ptr<Shader>& shader){
@@ -157,25 +158,5 @@ namespace Raindrop::Graphics::Builders{
 
 	void PipelineBuilder::setRenderPass(VkRenderPass renderPass){
 		_renderPass = renderPass;
-	}
-	
-	VkPipelineLayout PipelineBuilder::createPipelineLayout(VkAllocationCallbacks* callbacks){
-
-		VkPipelineLayoutCreateInfo createInfo = {};
-		createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		createInfo.pushConstantRangeCount = 0;
-		createInfo.setLayoutCount = 0;
-		createInfo.flags = 0;
-		
-		VkPipelineLayout layout;
-		if (vkCreatePipelineLayout(_device->get(), &createInfo, callbacks, &layout) != VK_SUCCESS){
-			throw std::runtime_error("Failed to create vulkan pipeline layout");
-		}
-
-		return layout;
-	}
-
-	void PipelineBuilder::destroyPipelineLayout(VkPipelineLayout layout, VkAllocationCallbacks* callbacks){
-		vkDestroyPipelineLayout(_device->get(), layout, callbacks);
 	}
 }

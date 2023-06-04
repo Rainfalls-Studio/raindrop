@@ -5,11 +5,16 @@
 #include <Raindrop/Graphics/PhysicalDevice.hpp>
 #include <Raindrop/Graphics/Device.hpp>
 #include <Raindrop/Graphics/Swapchain.hpp>
+#include <Raindrop/Graphics/GraphicsPipeline.hpp>
+#include <Raindrop/Graphics/GUI.hpp>
 #include <Raindrop/Core/Asset/AssetManager.hpp>
+#include <Raindrop/Core/Scene/Entity.hpp>
+
 #include <SDL2/SDL_vulkan.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace Raindrop::Graphics{
-	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry) : _eventManager{eventManager}, _assetManager{assetManager}, _registry{registry}{
+	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, Core::Scene::Scene& scene) : _eventManager{eventManager}, _assetManager{assetManager}, _registry{registry}, _scene{scene}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
@@ -24,18 +29,24 @@ namespace Raindrop::Graphics{
 		registerFactories();
 		createSwapchain();
 		createGraphicsCommandPool();
+		createTransfertCommandPool();
 		createGraphicsCommandBuffers();
 		CLOG(INFO, "Engine.Graphics") << "Created renderer with success !";
+
+		_gui = std::make_unique<GUI>(*this);
 	}
 
 	Renderer::~Renderer(){
 		CLOG(INFO, "Engine.Graphics") << "Destroying renderer ...";
 		_device->waitIdle();
+		_gui.reset();
 		eraseFactories();
 		_swapchain.reset();
 		if (_surface) vkDestroySurfaceKHR(_instance->get(), _surface, nullptr);
 		destroyGraphicsCommandBuffers();
 		destroyGraphicsCommandPool();
+		destroyTransfertCommandPool();
+
 		_device.reset();
 		_physicalDeviceManager.reset();
 		_instance.reset();
@@ -44,15 +55,35 @@ namespace Raindrop::Graphics{
 
 	void Renderer::update(){
 		_window->events();
+		_gui->newFrame();
 
 		VkCommandBuffer commandBuffer = beginFrame();
 		if (commandBuffer){
 			_swapchain->beginRenderPass(commandBuffer);
 
-			
+
+			if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(_registry["Pipeline"].as<std::weak_ptr<Core::Asset::Asset>>().lock())){
+				pipeline->bind(commandBuffer);
+				drawEntityAndChilds(_scene.root(), commandBuffer, pipeline->layout());
+			}
+
+			_gui->render(commandBuffer);
 
 			_swapchain->endRenderPass(commandBuffer);
 			endFrame();
+		}
+	}
+
+	void Renderer::drawEntityAndChilds(Core::Scene::Entity& entity, VkCommandBuffer commandBuffer, VkPipelineLayout layout){
+		PushConstant pushConstant;
+		pushConstant.viewTransform = glm::translate(glm::scale(glm::mat4(1), entity.transform.scale), entity.transform.translation);
+		pushConstant.localTransform = glm::mat4(1.f);
+
+		vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &pushConstant);
+		vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+
+		for (auto &c : entity){
+			drawEntityAndChilds(c, commandBuffer, layout);
 		}
 	}
 
@@ -95,6 +126,7 @@ namespace Raindrop::Graphics{
 		_device = builder.build();
 
 		_graphicsQueue = _device->families()[_device->graphicsFamily()].queues[0];
+		_transfertQueue = _device->families()[_device->transfertFamily()].queues[0];
 		_presentQueue = _device->families()[_device->presentFamily(_surface)].queues[0];
 		CLOG(INFO, "Engine.Graphics") << "Created renderer vulkan device with success !";
 	}
@@ -231,4 +263,59 @@ namespace Raindrop::Graphics{
 		_shaderFactory.reset();
 		_graphicsPipelineFactory.reset();
 	}
+
+	void Renderer::createTransfertCommandPool(){
+		VkCommandPoolCreateInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
+		info.queueFamilyIndex = _device->transfertFamily();
+
+		if (vkCreateCommandPool(_device->get(), &info, VK_NULL_HANDLE, &_transfertCommandPool) != VK_SUCCESS){
+			throw std::runtime_error("Failed to create transfert command pool");
+		}
+	}
+	
+	VkCommandBuffer Renderer::beginSingleUseTransfertCommandBuffer(){
+		VkCommandBufferAllocateInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		info.commandBufferCount = 1;
+		info.commandPool = _transfertCommandPool;
+
+		VkCommandBuffer commandBuffer;
+
+		if (vkAllocateCommandBuffers(_device->get(), &info, &commandBuffer) != VK_SUCCESS){
+			throw std::runtime_error("Failed to allocate transfert command buffer");
+		}
+
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS){
+			throw std::runtime_error("Failed to begin transfert command buffer");
+		}
+
+		return commandBuffer;
+	}
+
+	void Renderer::endSingleUseTransfertCommandBuffer(VkCommandBuffer commandBuffer){
+		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS){
+			throw std::runtime_error("Failed to end transfert command buffer");
+		}
+
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+
+		vkQueueSubmit(_transfertQueue, 1, &submitInfo, VK_NULL_HANDLE);
+		vkQueueWaitIdle(_transfertQueue);
+
+		vkFreeCommandBuffers(_device->get(), _transfertCommandPool, 1, &commandBuffer);
+	}
+
+	void Renderer::destroyTransfertCommandPool(){
+		vkDestroyCommandPool(_device->get(), _transfertCommandPool, nullptr);
+	}
+
 }

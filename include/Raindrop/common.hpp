@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <easylogging++.h>
 #include <tinyxml2.h>
+#include <imgui/imgui.h>
 
 #include <memory>
 #include <functional>

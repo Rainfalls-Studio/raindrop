@@ -7,8 +7,11 @@ int main(int argc, char **argv){
 	Raindrop::Core::Engine engine;
 
 	engine.registry()["Engine.Resources.Directory"] = RESOURCES.string();
-	
-	engine.assetManager().loadOrGet(RESOURCES / "pipelines/default.xml.gfxpipe");
+	auto pipeline = engine.assetManager().loadOrGet(RESOURCES / "pipelines/default.xml.gfxpipe");
+
+	// /!\ TEST
+	engine.registry()["Pipeline"] = pipeline;
+	// /!\ TEST
 
 	engine.mainloop();
 	return 0;

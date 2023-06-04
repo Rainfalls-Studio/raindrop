@@ -23,6 +23,7 @@ namespace Raindrop::Graphics{
 			void waitIdle() const;
 
 			uint32_t graphicsFamily();
+			uint32_t transfertFamily();
 			uint32_t presentFamily(VkSurfaceKHR surface);
 
 		private:
