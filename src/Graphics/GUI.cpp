@@ -14,7 +14,7 @@ namespace Raindrop::Graphics{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics.GUI");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
-		CLOG(ERROR, "Engine.Graphics.GUI") << "Loading IMGUI...";
+		CLOG(INFO, "Engine.Graphics.GUI") << "Loading IMGUI...";
 
 		_device = renderer._device->get();
 		auto window = renderer._window->get();
@@ -75,7 +75,7 @@ namespace Raindrop::Graphics{
 
 		ImGui_ImplVulkan_DestroyFontUploadObjects();
 		
-		CLOG(ERROR, "Engine.Graphics.GUI") << "Loaded IMGUI with success!";
+		CLOG(INFO, "Engine.Graphics.GUI") << "Loaded IMGUI with success!";
 	}
 
 	GUI::~GUI(){
@@ -94,5 +94,9 @@ namespace Raindrop::Graphics{
 	void GUI::render(VkCommandBuffer commandBuffer){
 		ImGui::Render();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+	}
+
+	void GUI::event(SDL_Event* e){
+		ImGui_ImplSDL2_ProcessEvent(e);
 	}
 }

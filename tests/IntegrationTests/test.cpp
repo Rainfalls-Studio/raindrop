@@ -13,6 +13,8 @@ int main(int argc, char **argv){
 	engine.registry()["Pipeline"] = pipeline;
 	// /!\ TEST
 
+	engine.scene().createEntity();
+
 	engine.mainloop();
 	return 0;
 }

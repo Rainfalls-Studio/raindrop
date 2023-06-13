@@ -12,7 +12,7 @@ namespace Raindrop::Core{
 		_eventManager = std::make_unique<Core::Event::EventManager>();
 		_assetManager = std::make_unique<Core::Asset::AssetManager>();
 		_registry = std::make_unique<Core::Registry::Registry>();
-		_scene = std::make_unique<Core::Scene::Scene>(registry());
+		_scene = std::make_unique<Core::Scene::Scene>(5000, 100);
 		_renderer = std::make_unique<Graphics::Renderer>(*_eventManager, *_assetManager, *_registry, *_scene);
 
 		setupEvents();
@@ -25,6 +25,12 @@ namespace Raindrop::Core{
 
 	Engine::~Engine(){
 		CLOG(INFO, "Engine") << "Destroying Engine ...";
+		_eventManager.reset();
+		_assetManager.reset();
+		_registry.reset();
+		_scene.reset();
+		_renderer.reset();
+		CLOG(INFO, "Engine") << "Engine destroyed with success !";
 	}
 
 	Event::EventManager& Engine::eventManager(){

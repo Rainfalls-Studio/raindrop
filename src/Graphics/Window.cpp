@@ -5,6 +5,7 @@
 #include <Raindrop/Graphics/Device.hpp>
 #include <Raindrop/Graphics/Swapchain.hpp>
 #include <Raindrop/Graphics/Renderer.hpp>
+#include <Raindrop/Graphics/GUI.hpp>
 
 #include <SDL2/SDL_vulkan.h>
 
@@ -63,9 +64,10 @@ namespace Raindrop::Graphics{
 		return _window != nullptr;
 	}
 
-	void Window::events(){
+	void Window::events(GUI* gui){
 		SDL_Event e;
 		while (SDL_PollEvent(&e)){
+			if (gui) gui->event(&e);
 			switch (e.type){
 				case SDL_QUIT: quitEvent(); break;
 				case SDL_WINDOWEVENT: windowEvent(e); break;

@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <fstream>
 #include <regex>
+#include <typeinfo>
 
 #include <vector>
 #include <list>

@@ -3,8 +3,8 @@
 layout (location = 0) out vec3 fragColor;
 
 layout (push_constant) uniform Push{
-	mat4 viewTransform;
-	mat4 localTransform;
+	mat4 projectionViewMatrix;
+	mat4 modelMatrix;
 } push;
 
 struct Vertex{
@@ -24,5 +24,6 @@ Vertex vertices[6] = Vertex[](
 
 void main(){
 	fragColor = vertices[gl_VertexIndex].color;
-	gl_Position = vec4(vertices[gl_VertexIndex].position, 1.0) * push.localTransform * push.viewTransform;
+    vec4 positionWorld = push.modelMatrix * vec4(vertices[gl_VertexIndex].position, 1.0);
+    gl_Position = push.projectionViewMatrix * positionWorld;
 }

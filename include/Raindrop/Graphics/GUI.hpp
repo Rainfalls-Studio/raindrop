@@ -12,6 +12,8 @@ namespace Raindrop::Graphics{
 			void newFrame();
 			void render(VkCommandBuffer commandBuffer);
 
+			void event(SDL_Event* e);
+
 		private:
 			VkDescriptorPool _imguiPool;
 			VkDevice _device;

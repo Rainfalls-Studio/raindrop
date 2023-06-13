@@ -53,37 +53,52 @@ namespace Raindrop::Graphics{
 		CLOG(INFO, "Engine.Graphics") << "Destroyed renderer with success !";
 	}
 
-	void Renderer::update(){
-		_window->events();
-		_gui->newFrame();
+	void drawEntity(Core::Scene::Entity entity, VkPipelineLayout layout, VkCommandBuffer commandBuffer){
 
-		VkCommandBuffer commandBuffer = beginFrame();
-		if (commandBuffer){
-			_swapchain->beginRenderPass(commandBuffer);
+		auto& transform = entity.transform();
+		PushConstant p;
+		p.viewTransform = glm::inverse(glm::scale(glm::mat4(1.f), {1080.f, 720.f, 1.f}));
+		p.localTransform = glm::translate(glm::mat4(1.f), transform.translation) * glm::rotate(glm::mat4(1.f), 3.14f, transform.rotation) * glm::scale(glm::mat4(1.f), transform.scale);
+		vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &p);
+		vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 
-
-			if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(_registry["Pipeline"].as<std::weak_ptr<Core::Asset::Asset>>().lock())){
-				pipeline->bind(commandBuffer);
-				drawEntityAndChilds(_scene.root(), commandBuffer, pipeline->layout());
-			}
-
-			_gui->render(commandBuffer);
-
-			_swapchain->endRenderPass(commandBuffer);
-			endFrame();
+		for (auto c : entity){
+			drawEntity(c, layout, commandBuffer);
 		}
 	}
 
-	void Renderer::drawEntityAndChilds(Core::Scene::Entity& entity, VkCommandBuffer commandBuffer, VkPipelineLayout layout){
-		PushConstant pushConstant;
-		pushConstant.viewTransform = glm::translate(glm::scale(glm::mat4(1), entity.transform.scale), entity.transform.translation);
-		pushConstant.localTransform = glm::mat4(1.f);
+	void Renderer::update(){
+		_window->events(_gui.get());
 
-		vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &pushConstant);
-		vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+		static Core::Scene::EntityID selectedEntity = Core::Scene::INVALID_ENTITY_ID;
 
-		for (auto &c : entity){
-			drawEntityAndChilds(c, commandBuffer, layout);
+		VkCommandBuffer commandBuffer = beginFrame();
+		if (commandBuffer){
+			_gui->newFrame();
+			_swapchain->beginRenderPass(commandBuffer);
+
+			auto weak_pipeline = _registry["Pipeline"].as<std::weak_ptr<Raindrop::Core::Asset::Asset>>();
+			if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(weak_pipeline.lock())){
+				pipeline->bind(commandBuffer);
+				drawEntity(Core::Scene::Entity(_scene.root(), &_scene), pipeline->layout(), commandBuffer);
+			}
+
+			if (ImGui::Begin("Scene")){
+				selectedEntity = _scene.UI(selectedEntity);
+			}
+			ImGui::End();
+
+			if (ImGui::Begin("Components")){
+				if (selectedEntity != Core::Scene::INVALID_ENTITY_ID){
+					_scene.componentsUI(selectedEntity);
+				}
+			}
+			ImGui::End();
+
+			// The GUI should be rendered at the end.
+			_gui->render(commandBuffer);
+			_swapchain->endRenderPass(commandBuffer);
+			endFrame();
 		}
 	}
 
