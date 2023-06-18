@@ -1,13 +1,13 @@
-#ifndef __RAINDROP_GRAPHICS_UI_HPP__
-#define __RAINDROP_GRAPHICS_UI_HPP__
+#ifndef __RAINDROP_GRAPHICS_IMGUI_HPP__
+#define __RAINDROP_GRAPHICS_IMGUI_HPP__
 
 #include <Raindrop/Graphics/common.hpp>
 
 namespace Raindrop::Graphics{
-	class GUI{
+	class ImGUI{
 		public:
-			GUI(Renderer& renderer);
-			~GUI();
+			ImGUI(Renderer& renderer);
+			~ImGUI();
 
 			void newFrame();
 			void render(VkCommandBuffer commandBuffer);

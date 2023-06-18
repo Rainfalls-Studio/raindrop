@@ -20,6 +20,7 @@ namespace Raindrop::Core{
 			Asset::AssetManager& assetManager();
 			Registry::Registry& registry();
 			Scene::Scene& scene();
+			Graphics::Renderer& renderer();
 
 		private:
 			std::unique_ptr<Event::EventManager> _eventManager;

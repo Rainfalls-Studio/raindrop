@@ -26,7 +26,12 @@ namespace Raindrop::Core::Registry{
 
 			template<typename T>
 			T& as(){
-				return std::any_cast<T&>(_value);
+				try{
+					return std::any_cast<T&>(_value);
+				} catch (const std::exception &e){
+					_value = (T){};
+					return std::any_cast<T&>(_value);
+				}
 			}
 
 			template<typename T>
@@ -34,6 +39,8 @@ namespace Raindrop::Core::Registry{
 				_value = t;
 				return *this;
 			}
+
+			std::string toString() const;
 
 		private:
 			std::unordered_map<std::string, Registry> _nameToRegistry;

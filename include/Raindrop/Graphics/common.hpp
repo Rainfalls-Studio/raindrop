@@ -24,7 +24,7 @@ namespace Raindrop::Graphics{
 	class Window;
 	class Shader;
 	class GraphicsPipeline;
-	class GUI;
+	class ImGUI;
 	class SingleUseCommandBuffer;
 }
 

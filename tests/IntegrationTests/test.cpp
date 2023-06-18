@@ -14,7 +14,8 @@ int main(int argc, char **argv){
 	// /!\ TEST
 
 	engine.scene().createEntity();
-
+	engine.renderer().openGUI(RESOURCES / "gui/gui.xml");
 	engine.mainloop();
+
 	return 0;
 }

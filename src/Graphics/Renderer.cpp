@@ -6,7 +6,7 @@
 #include <Raindrop/Graphics/Device.hpp>
 #include <Raindrop/Graphics/Swapchain.hpp>
 #include <Raindrop/Graphics/GraphicsPipeline.hpp>
-#include <Raindrop/Graphics/GUI.hpp>
+#include <Raindrop/Graphics/ImGUI.hpp>
 #include <Raindrop/Core/Asset/AssetManager.hpp>
 #include <Raindrop/Core/Scene/Entity.hpp>
 
@@ -14,7 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Raindrop::Graphics{
-	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, Core::Scene::Scene& scene) : _eventManager{eventManager}, _assetManager{assetManager}, _registry{registry}, _scene{scene}{
+	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, Core::Scene::Scene& scene) : _eventManager{eventManager}, _assetManager{assetManager}, _registry{registry}, _scene{scene}, _interpreter{_registry}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
@@ -33,7 +33,7 @@ namespace Raindrop::Graphics{
 		createGraphicsCommandBuffers();
 		CLOG(INFO, "Engine.Graphics") << "Created renderer with success !";
 
-		_gui = std::make_unique<GUI>(*this);
+		_gui = std::make_unique<ImGUI>(*this);
 	}
 
 	Renderer::~Renderer(){
@@ -67,6 +67,10 @@ namespace Raindrop::Graphics{
 		}
 	}
 
+	void Renderer::openGUI(const std::filesystem::path& path){
+		_interpreter.parse(path);
+	}
+
 	void Renderer::update(){
 		_window->events(_gui.get());
 
@@ -83,17 +87,7 @@ namespace Raindrop::Graphics{
 				drawEntity(Core::Scene::Entity(_scene.root(), &_scene), pipeline->layout(), commandBuffer);
 			}
 
-			if (ImGui::Begin("Scene")){
-				selectedEntity = _scene.UI(selectedEntity);
-			}
-			ImGui::End();
-
-			if (ImGui::Begin("Components")){
-				if (selectedEntity != Core::Scene::INVALID_ENTITY_ID){
-					_scene.componentsUI(selectedEntity);
-				}
-			}
-			ImGui::End();
+			_interpreter.update();
 
 			// The GUI should be rendered at the end.
 			_gui->render(commandBuffer);

@@ -6,10 +6,11 @@
 #include <Raindrop/Graphics/PhysicalDeviceManager.hpp>
 #include <Raindrop/Graphics/factory/ShaderFactory.hpp>
 #include <Raindrop/Graphics/factory/GraphicsPipelineFactory.hpp>
+#include <Raindrop/Graphics/GUI/Interpreter.hpp>
 
 namespace Raindrop::Graphics{
 	class Renderer{
-		friend class GUI;
+		friend class ImGUI;
 		public:
 			Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, Core::Scene::Scene& scene);
 			~Renderer();
@@ -22,14 +23,15 @@ namespace Raindrop::Graphics{
 			VkCommandBuffer beginSingleUseTransfertCommandBuffer();
 			void endSingleUseTransfertCommandBuffer(VkCommandBuffer commandBuffer);
 
-		
+			void openGUI(const std::filesystem::path& path);
+
 		private:
 			Core::Event::EventManager& _eventManager;
 			Core::Asset::AssetManager& _assetManager;
 			Core::Scene::Scene& _scene;
 			Core::Registry::Registry& _registry;
-
-			std::unique_ptr<GUI> _gui;
+			GUI::Interpreter _interpreter;
+			std::unique_ptr<ImGUI> _gui;
 
 			std::shared_ptr<Instance> _instance;
 			std::shared_ptr<PhysicalDeviceManager> _physicalDeviceManager;

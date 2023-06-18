@@ -1,7 +1,7 @@
 #include <imgui/backends/imgui_impl_vulkan.h> 
 #include <imgui/backends/imgui_impl_sdl2.h>
 
-#include <Raindrop/Graphics/GUI.hpp>
+#include <Raindrop/Graphics/ImGUI.hpp>
 #include <Raindrop/Graphics/Renderer.hpp>
 #include <Raindrop/Graphics/Window.hpp>
 #include <Raindrop/Graphics/Device.hpp>
@@ -10,7 +10,7 @@
 #include <SDL2/SDL_vulkan.h>
 
 namespace Raindrop::Graphics{
-	GUI::GUI(Renderer& renderer){
+	ImGUI::ImGUI(Renderer& renderer){
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics.GUI");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
@@ -78,25 +78,25 @@ namespace Raindrop::Graphics{
 		CLOG(INFO, "Engine.Graphics.GUI") << "Loaded IMGUI with success!";
 	}
 
-	GUI::~GUI(){
+	ImGUI::~ImGUI(){
 		CLOG(INFO, "Engine.Graphics.GUI") << "Destroying IMGUI...";
 		vkDestroyDescriptorPool(_device, _imguiPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
 		CLOG(INFO, "Engine.Graphics.GUI") << "IMGUI destroyed with success !";
 	}
 
-	void GUI::newFrame(){
+	void ImGUI::newFrame(){
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 	}
 
-	void GUI::render(VkCommandBuffer commandBuffer){
+	void ImGUI::render(VkCommandBuffer commandBuffer){
 		ImGui::Render();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 	}
 
-	void GUI::event(SDL_Event* e){
+	void ImGUI::event(SDL_Event* e){
 		ImGui_ImplSDL2_ProcessEvent(e);
 	}
 }

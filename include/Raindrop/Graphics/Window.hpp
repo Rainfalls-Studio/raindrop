@@ -18,7 +18,7 @@ namespace Raindrop::Graphics{
 			bool loaded() const;
 			SDL_Window* get() const;
 
-			void events(GUI* gui = nullptr);
+			void events(ImGUI* gui = nullptr);
 			
 			bool resized() const;
 			void resetResizedFlag();

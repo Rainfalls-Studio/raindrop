@@ -1,0 +1,9 @@
+<Frame name="my frame" open="MainFrame.open">
+	<Button label="close">
+		<SetBool variable="MainFrame.open" value="false"/>
+	</Button>
+
+	<Separator/>
+
+	<Text text="${hello}"/>
+</Frame>

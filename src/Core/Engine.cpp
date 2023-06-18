@@ -66,4 +66,8 @@ namespace Raindrop::Core{
 			launched = false;
 		});
 	}
+
+	Graphics::Renderer& Engine::renderer(){
+		return *_renderer;
+	}
 }
