@@ -1,7 +1,7 @@
 #include <Raindrop/Graphics/GUI/Widgets/Text.hpp>
 
 namespace Raindrop::Graphics::GUI::Widgets{
-	Text::Text(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item(element, registry){
+	Text::Text(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 		getText(element);
 	}
 

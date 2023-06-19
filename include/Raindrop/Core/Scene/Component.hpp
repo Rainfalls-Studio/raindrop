@@ -54,7 +54,7 @@ namespace Raindrop::Core::Scene{
 		class Camera : public Component{
 			public:
 				static constexpr int ORTHOGRAPHIC_MODE = 0;
-				static constexpr int PERSPECTIVE_MODE = 0;
+				static constexpr int PERSPECTIVE_MODE = 1;
 
 				Camera(){
 
@@ -72,7 +72,10 @@ namespace Raindrop::Core::Scene{
 						ImGuiStorage* storage = ImGui::GetStateStorage();
 						int* mode = storage->GetIntRef(ImGui::GetID("mode"));
 
-						if (ImGui::RadioButton("orthographic", mode, ORTHOGRAPHIC_MODE)){
+						ImGui::RadioButton("orthographic", mode, ORTHOGRAPHIC_MODE);
+						ImGui::RadioButton("perspective", mode, PERSPECTIVE_MODE);
+
+						if (*mode == ORTHOGRAPHIC_MODE){
 							float* _left = storage->GetFloatRef(ImGui::GetID("left"));
 							float* _right = storage->GetFloatRef(ImGui::GetID("right"));
 							float* _top = storage->GetFloatRef(ImGui::GetID("top"));
@@ -91,9 +94,9 @@ namespace Raindrop::Core::Scene{
 							if (change){
 								projection = glm::ortho(*_left, *_right, *_bottom, *_top, *_near, *_far);
 							}
-						}
+							
+						} else if (*mode == PERSPECTIVE_MODE){
 
-						if (ImGui::RadioButton("perspective", mode, PERSPECTIVE_MODE)){
 							float* _fov = storage->GetFloatRef(ImGui::GetID("fov"));
 							float* _width = storage->GetFloatRef(ImGui::GetID("width"));
 							float* _height = storage->GetFloatRef(ImGui::GetID("height"));
@@ -111,6 +114,8 @@ namespace Raindrop::Core::Scene{
 								projection = glm::perspective(*_fov, *_width / *_height, *_near, *_far);
 							}
 						}
+
+						ImGui::TreePop();
 					}
 				}
 

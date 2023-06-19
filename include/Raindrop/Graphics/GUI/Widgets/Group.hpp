@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Group : public Item{
 		public:
-			Group(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Group(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Group() = default;
 
 			// Note that update also update the childs

@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Spacing : public Item{
 		public:
-			Spacing(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Spacing(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Spacing() = default;
 
 			virtual bool update() override;

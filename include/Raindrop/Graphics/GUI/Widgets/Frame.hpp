@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Frame : public Item{
 		public:
-			Frame(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Frame(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Frame() = default;
 
 			// Note that update also update the childs

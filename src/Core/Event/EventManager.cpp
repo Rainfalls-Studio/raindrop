@@ -5,6 +5,9 @@ namespace Raindrop::Core::Event{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Core.EventManager");
     	customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 		CLOG(INFO, "Engine.Core.EventManager") << "New Event Manager";
+
+		_keyEvents = std::make_unique<KeyEvents>();	
+		_mouseEvents = std::make_unique<MouseEvents>();	
 	}
 	
 	EventManager::~EventManager() {
@@ -21,5 +24,13 @@ namespace Raindrop::Core::Event{
 		for (auto &c : callbacks){
 			c();
 		}
+	}
+	
+	KeyEvents& EventManager::keyEvents(){
+		return *_keyEvents;
+	}
+
+	MouseEvents& EventManager::mouseEvents(){
+		return *_mouseEvents;
 	}
 }

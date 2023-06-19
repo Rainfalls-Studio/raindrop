@@ -1,13 +1,14 @@
 #include <Raindrop/Graphics/GUI/Widgets/Frame.hpp>
 
 namespace Raindrop::Graphics::GUI::Widgets{
-	Frame::Frame(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item(element, registry){
+	Frame::Frame(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 		getName(element);
 		getOpenValue(element);
 		getFlags(element);
 	}
 
 	bool Frame::update(){
+		ImGui::PushID(this);
 		if (ImGui::Begin(_name.c_str(), _open, _flags)){
 			auto it = _childs.begin();
 			while (it != _childs.end()){
@@ -18,6 +19,7 @@ namespace Raindrop::Graphics::GUI::Widgets{
 			}
 		}
 		ImGui::End();
+		ImGui::PopID();
 		return _open == nullptr ? false : !(*_open);
 	}
 
@@ -34,8 +36,7 @@ namespace Raindrop::Graphics::GUI::Widgets{
 		if (element->QueryStringAttribute("open", &openStr) == tinyxml2::XML_NO_ATTRIBUTE){
 			return;
 		}
-		_open = &_registry[openStr].as<bool>();
-		*_open = true;
+		_open = &_registry[openStr].as<bool>(true);
 	}
 
 	void Frame::getFlags(tinyxml2::XMLElement* element){

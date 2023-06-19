@@ -5,6 +5,8 @@
 
 namespace Raindrop::Core::Event{
 	class EventManager;
+	class KeyEvents;
+	class MouseEvents;
 }
 
 #endif

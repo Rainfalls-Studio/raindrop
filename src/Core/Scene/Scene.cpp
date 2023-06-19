@@ -115,6 +115,10 @@ namespace Raindrop::Core::Scene{
 	EntityID Scene::root() const{
 		return _root;
 	}
+
+	std::list<EntityID>& Scene::componentEntities(ComponentID component){
+		return _componentRegistry->getManager(component)->entities();
+	}
 	
 	bool drawEntityNode(Entity entity, EntityID& selection){
 		const ImGuiStyle& style = ImGui::GetStyle();
@@ -194,12 +198,24 @@ namespace Raindrop::Core::Scene{
 	}
 
 	#define draw_component(component) if (entity.hasComponent<component>()) {entity.getComponent<component>().UI();}
+	#define add_component(component) if (!entity.hasComponent<component>()) {if (ImGui::MenuItem(#component)){entity.createComponent<component>();}}
 
 	void Scene::componentsUI(EntityID id){
 		Entity entity = Entity(id, this);
 		ImGui::Text("LUID: 0x%x", entity.id());
 		ImGui::Text("GUID: none");
 
+		if (ImGui::Button("add component")){
+			ImGui::OpenPopup("add component");
+		}
+
+		if (ImGui::BeginPopup("add component")){
+			add_component(Components::Transform);
+			add_component(Components::Camera);
+			ImGui::EndPopup();
+		}
+
 		draw_component(Components::Transform);
+		draw_component(Components::Camera);
 	}
 }

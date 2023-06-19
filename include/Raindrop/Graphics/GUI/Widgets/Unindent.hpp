@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Unindent : public Item{
 		public:
-			Unindent(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Unindent(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Unindent() = default;
 
 			virtual bool update() override;

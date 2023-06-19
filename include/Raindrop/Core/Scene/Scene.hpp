@@ -6,6 +6,7 @@
 namespace Raindrop::Core::Scene{
 	class Scene{
 		public:
+
 			Scene(uint32_t entityCount, uint32_t componentCount);
 			~Scene();
 
@@ -70,6 +71,14 @@ namespace Raindrop::Core::Scene{
 			EntityID root() const;
 			EntityID UI(EntityID selectedEntity = INVALID_ENTITY_ID);
 			void componentsUI(EntityID entity);
+
+
+			std::list<EntityID>& componentEntities(ComponentID component);	
+
+			template<typename T>
+			std::list<EntityID>& componentEntities(){
+				return componentEntities(getComponentID<T>());
+			}
 
 		private:
 			std::unique_ptr<ComponentRegistry> _componentRegistry;

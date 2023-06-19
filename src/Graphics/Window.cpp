@@ -14,7 +14,7 @@ namespace Raindrop::Graphics{
 	static constexpr uint32_t DEFAULT_WINDOW_WIDTH = 1080;
 	static constexpr uint32_t DEFAULT_WINDOW_HEIGHT = 720;
 
-	Window::Window(Core::Event::EventManager& eventManager) : _eventManager{eventManager}{
+	Window::Window(Core::Event::EventManager& eventManager, Core::Registry::Registry& registry) : _eventManager{eventManager}, _registry{registry}{
 		_window = SDL_CreateWindow("Raindrop::Graphics window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_VULKAN);
 
 		if (!_window){
@@ -72,6 +72,10 @@ namespace Raindrop::Graphics{
 				case SDL_QUIT: quitEvent(); break;
 				case SDL_WINDOWEVENT: windowEvent(e); break;
 				case SDL_MOUSEMOTION: mouseMotionEvent(e); break;
+				case SDL_KEYDOWN: keyDown(e); break;
+				case SDL_KEYUP: keyUp(e); break;
+				case SDL_MOUSEBUTTONDOWN: mouseDown(e); break;
+				case SDL_MOUSEBUTTONUP: mouseUp(e); break;
 			}
 		}
 	}
@@ -83,20 +87,38 @@ namespace Raindrop::Graphics{
 	}
 
 	void Window::quitEvent(){
-		_eventManager.trigger("engine.window.quit");
+		_eventManager.trigger("Engine.Window.Quit");
 	}
 
 	void Window::windowResizedEvent(SDL_WindowEvent& e){
 		_resized = true;
-		_eventManager.trigger("engine.window.resized");
+		_registry["Engine.Window.Size"] = glm::vec2((float)e.data1, (float)e.data2);
+		_eventManager.trigger("Engine.Window.Resized");
 	}
 
 	void Window::mouseMotionEvent(SDL_Event& e){
-		_eventManager.trigger("engine.mouse.mouved");
+		_eventManager.trigger("Engine.Mouse.Mouved");
+		_eventManager.mouseEvents().pos() = glm::vec2(e.motion.x, e.motion.y);
+		_eventManager.mouseEvents().relPos() = glm::vec2(e.motion.xrel, e.motion.yrel);
 	}
 
-	void Window::mouseClicked(SDL_Event& e){
-		_eventManager.trigger("engine.mouse.cliked");
+	Core::Event::MouseButton SDLToRaindropMouseButton(Uint8 button){
+		switch (button){
+			case SDL_BUTTON_LEFT: return Core::Event::BUTTON_LEFT;
+			case SDL_BUTTON_MIDDLE: return Core::Event::BUTTON_MIDDLE;
+			case SDL_BUTTON_RIGHT: return Core::Event::BUTTON_RIGHT;
+		}
+		throw std::runtime_error("unknow button");
+	}
+
+	void Window::mouseDown(SDL_Event& e){
+		_eventManager.trigger("Engine.Mouse.ButtonDown");
+		_eventManager.mouseEvents().state(SDLToRaindropMouseButton(e.button.button)) = Core::Event::BUTTON_DOWN;
+	}
+
+	void Window::mouseUp(SDL_Event& e){
+		_eventManager.trigger("Engine.Mouse.ButtonUp");
+		_eventManager.mouseEvents().state(SDLToRaindropMouseButton(e.button.button)) = Core::Event::BUTTON_UP;
 	}
 	
 	bool Window::resized() const{
@@ -105,5 +127,17 @@ namespace Raindrop::Graphics{
 
 	void Window::resetResizedFlag(){
 		_resized = false;
+	}
+
+	void Window::keyDown(SDL_Event& e){
+		_registry["Engine.Key.Down"] = SDL_GetScancodeName(e.key.keysym.scancode);
+		_eventManager.trigger("Engine.KeyDown");
+		_eventManager.keyEvents()[static_cast<Core::Event::Key>(e.key.keysym.scancode)] = Core::Event::KEY_PRESSED;
+	}
+
+	void Window::keyUp(SDL_Event& e){
+		_registry["Engine.Key.Up"] = SDL_GetScancodeName(e.key.keysym.scancode);
+		_eventManager.trigger("Engine.KeyUp");
+		_eventManager.keyEvents()[static_cast<Core::Event::Key>(e.key.keysym.scancode)] = Core::Event::KEY_RELEASED;
 	}
 }

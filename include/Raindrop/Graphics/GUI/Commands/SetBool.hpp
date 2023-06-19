@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Commands{
 	class SetBool : public Item{
 		public:
-			SetBool(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			SetBool(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~SetBool() = default;
 
 			virtual bool update() override;

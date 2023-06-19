@@ -25,11 +25,11 @@ namespace Raindrop::Core::Registry{
 			std::string formatString(std::string str);
 
 			template<typename T>
-			T& as(){
+			T& as(const T d = T{}){
 				try{
 					return std::any_cast<T&>(_value);
 				} catch (const std::exception &e){
-					_value = (T){};
+					_value = d;
 					return std::any_cast<T&>(_value);
 				}
 			}

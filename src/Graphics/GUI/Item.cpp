@@ -13,13 +13,15 @@
 #include <Raindrop/Graphics/GUI/Commands/SetFloat.hpp>
 #include <Raindrop/Graphics/GUI/Commands/SetInt.hpp>
 #include <Raindrop/Graphics/GUI/Commands/SetBool.hpp>
+#include <Raindrop/Graphics/GUI/Commands/Open.hpp>
+#include <Raindrop/Graphics/GUI/Commands/OpenChild.hpp>
 
 namespace Raindrop::Graphics::GUI{
-	using Constructor = std::unique_ptr<Item>(*)(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
-	#define widget_constructor(T) [](tinyxml2::XMLElement* _element, Core::Registry::Registry& _registry){return (std::unique_ptr<Item>)std::move(std::make_unique<Widgets::T>(_element, _registry));}
-	#define command_constructor(T) [](tinyxml2::XMLElement* _element, Core::Registry::Registry& _registry){return (std::unique_ptr<Item>)std::move(std::make_unique<Commands::T>(_element, _registry));}
+	using Constructor = std::unique_ptr<Item>(*)(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
+	#define widget_constructor(T) [](tinyxml2::XMLElement* _element, Core::Registry::Registry& _registry, Core::Event::EventManager& _eventManager){return (std::unique_ptr<Item>)std::move(std::make_unique<Widgets::T>(_element, _registry, _eventManager));}
+	#define command_constructor(T) [](tinyxml2::XMLElement* _element, Core::Registry::Registry& _registry, Core::Event::EventManager& _eventManager){return (std::unique_ptr<Item>)std::move(std::make_unique<Commands::T>(_element, _registry, _eventManager));}
 
-	std::unique_ptr<Item> Item::create(tinyxml2::XMLElement* element, Core::Registry::Registry& registry){
+	std::unique_ptr<Item> Item::create(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& eventManager){
 		static const std::unordered_map<std::string, Constructor> map{
 			{"Frame", widget_constructor(Frame)},
 			{"Button", widget_constructor(Button)},
@@ -36,6 +38,8 @@ namespace Raindrop::Graphics::GUI{
 			{"SetInt", command_constructor(SetInt)},
 			{"SetFloat", command_constructor(SetFloat)},
 			{"SetBool", command_constructor(SetBool)},
+			{"Open", command_constructor(Open)},
+			{"OpenChild", command_constructor(OpenChild)},
 		};
 
 		auto it = map.find(element->Name());
@@ -44,7 +48,7 @@ namespace Raindrop::Graphics::GUI{
 			return nullptr;
 		}
 
-		return it->second(element, registry);
+		return it->second(element, registry, eventManager);
 	}
 
 	ImGuiWindowFlags Item::strToFlags(const std::string& str){

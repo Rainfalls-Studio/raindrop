@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Commands{
 	class SetFloat : public Item{
 		public:
-			SetFloat(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			SetFloat(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~SetFloat() = default;
 
 			virtual bool update() override;

@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Dummy : public Item{
 		public:
-			Dummy(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Dummy(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Dummy() = default;
 			
 			virtual bool update() override;

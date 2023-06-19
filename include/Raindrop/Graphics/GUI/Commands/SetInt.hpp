@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Commands{
 	class SetInt : public Item{
 		public:
-			SetInt(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			SetInt(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~SetInt() = default;
 
 			virtual bool update() override;

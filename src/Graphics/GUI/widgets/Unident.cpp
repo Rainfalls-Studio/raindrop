@@ -1,7 +1,7 @@
 #include <Raindrop/Graphics/GUI/Widgets/Unindent.hpp>
 
 namespace Raindrop::Graphics::GUI::Widgets{
-	Unindent::Unindent(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item(element, registry){
+	Unindent::Unindent(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 		getIndent(element);
 	}
 

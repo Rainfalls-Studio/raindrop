@@ -1,20 +1,13 @@
 #include <Raindrop/Graphics/GUI/Widgets/SameLine.hpp>
 
 namespace Raindrop::Graphics::GUI::Widgets{
-	SameLine::SameLine(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item(element, registry){
+	SameLine::SameLine(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 		getOffset(element);
 		getSpacing(element);
 	}
 
 	bool SameLine::update(){
-		auto it = _childs.begin();
-		while (it != _childs.end()){
-			ImGui::SameLine(_offset, _spacing);
-			if (it->get()->update()){
-				_childs.erase(it);
-			}
-			it++;
-		}
+		ImGui::SameLine(_offset, _spacing);
 		return false;
 	}
 	

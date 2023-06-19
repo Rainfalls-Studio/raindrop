@@ -14,7 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Raindrop::Graphics{
-	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, Core::Scene::Scene& scene) : _eventManager{eventManager}, _assetManager{assetManager}, _registry{registry}, _scene{scene}, _interpreter{_registry}{
+	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, Core::Scene::Scene& scene) : _eventManager{eventManager}, _assetManager{assetManager}, _registry{registry}, _scene{scene}, _interpreter{_registry, _eventManager}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
@@ -53,41 +53,60 @@ namespace Raindrop::Graphics{
 		CLOG(INFO, "Engine.Graphics") << "Destroyed renderer with success !";
 	}
 
-	void drawEntity(Core::Scene::Entity entity, VkPipelineLayout layout, VkCommandBuffer commandBuffer){
-
-		auto& transform = entity.transform();
-		PushConstant p;
-		p.viewTransform = glm::inverse(glm::scale(glm::mat4(1.f), {1080.f, 720.f, 1.f}));
-		p.localTransform = glm::translate(glm::mat4(1.f), transform.translation) * glm::rotate(glm::mat4(1.f), 3.14f, transform.rotation) * glm::scale(glm::mat4(1.f), transform.scale);
-		vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &p);
-		vkCmdDraw(commandBuffer, 6, 1, 0, 0);
-
-		for (auto c : entity){
-			drawEntity(c, layout, commandBuffer);
-		}
-	}
 
 	void Renderer::openGUI(const std::filesystem::path& path){
 		_interpreter.parse(path);
 	}
 
+	void drawEntity(Core::Scene::Entity entity, VkPipelineLayout layout, VkCommandBuffer commandBuffer, glm::mat4& viewTransform){
+
+		auto& transform = entity.transform();
+		PushConstant p;
+		p.viewTransform = viewTransform;
+		p.localTransform = glm::translate(glm::mat4(1.f), transform.translation) * glm::rotate(glm::mat4(1.f), 3.14f, transform.rotation) * glm::scale(glm::mat4(1.f), transform.scale);
+		vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &p);
+		vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+
+		for (auto c : entity){
+			drawEntity(c, layout, commandBuffer, viewTransform);
+		}
+	}
+
 	void Renderer::update(){
 		_window->events(_gui.get());
-
-		static Core::Scene::EntityID selectedEntity = Core::Scene::INVALID_ENTITY_ID;
 
 		VkCommandBuffer commandBuffer = beginFrame();
 		if (commandBuffer){
 			_gui->newFrame();
 			_swapchain->beginRenderPass(commandBuffer);
 
+			glm::mat4 viewTransform;
+			{
+				auto& list = _scene.componentEntities<Core::Scene::Components::Camera>();
+				if (!list.empty()){
+					auto entity = Core::Scene::Entity(list.front(), &_scene);
+					auto& component = entity.getComponent<Core::Scene::Components::Camera>();
+					component.update(entity.getComponent<Core::Scene::Components::Transform>());
+					viewTransform = component.viewProjection;
+				} else {
+					viewTransform = glm::mat4(1.f);
+				}
+			}
+
 			auto weak_pipeline = _registry["Pipeline"].as<std::weak_ptr<Raindrop::Core::Asset::Asset>>();
 			if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(weak_pipeline.lock())){
 				pipeline->bind(commandBuffer);
-				drawEntity(Core::Scene::Entity(_scene.root(), &_scene), pipeline->layout(), commandBuffer);
+				drawEntity(Core::Scene::Entity(_scene.root(), &_scene), pipeline->layout(), commandBuffer, viewTransform);
 			}
 
 			_interpreter.update();
+			_registry["Edit.SelectedEntity"] = _scene.UI(_registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>(Core::Scene::INVALID_ENTITY_ID));
+
+			if (ImGui::Begin("component")){
+				auto entity = _registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>();
+				if (entity != Core::Scene::INVALID_ENTITY_ID) _scene.componentsUI(entity);
+			}
+			ImGui::End();
 
 			// The GUI should be rendered at the end.
 			_gui->render(commandBuffer);
@@ -150,7 +169,7 @@ namespace Raindrop::Graphics{
 
 	void Renderer::createWindow(){
 		CLOG(INFO, "Engine.Graphics") << "Creating renderer window ...";
-		_window = std::make_shared<Window>(_eventManager);
+		_window = std::make_shared<Window>(_eventManager, _registry);
 		CLOG(INFO, "Engine.Graphics") << "Created renderer window with success !";
 	}
 

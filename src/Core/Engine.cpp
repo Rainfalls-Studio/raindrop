@@ -16,7 +16,7 @@ namespace Raindrop::Core{
 		_renderer = std::make_unique<Graphics::Renderer>(*_eventManager, *_assetManager, *_registry, *_scene);
 
 		setupEvents();
-		_eventManager->subscribe("engine.window.quit", [&](){
+		_eventManager->subscribe("Engine.Window.Quit", [&](){
 			launched = false;
 		});
 
@@ -37,6 +37,14 @@ namespace Raindrop::Core{
 		return *_eventManager.get();
 	}
 
+	Event::KeyEvents& Engine::keyEvents(){
+		return _eventManager->keyEvents();
+	}
+
+	Event::MouseEvents& Engine::mouseEvents(){
+		return _eventManager->mouseEvents();
+	}
+
 	Registry::Registry& Engine::registry(){
 		return *_registry;
 	}
@@ -53,16 +61,16 @@ namespace Raindrop::Core{
 		CLOG(INFO, "Engine") << "Starting engine mainloop";
 		launched = true;
 
-		_eventManager->trigger("engine.loop.start");
+		_eventManager->trigger("Engine.Mainloop.Start");
 		while (launched){
-			_eventManager->trigger("engine.loop.tick");
+			_eventManager->trigger("Engine.Mainloop.Tick");
 			_renderer->update();
 		}
-		_eventManager->trigger("engine.loop.end");
+		_eventManager->trigger("Engine.Mainloop.End");
 	}
 
 	void Engine::setupEvents(){
-		_eventManager->subscribe("engine.quit", [&](){
+		_eventManager->subscribe("Engine.Quit", [&](){
 			launched = false;
 		});
 	}

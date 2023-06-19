@@ -1,7 +1,7 @@
 #include <Raindrop/Graphics/GUI/Widgets/Dummy.hpp>
 
 namespace Raindrop::Graphics::GUI::Widgets{
-	Dummy::Dummy(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item{element, registry}{
+	Dummy::Dummy(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 		getSize(element);
 	}
 			

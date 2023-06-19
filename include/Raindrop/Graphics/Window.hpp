@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics{
 	class Window{
 		public:
-			Window(Core::Event::EventManager& eventManager);
+			Window(Core::Event::EventManager& eventManager, Core::Registry::Registry& registry);
 			virtual ~Window();
 
 			void setTitle(const char* title);
@@ -25,13 +25,17 @@ namespace Raindrop::Graphics{
 		
 		private:
 			Core::Event::EventManager& _eventManager;
+			Core::Registry::Registry& _registry;
 			SDL_Window* _window;
 
 			void quitEvent();
 			void windowEvent(SDL_Event& e);
 			void windowResizedEvent(SDL_WindowEvent& e);
 			void mouseMotionEvent(SDL_Event& e);
-			void mouseClicked(SDL_Event& e);
+			void mouseDown(SDL_Event& e);
+			void mouseUp(SDL_Event& e);
+			void keyDown(SDL_Event& e);
+			void keyUp(SDL_Event& e);
 
 			bool _resized = false;
 	};

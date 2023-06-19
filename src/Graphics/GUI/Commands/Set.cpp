@@ -1,7 +1,7 @@
 #include <Raindrop/Graphics/GUI/Commands/Set.hpp>
 
 namespace Raindrop::Graphics::GUI::Commands{
-	Set::Set(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item(element, registry){
+	Set::Set(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 		getVariable(element);
 		getValue(element);
 	}

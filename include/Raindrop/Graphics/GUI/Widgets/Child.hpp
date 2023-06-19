@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Child : public Item{
 		public:
-			Child(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Child(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Child() = default;
 
 			// Note that update also update the childs

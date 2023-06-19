@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class SameLine : public Item{
 		public:
-			SameLine(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			SameLine(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~SameLine() = default;
 
 			// Note that update also update the childs

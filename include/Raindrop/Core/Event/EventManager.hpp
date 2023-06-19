@@ -7,6 +7,8 @@
  */
 
 #include <Raindrop/Core/Event/common.hpp>
+#include <Raindrop/Core/Event/KeyEvents.hpp>
+#include <Raindrop/Core/Event/MouseEvents.hpp>
 
 namespace Raindrop::Core::Event{
 
@@ -20,8 +22,13 @@ namespace Raindrop::Core::Event{
 			void subscribe(const std::string& name, Callback callback);
 			void trigger(const std::string& name);
 
+			KeyEvents& keyEvents();
+			MouseEvents& mouseEvents();
+
 		private:
 			std::unordered_map<std::string, std::list<Callback>> _nameToCallbacksMap;
+			std::unique_ptr<KeyEvents> _keyEvents;
+			std::unique_ptr<MouseEvents> _mouseEvents;
 	};
 }
 

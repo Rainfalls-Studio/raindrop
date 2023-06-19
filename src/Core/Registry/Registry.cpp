@@ -57,6 +57,28 @@ namespace Raindrop::Core::Registry{
 		if (_value.type() == typeid(double)) return std::to_string(std::any_cast<double>(_value));
 		if (_value.type() == typeid(void*)) return std::to_string((unsigned long long)std::any_cast<void*>(_value));
 		if (_value.type() == typeid(bool)) return std::any_cast<bool>(_value) == true ? "true" : "false";
+
+		if (_value.type() == typeid(glm::vec2)){
+			glm::vec2 vec = std::any_cast<glm::vec2>(_value);
+			char str[100];
+			std::sprintf(str, "(%f, %f)", vec.x, vec.y);
+			return str;
+		}
+
+		if (_value.type() == typeid(glm::vec3)){
+			glm::vec3 vec = std::any_cast<glm::vec3>(_value);
+			char str[100];
+			std::sprintf(str, "(%f, %f, %f)", vec.x, vec.y, vec.z);
+			return str;
+		}
+
+		if (_value.type() == typeid(glm::vec4)){
+			glm::vec4 vec = std::any_cast<glm::vec4>(_value);
+			char str[100];
+			std::sprintf(str, "(%f, %f, %f, %f)", vec.x, vec.y, vec.z, vec.w);
+			return str;
+		}
+		
 		return "";
 	}
 }

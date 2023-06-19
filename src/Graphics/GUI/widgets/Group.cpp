@@ -1,7 +1,7 @@
 #include <Raindrop/Graphics/GUI/Widgets/Group.hpp>
 
 namespace Raindrop::Graphics::GUI::Widgets{
-	Group::Group(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item(element, registry){
+	Group::Group(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 	}
 
 	bool Group::update(){

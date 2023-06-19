@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Indent : public Item{
 		public:
-			Indent(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Indent(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Indent() = default;
 
 			virtual bool update() override;

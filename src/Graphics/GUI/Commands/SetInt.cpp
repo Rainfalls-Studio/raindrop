@@ -1,7 +1,7 @@
 #include <Raindrop/Graphics/GUI/Commands/SetInt.hpp>
 
 namespace Raindrop::Graphics::GUI::Commands{
-	SetInt::SetInt(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item(element, registry){
+	SetInt::SetInt(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 		getVariable(element);
 		getValue(element);
 	}

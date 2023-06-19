@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Commands{
 	class Set : public Item{
 		public:
-			Set(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Set(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Set() = default;
 
 			virtual bool update() override;

@@ -3,6 +3,7 @@
 
 #include <Raindrop/common.hpp>
 #include <Raindrop/Core/Event/EventManager.hpp>
+#include <Raindrop/Core/Event/KeyEvents.hpp>
 #include <Raindrop/Core/Scene/Scene.hpp>
 #include <Raindrop/Core/Asset/AssetManager.hpp>
 #include <Raindrop/Core/Registry/Registry.hpp>
@@ -17,6 +18,9 @@ namespace Raindrop::Core{
 			void mainloop();
 
 			Event::EventManager& eventManager();
+			Event::KeyEvents& keyEvents();
+			Event::MouseEvents& mouseEvents();
+			
 			Asset::AssetManager& assetManager();
 			Registry::Registry& registry();
 			Scene::Scene& scene();

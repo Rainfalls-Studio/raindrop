@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Button : public Item{
 		public:
-			Button(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Button(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Button() = default;
 
 			// Note that update also update the childs

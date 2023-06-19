@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Text : public Item{
 		public:
-			Text(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Text(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Text() = default;
 
 			// Note that update also update the childs

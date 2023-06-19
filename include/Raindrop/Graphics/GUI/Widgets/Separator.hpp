@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::GUI::Widgets{
 	class Separator : public Item{
 		public:
-			Separator(tinyxml2::XMLElement* element, Core::Registry::Registry& registry);
+			Separator(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager);
 			virtual ~Separator() = default;
 
 			// Note that update also update the childs

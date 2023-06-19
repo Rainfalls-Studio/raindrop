@@ -1,7 +1,7 @@
 #include <Raindrop/Graphics/GUI/Widgets/Button.hpp>
 
 namespace Raindrop::Graphics::GUI::Widgets{
-	Button::Button(tinyxml2::XMLElement* element, Core::Registry::Registry& registry) : Item(element, registry){
+	Button::Button(tinyxml2::XMLElement* element, Core::Registry::Registry& registry, Core::Event::EventManager& _eventManager) : Item(element, registry, _eventManager){
 		getLabel(element);
 		getSize(element);
 	}
