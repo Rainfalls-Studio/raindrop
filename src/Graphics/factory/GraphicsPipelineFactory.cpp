@@ -3,6 +3,7 @@
 #include <Raindrop/Graphics/GraphicsPipeline.hpp>
 #include <Raindrop/Graphics/Shader.hpp>
 #include <Raindrop/Graphics/builders/GraphicsPipelineBuilder.hpp>
+#include <Raindrop/Graphics/GraphicsContext.hpp>
 
 struct CaseInsensitiveHash {
 	std::size_t operator()(const std::wstring& str) const {
@@ -26,7 +27,7 @@ struct CaseInsensitiveEqual {
 };
 
 namespace Raindrop::Graphics::Factory{
-	GraphicsPipelineFactory::GraphicsPipelineFactory(std::shared_ptr<Device> device, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, VkAllocationCallbacks* allocationCallbacks) : _assetManager{assetManager}, _device{device}, _registry{registry}, _allocationCallbacks{allocationCallbacks}{
+	GraphicsPipelineFactory::GraphicsPipelineFactory(GraphicsContext& context) : _context{context}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics.Pipeline");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
@@ -62,8 +63,10 @@ namespace Raindrop::Graphics::Factory{
 	}
 
 	void GraphicsPipelineFactory::registerExtensions(const std::shared_ptr<GraphicsPipelineFactory>& factory){
-		_assetManager.linkFactory(".gfxpipe", factory);
-		_assetManager.linkFactory(".gfxpipeline", factory);
+		auto& assetManager = _context->assetManager;
+
+		assetManager.linkFactory(".gfxpipe", factory);
+		assetManager.linkFactory(".gfxpipeline", factory);
 	}
 
 	GraphicsPipelineFactory::Format GraphicsPipelineFactory::getFormat(const std::filesystem::path& path){
@@ -97,6 +100,9 @@ namespace Raindrop::Graphics::Factory{
 	}
 
 	std::shared_ptr<GraphicsPipeline> GraphicsPipelineFactory::loadFromXML(const std::filesystem::path& path){
+		auto& assetManager = _context->assetManager;
+		auto& registry = _context->registry;
+
 		CLOG(INFO, "Engine.Graphics.Pipeline") << "Loading " << path << " xml graphics pipeline";
 
 		tinyxml2::XMLDocument document;
@@ -107,7 +113,7 @@ namespace Raindrop::Graphics::Factory{
 
 		Builders::PipelineBuilder builder;
 
-		builder.setDevice(_device);
+		// builder.setDevice();
 
 		{
 			std::list<std::shared_ptr<Shader>> shaders = getShadersXML(document.FirstChildElement("shaders"));
@@ -116,10 +122,10 @@ namespace Raindrop::Graphics::Factory{
 			}
 		}
 
-		VkRenderPass renderPass = _registry["Engine.Graphics.Swapchain.RenderPass"].as<VkRenderPass>();
+		VkRenderPass renderPass = registry["Engine.Graphics.Swapchain.RenderPass"].as<VkRenderPass>();
 		builder.setRenderPass(renderPass);
 
-		return builder.build(_allocationCallbacks);
+		return builder.build(_context);
 	}
 
 	std::list<std::shared_ptr<Shader>> GraphicsPipelineFactory::getShadersXML(tinyxml2::XMLElement* element){
@@ -133,12 +139,15 @@ namespace Raindrop::Graphics::Factory{
 	}
 
 	std::shared_ptr<Shader> GraphicsPipelineFactory::getShaderXML(tinyxml2::XMLElement* shaderElement){
+		auto& assetManager = _context->assetManager;
+		auto& registry = _context->registry;
+
 		const char* source = shaderElement->Attribute("source");
 		if (!source){
 			CLOG(WARNING, "Engine.Graphics.Pipeline") << "The xml shader node does node contain a \"source\" attribute. This might result in errors.";
 			throw std::runtime_error("the shader node does not contain \"source\" attribute.");
 		}
 
-		return _assetManager.loadOrGet<Shader>(_registry.formatString(source)).lock();
+		return assetManager.loadOrGet<Shader>(registry.formatString(source)).lock();
 	}
 }

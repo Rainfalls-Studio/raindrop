@@ -1,22 +1,23 @@
 #include <Raindrop/Graphics/GraphicsPipeline.hpp>
 #include <Raindrop/Graphics/Device.hpp>
+#include <Raindrop/Graphics/GraphicsContext.hpp>
 
 namespace Raindrop::Graphics{
-	GraphicsPipeline::GraphicsPipeline(const std::shared_ptr<Device>& device, VkGraphicsPipelineCreateInfo info, VkPipelineLayoutCreateInfo layoutInfo, std::vector<std::shared_ptr<Shader>> shaders, VkAllocationCallbacks* allocationCallbacks) : _allocationCallbacks{allocationCallbacks}, _shaders{shaders}, _device{device}{
-		if (vkCreatePipelineLayout(_device->get(), &layoutInfo, allocationCallbacks, &_pipelineLayout) != VK_SUCCESS){
+	GraphicsPipeline::GraphicsPipeline(GraphicsContext& context, VkGraphicsPipelineCreateInfo info, VkPipelineLayoutCreateInfo layoutInfo, std::vector<std::shared_ptr<Shader>> shaders) : _context{context}, _shaders{shaders}{
+		if (vkCreatePipelineLayout(_context.device.get(), &layoutInfo, _context.allocationCallbacks, &_pipelineLayout) != VK_SUCCESS){
 			throw std::runtime_error("Failed to create pipeline layout");
 		}
 
 		info.layout = _pipelineLayout;
 
-		if (vkCreateGraphicsPipelines(_device->get(), VK_NULL_HANDLE, 1, &info, allocationCallbacks, &_pipeline) != VK_SUCCESS){
+		if (vkCreateGraphicsPipelines(_context.device.get(), VK_NULL_HANDLE, 1, &info, _context.allocationCallbacks, &_pipeline) != VK_SUCCESS){
 			throw std::runtime_error("Failed to create graphics pipeline");
 		}
 	}
 
 	GraphicsPipeline::~GraphicsPipeline(){
-		if (_pipeline) vkDestroyPipeline(_device->get(), _pipeline, _allocationCallbacks);
-		if (_pipelineLayout) vkDestroyPipelineLayout(_device->get(), _pipelineLayout, _allocationCallbacks);
+		if (_pipeline) vkDestroyPipeline(_context.device.get(), _pipeline, _context.allocationCallbacks);
+		if (_pipelineLayout) vkDestroyPipelineLayout(_context.device.get(), _pipelineLayout, _context.allocationCallbacks);
 	}
 
 	void GraphicsPipeline::bind(VkCommandBuffer commandBuffer){

@@ -9,6 +9,11 @@
 #include <Raindrop/Graphics/GUI/Widgets/Unindent.hpp>
 #include <Raindrop/Graphics/GUI/Widgets/Group.hpp>
 #include <Raindrop/Graphics/GUI/Widgets/Text.hpp>
+#include <Raindrop/Graphics/GUI/Widgets/DragInt.hpp>
+#include <Raindrop/Graphics/GUI/Widgets/DragFloat.hpp>
+#include <Raindrop/Graphics/GUI/Widgets/DragVec2.hpp>
+#include <Raindrop/Graphics/GUI/Widgets/DragVec3.hpp>
+#include <Raindrop/Graphics/GUI/Widgets/DragVec4.hpp>
 #include <Raindrop/Graphics/GUI/Commands/Set.hpp>
 #include <Raindrop/Graphics/GUI/Commands/SetFloat.hpp>
 #include <Raindrop/Graphics/GUI/Commands/SetInt.hpp>
@@ -33,6 +38,11 @@ namespace Raindrop::Graphics::GUI{
 			{"Unindent", widget_constructor(Unindent)},
 			{"Group", widget_constructor(Group)},
 			{"Text", widget_constructor(Text)},
+			{"DragInt", widget_constructor(DragInt)},
+			{"DragFloat", widget_constructor(DragFloat)},
+			{"DragVec2", widget_constructor(DragVec2)},
+			{"DragVec3", widget_constructor(DragVec3)},
+			{"DragVec4", widget_constructor(DragVec4)},
 
 			{"Set", command_constructor(Set)},
 			{"SetInt", command_constructor(SetInt)},

@@ -21,6 +21,8 @@ namespace Raindrop::Core::Scene{
 		registerComponent<Components::Transform>(entityCount);
 		registerComponent<Components::Hierachy>(entityCount);
 		registerComponent<Components::Camera>(1);
+		registerComponent<Components::DB_KeyboadController>(1);
+		registerComponent<Components::Model>(entityCount);
 
 		_root = createEntity();
 	}
@@ -212,10 +214,12 @@ namespace Raindrop::Core::Scene{
 		if (ImGui::BeginPopup("add component")){
 			add_component(Components::Transform);
 			add_component(Components::Camera);
+			add_component(Components::DB_KeyboadController);
 			ImGui::EndPopup();
 		}
 
 		draw_component(Components::Transform);
 		draw_component(Components::Camera);
+		draw_component(Components::DB_KeyboadController);
 	}
 }

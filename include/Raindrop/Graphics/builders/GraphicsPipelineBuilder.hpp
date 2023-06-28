@@ -9,14 +9,12 @@ namespace Raindrop::Graphics::Builders{
 			PipelineBuilder();
 			~PipelineBuilder();
 
-			std::shared_ptr<GraphicsPipeline> build(VkAllocationCallbacks* callbacks = nullptr);
+			std::shared_ptr<GraphicsPipeline> build(GraphicsContext& context);
 
-			void setDevice(const std::shared_ptr<Device>& device);
 			void addShader(const std::shared_ptr<Shader>& shader);
 			void setRenderPass(VkRenderPass renderPass);
 
 		private:
-			std::shared_ptr<Device> _device;
 			VkRenderPass _renderPass = VK_NULL_HANDLE;
 			uint32_t _subpass = 0;
 

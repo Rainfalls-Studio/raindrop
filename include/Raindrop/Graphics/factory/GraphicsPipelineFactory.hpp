@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics::Factory{
 	class GraphicsPipelineFactory : public Raindrop::Core::Asset::AssetFactory{
 		public:
-			GraphicsPipelineFactory(std::shared_ptr<Device> device, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, VkAllocationCallbacks* allocationCallbacks = nullptr);
+			GraphicsPipelineFactory(GraphicsContext& context);
 			virtual ~GraphicsPipelineFactory() override;
 
 			virtual std::shared_ptr<Core::Asset::Asset> createAsset(const std::filesystem::path& path) override;
@@ -16,10 +16,7 @@ namespace Raindrop::Graphics::Factory{
 		
 		private:
 			class ExtensionToFormat;
-			VkAllocationCallbacks* _allocationCallbacks = nullptr;
-			Core::Asset::AssetManager& _assetManager;
-			Core::Registry::Registry& _registry;
-			std::shared_ptr<Device> _device;
+			GraphicsContext& _context;
 			std::list<std::shared_ptr<GraphicsPipeline>> _pipelines;
 
 			enum Format{

@@ -1,8 +1,0 @@
-file(GLOB_RECURSE GUIS *.xml)
-
-foreach(GUI IN LISTS GUIS)
-	get_filename_component(FILENAME ${GUI} NAME)
-	set(destination_file "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
-	configure_file(${GUI} ${destination_file} COPYONLY)
-	add_custom_target(${FILENAME} ALL DEPENDS ${destination_file})
-endforeach()

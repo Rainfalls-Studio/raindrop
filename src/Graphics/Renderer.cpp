@@ -1,7 +1,5 @@
 #include <Raindrop/Graphics/Renderer.hpp>
 #include <Raindrop/Graphics/Window.hpp>
-#include <Raindrop/Graphics/builders/InstanceBuilder.hpp>
-#include <Raindrop/Graphics/builders/DeviceBuilder.hpp>
 #include <Raindrop/Graphics/PhysicalDevice.hpp>
 #include <Raindrop/Graphics/Device.hpp>
 #include <Raindrop/Graphics/Swapchain.hpp>
@@ -14,45 +12,34 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Raindrop::Graphics{
-	Renderer::Renderer(Core::Event::EventManager& eventManager, Core::Asset::AssetManager& assetManager, Core::Registry::Registry& registry, Core::Scene::Scene& scene) : _eventManager{eventManager}, _assetManager{assetManager}, _registry{registry}, _scene{scene}, _interpreter{_registry, _eventManager}{
+	Renderer::Renderer(Core::EngineContext& context, Core::Scene::Scene& scene) : _interpreter{context}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
-		
 		CLOG(INFO, "Engine.Graphics") << "Creating renderer ...";
-		createInstance();
-		createPhysicalDeviceManager();
+		
+		_context = std::make_unique<GraphicsContext>(context, scene);
+		_gui = std::make_unique<ImGUI>(*_context);
 
-		createWindow();
-		createSurface();
-		createDevice();
 		registerFactories();
-		createSwapchain();
-		createGraphicsCommandPool();
-		createTransfertCommandPool();
 		createGraphicsCommandBuffers();
-		CLOG(INFO, "Engine.Graphics") << "Created renderer with success !";
 
-		_gui = std::make_unique<ImGUI>(*this);
+		CLOG(INFO, "Engine.Graphics") << "Created renderer with success !";
 	}
 
 	Renderer::~Renderer(){
 		CLOG(INFO, "Engine.Graphics") << "Destroying renderer ...";
-		_device->waitIdle();
-		_gui.reset();
-		eraseFactories();
-		_swapchain.reset();
-		if (_surface) vkDestroySurfaceKHR(_instance->get(), _surface, nullptr);
-		destroyGraphicsCommandBuffers();
-		destroyGraphicsCommandPool();
-		destroyTransfertCommandPool();
 
-		_device.reset();
-		_physicalDeviceManager.reset();
-		_instance.reset();
+		_context->device.waitIdle();
+
+		eraseFactories();
+		destroyGraphicsCommandBuffers();
+
+		_gui.reset();
+		_context.reset();
+		
 		CLOG(INFO, "Engine.Graphics") << "Destroyed renderer with success !";
 	}
-
 
 	void Renderer::openGUI(const std::filesystem::path& path){
 		_interpreter.parse(path);
@@ -73,18 +60,24 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::update(){
-		_window->events(_gui.get());
+		auto& registry = _context->context.registry;
+		auto& assetManager = _context->context.assetManager;
+		auto& eventManager = _context->context.eventManager;
+		auto& scene = _context->scene;
+		auto& swapchain = _context->swapchain;
+
+		_context->window.events(_gui.get());
 
 		VkCommandBuffer commandBuffer = beginFrame();
 		if (commandBuffer){
 			_gui->newFrame();
-			_swapchain->beginRenderPass(commandBuffer);
+			swapchain.beginRenderPass(commandBuffer);
 
 			glm::mat4 viewTransform;
 			{
-				auto& list = _scene.componentEntities<Core::Scene::Components::Camera>();
+				auto& list = scene.componentEntities<Core::Scene::Components::Camera>();
 				if (!list.empty()){
-					auto entity = Core::Scene::Entity(list.front(), &_scene);
+					auto entity = Core::Scene::Entity(list.front(), &scene);
 					auto& component = entity.getComponent<Core::Scene::Components::Camera>();
 					component.update(entity.getComponent<Core::Scene::Components::Transform>());
 					viewTransform = component.viewProjection;
@@ -93,135 +86,37 @@ namespace Raindrop::Graphics{
 				}
 			}
 
-			auto weak_pipeline = _registry["Pipeline"].as<std::weak_ptr<Raindrop::Core::Asset::Asset>>();
-			if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(weak_pipeline.lock())){
-				pipeline->bind(commandBuffer);
-				drawEntity(Core::Scene::Entity(_scene.root(), &_scene), pipeline->layout(), commandBuffer, viewTransform);
-			}
+			// auto weak_pipeline = _context->context->registry["Pipeline"].as<std::weak_ptr<Raindrop::Core::Asset::Asset>>();
+			// if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(weak_pipeline.lock())){
+			// 	pipeline->bind(commandBuffer);
+			// 	drawEntity(Core::Scene::Entity(_scene.root(), &_scene), pipeline->layout(), commandBuffer, viewTransform);
+			// }
 
 			_interpreter.update();
-			_registry["Edit.SelectedEntity"] = _scene.UI(_registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>(Core::Scene::INVALID_ENTITY_ID));
+			registry["Edit.SelectedEntity"] = scene.UI(registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>(Core::Scene::INVALID_ENTITY_ID));
 
 			if (ImGui::Begin("component")){
-				auto entity = _registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>();
-				if (entity != Core::Scene::INVALID_ENTITY_ID) _scene.componentsUI(entity);
+				auto entity = registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>();
+				if (entity != Core::Scene::INVALID_ENTITY_ID) scene.componentsUI(entity);
 			}
 			ImGui::End();
 
 			// The GUI should be rendered at the end.
 			_gui->render(commandBuffer);
-			_swapchain->endRenderPass(commandBuffer);
+			swapchain.endRenderPass(commandBuffer);
 			endFrame();
 		}
 	}
 
-	void Renderer::createSurface(){
-		CLOG(INFO, "Engine.Graphics") << "Creating renderer vulkan surface ...";
-		SDL_Vulkan_CreateSurface(_window->get(), _instance->get(), &_surface);
-		CLOG(INFO, "Engine.Graphics") << "Created renderer vulkan surface with success !";
-	}
-
-	void Renderer::createInstance(){
-		CLOG(INFO, "Engine.Graphics") << "Creating renderer vulkan instance ...";
-		Builders::InstanceBuilder builder;
-
-		builder.setEngineName("Raindrop");
-		builder.setApplicationName("Raindrop::Graphics");
-
-		builder.setEngineVersion(0, 0, 1, 0);
-		builder.setApplicationVersion(0, 0, 1, 0);
-		builder.setVulkanAPIVersion(VK_API_VERSION_1_3);
-		builder.requireGraphicsExtensions();
-		builder.requireValidationLayer("VK_LAYER_KHRONOS_validation");
-
-		_instance = builder.build();
-		CLOG(INFO, "Engine.Graphics") << "created Renderer vulkan instance created with success !";
-	}
-
-	void Renderer::createPhysicalDeviceManager(){
-		CLOG(INFO, "Engine.Graphics") << "Creating renderer physical device manager ...";
-		_physicalDeviceManager = std::make_shared<PhysicalDeviceManager>(_instance);
-		CLOG(INFO, "Engine.Graphics") << "created Renderer vulkan instance created with success !";
-	}
-
-	void Renderer::createDevice(){
-		CLOG(INFO, "Engine.Graphics") << "Creating renderer device ...";
-		Builders::DeviceBuilder builder;
-
-		builder.setPhysicalDevice(findSuitablePhysicalDevice());
-		builder.requireExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-
-		_device = builder.build();
-
-		_graphicsQueue = _device->families()[_device->graphicsFamily()].queues[0];
-		_transfertQueue = _device->families()[_device->transfertFamily()].queues[0];
-		_presentQueue = _device->families()[_device->presentFamily(_surface)].queues[0];
-		CLOG(INFO, "Engine.Graphics") << "Created renderer vulkan device with success !";
-	}
-
-	std::shared_ptr<PhysicalDevice> Renderer::findSuitablePhysicalDevice(){
-		for (auto& d : _physicalDeviceManager->devices()){
-			auto swapchainSupport = d->getSwapchainSupport(_surface);
-			if (swapchainSupport.supported) return d;
-		}
-		return nullptr;
-	}
-
-	void Renderer::createWindow(){
-		CLOG(INFO, "Engine.Graphics") << "Creating renderer window ...";
-		_window = std::make_shared<Window>(_eventManager, _registry);
-		CLOG(INFO, "Engine.Graphics") << "Created renderer window with success !";
-	}
-
-	void Renderer::createSwapchain(){
-		CLOG(INFO, "Engine.Graphics") << "Creating renderer swapchain ...";
-		auto size = _window->getSize();
-		_swapchain = std::make_unique<Swapchain>(_device, _surface, VkExtent2D{size.x, size.y}, _registry);
-		_swapchain->setGraphicsQueue(_graphicsQueue);
-		_swapchain->setPresentQueue(_presentQueue);
-		CLOG(INFO, "Engine.Graphics") << "Created renderer swapchain with success !";
-	}
-
-	std::shared_ptr<Instance> Renderer::instance() const{
-		return _instance;
-	}
-
-	std::shared_ptr<Device> Renderer::device() const{
-		return _device;
-	}
-
-	void Renderer::createGraphicsCommandPool(){
-		VkCommandPoolCreateInfo info{};
-		info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		info.queueFamilyIndex = _device->graphicsFamily();
-		info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-
-		if (vkCreateCommandPool(_device->get(), &info, nullptr, &_graphicsCommandPool) != VK_SUCCESS){
-			throw std::runtime_error("failed to create vulkan graphics command pool");
-		}
-	}
-
-	void Renderer::createGraphicsCommandBuffers(){
-		uint32_t count = _swapchain->frameCount();
-		_graphicsCommandBuffers.resize(count);
-
-		VkCommandBufferAllocateInfo info{};
-		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		info.commandPool = _graphicsCommandPool;
-		info.commandBufferCount = count;
-
-		if (vkAllocateCommandBuffers(_device->get(), &info, _graphicsCommandBuffers.data()) != VK_SUCCESS){
-			throw std::runtime_error("failed to allocate vulkan graphics command buffers");
-		}
-	}
-
 	VkCommandBuffer Renderer::beginFrame(){
-		VkResult result = _swapchain->acquireNextImage();
+		auto& window = _context->window;
+		auto& swapchain = _context->swapchain;
+
+		VkResult result = swapchain.acquireNextImage();
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-			auto size = _window->getSize();
-			_swapchain->setExtent(VkExtent2D{size.x, size.y});
-			_swapchain->rebuildSwapchain();
+			auto size = window.getSize();
+			swapchain.setExtent(VkExtent2D{size.x, size.y});
+			swapchain.rebuildSwapchain();
 			return nullptr;
 		}
 
@@ -240,17 +135,20 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::endFrame(){
+		auto& window = _context->window;
+		auto& swapchain = _context->swapchain;
+
 		VkCommandBuffer commandBuffer = getCurrentGraphicsCommandBuffer();
 
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
 			throw std::runtime_error("failed to record command buffer");
 		
-		VkResult result = _swapchain->submitCommandBuffer(&commandBuffer);
+		VkResult result = swapchain.submitCommandBuffer(&commandBuffer);
 
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || _window->resized()){
-			auto size = _window->getSize();
-			_swapchain->setExtent(VkExtent2D{size.x, size.y});
-			_swapchain->rebuildSwapchain();
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.resized()){
+			auto size = window.getSize();
+			swapchain.setExtent(VkExtent2D{size.x, size.y});
+			swapchain.rebuildSwapchain();
 		}
 
 		if (result != VK_SUCCESS){
@@ -259,91 +157,55 @@ namespace Raindrop::Graphics{
 	}
 
 	VkCommandBuffer Renderer::getCurrentGraphicsCommandBuffer(){
-		return _graphicsCommandBuffers[_swapchain->currentFrame()];
-	}
-
-	void Renderer::destroyGraphicsCommandBuffers(){
-		vkFreeCommandBuffers(_device->get(), _graphicsCommandPool, _graphicsCommandBuffers.size(), _graphicsCommandBuffers.data());
-	}
-
-	void Renderer::destroyGraphicsCommandPool(){
-		vkDestroyCommandPool(_device->get(), _graphicsCommandPool, nullptr);
+		return _graphicsCommandBuffers[_context->swapchain.currentFrame()];
 	}
 
 	void Renderer::registerFactories(){
 		CLOG(INFO, "Engine.Graphics") << "registering renderer asset factories ...";
 		registerShaderFactory();
 		registerGraphicsPipelineFactory();
+		registerModelFactory();
 		CLOG(INFO, "Engine.Graphics") << "registred renderer asset factories with success !";
 	}
 
 	void Renderer::registerShaderFactory(){
-		_shaderFactory = std::make_shared<Factory::ShaderFactory>(_device);
-		_assetManager.linkFactory(".spv", _shaderFactory);
+		_shaderFactory = std::make_shared<Factory::ShaderFactory>(*_context);
+		_context->context.assetManager.linkFactory(".spv", _shaderFactory);
 	}
 
 	void Renderer::registerGraphicsPipelineFactory(){
-		_graphicsPipelineFactory = std::make_unique<Factory::GraphicsPipelineFactory>(_device, _assetManager, _registry, nullptr);
+		_graphicsPipelineFactory = std::make_unique<Factory::GraphicsPipelineFactory>(*_context);
 		_graphicsPipelineFactory->registerExtensions(_graphicsPipelineFactory);
+	}
+
+	void Renderer::registerModelFactory(){
+		_modelFactory = std::make_unique<Factory::ModelFactory>(*_context);
+		_modelFactory->registerExtensions(_modelFactory);
 	}
 
 	void Renderer::eraseFactories(){
 		_shaderFactory.reset();
 		_graphicsPipelineFactory.reset();
+		_modelFactory.reset();
 	}
 
-	void Renderer::createTransfertCommandPool(){
-		VkCommandPoolCreateInfo info{};
-		info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
-		info.queueFamilyIndex = _device->transfertFamily();
+	void Renderer::createGraphicsCommandBuffers(){
+		_graphicsCommandBuffers.resize(_context->swapchain.frameCount());
 
-		if (vkCreateCommandPool(_device->get(), &info, VK_NULL_HANDLE, &_transfertCommandPool) != VK_SUCCESS){
-			throw std::runtime_error("Failed to create transfert command pool");
-		}
-	}
-	
-	VkCommandBuffer Renderer::beginSingleUseTransfertCommandBuffer(){
 		VkCommandBufferAllocateInfo info{};
 		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		info.commandPool = _context->graphicsCommandPool.primary();
 		info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		info.commandBufferCount = 1;
-		info.commandPool = _transfertCommandPool;
+		info.commandBufferCount = _graphicsCommandBuffers.size();
 
-		VkCommandBuffer commandBuffer;
-
-		if (vkAllocateCommandBuffers(_device->get(), &info, &commandBuffer) != VK_SUCCESS){
-			throw std::runtime_error("Failed to allocate transfert command buffer");
+		if (vkAllocateCommandBuffers(_context->device.get(), &info, _graphicsCommandBuffers.data()) != VK_SUCCESS){
+			CLOG(ERROR, "Engine.Graphics") << "Failed to allocate graphics command buffer";
+			throw std::runtime_error("Failed to allocate graphics command buffers");
 		}
-
-		VkCommandBufferBeginInfo beginInfo{};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS){
-			throw std::runtime_error("Failed to begin transfert command buffer");
-		}
-
-		return commandBuffer;
 	}
 
-	void Renderer::endSingleUseTransfertCommandBuffer(VkCommandBuffer commandBuffer){
-		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS){
-			throw std::runtime_error("Failed to end transfert command buffer");
-		}
-
-		VkSubmitInfo submitInfo{};
-		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &commandBuffer;
-
-		vkQueueSubmit(_transfertQueue, 1, &submitInfo, VK_NULL_HANDLE);
-		vkQueueWaitIdle(_transfertQueue);
-
-		vkFreeCommandBuffers(_device->get(), _transfertCommandPool, 1, &commandBuffer);
+	void Renderer::destroyGraphicsCommandBuffers(){
+		vkFreeCommandBuffers(_context->device.get(), _context->graphicsCommandPool.primary(), _graphicsCommandBuffers.size(), _graphicsCommandBuffers.data());
+		_graphicsCommandBuffers.clear();
 	}
-
-	void Renderer::destroyTransfertCommandPool(){
-		vkDestroyCommandPool(_device->get(), _transfertCommandPool, nullptr);
-	}
-
 }

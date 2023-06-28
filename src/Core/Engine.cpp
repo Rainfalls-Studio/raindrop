@@ -1,4 +1,6 @@
 #include <Raindrop/Core/Engine.hpp>
+#include <Raindrop/Core/Scene/Component.hpp>
+#include <Raindrop/Core/Scene/Entity.hpp>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -9,14 +11,13 @@ namespace Raindrop::Core{
 
 		CLOG(INFO, "Engine") << "Creating New Engine ...";
 
-		_eventManager = std::make_unique<Core::Event::EventManager>();
-		_assetManager = std::make_unique<Core::Asset::AssetManager>();
-		_registry = std::make_unique<Core::Registry::Registry>();
+		_context = std::make_unique<EngineContext>();
+
 		_scene = std::make_unique<Core::Scene::Scene>(5000, 100);
-		_renderer = std::make_unique<Graphics::Renderer>(*_eventManager, *_assetManager, *_registry, *_scene);
+		_renderer = std::make_unique<Graphics::Renderer>(*_context, *_scene);
 
 		setupEvents();
-		_eventManager->subscribe("Engine.Window.Quit", [&](){
+		_context->eventManager.subscribe("Engine.Window.Quit", [&](){
 			launched = false;
 		});
 
@@ -25,28 +26,25 @@ namespace Raindrop::Core{
 
 	Engine::~Engine(){
 		CLOG(INFO, "Engine") << "Destroying Engine ...";
-		_eventManager.reset();
-		_assetManager.reset();
-		_registry.reset();
-		_scene.reset();
+		_context.reset();
 		_renderer.reset();
 		CLOG(INFO, "Engine") << "Engine destroyed with success !";
 	}
 
 	Event::EventManager& Engine::eventManager(){
-		return *_eventManager.get();
+		return _context->eventManager;
 	}
 
 	Event::KeyEvents& Engine::keyEvents(){
-		return _eventManager->keyEvents();
+		return _context->eventManager.keyEvents();
 	}
 
 	Event::MouseEvents& Engine::mouseEvents(){
-		return _eventManager->mouseEvents();
+		return _context->eventManager.mouseEvents();
 	}
 
 	Registry::Registry& Engine::registry(){
-		return *_registry;
+		return _context->registry;
 	}
 
 	Scene::Scene& Engine::scene(){
@@ -54,23 +52,33 @@ namespace Raindrop::Core{
 	}
 
 	Asset::AssetManager& Engine::assetManager(){
-		return *_assetManager;
+		return _context->assetManager;
 	}
 	
 	void Engine::mainloop(){
 		CLOG(INFO, "Engine") << "Starting engine mainloop";
 		launched = true;
 
-		_eventManager->trigger("Engine.Mainloop.Start");
+		_context->eventManager.trigger("Engine.Mainloop.Start");
 		while (launched){
-			_eventManager->trigger("Engine.Mainloop.Tick");
+			_context->eventManager.trigger("Engine.Mainloop.Tick");
+
+			// {
+			// 	auto& list = _scene->componentEntities<Scene::Components::DB_KeyboadController>();
+			// 	if (!list.empty()){
+			// 		auto entity = Scene::Entity(list.front(), _scene.get());
+			// 		auto& component = entity.getComponent<Core::Scene::Components::DB_KeyboadController>();
+			// 		component.update(entity.getComponent<Core::Scene::Components::Transform>(), *_eventManager);
+			// 	}
+			// }
+
 			_renderer->update();
 		}
-		_eventManager->trigger("Engine.Mainloop.End");
+		_context->eventManager.trigger("Engine.Mainloop.End");
 	}
 
 	void Engine::setupEvents(){
-		_eventManager->subscribe("Engine.Quit", [&](){
+		_context->eventManager.subscribe("Engine.Quit", [&](){
 			launched = false;
 		});
 	}

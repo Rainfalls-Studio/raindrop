@@ -3,6 +3,8 @@
 
 #include <Raindrop/Core/Scene/common.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <Raindrop/Core/Event/EventManager.hpp>
+#include <Raindrop/Graphics/Model.hpp>
 
 namespace Raindrop::Core::Scene{
 	class Component{
@@ -124,6 +126,35 @@ namespace Raindrop::Core::Scene{
 					view = glm::inverse(transformMat);
 					viewProjection = projection * view;
 				}
+		};
+
+		class DB_KeyboadController : public Component{
+			public:
+				void update(Transform& transform, Event::EventManager& events){
+					if (events.keyEvents()[Event::KEY_Z] == Event::KEY_PRESSED) {transform.translation.x += speed;}
+					if (events.keyEvents()[Event::KEY_S] == Event::KEY_PRESSED) {transform.translation.x -= speed;}
+
+					if (events.keyEvents()[Event::KEY_Q] == Event::KEY_PRESSED) {transform.translation.y += speed;}
+					if (events.keyEvents()[Event::KEY_D] == Event::KEY_PRESSED) {transform.translation.y -= speed;}
+
+					if (events.keyEvents()[Event::KEY_W] == Event::KEY_PRESSED) {transform.translation.z += speed;}
+					if (events.keyEvents()[Event::KEY_X] == Event::KEY_PRESSED) {transform.translation.z -= speed;}
+				}
+
+			private:
+				Event::Key front;
+				Event::Key back;
+				Event::Key left;
+				Event::Key right;
+				Event::Key up;
+				Event::Key down;
+				
+				float speed = 0.01f;
+		};
+
+		class Model{
+			public:
+				std::weak_ptr<Model> _model;
 		};
 	}
 }

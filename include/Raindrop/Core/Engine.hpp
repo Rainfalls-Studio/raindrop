@@ -2,12 +2,10 @@
 #define __RAINDROP_CORE_ENGINE_HPP__
 
 #include <Raindrop/common.hpp>
-#include <Raindrop/Core/Event/EventManager.hpp>
 #include <Raindrop/Core/Event/KeyEvents.hpp>
 #include <Raindrop/Core/Scene/Scene.hpp>
-#include <Raindrop/Core/Asset/AssetManager.hpp>
-#include <Raindrop/Core/Registry/Registry.hpp>
 #include <Raindrop/Graphics/Renderer.hpp>
+#include <Raindrop/Core/EngineContext.hpp>
 
 namespace Raindrop::Core{
 	class Engine{
@@ -27,9 +25,7 @@ namespace Raindrop::Core{
 			Graphics::Renderer& renderer();
 
 		private:
-			std::unique_ptr<Event::EventManager> _eventManager;
-			std::unique_ptr<Asset::AssetManager> _assetManager;
-			std::unique_ptr<Registry::Registry> _registry;
+			std::unique_ptr<EngineContext> _context;
 			std::unique_ptr<Scene::Scene> _scene;
 
 			std::unique_ptr<Graphics::Renderer> _renderer;

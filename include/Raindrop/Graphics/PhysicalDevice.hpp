@@ -6,13 +6,6 @@
 namespace Raindrop::Graphics{
 	class PhysicalDevice{
 		public:
-			struct SwapchainSupport{
-				VkSurfaceCapabilitiesKHR capabilities;
-				std::vector<VkSurfaceFormatKHR> formats;
-				std::vector<VkPresentModeKHR> presentModes;
-				bool supported;
-			};
-
 			PhysicalDevice(VkPhysicalDevice device);
 			~PhysicalDevice();
 

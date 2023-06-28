@@ -10,19 +10,18 @@
 #include <SDL2/SDL_vulkan.h>
 
 namespace Raindrop::Graphics{
-	ImGUI::ImGUI(Renderer& renderer){
+	ImGUI::ImGUI(GraphicsContext& context) : _context{context}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics.GUI");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
 		CLOG(INFO, "Engine.Graphics.GUI") << "Loading IMGUI...";
 
-		_device = renderer._device->get();
-		auto window = renderer._window->get();
-		auto instance = renderer._instance->get();
-		auto physicalDevice = renderer._device->physicalDevice()->get();
-		auto device = renderer._device->get();
-		auto renderPass = renderer._swapchain->renderPass();
-		auto graphicsQueue = renderer._graphicsQueue;
+		auto window = _context.window.get();
+		auto instance = _context.instance.get();
+		auto physicalDevice = _context.device.getPhysicalDevice();
+		auto device = _context.device.get();
+		auto renderPass = _context.swapchain.renderPass();
+		auto graphicsQueue = _context.graphicsQueue;
 
 		VkDescriptorPoolSize pool_sizes[] ={
 			{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -61,16 +60,16 @@ namespace Raindrop::Graphics{
 		init_info.Device = device;
 		init_info.Queue = graphicsQueue;
 		init_info.DescriptorPool = _imguiPool;
-		init_info.MinImageCount = renderer._swapchain->frameCount();
-		init_info.ImageCount = renderer._swapchain->frameCount();
+		init_info.MinImageCount = _context.swapchain.frameCount();
+		init_info.ImageCount = _context.swapchain.frameCount();
 		init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
 		ImGui_ImplVulkan_Init(&init_info, renderPass);
 
 		{
-			VkCommandBuffer cmd = renderer.beginSingleUseTransfertCommandBuffer();
+			VkCommandBuffer cmd = _context.transfertCommandPool.beginSingleTime();
 			ImGui_ImplVulkan_CreateFontsTexture(cmd);
-			renderer.endSingleUseTransfertCommandBuffer(cmd);
+			_context.transfertCommandPool.endSingleTime(cmd);
 		}
 
 		ImGui_ImplVulkan_DestroyFontUploadObjects();
@@ -80,7 +79,7 @@ namespace Raindrop::Graphics{
 
 	ImGUI::~ImGUI(){
 		CLOG(INFO, "Engine.Graphics.GUI") << "Destroying IMGUI...";
-		vkDestroyDescriptorPool(_device, _imguiPool, nullptr);
+		vkDestroyDescriptorPool(_context.device.get(), _imguiPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
 		CLOG(INFO, "Engine.Graphics.GUI") << "IMGUI destroyed with success !";
 	}

@@ -2,12 +2,11 @@
 #define __RAINDROP_GRAPHICS_SWAPCHAIN_HPP__
 
 #include <Raindrop/Graphics/common.hpp>
-#include <Raindrop/Graphics/PhysicalDevice.hpp>
 
 namespace Raindrop::Graphics{
 	class Swapchain{
 		public:
-			Swapchain(const std::shared_ptr<Device>& device, VkSurfaceKHR surface, VkExtent2D extent, Core::Registry::Registry& registry, VkAllocationCallbacks* allocationCallbacks = nullptr);
+			Swapchain(GraphicsContext& context);
 			~Swapchain();
 
 			void rebuildSwapchain();
@@ -33,11 +32,8 @@ namespace Raindrop::Graphics{
 			void setClearColor(VkClearColorValue color);
 
 		private:
-			VkAllocationCallbacks* _allocationCallbacks;
-			Core::Registry::Registry& _registry;
-			VkSurfaceKHR _surface;
-			std::shared_ptr<Device> _device;
-			PhysicalDevice::SwapchainSupport _swapchainSupport;
+			GraphicsContext& _context;
+			SwapchainSupport _swapchainSupport;
 
 			VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
 			VkSwapchainKHR _oldSwapchain = VK_NULL_HANDLE;
@@ -66,9 +62,6 @@ namespace Raindrop::Graphics{
 			VkExtent2D _wantedExtent;
 			VkPresentModeKHR _wantedPresentMode = VK_PRESENT_MODE_FIFO_KHR;
 			VkSurfaceFormatKHR _wantedSurfaceFormat = {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
-
-			VkQueue _graphicsQueue = VK_NULL_HANDLE;
-			VkQueue _presentQueue = VK_NULL_HANDLE;
 
 			VkClearColorValue _clearColor = {0.f, 0.f, 0.f, 0.f};
 

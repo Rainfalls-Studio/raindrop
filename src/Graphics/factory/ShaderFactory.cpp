@@ -43,7 +43,7 @@ namespace Raindrop::Graphics::Factory{
 		return buffer;
 	}
 
-	ShaderFactory::ShaderFactory(std::shared_ptr<Device> device, VkAllocationCallbacks* allocationCallbacks) : _device{device}, _allocationCallbacks{allocationCallbacks}{
+	ShaderFactory::ShaderFactory(GraphicsContext& context) : _context{context}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics.Shader");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 	}
@@ -79,7 +79,7 @@ namespace Raindrop::Graphics::Factory{
 		std::vector<char> code = readFile(path);
 		VkShaderStageFlagBits stage = getStage(path);
 		CLOG(INFO, "Engine.Graphics.Shader") << "Loading " << string_VkShaderStageFlagBits(stage) << " shader from " << path;
-		return std::make_unique<Shader>(_device, code, stage, _allocationCallbacks);
+		return std::make_unique<Shader>(_context, code, stage);
 	}
 
 	VkShaderStageFlagBits ShaderFactory::getStage(const std::filesystem::path& path){

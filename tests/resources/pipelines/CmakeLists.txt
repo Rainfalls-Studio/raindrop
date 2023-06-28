@@ -1,8 +1,0 @@
-file(GLOB_RECURSE pipes *.xml.*)
-
-foreach(PIPE IN LISTS pipes)
-	get_filename_component(FILENAME ${PIPE} NAME)
-	set(destination_file "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
-	configure_file(${PIPE} ${destination_file} COPYONLY)
-	add_custom_target(${FILENAME} ALL DEPENDS ${destination_file})
-endforeach()

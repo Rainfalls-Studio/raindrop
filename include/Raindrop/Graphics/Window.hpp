@@ -6,8 +6,12 @@
 namespace Raindrop::Graphics{
 	class Window{
 		public:
-			Window(Core::Event::EventManager& eventManager, Core::Registry::Registry& registry);
+			Window(GraphicsContext& context);
 			virtual ~Window();
+			
+			// THIS SHOULD ONLY BE CALLED ONCE
+			void createSurface();
+			void destroySurface();
 
 			void setTitle(const char* title);
 			void setSize(glm::u32vec2 size);
@@ -22,11 +26,15 @@ namespace Raindrop::Graphics{
 			
 			bool resized() const;
 			void resetResizedFlag();
+
+			VkSurfaceKHR surface();
+			std::vector<const char*> vulkanExtensions();
 		
 		private:
-			Core::Event::EventManager& _eventManager;
-			Core::Registry::Registry& _registry;
+			GraphicsContext& _context;
 			SDL_Window* _window;
+			VkSurfaceKHR _surface;
+
 
 			void quitEvent();
 			void windowEvent(SDL_Event& e);

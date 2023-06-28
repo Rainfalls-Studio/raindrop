@@ -6,7 +6,7 @@
 namespace Raindrop::Graphics{
 	class ImGUI{
 		public:
-			ImGUI(Renderer& renderer);
+			ImGUI(GraphicsContext& context);
 			~ImGUI();
 
 			void newFrame();
@@ -15,8 +15,8 @@ namespace Raindrop::Graphics{
 			void event(SDL_Event* e);
 
 		private:
+			GraphicsContext& _context;
 			VkDescriptorPool _imguiPool;
-			VkDevice _device;
 
 	};
 }

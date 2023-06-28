@@ -11,7 +11,7 @@ namespace Raindrop::Graphics::Builders{
 	PipelineBuilder::~PipelineBuilder(){
 	}
 
-	std::shared_ptr<GraphicsPipeline> PipelineBuilder::build(VkAllocationCallbacks* callbacks){
+	std::shared_ptr<GraphicsPipeline> PipelineBuilder::build(GraphicsContext& context){
 		CLOG(INFO, "Engine.Graphics") << "Building vulkan graphics pipeline";
 
 		VkPipelineViewportStateCreateInfo viewportInfo{};
@@ -145,15 +145,11 @@ namespace Raindrop::Graphics::Builders{
 		layoutInfo.setLayoutCount = 0;
 		layoutInfo.flags = 0;
 
-		return std::make_shared<GraphicsPipeline>(_device, createInfo, layoutInfo, _shaders, callbacks);
+		return std::make_shared<GraphicsPipeline>(context, createInfo, layoutInfo, _shaders);
 	}
 
 	void PipelineBuilder::addShader(const std::shared_ptr<Shader>& shader){
 		_shaders.push_back(shader);
-	}
-
-	void PipelineBuilder::setDevice(const std::shared_ptr<Device>& device){
-		_device = device;
 	}
 
 	void PipelineBuilder::setRenderPass(VkRenderPass renderPass){

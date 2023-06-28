@@ -7,7 +7,7 @@ target_precompile_headers(pch_target INTERFACE ${PCH_PATH})
 file(GLOB_RECURSE SOURCES *.cpp)
 add_library(RaindropEngine STATIC ${SOURCES})
 
-target_link_libraries(RaindropEngine PRIVATE ${Vulkan_LIBRARIES} SDL2::SDL2-static)
+target_link_libraries(RaindropEngine PRIVATE ${Vulkan_LIBRARIES} SDL2::SDL2-static assimp::assimp)
 target_link_libraries(RaindropEngine PUBLIC easyloggingpp tinyxml2 imgui pch_target)
 
 set_target_properties(RaindropEngine PROPERTIES

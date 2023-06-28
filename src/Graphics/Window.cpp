@@ -1,10 +1,5 @@
 #include <Raindrop/Graphics/Window.hpp>
-#include <Raindrop/Graphics/Instance.hpp>
-#include <Raindrop/Graphics/PhysicalDeviceManager.hpp>
-#include <Raindrop/Graphics/PhysicalDevice.hpp>
-#include <Raindrop/Graphics/Device.hpp>
-#include <Raindrop/Graphics/Swapchain.hpp>
-#include <Raindrop/Graphics/Renderer.hpp>
+#include <Raindrop/Graphics/GraphicsContext.hpp>
 #include <Raindrop/Graphics/ImGUI.hpp>
 
 #include <SDL2/SDL_vulkan.h>
@@ -14,7 +9,15 @@ namespace Raindrop::Graphics{
 	static constexpr uint32_t DEFAULT_WINDOW_WIDTH = 1080;
 	static constexpr uint32_t DEFAULT_WINDOW_HEIGHT = 720;
 
-	Window::Window(Core::Event::EventManager& eventManager, Core::Registry::Registry& registry) : _eventManager{eventManager}, _registry{registry}{
+	Window::Window(GraphicsContext& context) : _context{context}{
+		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics.Window");
+		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
+
+		if (SDL_Init(SDL_INIT_VIDEO) != 0){
+			CLOG(ERROR, "Engine.Graphics.Window") << "Failed to initialize SDL2 API : " << SDL_GetError();
+			throw std::runtime_error("Failed initialize SDL2 API");
+		}
+
 		_window = SDL_CreateWindow("Raindrop::Graphics window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_VULKAN);
 
 		if (!_window){
@@ -26,6 +29,30 @@ namespace Raindrop::Graphics{
 
 	Window::~Window(){
 		if (_window) SDL_DestroyWindow(_window);
+
+		SDL_Quit();
+	}
+
+	std::vector<const char*> Window::vulkanExtensions(){
+		uint32_t extensionCount = 0;
+		if (!SDL_Vulkan_GetInstanceExtensions(_window, &extensionCount, nullptr)){
+			throw std::runtime_error("failed to querry SDL2 vulkan instance extensions");
+		}
+
+		std::vector<const char*> extensions(extensionCount);
+		SDL_Vulkan_GetInstanceExtensions(_window, &extensionCount, extensions.data());
+		return extensions;
+	}
+
+	void Window::createSurface(){
+		if (SDL_Vulkan_CreateSurface(_window, _context.instance.get(), &_surface) == SDL_FALSE){
+			CLOG(ERROR, "Engine.Graphics.Window") << "Failed to create SDL2 Vulkan surface : " << SDL_GetError();
+			throw std::runtime_error("Failed to create SDL2 Vulkan surface");
+		}
+	}
+
+	void Window::destroySurface(){
+		if (_surface) vkDestroySurfaceKHR(_context.instance.get(), _surface, _context.allocationCallbacks);
 	}
 
 	void Window::setTitle(const char* title){
@@ -87,19 +114,19 @@ namespace Raindrop::Graphics{
 	}
 
 	void Window::quitEvent(){
-		_eventManager.trigger("Engine.Window.Quit");
+		_context->eventManager.trigger("Engine.Window.Quit");
 	}
 
 	void Window::windowResizedEvent(SDL_WindowEvent& e){
 		_resized = true;
-		_registry["Engine.Window.Size"] = glm::vec2((float)e.data1, (float)e.data2);
-		_eventManager.trigger("Engine.Window.Resized");
+		_context->registry["Engine.Window.Size"] = glm::vec2((float)e.data1, (float)e.data2);
+		_context->eventManager.trigger("Engine.Window.Resized");
 	}
 
 	void Window::mouseMotionEvent(SDL_Event& e){
-		_eventManager.trigger("Engine.Mouse.Mouved");
-		_eventManager.mouseEvents().pos() = glm::vec2(e.motion.x, e.motion.y);
-		_eventManager.mouseEvents().relPos() = glm::vec2(e.motion.xrel, e.motion.yrel);
+		_context->eventManager.trigger("Engine.Mouse.Mouved");
+		_context->eventManager.mouseEvents().pos() = glm::vec2(e.motion.x, e.motion.y);
+		_context->eventManager.mouseEvents().relPos() = glm::vec2(e.motion.xrel, e.motion.yrel);
 	}
 
 	Core::Event::MouseButton SDLToRaindropMouseButton(Uint8 button){
@@ -112,13 +139,13 @@ namespace Raindrop::Graphics{
 	}
 
 	void Window::mouseDown(SDL_Event& e){
-		_eventManager.trigger("Engine.Mouse.ButtonDown");
-		_eventManager.mouseEvents().state(SDLToRaindropMouseButton(e.button.button)) = Core::Event::BUTTON_DOWN;
+		_context->eventManager.trigger("Engine.Mouse.ButtonDown");
+		_context->eventManager.mouseEvents().state(SDLToRaindropMouseButton(e.button.button)) = Core::Event::BUTTON_DOWN;
 	}
 
 	void Window::mouseUp(SDL_Event& e){
-		_eventManager.trigger("Engine.Mouse.ButtonUp");
-		_eventManager.mouseEvents().state(SDLToRaindropMouseButton(e.button.button)) = Core::Event::BUTTON_UP;
+		_context->eventManager.trigger("Engine.Mouse.ButtonUp");
+		_context->eventManager.mouseEvents().state(SDLToRaindropMouseButton(e.button.button)) = Core::Event::BUTTON_UP;
 	}
 	
 	bool Window::resized() const{
@@ -130,14 +157,18 @@ namespace Raindrop::Graphics{
 	}
 
 	void Window::keyDown(SDL_Event& e){
-		_registry["Engine.Key.Down"] = SDL_GetScancodeName(e.key.keysym.scancode);
-		_eventManager.trigger("Engine.KeyDown");
-		_eventManager.keyEvents()[static_cast<Core::Event::Key>(e.key.keysym.scancode)] = Core::Event::KEY_PRESSED;
+		_context->registry["Engine.Key.Down"] = SDL_GetScancodeName(e.key.keysym.scancode);
+		_context->eventManager.trigger("Engine.KeyDown");
+		_context->eventManager.keyEvents()[static_cast<Core::Event::Key>(e.key.keysym.scancode)] = Core::Event::KEY_PRESSED;
 	}
 
 	void Window::keyUp(SDL_Event& e){
-		_registry["Engine.Key.Up"] = SDL_GetScancodeName(e.key.keysym.scancode);
-		_eventManager.trigger("Engine.KeyUp");
-		_eventManager.keyEvents()[static_cast<Core::Event::Key>(e.key.keysym.scancode)] = Core::Event::KEY_RELEASED;
+		_context->registry["Engine.Key.Up"] = SDL_GetScancodeName(e.key.keysym.scancode);
+		_context->eventManager.trigger("Engine.KeyUp");
+		_context->eventManager.keyEvents()[static_cast<Core::Event::Key>(e.key.keysym.scancode)] = Core::Event::KEY_RELEASED;
+	}
+
+	VkSurfaceKHR Window::surface(){
+		return _surface;
 	}
 }
