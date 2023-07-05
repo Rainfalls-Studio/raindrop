@@ -62,5 +62,6 @@ namespace Raindrop::Graphics{
 }
 
 #include <Raindrop/Graphics/Target.hpp>
+#include <Raindrop/Graphics/stringToVulkan.hpp>
 
 #endif

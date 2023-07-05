@@ -197,55 +197,6 @@ namespace Raindrop::Graphics::Factory{
 		builder.setName(name);
 	}
 
-	static VkPolygonMode strToPolygonMode(const char* mode){
-		static const std::unordered_map<std::string, VkPolygonMode> map = {
-			{"Fill", VK_POLYGON_MODE_FILL},
-			{"Line", VK_POLYGON_MODE_LINE},
-			{"Point", VK_POLYGON_MODE_POINT},
-		};
-		
-		auto it = map.find(mode);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << mode << "\" polygon mode";
-			throw std::runtime_error("Unknown polygon mode");
-		}
-
-		return it->second;
-	}
-
-	static VkCullModeFlags strToCullMode(const char* mode, VkCullModeFlags d){
-		static const std::unordered_map<std::string, VkCullModeFlags> map = {
-			{"Back", VK_CULL_MODE_BACK_BIT},
-			{"Front", VK_CULL_MODE_FRONT_BIT},
-			{"None", VK_CULL_MODE_NONE},
-			{"Front and Back", VK_CULL_MODE_FRONT_AND_BACK},
-		};
-
-		
-		auto it = map.find(mode);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << mode << "\" cull mode";
-			return d;
-		}
-
-		return it->second;
-	}
-	
-	static VkFrontFace strToFrontFace(const char* mode, VkFrontFace d){
-		static const std::unordered_map<std::string, VkFrontFace> map = {
-			{"Clockwise", VK_FRONT_FACE_CLOCKWISE},
-			{"Anticlockwise", VK_FRONT_FACE_COUNTER_CLOCKWISE},
-		};
-
-		auto it = map.find(mode);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << mode << "\" front face";
-			return d;
-		}
-
-		return it->second;
-	}
-
 	void GraphicsPipelineFactory::getRasterisationInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder){
 		if (!element) return;
 		auto& info = builder.rasterizationInfo();
@@ -259,7 +210,7 @@ namespace Raindrop::Graphics::Factory{
 		if (auto polygonMode = element->FirstChildElement("PolygonMode")){
 			const char* mode;
 			if (polygonMode->QueryStringAttribute("Mode", &mode) == tinyxml2::XML_SUCCESS)
-				info.polygonMode = strToPolygonMode(mode);
+				info.polygonMode = strToVkEnumT(_context.context.registry.formatString(mode), info.polygonMode);
 		}
 		
 		if (auto lineWith = element->FirstChildElement("LineWidth"))
@@ -268,13 +219,13 @@ namespace Raindrop::Graphics::Factory{
 		if (auto cullMode = element->FirstChildElement("CullMode")){
 			const char* mode;
 			if (cullMode->QueryStringAttribute("Mode", &mode) == tinyxml2::XML_SUCCESS)
-				info.cullMode = strToCullMode(mode, info.cullMode);
+				info.cullMode = strToVkEnumT(_context.context.registry.formatString(mode), info.cullMode);
 		}
 		
 		if (auto frontFace = element->FirstChildElement("FrontFace")){
 			const char* mode;
 			if (frontFace->QueryStringAttribute("FrontFace", &mode) == tinyxml2::XML_SUCCESS)
-				info.frontFace = strToFrontFace(mode, info.frontFace);
+				info.frontFace = strToVkEnumT(_context.context.registry.formatString(mode), info.frontFace);
 		}
 
 		if (auto depthBias = element->FirstChildElement("DepthBias"))
@@ -290,20 +241,6 @@ namespace Raindrop::Graphics::Factory{
 			info.depthBiasSlopeFactor = depthBiasSlopeFactor->FloatAttribute("Clamp", info.depthBiasSlopeFactor);
 	}
 
-	static VkSampleCountFlagBits intToSampleCount(int count, VkSampleCountFlagBits d){
-		switch (count){
-			case 1: return VK_SAMPLE_COUNT_1_BIT;
-			case 2: return VK_SAMPLE_COUNT_2_BIT;
-			case 4: return VK_SAMPLE_COUNT_4_BIT;
-			case 8: return VK_SAMPLE_COUNT_8_BIT;
-			case 16: return VK_SAMPLE_COUNT_16_BIT;
-			case 32: return VK_SAMPLE_COUNT_32_BIT;
-			case 64: return VK_SAMPLE_COUNT_64_BIT;
-			default: CLOG(WARNING, "Engine.Graphics.Pipeline") << "Sample count can only be 1, 2, 4, 8, 16, 32 or 64";
-		}
-		return d;
-	}
-
 	void GraphicsPipelineFactory::getMultisampleInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder){
 		if (!element) return;
 		auto& info = builder.multisampleInfo();
@@ -311,8 +248,11 @@ namespace Raindrop::Graphics::Factory{
 		if (auto sampleShading = element->FirstChildElement("SampleShading"))
 			info.sampleShadingEnable = sampleShading->BoolAttribute("Enable", info.sampleShadingEnable);
 		
-		if (auto rasterizationSamples = element->FirstChildElement("RasterizationSamples"))
-			info.rasterizationSamples = intToSampleCount(rasterizationSamples->IntAttribute("Samples", info.rasterizationSamples), info.rasterizationSamples);
+		if (auto rasterizationSamples = element->FirstChildElement("RasterizationSamples")){
+			const char* mode;
+			if (rasterizationSamples->QueryStringAttribute("Samples", &mode) == tinyxml2::XML_SUCCESS)
+				info.rasterizationSamples = strToVkEnumT(_context.context.registry.formatString(mode), info.rasterizationSamples);
+		}
 		
 		if (auto minSampleShading = element->FirstChildElement("MinSampleShading"))
 			info.minSampleShading = element->FloatAttribute("Minumum", info.minSampleShading);
@@ -324,29 +264,6 @@ namespace Raindrop::Graphics::Factory{
 			info.alphaToOneEnable = alphaToOneEnable->BoolAttribute("Enable", info.alphaToOneEnable);
 	}
 
-	static VkPrimitiveTopology strToTopology(const char* topology, VkPrimitiveTopology d){
-		static const std::unordered_map<std::string, VkPrimitiveTopology> map = {
-			{"PointList", VK_PRIMITIVE_TOPOLOGY_POINT_LIST},
-			{"LineList", VK_PRIMITIVE_TOPOLOGY_LINE_LIST},
-			{"LineStrip", VK_PRIMITIVE_TOPOLOGY_LINE_STRIP},
-			{"TriangleList", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST},
-			{"TriangleStrip", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP},
-			{"TriangleFan", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN},
-			{"LineListWithAdjency", VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY},
-			{"LineStripWithAdjency", VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY},
-			{"TriangleListWithAdjency", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY},
-			{"TriangleStripWithAdjency", VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY},
-		};
-
-		auto it = map.find(topology);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << topology << "\" topology";
-			return d;
-		}
-
-		return it->second;
-	}
-
 	void GraphicsPipelineFactory::getAssemnlyInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder){
 		if (!element) return;
 		auto& info = builder.inputAssemblyInfo();
@@ -354,32 +271,11 @@ namespace Raindrop::Graphics::Factory{
 		if (auto topology = element->FirstChildElement("Topology")){
 			const char* mode;
 			if (topology->QueryStringAttribute("Topology", &mode) == tinyxml2::XML_SUCCESS)
-				info.topology = strToTopology(mode, info.topology);
+				info.topology = strToVkEnumT(_context.context.registry.formatString(mode), info.topology);
 		}
 
 		if (auto primitiveRestartEnable = element->FirstChildElement("PrimitiveRestart"))
 			info.primitiveRestartEnable = primitiveRestartEnable->BoolAttribute("Enable", info.primitiveRestartEnable);
-	}
-
-	static VkCompareOp strToCompareOp(const char* op, VkCompareOp d){
-		static const std::unordered_map<std::string, VkCompareOp> map = {
-			{"Never", VK_COMPARE_OP_NEVER},
-			{"Less", VK_COMPARE_OP_LESS},
-			{"Equal", VK_COMPARE_OP_EQUAL},
-			{"LessOrEqual", VK_COMPARE_OP_LESS_OR_EQUAL},
-			{"Greater", VK_COMPARE_OP_GREATER},
-			{"NotEqual", VK_COMPARE_OP_NOT_EQUAL},
-			{"GreaterOrEqual", VK_COMPARE_OP_GREATER_OR_EQUAL},
-			{"Always", VK_COMPARE_OP_ALWAYS},
-		};
-
-		auto it = map.find(op);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << op << "\" compare operation";
-			return d;
-		}
-
-		return it->second;
 	}
 
 	void GraphicsPipelineFactory::getDepthStencilInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder){
@@ -395,7 +291,7 @@ namespace Raindrop::Graphics::Factory{
 		if (auto compareOp = element->FirstChildElement("DepthCompare")){
 			const char* mode;
 			if (compareOp->QueryStringAttribute("Operation", &mode) == tinyxml2::XML_SUCCESS)
-				info.depthCompareOp = strToCompareOp(mode, info.depthCompareOp);
+				info.depthCompareOp = strToVkEnumT(_context.context.registry.formatString(mode), info.depthCompareOp);
 		}
 
 		if (auto depthBoundTestEnable = element->FirstChildElement("DepthBoundTest"))
@@ -413,52 +309,31 @@ namespace Raindrop::Graphics::Factory{
 		getDepthStencilOpStateXML(element->FirstChildElement("Back"), info.back);
 	}
 
-	static VkStencilOp strToStencilOp(const char* op, VkStencilOp d){
-		static const std::unordered_map<std::string, VkStencilOp> map = {
-			{"Keep", VK_STENCIL_OP_KEEP},
-			{"Zero", VK_STENCIL_OP_ZERO},
-			{"Replace", VK_STENCIL_OP_REPLACE},
-			{"IncrementAndClamp", VK_STENCIL_OP_INCREMENT_AND_CLAMP},
-			{"DecrementAndClamp", VK_STENCIL_OP_DECREMENT_AND_CLAMP},
-			{"Invert", VK_STENCIL_OP_INVERT},
-			{"IncrementAndWrap", VK_STENCIL_OP_INCREMENT_AND_WRAP},
-			{"DecrementAndWrap", VK_STENCIL_OP_DECREMENT_AND_WRAP},
-		};
-
-		auto it = map.find(op);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << op << "\" stencil operation";
-			return d;
-		}
-
-		return it->second;
-	}
-
 	void GraphicsPipelineFactory::getDepthStencilOpStateXML(tinyxml2::XMLElement* element, VkStencilOpState& op){
 		if (!element) return;
 
 		if (auto failOp = element->FirstChildElement("Fail")){
 			const char* mode;
 			if (failOp->QueryStringAttribute("Operation", &mode) == tinyxml2::XML_SUCCESS)
-				op.failOp = strToStencilOp(mode, op.failOp);
+				op.failOp = strToVkEnumT(_context.context.registry.formatString(mode), op.failOp);
 		}
 
 		if (auto passOp = element->FirstChildElement("Pass")){
 			const char* mode;
 			if (passOp->QueryStringAttribute("Operation", &mode) == tinyxml2::XML_SUCCESS)
-				op.passOp = strToStencilOp(mode, op.passOp);
+				op.passOp = strToVkEnumT(_context.context.registry.formatString(mode), op.passOp);
 		}
 
 		if (auto depthFailOp = element->FirstChildElement("DepthFail")){
 			const char* mode;
 			if (depthFailOp->QueryStringAttribute("Operation", &mode) == tinyxml2::XML_SUCCESS)
-				op.depthFailOp = strToStencilOp(mode, op.depthFailOp);
+				op.depthFailOp = strToVkEnumT(_context.context.registry.formatString(mode), op.depthFailOp);
 		}
 
 		if (auto compare = element->FirstChildElement("Compare")){
 			const char* mode;
 			if (compare->QueryStringAttribute("Operation", &mode) == tinyxml2::XML_SUCCESS)
-				op.compareOp = strToCompareOp(mode, op.compareOp);
+				op.compareOp = strToVkEnumT(_context.context.registry.formatString(mode), op.compareOp);
 			
 			if (compare->QueryStringAttribute("Mask", &mode) == tinyxml2::XML_SUCCESS)
 				op.compareMask = static_cast<uint32_t>(std::bitset<32>(mode).to_ulong());
@@ -477,83 +352,6 @@ namespace Raindrop::Graphics::Factory{
 		}
 	}
 
-	static VkLogicOp strToLogicOp(const char* op, VkLogicOp d){
-		static const std::unordered_map<std::string, VkLogicOp> map = {
-			{"Clear", VK_LOGIC_OP_CLEAR},
-			{"And", VK_LOGIC_OP_AND},
-			{"AndReverse", VK_LOGIC_OP_AND_REVERSE},
-			{"Copy", VK_LOGIC_OP_COPY},
-			{"AndInverted", VK_LOGIC_OP_AND_INVERTED},
-			{"NONE", VK_LOGIC_OP_NO_OP},
-			{"XOX", VK_LOGIC_OP_XOR},
-			{"NOR", VK_LOGIC_OP_NOR},
-			{"Equivalent", VK_LOGIC_OP_EQUIVALENT},
-			{"Invert", VK_LOGIC_OP_INVERT},
-			{"OrReverse", VK_LOGIC_OP_OR_REVERSE},
-			{"CopyInverted", VK_LOGIC_OP_COPY_INVERTED},
-			{"OrInverted", VK_LOGIC_OP_OR_INVERTED},
-			{"NAND", VK_LOGIC_OP_NAND},
-			{"Set", VK_LOGIC_OP_SET},
-		};
-
-		auto it = map.find(op);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << op << "\" logic operation";
-			return d;
-		}
-
-		return it->second;
-	}
-
-	static VkBlendFactor strToBlendFactor(const char* factor, VkBlendFactor d){
-		static const std::unordered_map<std::string, VkBlendFactor> map = {
-			{"Zero", VK_BLEND_FACTOR_ZERO},
-			{"One", VK_BLEND_FACTOR_ONE},
-			{"SrcColor", VK_BLEND_FACTOR_SRC_COLOR},
-			{"OneMinusSrcColor", VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR},
-			{"DstColor", VK_BLEND_FACTOR_DST_COLOR},
-			{"OneMinusDstColor", VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR},
-			{"SrcAlpha", VK_BLEND_FACTOR_SRC_ALPHA},
-			{"OneMinusSrcAlpha", VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA},
-			{"DstAlpha", VK_BLEND_FACTOR_DST_ALPHA},
-			{"OneMinusDstAlpha", VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA},
-			{"ConstantColor", VK_BLEND_FACTOR_CONSTANT_COLOR},
-			{"OneMinusConstantColor", VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR},
-			{"ConstantAlpha", VK_BLEND_FACTOR_CONSTANT_ALPHA},
-			{"OneMinusConstantAlpha", VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA},
-			{"SrcAlphaSaturate", VK_BLEND_FACTOR_SRC_ALPHA_SATURATE},
-			{"Src1Color", VK_BLEND_FACTOR_SRC1_COLOR},
-			{"OneMinusSrc1Color", VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR},
-			{"Src1Alpha", VK_BLEND_FACTOR_SRC1_ALPHA},
-			{"OneMinusSrc1Alpha", VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA},
-		};
-
-		auto it = map.find(factor);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << factor << "\" blend factor";
-			return d;
-		}
-
-		return it->second;
-	}
-
-	static VkBlendOp strToBlendOp(const char* op, VkBlendOp d){
-		static const std::unordered_map<std::string, VkBlendOp> map = {
-			{"Add", VK_BLEND_OP_ADD},
-			{"SubStract", VK_BLEND_OP_SUBTRACT},
-			{"Min", VK_BLEND_OP_MIN},
-			{"Max", VK_BLEND_OP_MAX},
-		};
-
-		auto it = map.find(op);
-		if (it == map.end()){
-			CLOG(WARNING, "Engine.Graphics.Pipeline") << "Cannot reconize \"" << op << "\" blend operation";
-			return d;
-		}
-
-		return it->second;
-	}
-
 	void GraphicsPipelineFactory::getColorBlendInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder){
 		if (!element) return;
 		auto& info = builder.colorBlendInfo();
@@ -563,7 +361,7 @@ namespace Raindrop::Graphics::Factory{
 
 			const char* op;
 			if (logicOpEnabled->QueryStringAttribute("Operation", &op) == tinyxml2::XML_SUCCESS)
-				info.logicOp = strToLogicOp(op, info.logicOp);
+				info.logicOp = strToVkEnumT(op, info.logicOp);
 		}
 
 		if (auto blendConstants = element->FirstChildElement("BlendConstants")){
@@ -588,37 +386,37 @@ namespace Raindrop::Graphics::Factory{
 			if (auto srcColorBlendFactor = attachment->FirstChildElement("SrcColorBlend")){
 				const char* factor;
 				if (srcColorBlendFactor->QueryStringAttribute("Factor", &factor) == tinyxml2::XML_SUCCESS)
-					info.srcColorBlendFactor = strToBlendFactor(factor, info.srcColorBlendFactor);
+					info.srcColorBlendFactor = strToVkEnumT(_context.context.registry.formatString(factor), info.srcColorBlendFactor);
 			}
 
 			if (auto dstColorBlendFactor = attachment->FirstChildElement("DstColorBlend")){
 				const char* factor;
 				if (dstColorBlendFactor->QueryStringAttribute("Factor", &factor) == tinyxml2::XML_SUCCESS)
-					info.dstColorBlendFactor = strToBlendFactor(factor, info.dstColorBlendFactor);
+					info.dstColorBlendFactor = strToVkEnumT(_context.context.registry.formatString(factor), info.dstColorBlendFactor);
 			}
 
 			if (auto colorBlendOp = attachment->FirstChildElement("ColorBlend")){
 				const char* factor;
 				if (colorBlendOp->QueryStringAttribute("Operation", &factor) == tinyxml2::XML_SUCCESS)
-					info.colorBlendOp = strToBlendOp(factor, info.colorBlendOp);
+					info.colorBlendOp = strToVkEnumT(_context.context.registry.formatString(factor), info.colorBlendOp);
 			}
 
 			if (auto srcAlphaBlendFactor = attachment->FirstChildElement("SrcAlphaBlend")){
 				const char* factor;
 				if (srcAlphaBlendFactor->QueryStringAttribute("Factor", &factor) == tinyxml2::XML_SUCCESS)
-					info.srcAlphaBlendFactor = strToBlendFactor(factor, info.srcAlphaBlendFactor);
+					info.srcAlphaBlendFactor = strToVkEnumT(_context.context.registry.formatString(factor), info.srcAlphaBlendFactor);
 			}
 
 			if (auto dstAlphaBlendFactor = attachment->FirstChildElement("DstAlphaBlend")){
 				const char* factor;
 				if (dstAlphaBlendFactor->QueryStringAttribute("Factor", &factor) == tinyxml2::XML_SUCCESS)
-					info.dstAlphaBlendFactor = strToBlendFactor(factor, info.dstAlphaBlendFactor);
+					info.dstAlphaBlendFactor = strToVkEnumT(_context.context.registry.formatString(factor), info.dstAlphaBlendFactor);
 			}
 
 			if (auto alphaBlendOp = attachment->FirstChildElement("AlphaBlend")){
 				const char* factor;
 				if (alphaBlendOp->QueryStringAttribute("Operation", &factor) == tinyxml2::XML_SUCCESS)
-					info.alphaBlendOp = strToBlendOp(factor, info.alphaBlendOp);
+					info.alphaBlendOp = strToVkEnumT(_context.context.registry.formatString(factor), info.alphaBlendOp);
 			}
 
 			if (auto colorWriteMask = element->FirstChildElement("ColorWrite")){
