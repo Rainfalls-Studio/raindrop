@@ -29,6 +29,8 @@ namespace Raindrop::Graphics{
 			std::shared_ptr<Factory::ShaderFactory> _shaderFactory; 
 			std::shared_ptr<Factory::ModelFactory> _modelFactory;
 
+			std::unique_ptr<WorldFramebuffer> _worldFramebuffer;
+
 			void registerFactories();
 			void registerShaderFactory();
 			void registerGraphicsPipelineFactory();
@@ -44,6 +46,10 @@ namespace Raindrop::Graphics{
 
 			VkCommandBuffer beginFrame();
 			void endFrame();
+
+			void renderGui();
+			void renderScene(VkCommandBuffer commmandBuffer);
+			void renderSwapchain(VkCommandBuffer commandBuffer);
 	};
 
 	struct PushConstant{

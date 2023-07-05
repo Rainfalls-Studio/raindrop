@@ -1,5 +1,19 @@
-<shaders>
-	<shader source="${Engine.Resources.Directory}/shaders/default/default.glsl.frag.spv"/>
-	<shader source="${Engine.Resources.Directory}/shaders/default/default.glsl.vert.spv"/>
-</shaders>
-
+<GraphicsPipeline name="default pipeline">
+	<Shaders>
+		<Shader source="${Engine.Resources.Directory}/shaders/default/default.glsl.frag.spv"/>
+		<Shader source="${Engine.Resources.Directory}/shaders/default/default.glsl.vert.spv"/>
+	</Shaders>
+	<Target id="WorldFramebuffer"/>
+	<ColorBlend>
+		<Attachment ID="0">
+			<Blend Enable="true"/>
+			<SrcColorBlend Factor="SrcAlpha"/>
+			<DstColorBlend Factor="OneMinusSrcAlpha"/>
+			<ColorBlend Operation="Add"/>
+			<SrcAlphaBlend Factor="One"/>
+			<DstAlphaBlend Factor="Zero"/>
+			<AlphaBlend Operation="Add"/>
+			<ColorWrite r="true" g="true" b="true" a="true"/>
+		</Attachment>
+	</ColorBlend>
+</GraphicsPipeline>

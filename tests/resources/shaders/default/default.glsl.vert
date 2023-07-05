@@ -1,29 +1,22 @@
 #version 450
 
-layout (location = 0) out vec3 fragColor;
+layout (location = 0) in vec3 in_position;
+layout (location = 1) in vec3 in_color;
+layout (location = 2) in vec3 in_normal;
+layout (location = 3) in vec2 in_UV;
+
+layout (location = 0) out vec3 frag_position;
+layout (location = 1) out vec3 frag_color;
+layout (location = 2) out vec3 frag_normal;
+layout (location = 3) out vec2 frag_UV;
 
 layout (push_constant) uniform Push{
 	mat4 projectionViewMatrix;
 	mat4 modelMatrix;
 } push;
 
-struct Vertex{
-	vec3 position;
-	vec3 color;
-};
-
-Vertex vertices[6] = Vertex[](
-	Vertex(vec3(-1, -1, 0.5), vec3(1.0, 1.0, 0.0)),
-	Vertex(vec3(-1, 1, 0.5), vec3(1.0, 1.0, 0.0)),
-	Vertex(vec3(1, 1, 0.5), vec3(0.0, 1.0, 1.0)),
-	
-	Vertex(vec3(-1, -1, 0.5), vec3(1.0, 1.0, 0.0)),
-	Vertex(vec3(1, 1, 0.5), vec3(1.0, 1.0, 0.0)),
-	Vertex(vec3(1, -1, 0.5), vec3(0.0, 1.0, 1.0))
-);
-
 void main(){
-	fragColor = vertices[gl_VertexIndex].color;
-    vec4 positionWorld = push.modelMatrix * vec4(vertices[gl_VertexIndex].position, 1.0);
-    gl_Position = push.projectionViewMatrix * positionWorld;
+	frag_color = in_color;
+	vec4 positionWorld = push.modelMatrix * vec4(in_position, 1.0);
+	gl_Position = push.projectionViewMatrix * positionWorld;
 }

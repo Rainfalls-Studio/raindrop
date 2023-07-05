@@ -17,7 +17,7 @@ namespace Raindrop::Graphics::Factory{
 		private:
 			class ExtensionToFormat;
 			GraphicsContext& _context;
-			std::list<std::shared_ptr<GraphicsPipeline>> _pipelines;
+			std::unordered_map<std::string, std::shared_ptr<GraphicsPipeline>> _pipelines;
 
 			enum Format{
 				NONE = 0,
@@ -29,9 +29,17 @@ namespace Raindrop::Graphics::Factory{
 
 			std::shared_ptr<GraphicsPipeline> loadFromXML(const std::filesystem::path& path);
 
-			std::list<std::shared_ptr<Shader>> getShadersXML(tinyxml2::XMLElement*  element);
+			void getShadersXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
 			std::shared_ptr<Shader> getShaderXML(tinyxml2::XMLElement* shaderElement);
-
+			void getTargetXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
+			void getNameXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
+			void getRasterisationInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
+			void getMultisampleInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
+			void getAssemnlyInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
+			void getDepthStencilInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
+			void getColorBlendInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
+			void getTessellationInfoXML(tinyxml2::XMLElement* element, Builders::GraphicsPipelineBuilder& builder);
+			void getDepthStencilOpStateXML(tinyxml2::XMLElement* element, VkStencilOpState& op);
 	};
 }
 

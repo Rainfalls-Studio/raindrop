@@ -1,81 +1,89 @@
 #include <Raindrop/Graphics/builders/ModelBuilder.hpp>
 #include <Raindrop/Graphics/Model.hpp>
 
+#include <tiny_obj_loader.h>
+#include <glm/gtx/hash.hpp>
+
+template <typename T, typename... Rest>
+void hashCombine(std::size_t &seed, const T &v, const Rest&... rest){
+    seed ^= std::hash<T>{}(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    (hashCombine(seed, rest), ...);
+}
+
+namespace std{
+	template<>
+	struct hash<Raindrop::Graphics::Vertex> {
+		size_t operator()(Raindrop::Graphics::Vertex const &vertex) const{
+			size_t seed = 0;
+			hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+			return seed;
+		}
+	};
+}
+
 namespace Raindrop::Graphics::Builders{
 	ModelBuilder::ModelBuilder(const std::filesystem::path& path){
-		
-		el::Logger* customLogger = el::Loggers::getLogger("Engine.Graphics.Model");
-		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
+		tinyobj::attrib_t attrib;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> materials;
+		std::string warn, err;
 
-		Assimp::Importer importer;
-
-		unsigned int postProcessSteps = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_GenUVCoords;
-		const aiScene* scene = importer.ReadFile(path.string(), postProcessSteps);
-
-		// Check if the model was loaded successfully
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-			CLOG(ERROR, "Engine.Graphics.Model") << "Failed to load model : " << importer.GetErrorString();
-			throw std::runtime_error("Failed to load model");
+		// tinyobj::LoadObj()
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, path.string().c_str())) {
+			throw std::runtime_error(warn + err);
 		}
 
-		aiNode* rootNode = scene->mRootNode;
-		aiMesh* mesh = scene->mMeshes[0];
+		_vertices.clear();
+		_indices.clear();
 
-		getVertices(mesh);
-		getIndices(mesh);
+		std::unordered_map<Vertex, uint32_t> uniqueVertices;
 
-		importer.FreeScene();
+
+		for (const auto &shape : shapes) {
+			for (const auto &index : shape.mesh.indices) {
+				Vertex vertex{};
+
+				if (index.vertex_index >= 0) {
+					vertex.position = {
+						attrib.vertices[3 * index.vertex_index + 0],
+						attrib.vertices[3 * index.vertex_index + 1],
+						attrib.vertices[3 * index.vertex_index + 2],
+					};
+
+					vertex.color = {
+						attrib.colors[3 * index.vertex_index + 0],
+						attrib.colors[3 * index.vertex_index + 1],
+						attrib.colors[3 * index.vertex_index + 2],
+					};
+				}
+
+				if (index.normal_index >= 0) {
+					vertex.normal = {
+						attrib.normals[3 * index.normal_index + 0],
+						attrib.normals[3 * index.normal_index + 1],
+						attrib.normals[3 * index.normal_index + 2],
+					};
+				}
+
+				if (index.texcoord_index >= 0) {
+					vertex.uv = {
+						attrib.texcoords[2 * index.texcoord_index + 0],
+						attrib.texcoords[2 * index.texcoord_index + 1],
+					};
+				}
+
+				if (uniqueVertices.count(vertex) == 0){
+					uniqueVertices[vertex] = static_cast<uint32_t>(_vertices.size());
+					_vertices.push_back(vertex);
+				}
+
+				_indices.push_back(uniqueVertices[vertex]);
+			}
+		}
 	}
 
 	std::shared_ptr<Model> ModelBuilder::build(GraphicsContext& context){
 		return std::make_shared<Model>(context, *this);
-	}
-	
-	void ModelBuilder::getVertices(aiMesh* mesh){
-		aiVector3D* vertices = mesh->mVertices;
-    	aiVector3D* normals = mesh->mNormals;
-    	aiColor4D* colors = mesh->mColors[0];
-    	aiVector3D* uvs = mesh->mTextureCoords[0];
-
-		unsigned int numVertices = mesh->mNumVertices;
-
-		_vertices.resize(numVertices);
-
-		for (unsigned int i = 0; i < numVertices; i++){
-			auto& vertex = _vertices[i];
-			auto& pos = vertices[i];
-			auto& color = colors[i];
-			auto& normal = normals[i];
-
-			vertex.position = glm::vec3(pos.x, pos.y, pos.z);
-			vertex.color = glm::vec4(color.r, color.g, color.b, color.a);
-			vertex.normal = glm::vec3(normal.x, normal.y, normal.z);
-		}
-
-		if (mesh->HasTextureCoords(0)){
-			for (unsigned int i = 0; i < numVertices; i++){
-				auto& vertex = _vertices[i];
-				auto& uv = uvs[i];
-
-				vertex.uv = glm::vec2(uv.x, uv.y);
-			}
-		}
-	}
-
-	void ModelBuilder::getIndices(aiMesh* mesh){
-		aiFace* faces = mesh->mFaces;
-		unsigned int numFaces = mesh->mNumFaces;
-
-		_indices.resize(numFaces);
-
-		for (unsigned int i = 0; i < numFaces; i++) {
-			aiFace& face = faces[i];
-			unsigned int numIndices = face.mNumIndices;
-
-			for (unsigned int j = 0; j < numIndices; j++) {
-				_indices[i * j] = face.mIndices[j];
-			}
-		}
 	}
 
 	ModelBuilder::ModelBuilder(){
@@ -85,10 +93,6 @@ namespace Raindrop::Graphics::Builders{
 	ModelBuilder::~ModelBuilder(){
 
 	}
-
-	void ModelBuilder::setRenderer(Renderer* renderer){
-		_renderer = renderer;
-	}
 	
 	std::vector<Vertex>& ModelBuilder::vertices(){
 		return _vertices;
@@ -96,9 +100,5 @@ namespace Raindrop::Graphics::Builders{
 
 	std::vector<uint32_t>& ModelBuilder::indices(){
 		return _indices;
-	}
-
-	Renderer* ModelBuilder::renderer(){
-		return _renderer;
 	}
 }

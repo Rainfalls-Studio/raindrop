@@ -18,6 +18,8 @@ namespace Raindrop::Graphics{
 		auto& vertices = builder.vertices();
 		if (vertices.empty()) return;
 
+		_vertexCount = vertices.size();
+
 		Buffer staginBuffer(_context);
 		staginBuffer.allocate(sizeof(Vertex) * vertices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		staginBuffer.map();
@@ -42,6 +44,8 @@ namespace Raindrop::Graphics{
 		auto& indices = builder.indices();
 		if (indices.empty()) return;
 
+		_indexCount = indices.size();
+
 		Buffer staginBuffer(_context);
 		staginBuffer.allocate(sizeof(uint32_t) * indices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		staginBuffer.map();
@@ -62,10 +66,15 @@ namespace Raindrop::Graphics{
 		_context.transfertCommandPool.endSingleTime(commandBuffer);
 	}
 
-	void Model::bind(VkCommandBuffer commandBuffer){
+	void Model::draw(VkCommandBuffer commandBuffer){
 		VkDeviceSize offsets[] = {0};
 		VkBuffer buffers[] = {_vertexBuffer->get()};
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
-		if (_indexBuffer) vkCmdBindIndexBuffer(commandBuffer, _indexBuffer->get(), 0, VK_INDEX_TYPE_UINT32);
+		if (_indexBuffer){
+			vkCmdBindIndexBuffer(commandBuffer, _indexBuffer->get(), 0, VK_INDEX_TYPE_UINT32);
+			vkCmdDrawIndexed(commandBuffer, _indexCount, 1, 0, 0, 0);
+		} else {
+			vkCmdDraw(commandBuffer, _vertexCount, 1, 0, 0);
+		}
 	}
 }

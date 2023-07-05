@@ -6,6 +6,16 @@
 namespace Raindrop::Graphics{
 	class Swapchain{
 		public:
+			struct Frame{
+				VkFramebuffer framebuffer;
+				VkSemaphore imageAvailable;
+				VkSemaphore imageFinished;
+				VkFence inFlightFence;
+				VkFence imageInFlight;
+				VkImage image;
+				VkImageView imageView;
+			};
+
 			Swapchain(GraphicsContext& context);
 			~Swapchain();
 
@@ -31,6 +41,10 @@ namespace Raindrop::Graphics{
 
 			void setClearColor(VkClearColorValue color);
 
+			Frame& getFrameData(uint32_t id);
+			Frame& getCurrentFrameData();
+			std::vector<Frame>& getFramesData();
+
 		private:
 			GraphicsContext& _context;
 			SwapchainSupport _swapchainSupport;
@@ -38,15 +52,6 @@ namespace Raindrop::Graphics{
 			VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
 			VkSwapchainKHR _oldSwapchain = VK_NULL_HANDLE;
 
-			struct Frame{
-				VkFramebuffer framebuffer;
-				VkSemaphore imageAvailable;
-				VkSemaphore imageFinished;
-				VkFence inFlightFence;
-				VkFence imageInFlight;
-				VkImage image;
-				VkImageView imageView;
-			};
 
 			VkRenderPass _renderPass = VK_NULL_HANDLE;
 			std::vector<Frame> _frames;

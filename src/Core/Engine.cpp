@@ -1,6 +1,10 @@
 #include <Raindrop/Core/Engine.hpp>
-#include <Raindrop/Core/Scene/Component.hpp>
 #include <Raindrop/Core/Scene/Entity.hpp>
+
+
+#include <Raindrop/Core/Scene/Components/Transform.hpp>
+#include <Raindrop/Core/Scene/Components/Tag.hpp>
+#include <Raindrop/Core/Scene/Components/Hierarchy.hpp>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -13,7 +17,7 @@ namespace Raindrop::Core{
 
 		_context = std::make_unique<EngineContext>();
 
-		_scene = std::make_unique<Core::Scene::Scene>(5000, 100);
+		_scene = std::make_unique<Core::Scene::Scene>(*_context, 5000, 100);
 		_renderer = std::make_unique<Graphics::Renderer>(*_context, *_scene);
 
 		setupEvents();

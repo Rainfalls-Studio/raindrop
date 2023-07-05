@@ -5,11 +5,19 @@
 #include <Raindrop/Graphics/Swapchain.hpp>
 #include <Raindrop/Graphics/GraphicsPipeline.hpp>
 #include <Raindrop/Graphics/ImGUI.hpp>
+#include <Raindrop/Graphics/WorldFramebuffer.hpp>
+#include <Raindrop/Graphics/Model.hpp>
 #include <Raindrop/Core/Asset/AssetManager.hpp>
 #include <Raindrop/Core/Scene/Entity.hpp>
 
 #include <SDL2/SDL_vulkan.h>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <Raindrop/Core/Scene/Components/Camera.hpp>
+#include <Raindrop/Core/Scene/Components/Hierarchy.hpp>
+#include <Raindrop/Core/Scene/Components/Tag.hpp>
+#include <Raindrop/Core/Scene/Components/Transform.hpp>
+#include <Raindrop/Core/Scene/Components/Model.hpp>
 
 namespace Raindrop::Graphics{
 	Renderer::Renderer(Core::EngineContext& context, Core::Scene::Scene& scene) : _interpreter{context}{
@@ -20,6 +28,7 @@ namespace Raindrop::Graphics{
 		
 		_context = std::make_unique<GraphicsContext>(context, scene);
 		_gui = std::make_unique<ImGUI>(*_context);
+		_worldFramebuffer = std::make_unique<WorldFramebuffer>(*_context, 1080, 720);
 
 		registerFactories();
 		createGraphicsCommandBuffers();
@@ -35,6 +44,7 @@ namespace Raindrop::Graphics{
 		eraseFactories();
 		destroyGraphicsCommandBuffers();
 
+		_worldFramebuffer.reset();
 		_gui.reset();
 		_context.reset();
 		
@@ -51,8 +61,15 @@ namespace Raindrop::Graphics{
 		PushConstant p;
 		p.viewTransform = viewTransform;
 		p.localTransform = glm::translate(glm::mat4(1.f), transform.translation) * glm::rotate(glm::mat4(1.f), 3.14f, transform.rotation) * glm::scale(glm::mat4(1.f), transform.scale);
-		vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &p);
-		vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+
+		if (entity.hasComponent<Core::Scene::Components::Model>()){
+			auto& model = entity.getComponent<Core::Scene::Components::Model>();
+
+			if (auto m = model._model.lock()){
+				vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstant), &p);
+				m->draw(commandBuffer);
+			}
+		}
 
 		for (auto c : entity){
 			drawEntity(c, layout, commandBuffer, viewTransform);
@@ -60,52 +77,50 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::update(){
-		auto& registry = _context->context.registry;
-		auto& assetManager = _context->context.assetManager;
-		auto& eventManager = _context->context.eventManager;
-		auto& scene = _context->scene;
 		auto& swapchain = _context->swapchain;
 
 		_context->window.events(_gui.get());
 
 		VkCommandBuffer commandBuffer = beginFrame();
 		if (commandBuffer){
-			_gui->newFrame();
+
+			_worldFramebuffer->beginRenderPass(commandBuffer);
+			renderScene(commandBuffer);
+			_worldFramebuffer->endRenderPass(commandBuffer);
+
+			renderGui();
+
 			swapchain.beginRenderPass(commandBuffer);
-
-			glm::mat4 viewTransform;
-			{
-				auto& list = scene.componentEntities<Core::Scene::Components::Camera>();
-				if (!list.empty()){
-					auto entity = Core::Scene::Entity(list.front(), &scene);
-					auto& component = entity.getComponent<Core::Scene::Components::Camera>();
-					component.update(entity.getComponent<Core::Scene::Components::Transform>());
-					viewTransform = component.viewProjection;
-				} else {
-					viewTransform = glm::mat4(1.f);
-				}
-			}
-
-			// auto weak_pipeline = _context->context->registry["Pipeline"].as<std::weak_ptr<Raindrop::Core::Asset::Asset>>();
-			// if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(weak_pipeline.lock())){
-			// 	pipeline->bind(commandBuffer);
-			// 	drawEntity(Core::Scene::Entity(_scene.root(), &_scene), pipeline->layout(), commandBuffer, viewTransform);
-			// }
-
-			_interpreter.update();
-			registry["Edit.SelectedEntity"] = scene.UI(registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>(Core::Scene::INVALID_ENTITY_ID));
-
-			if (ImGui::Begin("component")){
-				auto entity = registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>();
-				if (entity != Core::Scene::INVALID_ENTITY_ID) scene.componentsUI(entity);
-			}
-			ImGui::End();
-
-			// The GUI should be rendered at the end.
-			_gui->render(commandBuffer);
+			renderSwapchain(commandBuffer);
 			swapchain.endRenderPass(commandBuffer);
+
 			endFrame();
 		}
+	}
+
+	void Renderer::renderGui(){
+		_gui->newFrame();
+
+		auto& registry = _context->context.registry;
+		auto& assetManager = _context->context.assetManager;
+		auto& eventManager = _context->context.eventManager;
+		auto& scene = _context->scene;
+
+		_interpreter.update();
+		registry["Edit.SelectedEntity"] = scene.UI(registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>(Core::Scene::INVALID_ENTITY_ID));
+
+		if (ImGui::Begin("component")){
+			auto entity = registry["Edit.SelectedEntity"].as<Core::Scene::EntityID>();
+			if (entity != Core::Scene::INVALID_ENTITY_ID) scene.componentsUI(entity);
+		}
+		ImGui::End();
+	}
+
+	void Renderer::renderSwapchain(VkCommandBuffer commandBuffer){
+
+		
+
+		_gui->render(commandBuffer);
 	}
 
 	VkCommandBuffer Renderer::beginFrame(){
@@ -207,5 +222,28 @@ namespace Raindrop::Graphics{
 	void Renderer::destroyGraphicsCommandBuffers(){
 		vkFreeCommandBuffers(_context->device.get(), _context->graphicsCommandPool.primary(), _graphicsCommandBuffers.size(), _graphicsCommandBuffers.data());
 		_graphicsCommandBuffers.clear();
+	}
+
+	void Renderer::renderScene(VkCommandBuffer commandBuffer){
+		auto& scene = _context->scene;
+
+		glm::mat4 viewTransform;
+		{
+			auto& list = scene.componentEntities<Core::Scene::Components::Camera>();
+			if (!list.empty()){
+				auto entity = Core::Scene::Entity(list.front(), &scene);
+				auto& component = entity.getComponent<Core::Scene::Components::Camera>();
+				component.update(entity.getComponent<Core::Scene::Components::Transform>());
+				viewTransform = component.viewProjection;
+			} else {
+				viewTransform = glm::mat4(1.f);
+			}
+		}
+		
+		auto weak_pipeline = _context->context.registry["Pipeline"].as<std::weak_ptr<Raindrop::Core::Asset::Asset>>();
+		if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(weak_pipeline.lock())){
+			pipeline->bind(commandBuffer);
+			drawEntity(Core::Scene::Entity(scene.root(), &scene), pipeline->layout(), commandBuffer, viewTransform);
+		}
 	}
 }

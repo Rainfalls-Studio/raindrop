@@ -4,10 +4,15 @@
 #include <Raindrop/Core/Scene/ComponentManager.hpp>
 #include <Raindrop/Core/Scene/EntityManager.hpp>
 #include <Raindrop/Core/Scene/EntityComponentsRegistry.hpp>
-#include <Raindrop/Core/Scene/Component.hpp>
+
+#include <Raindrop/Core/Scene/Components/Camera.hpp>
+#include <Raindrop/Core/Scene/Components/Hierarchy.hpp>
+#include <Raindrop/Core/Scene/Components/Model.hpp>
+#include <Raindrop/Core/Scene/Components/Tag.hpp>
+#include <Raindrop/Core/Scene/Components/Transform.hpp>
 
 namespace Raindrop::Core::Scene{
-	Scene::Scene(uint32_t entityCount, uint32_t componentCount){
+	Scene::Scene(EngineContext& context, uint32_t entityCount, uint32_t componentCount) : _context{context}{
 		el::Logger* customLogger = el::Loggers::getLogger("Engine.Core.Scene");
 		customLogger->configurations()->set(el::Level::Global, el::ConfigurationType::Format, "%datetime %level [%logger]: %msg");
 
@@ -21,7 +26,6 @@ namespace Raindrop::Core::Scene{
 		registerComponent<Components::Transform>(entityCount);
 		registerComponent<Components::Hierachy>(entityCount);
 		registerComponent<Components::Camera>(1);
-		registerComponent<Components::DB_KeyboadController>(1);
 		registerComponent<Components::Model>(entityCount);
 
 		_root = createEntity();
@@ -199,7 +203,7 @@ namespace Raindrop::Core::Scene{
 		return drawEntity(base, selectedEntity);
 	}
 
-	#define draw_component(component) if (entity.hasComponent<component>()) {entity.getComponent<component>().UI();}
+	#define draw_component(component) if (entity.hasComponent<component>()) {entity.getComponent<component>().UI(_context);}
 	#define add_component(component) if (!entity.hasComponent<component>()) {if (ImGui::MenuItem(#component)){entity.createComponent<component>();}}
 
 	void Scene::componentsUI(EntityID id){
@@ -214,12 +218,12 @@ namespace Raindrop::Core::Scene{
 		if (ImGui::BeginPopup("add component")){
 			add_component(Components::Transform);
 			add_component(Components::Camera);
-			add_component(Components::DB_KeyboadController);
+			add_component(Components::Model);
 			ImGui::EndPopup();
 		}
 
 		draw_component(Components::Transform);
 		draw_component(Components::Camera);
-		draw_component(Components::DB_KeyboadController);
+		draw_component(Components::Model);
 	}
 }

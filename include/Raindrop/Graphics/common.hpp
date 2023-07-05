@@ -14,6 +14,10 @@
 #include <Raindrop/Core/Asset/Asset.hpp>
 
 namespace Raindrop::Graphics{
+	namespace Builders{
+		class GraphicsPipelineBuilder;
+		class ModelBuilder;
+	}
 	class GraphicsContext;
 	class Renderer;
 	class Instance;
@@ -33,12 +37,20 @@ namespace Raindrop::Graphics{
 	class TransfertCommandPool;
 	class WorldFramebuffer;
 	class OverlayFramebuffer;
+	class Target;
 
 	struct Vertex{
 		glm::vec3 position{};
 		glm::vec3 color{};
 		glm::vec3 normal{};
 		glm::vec2 uv{};
+
+		Vertex(){}
+		~Vertex(){}
+
+		bool operator==(const Vertex& other) const{
+			return (position == other.position) && (color == other.color) && (normal == other.normal) && (uv == other.uv);
+		}
 	};
 	
 	struct SwapchainSupport{
@@ -48,5 +60,7 @@ namespace Raindrop::Graphics{
 		bool supported;
 	};
 }
+
+#include <Raindrop/Graphics/Target.hpp>
 
 #endif

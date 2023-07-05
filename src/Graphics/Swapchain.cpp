@@ -376,4 +376,16 @@ namespace Raindrop::Graphics{
 	void Swapchain::setClearColor(VkClearColorValue color){
 		_clearColor = color;
 	}
+	
+	Swapchain::Frame& Swapchain::getFrameData(uint32_t id){
+		return _frames[id];
+	}
+
+	Swapchain::Frame& Swapchain::getCurrentFrameData(){
+		return _frames[currentFrame()];
+	}
+
+	std::vector<Swapchain::Frame>& Swapchain::getFramesData(){
+		return _frames;
+	}
 }

@@ -25,6 +25,8 @@ namespace Raindrop::Graphics{
 			err << "Failed to create SDL2 window : " << SDL_GetError();
 			throw std::runtime_error(err.str());
 		}
+
+		_context.gRegistry["Window"] = this;
 	}
 
 	Window::~Window(){

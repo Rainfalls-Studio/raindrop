@@ -10,12 +10,15 @@ namespace Raindrop::Graphics{
 			Model(GraphicsContext& context, Builders::ModelBuilder& builder);
 			~Model();
 
-			void bind(VkCommandBuffer commandBuffer);
+			void draw(VkCommandBuffer commandBuffer);
 
 		public:
 			GraphicsContext& _context;
 			std::unique_ptr<Buffer> _vertexBuffer;
 			std::unique_ptr<Buffer> _indexBuffer;
+
+			uint32_t _indexCount = 0;
+			uint32_t _vertexCount = 0;
 
 			void createVertexBuffer(Builders::ModelBuilder& builder);
 			void createIndexBuffer(Builders::ModelBuilder& builder);

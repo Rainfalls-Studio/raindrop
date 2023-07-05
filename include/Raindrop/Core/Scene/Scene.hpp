@@ -7,7 +7,7 @@ namespace Raindrop::Core::Scene{
 	class Scene{
 		public:
 
-			Scene(uint32_t entityCount, uint32_t componentCount);
+			Scene(EngineContext& context, uint32_t entityCount, uint32_t componentCount);
 			~Scene();
 
 			uint32_t maxEntityCount() const;
@@ -81,6 +81,7 @@ namespace Raindrop::Core::Scene{
 			}
 
 		private:
+			EngineContext& _context;
 			std::unique_ptr<ComponentRegistry> _componentRegistry;
 			std::unique_ptr<EntityComponentsRegistry> _entityComponentsRegistry;
 			std::unique_ptr<EntityManager> _entityManager;

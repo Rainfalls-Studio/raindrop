@@ -7,6 +7,7 @@ namespace Raindrop::Graphics{
 	GraphicsContext::GraphicsContext(Core::EngineContext& context, Core::Scene::Scene& scene) :
 		scene{scene},
 		context{context},
+		gRegistry{},
 		window{*this},
 		instance{*this},
 		device{*this},

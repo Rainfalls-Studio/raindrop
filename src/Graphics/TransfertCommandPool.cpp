@@ -27,7 +27,6 @@ namespace Raindrop::Graphics{
 		if (_singleTimeCommandPool != VK_NULL_HANDLE) vkDestroyCommandPool(_context.device.get(), _singleTimeCommandPool, _context.allocationCallbacks);
 	}
 
-	
 	VkCommandPool TransfertCommandPool::primary() const{
 		return _primaryCommandPool;
 	}

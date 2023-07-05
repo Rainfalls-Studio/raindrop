@@ -4,24 +4,45 @@
 #include <Raindrop/Graphics/common.hpp>
 
 namespace Raindrop::Graphics::Builders{
-	class PipelineBuilder{
+	class GraphicsPipelineBuilder{
 		public:
-			PipelineBuilder();
-			~PipelineBuilder();
+			GraphicsPipelineBuilder();
+			~GraphicsPipelineBuilder();
 
 			std::shared_ptr<GraphicsPipeline> build(GraphicsContext& context);
 
 			void addShader(const std::shared_ptr<Shader>& shader);
 			void setRenderPass(VkRenderPass renderPass);
+			void setName(const std::string& name);
+			void setAttachmentCount(uint32_t count);
+			
+			VkPipelineViewportStateCreateInfo& viewportInfo();
+			VkPipelineRasterizationStateCreateInfo& rasterizationInfo();
+			VkPipelineMultisampleStateCreateInfo& multisampleInfo();
+			VkPipelineInputAssemblyStateCreateInfo& inputAssemblyInfo();
+			VkPipelineColorBlendStateCreateInfo& colorBlendInfo();
+			VkPipelineDepthStencilStateCreateInfo& depthStencilInfo();
+			VkPipelineTessellationStateCreateInfo& tessellationInfo();
+			VkPipelineColorBlendAttachmentState& attachmentState(uint32_t id);
 
 		private:
 			VkRenderPass _renderPass = VK_NULL_HANDLE;
 			uint32_t _subpass = 0;
 
 			std::vector<std::shared_ptr<Shader>> _shaders;
+			std::vector<VkPipelineColorBlendAttachmentState> _colorAttachments;
+			std::string _name;
 
 			VkPipelineLayout createPipelineLayout(VkAllocationCallbacks* callbacks);
 			void destroyPipelineLayout(VkPipelineLayout layout, VkAllocationCallbacks* callbacks);
+
+			VkPipelineViewportStateCreateInfo _viewportInfo{};
+			VkPipelineRasterizationStateCreateInfo _rasterizationInfo{};
+			VkPipelineMultisampleStateCreateInfo _multisampleInfo{};
+			VkPipelineInputAssemblyStateCreateInfo _inputAssemblyInfo{};
+			VkPipelineColorBlendStateCreateInfo _colorBlendInfo{};
+			VkPipelineDepthStencilStateCreateInfo _depthStencilInfo{};
+			VkPipelineTessellationStateCreateInfo _tessellationInfo{};
 	};
 }
 

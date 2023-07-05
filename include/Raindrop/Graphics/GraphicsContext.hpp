@@ -8,6 +8,7 @@
 #include <Raindrop/Graphics/Swapchain.hpp>
 #include <Raindrop/Graphics/TransfertCommandPool.hpp>
 #include <Raindrop/Graphics/GraphicsCommandPool.hpp>
+#include <Raindrop/Graphics/GraphicsRegistry.hpp>
 
 namespace Raindrop::Graphics{
 	struct GraphicsContext{
@@ -24,6 +25,7 @@ namespace Raindrop::Graphics{
 		Core::EngineContext& context;
 		Core::Scene::Scene& scene;
 
+		GraphicsRegistry gRegistry;
 		VkAllocationCallbacks* allocationCallbacks = nullptr;
 
 		Window window;

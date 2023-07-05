@@ -2,8 +2,11 @@
 #define __RAINDROP_CORE_SCENE_ENTITY_HPP__
 
 #include <Raindrop/Core/Scene/common.hpp>
-#include <Raindrop/Core/Scene/Component.hpp>
 #include <Raindrop/Core/Scene/Scene.hpp>
+
+#include <Raindrop/Core/Scene/Components/Transform.hpp>
+#include <Raindrop/Core/Scene/Components/Tag.hpp>
+#include <Raindrop/Core/Scene/Components/Hierarchy.hpp>
 
 namespace Raindrop::Core::Scene{
 	class Entity{

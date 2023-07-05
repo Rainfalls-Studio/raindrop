@@ -14,9 +14,10 @@ namespace Raindrop::Graphics::GUI{
 		auto it = _items.begin();
 		while (it != _items.end()){
 			if (it->get()->update()){
-				_items.erase(it);
+				it = _items.erase(it);
+			} else {
+				++it;
 			}
-			it++;
 		}
 	}
 
