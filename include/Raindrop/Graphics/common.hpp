@@ -17,14 +17,14 @@ namespace Raindrop::Graphics{
 	namespace Builders{
 		class GraphicsPipelineBuilder;
 		class ModelBuilder;
+		class DescriptorPoolBuilder;
+		class DescriptorSetLayoutBuilder;
 	}
+
 	class GraphicsContext;
 	class Renderer;
 	class Instance;
-	class PhysicalDevice;
-	class PhysicalDeviceManager;
 	class Device;
-	class DeviceManager;
 	class Swapchain;
 	class Renderer;
 	class Window;
@@ -36,8 +36,9 @@ namespace Raindrop::Graphics{
 	class GraphicsCommandPool;
 	class TransfertCommandPool;
 	class WorldFramebuffer;
-	class OverlayFramebuffer;
 	class Target;
+	class DescriptorPool;
+	class DescriptorSetLayout;
 
 	struct Vertex{
 		glm::vec3 position{};
