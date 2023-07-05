@@ -9,8 +9,8 @@ namespace Raindrop::Graphics{
 			Target() = default;
 			virtual ~Target() = default;
 
-			virtual VkRenderPass renderPass() const {return VK_NULL_HANDLE;}
-			virtual uint32_t attachmentCount() const {return 0;}
+			virtual VkRenderPass renderPass() const = 0;
+			virtual uint32_t attachmentCount() const = 0;
 	};
 }
 

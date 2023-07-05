@@ -310,6 +310,7 @@ namespace Raindrop::Graphics::Factory{
 	}
 
 	void GraphicsPipelineFactory::getDepthStencilOpStateXML(tinyxml2::XMLElement* element, VkStencilOpState& op){
+
 		if (!element) return;
 
 		if (auto failOp = element->FirstChildElement("Fail")){

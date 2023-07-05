@@ -3,4 +3,21 @@
 
 #include <Raindrop/Graphics/common.hpp>
 
+namespace Raindrop::Graphics::Builders{
+	class DescriptorSetLayoutBuilder{
+		public:
+			DescriptorSetLayoutBuilder();
+			~DescriptorSetLayoutBuilder();
+
+			std::shared_ptr<DescriptorSetLayout> build(GraphicsContext& context);
+
+			void setFlags(VkDescriptorSetLayoutCreateFlags flags);
+			void pushBinding(VkDescriptorSetLayoutBinding& binding);
+
+		private:
+			VkDescriptorSetLayoutCreateFlags _flags = 0;
+			std::vector<VkDescriptorSetLayoutBinding> _bindings;
+	};
+}
+
 #endif

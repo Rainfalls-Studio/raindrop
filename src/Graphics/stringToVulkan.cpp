@@ -1,6 +1,6 @@
 /*
 
-if nedded. Here is a pyhton prog to automaticaly replace the empty strings
+if nedded. Here is a python prog to automaticaly replace the empty strings
 
 import re
 
