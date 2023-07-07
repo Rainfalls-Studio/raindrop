@@ -3,6 +3,7 @@
 
 #include <Raindrop/Graphics/common.hpp>
 
+//TODO: add build from xml  - https://trello.com/c/1ppfxZk8/1-add-build-from-xml
 namespace Raindrop::Graphics::Builders{
 	class DescriptorPoolBuilder{
 		public:

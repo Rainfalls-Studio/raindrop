@@ -39,11 +39,9 @@ namespace Raindrop::Graphics{
 
 			void createGraphicsCommandBuffers();
 			void destroyGraphicsCommandBuffers();
-
-			void drawEntityAndChilds(Core::Scene::Entity& entity, VkCommandBuffer commandBuffer, VkPipelineLayout layout);
 			
 			VkCommandBuffer getCurrentGraphicsCommandBuffer();
-
+			
 			VkCommandBuffer beginFrame();
 			void endFrame();
 

@@ -10,6 +10,7 @@ namespace Raindrop::Graphics{
 				VkDeviceMemory memory = VK_NULL_HANDLE;
 				VkImage image = VK_NULL_HANDLE;
 				VkImageView imageView = VK_NULL_HANDLE;
+				VkSampler sampler = VK_NULL_HANDLE;
 			};
 
 			WorldFramebuffer(GraphicsContext& context, uint32_t width, uint32_t height);
@@ -31,10 +32,19 @@ namespace Raindrop::Graphics{
 			VkRenderPass _renderPass;
 
 			std::vector<Attachment> _attachments;
-			std::weak_ptr<GraphicsPipeline> _pipeline;
+
+			// ! TEMP
+			std::shared_ptr<GraphicsPipeline> _pipeline;
+			std::shared_ptr<DescriptorPool> _descriptorPool;
+			std::shared_ptr<DescriptorSetLayout> _setLayout;
+			// ! TEMP
 
 			uint32_t _width;
 			uint32_t _height;
+
+			void createDescriptorPool();
+			void createSetLayout();
+			void createPipeline();
 
 			void createRenderPass();
 			void createAttachments();

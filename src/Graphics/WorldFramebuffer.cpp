@@ -1,5 +1,9 @@
 #include <Raindrop/Graphics/WorldFramebuffer.hpp>
 #include <Raindrop/Graphics/GraphicsContext.hpp>
+#include <Raindrop/Graphics/builders/DescriptorPoolBuilder.hpp>
+#include <Raindrop/Graphics/builders/DescriptorSetLayoutBuilder.hpp>
+#include <Raindrop/Graphics/DescriptorPool.hpp>
+#include <Raindrop/Graphics/DescriptorSetLayout.hpp>
 
 namespace Raindrop::Graphics{
 	struct AttachmentInfo{
@@ -356,6 +360,9 @@ namespace Raindrop::Graphics{
 		createAttachments();
 		createFramebuffer();
 
+		createDescriptorPool();
+		createSetLayout();
+
 		_context.gRegistry["WorldFramebuffer"] = this;
 
 		CLOG(INFO, "Engine.Graphics.WorldFramebuffer") << "Created world framebuffer with success !";
@@ -368,6 +375,7 @@ namespace Raindrop::Graphics{
 			if (a.imageView) vkDestroyImageView(_context.device.get(), a.imageView, _context.allocationCallbacks);
 			if (a.image) vkDestroyImage(_context.device.get(), a.image, _context.allocationCallbacks);
 			if (a.memory) vkFreeMemory(_context.device.get(), a.memory, _context.allocationCallbacks);
+			if (a.sampler) vkDestroySampler(_context.device.get(), a.sampler, _context.allocationCallbacks);
 		}
 
 		if (_renderPass) vkDestroyRenderPass(_context.device.get(), _renderPass, _context.allocationCallbacks);
@@ -423,6 +431,7 @@ namespace Raindrop::Graphics{
 		_attachments.resize(attachments.size());
 
 		for (int i=0; i<attachments.size(); i++){
+			auto& attachment = _attachments[i];
 			VkImageCreateInfo imageInfo{};
 
 			imageInfo = attachments[i].image;
@@ -435,13 +444,13 @@ namespace Raindrop::Graphics{
 			imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 			imageInfo.queueFamilyIndexCount = sizeof(familyIndices) / sizeof(uint32_t);
 			
-			if (vkCreateImage(_context.device.get(), &imageInfo, _context.allocationCallbacks, &_attachments[i].image) != VK_SUCCESS){
+			if (vkCreateImage(_context.device.get(), &imageInfo, _context.allocationCallbacks, &attachment.image) != VK_SUCCESS){
 				CLOG(ERROR, "Engine.Graphics.WorldFramebuffer") << "Failed to create world framebuffer attachment (" << i << ") image";
 				throw std::runtime_error("Failed to create world framebuffer attachment image");
 			}
 
 			VkMemoryRequirements requirements;
-			vkGetImageMemoryRequirements(_context.device.get(), _attachments[i].image, &requirements);
+			vkGetImageMemoryRequirements(_context.device.get(), attachment.image, &requirements);
 
 			VkMemoryAllocateInfo allocationInfo{};
 			allocationInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -449,23 +458,46 @@ namespace Raindrop::Graphics{
 			allocationInfo.allocationSize = requirements.size;
 			
 
-			if (vkAllocateMemory(_context.device.get(), &allocationInfo, _context.allocationCallbacks, &_attachments[i].memory) != VK_SUCCESS){
+			if (vkAllocateMemory(_context.device.get(), &allocationInfo, _context.allocationCallbacks, &attachment.memory) != VK_SUCCESS){
 				CLOG(ERROR, "Engine.Graphics.WorldFramebuffer") << "Failed to allocate world framebuffer attachment memory";
 				throw std::runtime_error("Failed to allocate world framebuffer attachment memory");
 			}
 
-			if (vkBindImageMemory(_context.device.get(), _attachments[i].image, _attachments[i].memory, 0) != VK_SUCCESS){
+			if (vkBindImageMemory(_context.device.get(), attachment.image, attachment.memory, 0) != VK_SUCCESS){
 				CLOG(ERROR, "Engine.graphics.WorldFramebuffer") << "Failed to bind world framebuffer attachment image memory";
 				throw std::runtime_error("Failed to bind world framebuffer attachment image memory");
 			}
 
 			VkImageViewCreateInfo imageViewInfo{};
 			imageViewInfo = attachments[i].imageView;
-			imageViewInfo.image = _attachments[i].image;
+			imageViewInfo.image = attachment.image;
 
-			if (vkCreateImageView(_context.device.get(), &imageViewInfo, _context.allocationCallbacks, &_attachments[i].imageView) != VK_SUCCESS){
+			if (vkCreateImageView(_context.device.get(), &imageViewInfo, _context.allocationCallbacks, &attachment.imageView) != VK_SUCCESS){
 				CLOG(ERROR, "Engine.Graphics.WorldFramebuffer") << "Failed to create world framebuffer attachment (" << i << ") image view";
 				throw std::runtime_error("Failed to create world framebuffer attachment image view");
+			}
+
+			VkSamplerCreateInfo samplerInfo{};
+			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+			samplerInfo.magFilter = VK_FILTER_LINEAR;
+			samplerInfo.minFilter = VK_FILTER_LINEAR;
+			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+			samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			samplerInfo.mipLodBias = 0.0f;
+			samplerInfo.anisotropyEnable = VK_FALSE;
+			samplerInfo.maxAnisotropy = 1.0f;
+			samplerInfo.compareEnable = VK_FALSE;
+			samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+			samplerInfo.minLod = 0.0f;
+			samplerInfo.maxLod = 0.0f;
+			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+			samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+			if (vkCreateSampler(_context.device.get(), &samplerInfo, _context.allocationCallbacks, &attachment.sampler) != VK_SUCCESS){
+				CLOG(ERROR, "Engine.Graphics.WorldFramebuffer") << "Failed to create world framebuffer attachment (" << i << ") sampler";
+				throw std::runtime_error("Failed to create sampler");
 			}
 		}
 	}
@@ -580,5 +612,33 @@ namespace Raindrop::Graphics{
 
 	uint32_t WorldFramebuffer::attachmentCount() const{
 		return _attachments.size() - 1;
+	}
+
+	void WorldFramebuffer::createDescriptorPool(){
+		Builders::DescriptorPoolBuilder builder;
+		builder.setMaxSets(1);
+		builder.pushPoolSize({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 5});
+
+		_descriptorPool = builder.build(_context);
+	}
+
+	void WorldFramebuffer::createSetLayout(){
+		Builders::DescriptorSetLayoutBuilder builder;
+
+		for (int i=0; i<_attachments.size(); i++){
+			VkDescriptorSetLayoutBinding binding{};
+			binding.binding = i;
+			binding.descriptorCount = 1;
+			binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+			binding.pImmutableSamplers = &_attachments[i].sampler;
+			builder.pushBinding(binding);
+		}
+
+		_setLayout = builder.build(_context);
+	}
+
+	void WorldFramebuffer::createPipeline(){
+
 	}
 }

@@ -15,4 +15,8 @@ namespace Raindrop::Graphics{
 	DescriptorSetLayout::~DescriptorSetLayout(){
 		if (_layout) vkDestroyDescriptorSetLayout(_context.device.get(), _layout, _context.allocationCallbacks);
 	}
+
+	VkDescriptorSetLayout DescriptorSetLayout::layout() const{
+		return _layout;
+	}
 }

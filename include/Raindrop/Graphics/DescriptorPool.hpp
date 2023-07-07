@@ -9,10 +9,11 @@ namespace Raindrop::Graphics{
 			DescriptorPool(GraphicsContext& context, VkDescriptorPoolCreateInfo& info);
 			~DescriptorPool();
 
+			VkDescriptorPool pool() const;
+
 		private:
 			GraphicsContext& _context;
 			VkDescriptorPool _pool = VK_NULL_HANDLE;
-
 	};
 }
 

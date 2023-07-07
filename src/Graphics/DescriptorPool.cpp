@@ -15,4 +15,8 @@ namespace Raindrop::Graphics{
 	DescriptorPool::~DescriptorPool(){
 		if (_pool) vkDestroyDescriptorPool(_context.device.get(), _pool, _context.allocationCallbacks);
 	}
+
+	VkDescriptorPool DescriptorPool::pool() const{
+		return _pool;
+	}
 }

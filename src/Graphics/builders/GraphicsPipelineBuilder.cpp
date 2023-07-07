@@ -169,9 +169,12 @@ namespace Raindrop::Graphics::Builders{
 
 		VkPipelineLayoutCreateInfo layoutInfo = {};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		layoutInfo.pushConstantRangeCount = 1;
+		
 		layoutInfo.pPushConstantRanges = &pushConstantRange;
-		layoutInfo.setLayoutCount = 0;
+		layoutInfo.pushConstantRangeCount = 1;
+
+		layoutInfo.pSetLayouts = _setLayouts.data();
+		layoutInfo.setLayoutCount = static_cast<uint32_t>(_setLayouts.size());
 		layoutInfo.flags = 0;
 
 		return std::make_shared<GraphicsPipeline>(context, createInfo, layoutInfo, _shaders, _name);
@@ -179,6 +182,10 @@ namespace Raindrop::Graphics::Builders{
 
 	void GraphicsPipelineBuilder::addShader(const std::shared_ptr<Shader>& shader){
 		_shaders.push_back(shader);
+	}
+
+	void GraphicsPipelineBuilder::addDescriptorSetLayout(const VkDescriptorSetLayout &layout){
+		_setLayouts.push_back(layout);
 	}
 
 	void GraphicsPipelineBuilder::setRenderPass(VkRenderPass renderPass){

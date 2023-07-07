@@ -3,6 +3,8 @@
 
 #include <Raindrop/Graphics/common.hpp>
 
+//TODO: Add 'loadFromXML' option - https://trello.com/c/ZkdVzN1X/3-add-loadfromxml-option
+//TODO: custom vertex input - https://trello.com/c/ZpnG1ebY/4-custom-vertex-input
 namespace Raindrop::Graphics::Builders{
 	class GraphicsPipelineBuilder{
 		public:
@@ -12,6 +14,7 @@ namespace Raindrop::Graphics::Builders{
 			std::shared_ptr<GraphicsPipeline> build(GraphicsContext& context);
 
 			void addShader(const std::shared_ptr<Shader>& shader);
+			void addDescriptorSetLayout(const VkDescriptorSetLayout &layout);
 			void setRenderPass(VkRenderPass renderPass);
 			void setName(const std::string& name);
 			void setAttachmentCount(uint32_t count);
@@ -31,6 +34,7 @@ namespace Raindrop::Graphics::Builders{
 
 			std::vector<std::shared_ptr<Shader>> _shaders;
 			std::vector<VkPipelineColorBlendAttachmentState> _colorAttachments;
+			std::vector<VkDescriptorSetLayout> _setLayouts;
 			std::string _name;
 
 			VkPipelineLayout createPipelineLayout(VkAllocationCallbacks* callbacks);
