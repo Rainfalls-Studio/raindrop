@@ -89,9 +89,9 @@ namespace Raindrop::Graphics{
 
 		if (VkCommandBuffer commandBuffer = beginFrame()){
 
-			// _worldFramebuffer->beginRenderPass(commandBuffer);
-			// renderScene(commandBuffer);
-			// _worldFramebuffer->endRenderPass(commandBuffer);
+			_worldFramebuffer->beginRenderPass(commandBuffer);
+			renderScene(commandBuffer);
+			_worldFramebuffer->endRenderPass(commandBuffer);
 
 			renderGui();
 
@@ -122,7 +122,7 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::renderSwapchain(VkCommandBuffer commandBuffer){
-		// _worldFramebuffer->render(commandBuffer);
+		_worldFramebuffer->render(commandBuffer);
 		_gui->render(commandBuffer);
 	}
 

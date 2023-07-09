@@ -19,6 +19,11 @@ namespace Raindrop::Graphics{
 		VkFormatFeatureFlags requiredFeatures;
 		VkClearValue clear;
 	};
+
+	static VkAttachmentDescriptionStencilLayout stencilLayout = VkAttachmentDescriptionStencilLayout{
+		.stencilInitialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+		.stencilFinalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	};
 	
 	// DEFAULT CONFIGURATION
 	static std::vector<AttachmentInfo> attachments = {
@@ -33,7 +38,7 @@ namespace Raindrop::Graphics{
 				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
 				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
@@ -69,10 +74,11 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
-				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 			},
 
 			.formats = {
+				VK_FORMAT_D32_SFLOAT,
 				VK_FORMAT_D32_SFLOAT_S8_UINT,
 				VK_FORMAT_D24_UNORM_S8_UINT,
 				VK_FORMAT_D16_UNORM_S8_UINT,
@@ -134,7 +140,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
-				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 			},
 
 			.formats = {
@@ -200,7 +206,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
-				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 			},
 
 			.formats = {
@@ -266,7 +272,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.queueFamilyIndexCount = 0,
 				.pQueueFamilyIndices = nullptr,
-				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 			},
 
 			.formats = {
@@ -333,7 +339,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.queueFamilyIndexCount = 0,
 				.pQueueFamilyIndices = nullptr,
-				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 			},
 
 			.formats = {
@@ -396,13 +402,13 @@ namespace Raindrop::Graphics{
 	void WorldFramebuffer::createRenderPass(){
 		VkAttachmentReference depthAttachmentRef{};
 		depthAttachmentRef.attachment = 0;
-		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
+		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
 		std::vector<VkAttachmentReference> colorAttachmentRefs(attachments.size() - 1);
 		for (int i=1; i<attachments.size(); i++){
 			auto& ref = colorAttachmentRefs[i-1];
 			ref.attachment = i;
-			ref.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
 
 		VkSubpassDescription subpass = {};
@@ -604,22 +610,26 @@ namespace Raindrop::Graphics{
 
 		info.pClearValues = clear.data();
 
-		vkCmdBeginRenderPass(commandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
-
-		std::vector<VkImageMemoryBarrier> layoutTransitionBarriers(attachments.size()-1);
-
+		std::vector<VkImageMemoryBarrier> layoutTransitionBarriers(attachments.size());
 		for (int i=0; i<layoutTransitionBarriers.size(); i++){
 			auto& layoutTransitionBarrier = layoutTransitionBarriers[i];
 
 			layoutTransitionBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			layoutTransitionBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-			layoutTransitionBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			layoutTransitionBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			layoutTransitionBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			if (i == 0){
+				layoutTransitionBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+				layoutTransitionBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+				layoutTransitionBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+			} else {
+				layoutTransitionBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+				layoutTransitionBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+				layoutTransitionBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			}
+
+			layoutTransitionBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			layoutTransitionBarrier.newLayout = attachments[i].description.initialLayout;
 			layoutTransitionBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 			layoutTransitionBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			layoutTransitionBarrier.image = _attachments[i+1].image;
-			layoutTransitionBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			layoutTransitionBarrier.image = _attachments[i].image;
 			layoutTransitionBarrier.subresourceRange.baseMipLevel = 0;
 			layoutTransitionBarrier.subresourceRange.levelCount = 1;
 			layoutTransitionBarrier.subresourceRange.baseArrayLayer = 0;
@@ -627,9 +637,11 @@ namespace Raindrop::Graphics{
 		}
 
 		vkCmdPipelineBarrier(commandBuffer,
-			VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,  // The appropriate pipeline stage
-			VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,          // The appropriate pipeline stage
+			VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+			VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
 			0, 0, nullptr, 0, nullptr, layoutTransitionBarriers.size(), layoutTransitionBarriers.data());
+
+		vkCmdBeginRenderPass(commandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
 	}
 
 	void WorldFramebuffer::endRenderPass(VkCommandBuffer commandBuffer){
