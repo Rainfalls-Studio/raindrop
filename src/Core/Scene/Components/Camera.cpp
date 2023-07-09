@@ -1,6 +1,7 @@
 #include <Raindrop/Core/Scene/Components/Camera.hpp>
 #include <Raindrop/Core/Scene/Components/Transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 namespace Raindrop::Core::Scene::Components{
 	Camera::Camera(){
@@ -65,7 +66,11 @@ namespace Raindrop::Core::Scene::Components{
 	}
 
 	void Camera::update(const Transform& transform){
-		glm::mat4 transformMat = glm::translate(glm::mat4(1.f), transform.translation) * glm::rotate(glm::mat4(1.f), glm::pi<float>(), transform.rotation);
+		glm::mat4 rotationMatrix = glm::eulerAngleXYZ(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), transform.translation);
+		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), transform.scale);
+
+		glm::mat4 transformMat = translationMatrix * rotationMatrix * scaleMatrix;
 		view = glm::inverse(transformMat);
 		viewProjection = projection * view;
 	}

@@ -16,7 +16,6 @@ namespace Raindrop::Core{
 		CLOG(INFO, "Engine") << "Creating New Engine ...";
 
 		_context = std::make_unique<EngineContext>();
-
 		_scene = std::make_unique<Core::Scene::Scene>(*_context, 5000, 100);
 		_renderer = std::make_unique<Graphics::Renderer>(*_context, *_scene);
 

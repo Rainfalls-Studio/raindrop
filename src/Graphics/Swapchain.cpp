@@ -21,9 +21,9 @@ namespace Raindrop::Graphics{
 
 	Swapchain::~Swapchain(){
 		CLOG(INFO, "Engine.Graphics.Swapchain") << "Destroying swapchain...";
-		
-		destroyFrames();
-		if (_swapchain) vkDestroySwapchainKHR(_context.device.get(), _swapchain, _context.allocationCallbacks);
+
+		_oldSwapchain.reset();
+		_swapchain.reset();
 		if (_renderPass) vkDestroyRenderPass(_context.device.get(), _renderPass, _context.allocationCallbacks);
 
 		CLOG(INFO, "Engine.Graphics.Swapchain") << "Swapchain destroyed with success !";
@@ -47,6 +47,24 @@ namespace Raindrop::Graphics{
 
 	void Swapchain::rebuildSwapchain(){
 		CLOG(INFO, "Engine.Graphics.Swapchain") << "Building/Rebuilding swapchain...";
+
+		_context.device.waitIdle();
+		
+		std::swap(_swapchain, _oldSwapchain);
+		_swapchain = std::make_unique<SwapchainData>(_context);
+
+		_swapchainSupport = _context.device.getSwapchainSupport(_context.window.surface());
+		auto surfaceFormat = _surfaceFormat;
+
+		findSurfaceFormat();
+		bool hasColorSpaceChanged = surfaceFormat.colorSpace != _surfaceFormat.colorSpace;
+		bool hasFormatChanged = surfaceFormat.format != _surfaceFormat.format;
+
+		if (hasColorSpaceChanged || hasFormatChanged){
+			CLOG(ERROR, "Engine.Graphics.Swapchain") << "The swapchain surface format and/or color space has changed";
+			throw std::runtime_error("The surface format and/or color space has changed");
+		}
+
 		findPresentMode();
 		findFrameCount();
 		findExtent();
@@ -54,7 +72,7 @@ namespace Raindrop::Graphics{
 		VkSwapchainCreateInfoKHR info{};
 		info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		info.surface = _context.window.surface();
-		info.oldSwapchain = _oldSwapchain;
+		info.oldSwapchain = _oldSwapchain != nullptr ? _oldSwapchain->_swapchain : VK_NULL_HANDLE;
 		info.preTransform = _swapchainSupport.capabilities.currentTransform;
 		info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		info.presentMode = _presentMode;
@@ -67,28 +85,19 @@ namespace Raindrop::Graphics{
 		info.imageArrayLayers = 1;
 		info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		if (vkCreateSwapchainKHR(_context.device.get(), &info, _context.allocationCallbacks, &_swapchain) != VK_SUCCESS){
+		if (vkCreateSwapchainKHR(_context.device.get(), &info, _context.allocationCallbacks, &_swapchain->_swapchain) != VK_SUCCESS){
 			throw std::runtime_error("Failed to create window vulkan swapchain !");
 		}
 
-		if (_oldSwapchain){
-			vkDestroySwapchainKHR(_context.device.get(), _oldSwapchain, _context.allocationCallbacks);
-			_oldSwapchain = VK_NULL_HANDLE;
-		}
-
-		destroyFrames();
 		getSwapchainImages();
 		createImageViews();
 		createFramebuffers();
 		createSyncObjects();
+		_currentFrame = 0;
 
 		CLOG(INFO, "Engine.Graphics.Swapchain") << "Swapchain Built/Rebuilt with success !";
 	}
 
-	void Swapchain::updateFrameArray(){
-		
-	}
-	
 	void Swapchain::findSurfaceFormat(){
 		for (auto& f : _swapchainSupport.formats){
 			if (f.colorSpace == _wantedSurfaceFormat.colorSpace && f.format == _wantedSurfaceFormat.format){
@@ -111,20 +120,16 @@ namespace Raindrop::Graphics{
 	}
 
 	void Swapchain::findExtent(){
-		VkExtent2D oldExtent = _extent;
 		auto& capabilities = _swapchainSupport.capabilities;
 
-		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()){
-			_extent = capabilities.currentExtent;
-			return;
-		}
+		// if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()){
+		// 	printf("aa\n");
+		// 	_extent = capabilities.currentExtent;
+		// 	return;
+		// }
 
 		_extent.width = std::clamp(_wantedExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
 		_extent.height = std::clamp(_wantedExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
-
-		if (oldExtent.width != _extent.width || oldExtent.height != _extent.height){
-			// UPDATE FRAMESBUFFERS
-		}
 
 		return;
 	}
@@ -136,27 +141,7 @@ namespace Raindrop::Graphics{
 		_frameCount = std::clamp(_wantedFrameCount, capabilities.minImageCount+1, capabilities.maxImageCount);
 
 		if (oldFrameCount != _frameCount){
-			if (_frameCount < oldFrameCount){
-				for (uint32_t i=_frameCount-1; i<oldFrameCount-1; i++){
-					destroyFrame(_frames[i]);
-				}
-			}
-			_frames.resize(_frameCount);
-		}
-	}
-
-	void Swapchain::destroyFrame(Frame& frame){
-		vkDestroyFramebuffer(_context.device.get(), frame.framebuffer, _context.allocationCallbacks);
-		vkDestroyImageView(_context.device.get(), frame.imageView, _context.allocationCallbacks);
-		vkDestroySemaphore(_context.device.get(), frame.imageAvailable, _context.allocationCallbacks);
-		vkDestroySemaphore(_context.device.get(), frame.imageFinished, _context.allocationCallbacks);
-		vkDestroyFence(_context.device.get(), frame.inFlightFence, _context.allocationCallbacks);
-	}
-
-	void Swapchain::destroyFrames(){
-		CLOG(INFO, "Engine.Graphics.Swapchain") << "Destroying frames : (" << _frames.size() << ")";
-		for (auto &f : _frames){
-			destroyFrame(f);
+			_swapchain->_frames.resize(_frameCount);
 		}
 	}
 
@@ -207,7 +192,7 @@ namespace Raindrop::Graphics{
 	}
 
 	void Swapchain::createImageViews(){
-		for (auto &f : _frames){
+		for (auto &f : _swapchain->_frames){
 			VkImageViewCreateInfo viewInfo{};
 			viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			viewInfo.image = f.image;
@@ -227,19 +212,19 @@ namespace Raindrop::Graphics{
 	}
 
 	void Swapchain::getSwapchainImages(){
-		vkGetSwapchainImagesKHR(_context.device.get(), _swapchain, &_frameCount, nullptr);
+		vkGetSwapchainImagesKHR(_context.device.get(), _swapchain->_swapchain, &_frameCount, nullptr);
 		std::vector<VkImage> images(_frameCount);
-		vkGetSwapchainImagesKHR(_context.device.get(), _swapchain, &_frameCount, images.data());
+		vkGetSwapchainImagesKHR(_context.device.get(), _swapchain->_swapchain, &_frameCount, images.data());
 
-		_frames.resize(_frameCount);
+		_swapchain->_frames.resize(_frameCount);
 
 		for (uint32_t i=0; i<_frameCount; i++){
-			_frames[i].image = images[i];
+			_swapchain->_frames[i].image = images[i];
 		}
 	}
 
 	void Swapchain::createFramebuffers(){
-		for (auto &f : _frames){
+		for (auto &f : _swapchain->_frames){
 			VkFramebufferCreateInfo framebufferInfo = {};
 			framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 			framebufferInfo.renderPass = _renderPass;
@@ -263,7 +248,7 @@ namespace Raindrop::Graphics{
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-		for (auto &f : _frames) {
+		for (auto &f : _swapchain->_frames) {
 			if (vkCreateSemaphore(_context.device.get(), &semaphoreInfo, _context.allocationCallbacks, &f.imageAvailable) != VK_SUCCESS)
 				throw std::runtime_error("failed to create vulkan swapchain semaphore");
 			
@@ -277,21 +262,21 @@ namespace Raindrop::Graphics{
 	
 	VkResult Swapchain::acquireNextImage(){
 		uint32_t index;
-		vkWaitForFences(_context.device.get(), 1, &_frames[_currentFrame].inFlightFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
-		VkResult result = vkAcquireNextImageKHR(_context.device.get(), _swapchain, std::numeric_limits<uint64_t>::max(), _frames[_currentFrame].imageAvailable, VK_NULL_HANDLE, &index);
+		vkWaitForFences(_context.device.get(), 1, &_swapchain->_frames[_currentFrame].inFlightFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
+		VkResult result = vkAcquireNextImageKHR(_context.device.get(), _swapchain->_swapchain, std::numeric_limits<uint64_t>::max(), _swapchain->_frames[_currentFrame].imageAvailable, VK_NULL_HANDLE, &index);
 		return result;
 	}
 
 	VkResult Swapchain::submitCommandBuffer(VkCommandBuffer* buffers){
-		if (_frames[_currentFrame].imageInFlight != VK_NULL_HANDLE)
-			vkWaitForFences(_context.device.get(), 1, &_frames[_currentFrame].imageInFlight, VK_TRUE, UINT64_MAX);
+		if (_swapchain->_frames[_currentFrame].imageInFlight != VK_NULL_HANDLE)
+			vkWaitForFences(_context.device.get(), 1, &_swapchain->_frames[_currentFrame].imageInFlight, VK_TRUE, UINT64_MAX);
 		
-		_frames[_currentFrame].imageInFlight = _frames[_currentFrame].inFlightFence;
+		_swapchain->_frames[_currentFrame].imageInFlight = _swapchain->_frames[_currentFrame].inFlightFence;
 
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = {_frames[_currentFrame].imageAvailable};
+		VkSemaphore waitSemaphores[] = {_swapchain->_frames[_currentFrame].imageAvailable};
 		VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
@@ -300,12 +285,12 @@ namespace Raindrop::Graphics{
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = buffers;
 
-		VkSemaphore signalSemaphores[] = {_frames[_currentFrame].imageFinished};
+		VkSemaphore signalSemaphores[] = {_swapchain->_frames[_currentFrame].imageFinished};
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		vkResetFences(_context.device.get(), 1, &_frames[_currentFrame].inFlightFence);
-		if (vkQueueSubmit(_context.graphicsQueue, 1, &submitInfo, _frames[_currentFrame].inFlightFence) != VK_SUCCESS)
+		vkResetFences(_context.device.get(), 1, &_swapchain->_frames[_currentFrame].inFlightFence);
+		if (vkQueueSubmit(_context.graphicsQueue, 1, &submitInfo, _swapchain->_frames[_currentFrame].inFlightFence) != VK_SUCCESS)
 			throw "failed to submit draw command buffer";
 
 		VkPresentInfoKHR presentInfo = {};
@@ -314,7 +299,7 @@ namespace Raindrop::Graphics{
 		presentInfo.waitSemaphoreCount = 1;
 		presentInfo.pWaitSemaphores = signalSemaphores;
 
-		VkSwapchainKHR swapChains[] = {_swapchain};
+		VkSwapchainKHR swapChains[] = {_swapchain->_swapchain};
 		presentInfo.swapchainCount = 1;
 		presentInfo.pSwapchains = swapChains;
 
@@ -344,7 +329,7 @@ namespace Raindrop::Graphics{
 
 		renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassBeginInfo.renderPass = _renderPass;
-		renderPassBeginInfo.framebuffer = _frames[_currentFrame].framebuffer;
+		renderPassBeginInfo.framebuffer = _swapchain->_frames[_currentFrame].framebuffer;
 
 		renderPassBeginInfo.renderArea.offset = {0, 0};
 		renderPassBeginInfo.renderArea.extent = _extent;
@@ -378,14 +363,28 @@ namespace Raindrop::Graphics{
 	}
 	
 	Swapchain::Frame& Swapchain::getFrameData(uint32_t id){
-		return _frames[id];
+		return _swapchain->_frames[id];
 	}
 
 	Swapchain::Frame& Swapchain::getCurrentFrameData(){
-		return _frames[currentFrame()];
+		return _swapchain->_frames[currentFrame()];
 	}
 
 	std::vector<Swapchain::Frame>& Swapchain::getFramesData(){
-		return _frames;
+		return _swapchain->_frames;
 	}
+	
+	Swapchain::SwapchainData::~SwapchainData(){
+		_context.device.waitIdle();
+		for (auto &frame : _frames){
+			if (frame.framebuffer != VK_NULL_HANDLE) vkDestroyFramebuffer(_context.device.get(), frame.framebuffer, _context.allocationCallbacks);
+			if (frame.imageView != VK_NULL_HANDLE) vkDestroyImageView(_context.device.get(), frame.imageView, _context.allocationCallbacks);
+			if (frame.imageAvailable != VK_NULL_HANDLE) vkDestroySemaphore(_context.device.get(), frame.imageAvailable, _context.allocationCallbacks);
+			if (frame.imageFinished != VK_NULL_HANDLE) vkDestroySemaphore(_context.device.get(), frame.imageFinished, _context.allocationCallbacks);
+			if (frame.inFlightFence != VK_NULL_HANDLE) vkDestroyFence(_context.device.get(), frame.inFlightFence, _context.allocationCallbacks);
+		}
+		if (_swapchain) vkDestroySwapchainKHR(_context.device.get(), _swapchain, _context.allocationCallbacks);
+	}
+
+	Swapchain::SwapchainData::SwapchainData(GraphicsContext& context) : _context{context}{}
 }

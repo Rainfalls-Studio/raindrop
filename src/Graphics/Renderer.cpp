@@ -12,6 +12,7 @@
 
 #include <SDL2/SDL_vulkan.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #include <Raindrop/Core/Scene/Components/Camera.hpp>
 #include <Raindrop/Core/Scene/Components/Hierarchy.hpp>
@@ -59,9 +60,13 @@ namespace Raindrop::Graphics{
 	void drawEntity(Core::Scene::Entity entity, VkPipelineLayout layout, VkCommandBuffer commandBuffer, glm::mat4& viewTransform){
 
 		auto& transform = entity.transform();
+		glm::mat4 rotationMatrix = glm::eulerAngleXYZ(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), transform.translation);
+		glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), transform.scale);
+
 		PushConstant p;
 		p.viewTransform = viewTransform;
-		p.localTransform = glm::translate(glm::mat4(1.f), transform.translation) * glm::rotate(glm::mat4(1.f),  transform.rotation.x, {1, 0, 0}) * glm::rotate(glm::mat4(1.f),  transform.rotation.y, {0, 1, 0}) * glm::rotate(glm::mat4(1.f),  transform.rotation.z, {0, 0, 1});// * glm::scale(glm::mat4(1.f), transform.scale);
+		p.localTransform = translationMatrix * rotationMatrix * scaleMatrix;
 
 		if (entity.hasComponent<Core::Scene::Components::Model>()){
 			auto& model = entity.getComponent<Core::Scene::Components::Model>();
@@ -82,12 +87,11 @@ namespace Raindrop::Graphics{
 
 		_context->window.events(_gui.get());
 
-		VkCommandBuffer commandBuffer = beginFrame();
-		if (commandBuffer){
+		if (VkCommandBuffer commandBuffer = beginFrame()){
 
-			_worldFramebuffer->beginRenderPass(commandBuffer);
-			renderScene(commandBuffer);
-			_worldFramebuffer->endRenderPass(commandBuffer);
+			// _worldFramebuffer->beginRenderPass(commandBuffer);
+			// renderScene(commandBuffer);
+			// _worldFramebuffer->endRenderPass(commandBuffer);
 
 			renderGui();
 
@@ -118,7 +122,7 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::renderSwapchain(VkCommandBuffer commandBuffer){
-		_worldFramebuffer->render(commandBuffer);
+		// _worldFramebuffer->render(commandBuffer);
 		_gui->render(commandBuffer);
 	}
 
@@ -161,11 +165,10 @@ namespace Raindrop::Graphics{
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.resized()){
 			auto size = window.getSize();
+			window.resetResizedFlag();
 			swapchain.setExtent(VkExtent2D{size.x, size.y});
 			swapchain.rebuildSwapchain();
-		}
-
-		if (result != VK_SUCCESS){
+		} else if (result != VK_SUCCESS){
 			throw std::runtime_error("failed to submit the command buffer");
 		}
 	}

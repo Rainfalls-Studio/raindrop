@@ -7,13 +7,13 @@ namespace Raindrop::Graphics{
 	class Swapchain{
 		public:
 			struct Frame{
-				VkFramebuffer framebuffer;
-				VkSemaphore imageAvailable;
-				VkSemaphore imageFinished;
-				VkFence inFlightFence;
-				VkFence imageInFlight;
-				VkImage image;
-				VkImageView imageView;
+				VkFramebuffer framebuffer = VK_NULL_HANDLE;
+				VkSemaphore imageAvailable = VK_NULL_HANDLE;
+				VkSemaphore imageFinished = VK_NULL_HANDLE;
+				VkFence inFlightFence = VK_NULL_HANDLE;
+				VkFence imageInFlight = VK_NULL_HANDLE;
+				VkImage image = VK_NULL_HANDLE;
+				VkImageView imageView = VK_NULL_HANDLE;
 			};
 
 			Swapchain(GraphicsContext& context);
@@ -29,9 +29,6 @@ namespace Raindrop::Graphics{
 			VkResult acquireNextImage();
 			VkResult submitCommandBuffer(VkCommandBuffer* buffers);
 
-			void setGraphicsQueue(VkQueue queue);
-			void setPresentQueue(VkQueue queue);
-
 			uint32_t frameCount() const;
 			uint32_t currentFrame() const;
 			VkRenderPass renderPass() const;
@@ -46,15 +43,22 @@ namespace Raindrop::Graphics{
 			std::vector<Frame>& getFramesData();
 
 		private:
+			struct SwapchainData{
+				GraphicsContext& _context;
+				VkSwapchainKHR _swapchain = VK_NULL_HANDLE;			
+				std::vector<Frame> _frames;
+
+				~SwapchainData();
+				SwapchainData(GraphicsContext& _context);
+			};
+
 			GraphicsContext& _context;
 			SwapchainSupport _swapchainSupport;
 
-			VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
-			VkSwapchainKHR _oldSwapchain = VK_NULL_HANDLE;
-
+			std::unique_ptr<SwapchainData> _swapchain = nullptr;
+			std::unique_ptr<SwapchainData> _oldSwapchain = nullptr;
 
 			VkRenderPass _renderPass = VK_NULL_HANDLE;
-			std::vector<Frame> _frames;
 			uint32_t _currentFrame = 0;
 			VkFormat _imageFormat;
 
@@ -74,10 +78,7 @@ namespace Raindrop::Graphics{
 			void findPresentMode();
 			void findExtent();
 			void findFrameCount();
-			
-			void updateFrameArray();
-			void destroyFrame(Frame& frame);
-			void destroyFrames();
+
 			void createRenderPass();
 			void createImageViews();
 			void getSwapchainImages();

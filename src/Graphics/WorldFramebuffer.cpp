@@ -33,7 +33,7 @@ namespace Raindrop::Graphics{
 				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
@@ -69,7 +69,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 			},
 
 			.formats = {
@@ -98,7 +98,7 @@ namespace Raindrop::Graphics{
 				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
@@ -134,7 +134,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 			},
 
 			.formats = {
@@ -164,7 +164,7 @@ namespace Raindrop::Graphics{
 				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
@@ -200,7 +200,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 			},
 
 			.formats = {
@@ -230,7 +230,7 @@ namespace Raindrop::Graphics{
 				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
@@ -266,7 +266,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.queueFamilyIndexCount = 0,
 				.pQueueFamilyIndices = nullptr,
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 			},
 
 			.formats = {
@@ -297,7 +297,7 @@ namespace Raindrop::Graphics{
 				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
@@ -333,7 +333,7 @@ namespace Raindrop::Graphics{
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.queueFamilyIndexCount = 0,
 				.pQueueFamilyIndices = nullptr,
-				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 			},
 
 			.formats = {
@@ -605,6 +605,31 @@ namespace Raindrop::Graphics{
 		info.pClearValues = clear.data();
 
 		vkCmdBeginRenderPass(commandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+
+		std::vector<VkImageMemoryBarrier> layoutTransitionBarriers(attachments.size()-1);
+
+		for (int i=0; i<layoutTransitionBarriers.size(); i++){
+			auto& layoutTransitionBarrier = layoutTransitionBarriers[i];
+
+			layoutTransitionBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			layoutTransitionBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+			layoutTransitionBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			layoutTransitionBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			layoutTransitionBarrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			layoutTransitionBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			layoutTransitionBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			layoutTransitionBarrier.image = _attachments[i+1].image;
+			layoutTransitionBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			layoutTransitionBarrier.subresourceRange.baseMipLevel = 0;
+			layoutTransitionBarrier.subresourceRange.levelCount = 1;
+			layoutTransitionBarrier.subresourceRange.baseArrayLayer = 0;
+			layoutTransitionBarrier.subresourceRange.layerCount = 1;
+		}
+
+		vkCmdPipelineBarrier(commandBuffer,
+			VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,  // The appropriate pipeline stage
+			VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,          // The appropriate pipeline stage
+			0, 0, nullptr, 0, nullptr, layoutTransitionBarriers.size(), layoutTransitionBarriers.data());
 	}
 
 	void WorldFramebuffer::endRenderPass(VkCommandBuffer commandBuffer){
