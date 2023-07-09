@@ -5,44 +5,6 @@
 #include <Raindrop/Graphics/Renderer.hpp>
 
 namespace Raindrop::Graphics::Builders{
-	static std::vector<VkVertexInputAttributeDescription> attributes = {
-		VkVertexInputAttributeDescription{
-			.location = 0,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(Vertex, position),
-		},
-
-		VkVertexInputAttributeDescription{
-			.location = 1,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(Vertex, color),
-		},
-
-		VkVertexInputAttributeDescription{
-			.location = 2,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32B32_SFLOAT,
-			.offset = offsetof(Vertex, normal),
-		},
-
-		VkVertexInputAttributeDescription{
-			.location = 3,
-			.binding = 0,
-			.format = VK_FORMAT_R32G32_SFLOAT,
-			.offset = offsetof(Vertex, uv),
-		},
-	};
-
-	static std::vector<VkVertexInputBindingDescription> bindings = {
-		VkVertexInputBindingDescription{
-			.binding = 0,
-			.stride = sizeof(Vertex),
-			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
-		},
-	};
-
 	GraphicsPipelineBuilder::GraphicsPipelineBuilder(){
 		_viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		_viewportInfo.viewportCount = 1;
@@ -76,7 +38,7 @@ namespace Raindrop::Graphics::Builders{
 		_inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
 		_colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-		_colorBlendInfo.logicOpEnable = VK_FALSE;
+		_colorBlendInfo.logicOpEnable = VK_TRUE;
 		_colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;  // Optional
 		_colorBlendInfo.attachmentCount = 0;
 		_colorBlendInfo.pAttachments = nullptr;
@@ -98,6 +60,44 @@ namespace Raindrop::Graphics::Builders{
 
 		_tessellationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO;
 		_tessellationInfo.patchControlPoints = 0;
+
+		_vertexAttributes = {
+			VkVertexInputAttributeDescription{
+				.location = 0,
+				.binding = 0,
+				.format = VK_FORMAT_R32G32B32_SFLOAT,
+				.offset = offsetof(Vertex, position),
+			},
+
+			VkVertexInputAttributeDescription{
+				.location = 1,
+				.binding = 0,
+				.format = VK_FORMAT_R32G32B32_SFLOAT,
+				.offset = offsetof(Vertex, color),
+			},
+
+			VkVertexInputAttributeDescription{
+				.location = 2,
+				.binding = 0,
+				.format = VK_FORMAT_R32G32B32_SFLOAT,
+				.offset = offsetof(Vertex, normal),
+			},
+
+			VkVertexInputAttributeDescription{
+				.location = 3,
+				.binding = 0,
+				.format = VK_FORMAT_R32G32_SFLOAT,
+				.offset = offsetof(Vertex, uv),
+			},
+		};
+
+		_vertexBindings = {
+			VkVertexInputBindingDescription{
+				.binding = 0,
+				.stride = sizeof(Vertex),
+				.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+			},
+		};
 	}
 
 	GraphicsPipelineBuilder::~GraphicsPipelineBuilder(){
@@ -137,10 +137,10 @@ namespace Raindrop::Graphics::Builders{
 
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindings.size());
-		vertexInputInfo.pVertexBindingDescriptions = bindings.data();
-		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributes.size());
-		vertexInputInfo.pVertexAttributeDescriptions = attributes.data();
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(_vertexBindings.size());
+		vertexInputInfo.pVertexBindingDescriptions = _vertexBindings.data();
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(_vertexAttributes.size());
+		vertexInputInfo.pVertexAttributeDescriptions = _vertexAttributes.data();
 
 		VkGraphicsPipelineCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -194,8 +194,18 @@ namespace Raindrop::Graphics::Builders{
 
 	void GraphicsPipelineBuilder::setAttachmentCount(uint32_t count){
 		_colorAttachments.resize(count);
-	}
 
+		for (auto& a : _colorAttachments){
+			a.blendEnable = VK_TRUE;
+			a.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+			a.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+			a.colorBlendOp = VK_BLEND_OP_ADD;
+			a.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+			a.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+			a.alphaBlendOp = VK_BLEND_OP_ADD;
+			a.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		}
+	}
 
 	void GraphicsPipelineBuilder::setName(const std::string& name){
 		_name = name;
@@ -233,4 +243,13 @@ namespace Raindrop::Graphics::Builders{
 		if (id > _colorAttachments.size()) throw std::runtime_error("out of bounds");
 		return _colorAttachments[id];
 	}
+
+	void GraphicsPipelineBuilder::setVertexAttribtes(const std::vector<VkVertexInputAttributeDescription>& attributes){
+		_vertexAttributes = attributes;
+	}
+
+	void GraphicsPipelineBuilder::setVertexBindings(const std::vector<VkVertexInputBindingDescription>& bindings){
+		_vertexBindings = bindings;
+	}
+
 }

@@ -4,6 +4,9 @@
 #include <Raindrop/Graphics/builders/DescriptorSetLayoutBuilder.hpp>
 #include <Raindrop/Graphics/DescriptorPool.hpp>
 #include <Raindrop/Graphics/DescriptorSetLayout.hpp>
+#include <Raindrop/Graphics/builders/GraphicsPipelineBuilder.hpp>
+#include <Raindrop/Graphics/Shader.hpp>
+#include <Raindrop/Graphics/GraphicsPipeline.hpp>
 
 namespace Raindrop::Graphics{
 	struct AttachmentInfo{
@@ -31,7 +34,7 @@ namespace Raindrop::Graphics{
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-				.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
 			.imageView = VkImageViewCreateInfo{
@@ -43,7 +46,7 @@ namespace Raindrop::Graphics{
 				.format = VK_FORMAT_UNDEFINED,
 				.components = VkComponentMapping{},
 				.subresourceRange = VkImageSubresourceRange{
-					.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+					.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
 					.baseMipLevel = 0,
 					.levelCount = 1,
 					.baseArrayLayer = 0,
@@ -62,7 +65,7 @@ namespace Raindrop::Graphics{
 				.arrayLayers = 1,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
 				.tiling = VK_IMAGE_TILING_OPTIMAL,
-				.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+				.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
@@ -96,7 +99,7 @@ namespace Raindrop::Graphics{
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-				.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
 			.imageView = VkImageViewCreateInfo{
@@ -127,7 +130,7 @@ namespace Raindrop::Graphics{
 				.arrayLayers = 1,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
 				.tiling = VK_IMAGE_TILING_OPTIMAL,
-				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
@@ -162,7 +165,7 @@ namespace Raindrop::Graphics{
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-				.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
 			.imageView = VkImageViewCreateInfo{
@@ -193,7 +196,7 @@ namespace Raindrop::Graphics{
 				.arrayLayers = 1,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
 				.tiling = VK_IMAGE_TILING_OPTIMAL,
-				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,	// Same, set afterward
 				.queueFamilyIndexCount = 0,					// again.
 				.pQueueFamilyIndices = nullptr,				// again
@@ -201,10 +204,11 @@ namespace Raindrop::Graphics{
 			},
 
 			.formats = {
-				VK_FORMAT_R8G8B8_UINT,
-				VK_FORMAT_R8G8B8_UNORM,
-				VK_FORMAT_B8G8R8_UINT,
-				VK_FORMAT_R8G8B8A8_UINT,
+				VK_FORMAT_R16G16B16_SFLOAT,
+				VK_FORMAT_R16G16B16_UNORM,
+				VK_FORMAT_R32G32B32_SFLOAT,
+				VK_FORMAT_R8G8B8A8_UNORM,
+				VK_FORMAT_R8G8B8A8_SRGB,
 			},
 			
 			.requiredFeatures = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT,
@@ -227,7 +231,7 @@ namespace Raindrop::Graphics{
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-				.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
 			.imageView = VkImageViewCreateInfo{
@@ -258,7 +262,7 @@ namespace Raindrop::Graphics{
 				.arrayLayers = 1,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
 				.tiling = VK_IMAGE_TILING_OPTIMAL,
-				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.queueFamilyIndexCount = 0,
 				.pQueueFamilyIndices = nullptr,
@@ -267,10 +271,11 @@ namespace Raindrop::Graphics{
 
 			.formats = {
 				VK_FORMAT_R16G16B16_SFLOAT,
-				VK_FORMAT_R16G16B16_UINT,
-				VK_FORMAT_R32G32B32_SFLOAT,
 				VK_FORMAT_R16G16B16_UNORM,
+				VK_FORMAT_R32G32B32_SFLOAT,
+				VK_FORMAT_R16G16B16A16_SNORM,
 				VK_FORMAT_R8G8B8A8_UNORM,
+				VK_FORMAT_R8G8B8A8_SRGB,
 			},
 			
 			.requiredFeatures = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT,
@@ -293,7 +298,7 @@ namespace Raindrop::Graphics{
 				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
 				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-				.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 			},
 
 			.imageView = VkImageViewCreateInfo{
@@ -324,7 +329,7 @@ namespace Raindrop::Graphics{
 				.arrayLayers = 1,
 				.samples = VK_SAMPLE_COUNT_1_BIT,
 				.tiling = VK_IMAGE_TILING_OPTIMAL,
-				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 				.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 				.queueFamilyIndexCount = 0,
 				.pQueueFamilyIndices = nullptr,
@@ -333,10 +338,11 @@ namespace Raindrop::Graphics{
 
 			.formats = {
 				VK_FORMAT_R16G16B16_SFLOAT,
-				VK_FORMAT_R16G16B16_UINT,
-				VK_FORMAT_R32G32B32_SFLOAT,
 				VK_FORMAT_R16G16B16_UNORM,
+				VK_FORMAT_R32G32B32_SFLOAT,
+				VK_FORMAT_R32G32B32A32_SFLOAT,
 				VK_FORMAT_R8G8B8A8_UNORM,
+				VK_FORMAT_R8G8B8A8_SRGB,
 			},
 			
 			.requiredFeatures = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT,
@@ -362,6 +368,8 @@ namespace Raindrop::Graphics{
 
 		createDescriptorPool();
 		createSetLayout();
+		createDescriptorSet();
+		createPipeline();
 
 		_context.gRegistry["WorldFramebuffer"] = this;
 
@@ -378,19 +386,23 @@ namespace Raindrop::Graphics{
 			if (a.sampler) vkDestroySampler(_context.device.get(), a.sampler, _context.allocationCallbacks);
 		}
 
+		vkResetDescriptorPool(_context.device.get(), _descriptorPool->get(), 0);
+		_descriptorPool.reset();
+		_setLayout.reset();
+
 		if (_renderPass) vkDestroyRenderPass(_context.device.get(), _renderPass, _context.allocationCallbacks);
 	}
 
 	void WorldFramebuffer::createRenderPass(){
 		VkAttachmentReference depthAttachmentRef{};
 		depthAttachmentRef.attachment = 0;
-		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		std::vector<VkAttachmentReference> colorAttachmentRefs(attachments.size() - 1);
 		for (int i=1; i<attachments.size(); i++){
 			auto& ref = colorAttachmentRefs[i-1];
 			ref.attachment = i;
-			ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			ref.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		}
 
 		VkSubpassDescription subpass = {};
@@ -530,6 +542,23 @@ namespace Raindrop::Graphics{
 
 			VkFormat bestCase = VK_FORMAT_UNDEFINED;
 
+			if (bestCase == VK_FORMAT_UNDEFINED){
+				for (auto &f : a.formats){
+					VkFormatProperties properties;
+					vkGetPhysicalDeviceFormatProperties(_context.device.getPhysicalDevice(), f, &properties);
+
+					if (properties.optimalTilingFeatures & a.requiredFeatures){
+						a.image.tiling = VK_IMAGE_TILING_OPTIMAL;
+						bestCase = f;
+						break;
+					} else if (properties.linearTilingFeatures & a.requiredFeatures){
+						a.image.tiling = VK_IMAGE_TILING_LINEAR;
+						bestCase = f;
+						break;
+					}
+				}
+			}
+			
 			for (auto &f : a.formats){
 				VkFormatProperties properties;
 				vkGetPhysicalDeviceFormatProperties(_context.device.getPhysicalDevice(), f, &properties);
@@ -547,22 +576,6 @@ namespace Raindrop::Graphics{
 				}
 			}
 
-			if (bestCase == VK_FORMAT_UNDEFINED){
-				for (auto &f : a.formats){
-					VkFormatProperties properties;
-					vkGetPhysicalDeviceFormatProperties(_context.device.getPhysicalDevice(), f, &properties);
-
-					if (properties.optimalTilingFeatures & a.requiredFeatures){
-						a.image.tiling = VK_IMAGE_TILING_OPTIMAL;
-						bestCase = f;
-						break;
-					} else if (properties.linearTilingFeatures & a.requiredFeatures){
-						a.image.tiling = VK_IMAGE_TILING_LINEAR;
-						bestCase = f;
-						break;
-					}
-				}
-			}
 
 			if (bestCase == VK_FORMAT_UNDEFINED){
 				CLOG(ERROR, "Engine.Graphics.WorldFramebuffer") << "failed to find a format for world framebuffer attachment";
@@ -638,7 +651,63 @@ namespace Raindrop::Graphics{
 		_setLayout = builder.build(_context);
 	}
 
-	void WorldFramebuffer::createPipeline(){
+	void WorldFramebuffer::createDescriptorSet(){
+		VkDescriptorSetAllocateInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		info.descriptorSetCount = 1;
+		info.descriptorPool = _descriptorPool->get();
+		
+		VkDescriptorSetLayout layout = _setLayout->get();
+		info.pSetLayouts = &layout;
+		
+		if (vkAllocateDescriptorSets(_context.device.get(), &info, &_descriptorSet) != VK_SUCCESS){
+			CLOG(ERROR, "Engine.Graphics.WorldFramebuffer") << "Failed to create world framebuffer descriptor set";
+			throw std::runtime_error("Failed to create world framebuffer descriptor set");
+		}
 
+		VkWriteDescriptorSet writes[5];
+		VkDescriptorImageInfo infos[5];
+
+		for (int i=0; i<sizeof(writes)/sizeof(VkWriteDescriptorSet); i++){
+			infos[i] = {};
+			writes[i] = {};
+
+			infos[i].imageLayout = attachments[i].description.finalLayout;
+			infos[i].imageView = _attachments[i].imageView;
+			infos[i].sampler = _attachments[i].sampler;
+
+			writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			writes[i].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			writes[i].dstBinding = i;
+			writes[i].pImageInfo = &infos[i];
+			writes[i].descriptorCount = 1;
+			writes[i].dstSet = _descriptorSet;
+		}
+
+		vkUpdateDescriptorSets(_context.device.get(), sizeof(writes)/sizeof(VkWriteDescriptorSet), writes, 0, nullptr);
+	}
+
+	void WorldFramebuffer::createPipeline(){
+		Builders::GraphicsPipelineBuilder builder;
+		builder.addShader(std::static_pointer_cast<Shader>(_context.context.assetManager.loadOrGet("C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.frag.spv").lock()));
+		builder.addShader(std::static_pointer_cast<Shader>(_context.context.assetManager.loadOrGet("C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.vert.spv").lock()));
+
+		builder.setName("world framebuffer");
+		builder.setRenderPass(_context.swapchain.renderPass());
+
+		builder.addDescriptorSetLayout(_setLayout->get());
+		builder.setAttachmentCount(1);
+
+		builder.setVertexAttribtes({});
+		builder.setVertexBindings({});
+
+		_pipeline = builder.build(_context);
+	}
+
+	void WorldFramebuffer::render(VkCommandBuffer commandBuffer){
+		_pipeline->bind(commandBuffer);
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline->layout(), 0, 1, &_descriptorSet, 0, nullptr);
+
+		vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 	}
 }

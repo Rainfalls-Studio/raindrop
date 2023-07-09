@@ -8,12 +8,13 @@ int main(int argc, char **argv){
 
 	engine.registry()["Engine.Resources.Directory"] = RESOURCES.string();
 	auto pipeline = engine.assetManager().loadOrGet(RESOURCES / "pipelines/default.xml.gfxpipe");
+	engine.assetManager().loadOrGet("C:/Users/aalee/Documents/raindrop/tests/resources/models/teapot.obj");
 
 	// /!\ TEST
 	engine.registry()["Pipeline"] = pipeline;
 	// /!\ TEST
 
-	engine.scene().createEntity();
+	// auto entity = engine.scene().createEntity();
 	engine.renderer().openGUI(RESOURCES / "gui/gui.xml");
 	engine.mainloop();
 

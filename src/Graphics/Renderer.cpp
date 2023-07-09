@@ -27,10 +27,11 @@ namespace Raindrop::Graphics{
 		CLOG(INFO, "Engine.Graphics") << "Creating renderer ...";
 		
 		_context = std::make_unique<GraphicsContext>(context, scene);
+		registerFactories();
+
 		_gui = std::make_unique<ImGUI>(*_context);
 		_worldFramebuffer = std::make_unique<WorldFramebuffer>(*_context, 1080, 720);
 
-		registerFactories();
 		createGraphicsCommandBuffers();
 
 		CLOG(INFO, "Engine.Graphics") << "Created renderer with success !";
@@ -60,7 +61,7 @@ namespace Raindrop::Graphics{
 		auto& transform = entity.transform();
 		PushConstant p;
 		p.viewTransform = viewTransform;
-		p.localTransform = glm::translate(glm::mat4(1.f), transform.translation) * glm::rotate(glm::mat4(1.f), 3.14f, transform.rotation) * glm::scale(glm::mat4(1.f), transform.scale);
+		p.localTransform = glm::translate(glm::mat4(1.f), transform.translation) * glm::rotate(glm::mat4(1.f),  transform.rotation.x, {1, 0, 0}) * glm::rotate(glm::mat4(1.f),  transform.rotation.y, {0, 1, 0}) * glm::rotate(glm::mat4(1.f),  transform.rotation.z, {0, 0, 1});// * glm::scale(glm::mat4(1.f), transform.scale);
 
 		if (entity.hasComponent<Core::Scene::Components::Model>()){
 			auto& model = entity.getComponent<Core::Scene::Components::Model>();
@@ -117,9 +118,7 @@ namespace Raindrop::Graphics{
 	}
 
 	void Renderer::renderSwapchain(VkCommandBuffer commandBuffer){
-
-		
-
+		_worldFramebuffer->render(commandBuffer);
 		_gui->render(commandBuffer);
 	}
 
@@ -236,13 +235,20 @@ namespace Raindrop::Graphics{
 				component.update(entity.getComponent<Core::Scene::Components::Transform>());
 				viewTransform = component.viewProjection;
 			} else {
-				viewTransform = glm::mat4(1.f);
+				viewTransform = glm::scale(glm::mat4(1.f), glm::vec3(1/100.f));
 			}
 		}
 		
 		auto weak_pipeline = _context->context.registry["Pipeline"].as<std::weak_ptr<Raindrop::Core::Asset::Asset>>();
 		if (auto pipeline = std::static_pointer_cast<GraphicsPipeline>(weak_pipeline.lock())){
 			pipeline->bind(commandBuffer);
+			
+			VkRect2D scissor = VkRect2D{{0, 0}, {1080, 720}};
+			VkViewport viewport = VkViewport{0, 0, 1080, 720, 0, 1};
+
+			vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+			vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
 			drawEntity(Core::Scene::Entity(scene.root(), &scene), pipeline->layout(), commandBuffer, viewTransform);
 		}
 	}

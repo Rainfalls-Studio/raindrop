@@ -31,3 +31,89 @@
 2023-07-05 01:59:34,333 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.vert.spv"
 2023-07-05 01:59:34,335 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_VERTEX_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.vert.spv"
 2023-07-05 01:59:34,336 INFO [Engine.Graphics] Building vulkan graphics pipeline
+2023-07-07 18:38:13,272 INFO [Engine] Creating New Engine ...
+2023-07-07 18:38:13,274 INFO [Engine.Core.EventManager] New Event Manager
+2023-07-07 18:38:13,275 INFO [AssetManager] New Asset Manager
+2023-07-07 18:38:13,276 INFO [Engine.Core.Scene] Creating new scene...
+2023-07-07 18:38:13,282 INFO [Engine.Core.Scene] Scene created with success !
+2023-07-07 18:38:13,284 TRACE [Engine.Core.EventManager] [void Raindrop::Core::Event::EventManager::subscribe(const std::string&, Raindrop::Core::Event::Callback)] [C:\Users\aalee\Documents\raindrop\src\Core\Event\EventManager.cpp:18] New subscriber to "Engine.GUI.Open" event
+2023-07-07 18:38:13,285 INFO [Engine.Graphics] Creating renderer ...
+2023-07-07 18:38:16,661 INFO [Engine.Graphics.Swapchain] Creating swapchain...
+2023-07-07 18:38:16,662 INFO [Engine.Graphics.Swapchain] Building/Rebuilding swapchain...
+2023-07-07 18:38:16,667 INFO [Engine.Graphics.Swapchain] Destroying frames : (2)
+2023-07-07 18:38:16,669 INFO [Engine.Graphics.Swapchain] Swapchain Built/Rebuilt with success !
+2023-07-07 18:38:16,669 INFO [Engine.Graphics.Swapchain] Created swapchain with success !
+2023-07-07 18:38:16,670 INFO [Engine.Graphics] registering renderer asset factories ...
+2023-07-07 18:38:16,672 INFO [Engine.Graphics.Pipeline] Creating graphics pipeline asset factory...
+2023-07-07 18:38:16,672 INFO [Engine.Graphics] registred renderer asset factories with success !
+2023-07-07 18:38:16,672 INFO [Engine.Graphics.GUI] Loading IMGUI...
+2023-07-07 18:38:16,699 INFO [Engine.Graphics.GUI] Loaded IMGUI with success!
+2023-07-07 18:38:16,701 INFO [Engine.Graphics.WorldFramebuffer] Creating world framebuffer...
+2023-07-07 18:38:16,721 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.frag.spv"
+2023-07-07 18:38:16,722 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.frag.spv"
+2023-07-07 18:38:16,723 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_FRAGMENT_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.frag.spv"
+2023-07-07 18:38:16,725 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.vert.spv"
+2023-07-07 18:38:16,725 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.vert.spv"
+2023-07-07 18:38:16,726 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_VERTEX_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.vert.spv"
+2023-07-07 18:38:16,727 INFO [Engine.Graphics] Building vulkan graphics pipeline
+2023-07-07 18:38:16,728 INFO [Engine.Graphics.WorldFramebuffer] Created world framebuffer with success !
+2023-07-07 18:38:16,728 INFO [Engine.Graphics] Created renderer with success !
+2023-07-07 18:38:16,729 TRACE [Engine.Core.EventManager] [void Raindrop::Core::Event::EventManager::subscribe(const std::string&, Raindrop::Core::Event::Callback)] [C:\Users\aalee\Documents\raindrop\src\Core\Event\EventManager.cpp:18] New subscriber to "Engine.Quit" event
+2023-07-07 18:38:16,729 TRACE [Engine.Core.EventManager] [void Raindrop::Core::Event::EventManager::subscribe(const std::string&, Raindrop::Core::Event::Callback)] [C:\Users\aalee\Documents\raindrop\src\Core\Event\EventManager.cpp:18] New subscriber to "Engine.Window.Quit" event
+2023-07-07 18:38:16,730 INFO [Engine] Engine created with success !
+2023-07-07 18:38:16,730 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources\\pipelines/default.xml.gfxpipe"
+2023-07-07 18:38:16,731 INFO [Engine.Graphics.Pipeline] Loading a new graphics pipeline from "C:/Users/aalee/Documents/raindrop/tests/resources\\pipelines/default.xml.gfxpipe" ...
+2023-07-07 18:38:16,731 INFO [Engine.Graphics.Pipeline] Loading "C:/Users/aalee/Documents/raindrop/tests/resources\\pipelines/default.xml.gfxpipe" xml graphics pipeline
+2023-07-07 18:38:16,733 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.frag.spv"
+2023-07-07 18:38:16,733 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.frag.spv"
+2023-07-07 18:38:16,734 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_FRAGMENT_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.frag.spv"
+2023-07-07 18:38:16,736 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.vert.spv"
+2023-07-07 18:38:16,737 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.vert.spv"
+2023-07-07 18:38:16,738 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_VERTEX_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.vert.spv"
+2023-07-07 18:38:16,739 INFO [Engine.Graphics] Building vulkan graphics pipeline
+2023-07-07 18:38:16,740 INFO [Engine.Graphics.GUI] Loading GUI... : "C:/Users/aalee/Documents/raindrop/tests/resources\\gui/gui.xml"
+2023-07-07 18:38:16,742 INFO [Engine.Graphics.GUI] GUI Loaded with success !
+2023-07-07 18:38:16,742 INFO [Engine] Starting engine mainloop
+2023-07-07 18:39:22,358 INFO [Engine] Creating New Engine ...
+2023-07-07 18:39:22,360 INFO [Engine.Core.EventManager] New Event Manager
+2023-07-07 18:39:22,360 INFO [AssetManager] New Asset Manager
+2023-07-07 18:39:22,361 INFO [Engine.Core.Scene] Creating new scene...
+2023-07-07 18:39:22,368 INFO [Engine.Core.Scene] Scene created with success !
+2023-07-07 18:39:22,371 TRACE [Engine.Core.EventManager] [void Raindrop::Core::Event::EventManager::subscribe(const std::string&, Raindrop::Core::Event::Callback)] [C:\Users\aalee\Documents\raindrop\src\Core\Event\EventManager.cpp:18] New subscriber to "Engine.GUI.Open" event
+2023-07-07 18:39:22,372 INFO [Engine.Graphics] Creating renderer ...
+2023-07-07 18:39:25,755 INFO [Engine.Graphics.Swapchain] Creating swapchain...
+2023-07-07 18:39:25,757 INFO [Engine.Graphics.Swapchain] Building/Rebuilding swapchain...
+2023-07-07 18:39:25,762 INFO [Engine.Graphics.Swapchain] Destroying frames : (2)
+2023-07-07 18:39:25,764 INFO [Engine.Graphics.Swapchain] Swapchain Built/Rebuilt with success !
+2023-07-07 18:39:25,765 INFO [Engine.Graphics.Swapchain] Created swapchain with success !
+2023-07-07 18:39:25,765 INFO [Engine.Graphics] registering renderer asset factories ...
+2023-07-07 18:39:25,767 INFO [Engine.Graphics.Pipeline] Creating graphics pipeline asset factory...
+2023-07-07 18:39:25,768 INFO [Engine.Graphics] registred renderer asset factories with success !
+2023-07-07 18:39:25,768 INFO [Engine.Graphics.GUI] Loading IMGUI...
+2023-07-07 18:39:25,791 INFO [Engine.Graphics.GUI] Loaded IMGUI with success!
+2023-07-07 18:39:25,792 INFO [Engine.Graphics.WorldFramebuffer] Creating world framebuffer...
+2023-07-07 18:40:27,535 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.frag.spv"
+2023-07-07 18:40:27,536 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.frag.spv"
+2023-07-07 18:40:27,537 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_FRAGMENT_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.frag.spv"
+2023-07-07 18:40:27,538 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.vert.spv"
+2023-07-07 18:40:27,539 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.vert.spv"
+2023-07-07 18:40:27,540 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_VERTEX_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/worldFramebuffer/default.glsl.vert.spv"
+2023-07-07 18:40:27,541 INFO [Engine.Graphics] Building vulkan graphics pipeline
+2023-07-07 18:40:27,543 INFO [Engine.Graphics.WorldFramebuffer] Created world framebuffer with success !
+2023-07-07 18:40:27,543 INFO [Engine.Graphics] Created renderer with success !
+2023-07-07 18:40:27,544 TRACE [Engine.Core.EventManager] [void Raindrop::Core::Event::EventManager::subscribe(const std::string&, Raindrop::Core::Event::Callback)] [C:\Users\aalee\Documents\raindrop\src\Core\Event\EventManager.cpp:18] New subscriber to "Engine.Quit" event
+2023-07-07 18:40:27,544 TRACE [Engine.Core.EventManager] [void Raindrop::Core::Event::EventManager::subscribe(const std::string&, Raindrop::Core::Event::Callback)] [C:\Users\aalee\Documents\raindrop\src\Core\Event\EventManager.cpp:18] New subscriber to "Engine.Window.Quit" event
+2023-07-07 18:40:27,545 INFO [Engine] Engine created with success !
+2023-07-07 18:40:27,546 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources\\pipelines/default.xml.gfxpipe"
+2023-07-07 18:40:27,546 INFO [Engine.Graphics.Pipeline] Loading a new graphics pipeline from "C:/Users/aalee/Documents/raindrop/tests/resources\\pipelines/default.xml.gfxpipe" ...
+2023-07-07 18:40:27,547 INFO [Engine.Graphics.Pipeline] Loading "C:/Users/aalee/Documents/raindrop/tests/resources\\pipelines/default.xml.gfxpipe" xml graphics pipeline
+2023-07-07 18:40:27,548 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.frag.spv"
+2023-07-07 18:40:27,548 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.frag.spv"
+2023-07-07 18:40:27,549 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_FRAGMENT_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.frag.spv"
+2023-07-07 18:40:27,552 INFO [AssetManager] requirering file : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.vert.spv"
+2023-07-07 18:40:27,552 INFO [Engine.Graphics.Shader] Loading a new shader : "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.vert.spv"
+2023-07-07 18:40:27,553 INFO [Engine.Graphics.Shader] Loading VK_SHADER_STAGE_VERTEX_BIT shader from "C:/Users/aalee/Documents/raindrop/tests/resources/shaders/default/default.glsl.vert.spv"
+2023-07-07 18:40:27,555 INFO [Engine.Graphics] Building vulkan graphics pipeline
+2023-07-07 18:40:27,556 INFO [Engine.Graphics.GUI] Loading GUI... : "C:/Users/aalee/Documents/raindrop/tests/resources\\gui/gui.xml"
+2023-07-07 18:40:27,557 INFO [Engine.Graphics.GUI] GUI Loaded with success !
+2023-07-07 18:40:27,558 INFO [Engine] Starting engine mainloop

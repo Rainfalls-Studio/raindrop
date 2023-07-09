@@ -21,9 +21,10 @@ namespace Raindrop::Graphics{
 		_vertexCount = vertices.size();
 
 		Buffer staginBuffer(_context);
-		staginBuffer.allocate(sizeof(Vertex) * vertices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		staginBuffer.allocate(sizeof(Vertex) * vertices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		staginBuffer.map();
-		staginBuffer.writeToBuffer(vertices.data());
+		staginBuffer.writeToBuffer((void*)vertices.data());
+		staginBuffer.flush();
 
 		_vertexBuffer = std::make_unique<Buffer>(_context);
 		_vertexBuffer->allocate(sizeof(Vertex) * vertices.size(), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -47,9 +48,10 @@ namespace Raindrop::Graphics{
 		_indexCount = indices.size();
 
 		Buffer staginBuffer(_context);
-		staginBuffer.allocate(sizeof(uint32_t) * indices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		staginBuffer.allocate(sizeof(uint32_t) * indices.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		staginBuffer.map();
-		staginBuffer.writeToBuffer(indices.data());
+		staginBuffer.writeToBuffer((void*)indices.data());
+		staginBuffer.flush();
 
 		_indexBuffer = std::make_unique<Buffer>(_context);
 		_indexBuffer->allocate(sizeof(uint32_t) * indices.size(), VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -61,7 +63,7 @@ namespace Raindrop::Graphics{
 		region.srcOffset = 0;
 		region.size = sizeof(uint32_t) * indices.size();
 
-		vkCmdCopyBuffer(commandBuffer, staginBuffer.get(), _vertexBuffer->get(), 1, &region);
+		vkCmdCopyBuffer(commandBuffer, staginBuffer.get(), _indexBuffer->get(), 1, &region);
 
 		_context.transfertCommandPool.endSingleTime(commandBuffer);
 	}

@@ -9,7 +9,7 @@ namespace Raindrop::Graphics{
 			DescriptorSetLayout(GraphicsContext& context, VkDescriptorSetLayoutCreateInfo& info);
 			~DescriptorSetLayout();
 
-			VkDescriptorSetLayout layout() const;
+			VkDescriptorSetLayout get() const;
 			
 		private:
 			GraphicsContext& _context;

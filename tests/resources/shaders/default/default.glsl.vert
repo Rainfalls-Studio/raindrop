@@ -16,7 +16,12 @@ layout (push_constant) uniform Push{
 } push;
 
 void main(){
-	frag_color = in_color;
 	vec4 positionWorld = push.modelMatrix * vec4(in_position, 1.0);
+
+	frag_color = in_color;
+	frag_normal = in_normal;
+	frag_UV = in_UV;
+	frag_position = positionWorld.rgb;
+
 	gl_Position = push.projectionViewMatrix * positionWorld;
 }

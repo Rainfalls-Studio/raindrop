@@ -18,6 +18,8 @@ namespace Raindrop::Graphics::Builders{
 			void setRenderPass(VkRenderPass renderPass);
 			void setName(const std::string& name);
 			void setAttachmentCount(uint32_t count);
+			void setVertexAttribtes(const std::vector<VkVertexInputAttributeDescription>& attributes);
+			void setVertexBindings(const std::vector<VkVertexInputBindingDescription>& bindings);
 			
 			VkPipelineViewportStateCreateInfo& viewportInfo();
 			VkPipelineRasterizationStateCreateInfo& rasterizationInfo();
@@ -35,6 +37,8 @@ namespace Raindrop::Graphics::Builders{
 			std::vector<std::shared_ptr<Shader>> _shaders;
 			std::vector<VkPipelineColorBlendAttachmentState> _colorAttachments;
 			std::vector<VkDescriptorSetLayout> _setLayouts;
+			std::vector<VkVertexInputAttributeDescription> _vertexAttributes;
+			std::vector<VkVertexInputBindingDescription> _vertexBindings;
 			std::string _name;
 
 			VkPipelineLayout createPipelineLayout(VkAllocationCallbacks* callbacks);
