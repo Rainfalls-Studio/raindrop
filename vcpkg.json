@@ -1,0 +1,17 @@
+{
+  "name": "raindrop",
+  "version-semver": "0.1.0",
+  "dependencies": [
+    "spdlog",
+    "entt"
+  ],
+  "default-features": [],
+  "features": {
+    "test": {
+      "description": "Dependencies for testing",
+      "dependencies": [
+        "catch2"
+      ]
+    }
+  }
+}
