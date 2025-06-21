@@ -15,7 +15,7 @@ if(FIX)
 endif()
 
 execute_process(
-    COMMAND "${SPELL_COMMAND}" ${flag}
+    COMMAND "${SPELL_COMMAND}" ${flag} src include
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     RESULT_VARIABLE result
 )

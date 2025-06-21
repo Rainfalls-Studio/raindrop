@@ -25,7 +25,7 @@ add_library(
 target_include_directories(
     Raindrop_lib ${warning_guard}
     PUBLIC
-    "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>"
+    "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
 
 target_compile_features(Raindrop_lib PUBLIC cxx_std_17)
