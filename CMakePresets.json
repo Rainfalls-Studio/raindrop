@@ -11,6 +11,7 @@
       "hidden": true,
       "cacheVariables": {
         "Raindrop_DEVELOPER_MODE": "ON",
+        "BUILD_TESTBED": "ON",
         "VCPKG_MANIFEST_FEATURES": "test"
       }
     },

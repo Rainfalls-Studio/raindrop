@@ -1,60 +1,46 @@
 #pragma once
 
+#include "Raindrop/Window/Context.hpp"
+#include "Raindrop/Window/Property.hpp"
+#include "../Engine.hpp"
+#include <glm/glm.hpp>
+#include <memory>
+#include <unordered_map>
 
-namespace Raindrop::Platform::Window{
+namespace Raindrop::Window{
 	class Window{
 		public:
-			using State = Internal::Window::Window::State;
-			using Flags = Internal::Window::Window::Flags;
-
-			Window();
-			Window(std::shared_ptr<Internal::Window::Window> impl);
+			Window(Engine& engine);
 			~Window();
 
-			static Window Create(const char* title, Extent extent, Position position);
+			glm::ivec2 getSize() const;
+			glm::ivec2 getPosition() const;
 
-			inline bool isValid();
+			const char* getTitle() const;
 
-			inline Extent getSize() const;
-			inline Position getPosition() const;
+			bool isFullscreen() const;
+			bool isMinimized() const;
+			bool isMaximized() const;
 
-			inline const char* getTitle() const;
-			inline State getState() const;
-
-			inline bool isFullscreen() const;
-			inline bool isMinimized() const;
-			inline bool isMaximized() const;
-
-			inline bool resized() const;
-			inline bool moved() const;
+			bool resized() const;
+			bool moved() const;
 			
-			inline void setSize(Extent size);
-			inline void setPosition(Position position);
+			void setSize(glm::ivec2 size);
+			void setPosition(glm::ivec2 position);
 
-			inline void setState(State state);
-
-			inline void setFullscreen();
-			inline void setMinimized();
-			inline void setMaximized();
-
-			inline void* getNativeHandle() const;
-
-			inline void setEventManager(Core::Event::Manager manager);
-			inline void handleEvents();
-			inline const Input::InputStateManager& getInputStateManager() const noexcept;
-
+			void* getNativeHandle() const;
 
 			template<typename T, typename... Args>
-			inline T& addProperty(Args&&... args);
+			inline std::shared_ptr<T> addProperty(Args&&... args);
 
 			template<typename T>
-			inline T& addProperty();
+			inline std::shared_ptr<T> addProperty();
 
 			template<typename T>
-			inline T& getProperty();
+			inline std::shared_ptr<T> getProperty();
 
 			template<typename T>
-			inline const T& getProperty() const;
+			inline const std::shared_ptr<T> getProperty() const;
 
 			template<typename T>
 			inline bool hasProperty() const noexcept;
@@ -62,11 +48,10 @@ namespace Raindrop::Platform::Window{
 			template<typename T>
 			inline void removeProperty() noexcept;
 
-			inline std::shared_ptr<Internal::Window::Window> getImpl();
-
-
-		private:
-			std::shared_ptr<Internal::Window::Window> _impl;
+		protected:
+			Engine& _engine;
+			void* _handle;
+			std::unordered_map<std::size_t, std::weak_ptr<Property>> _properties;
 
 	};
 }

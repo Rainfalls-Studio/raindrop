@@ -3,7 +3,7 @@
 #include <initializer_list>
 #include <type_traits>
 
-namespace Raindrop::Utils{
+namespace Raindrop::Core::Utils{
     template<typename U, int init_value = 0>
     class Flags{
         static_assert(std::is_enum<U>::value, "Flags<U>: U must be an enum");

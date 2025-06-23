@@ -10,7 +10,7 @@ enum class TestEnum : uint8_t {
     All = FlagA | FlagB | FlagC
 };
 
-using Raindrop::Utils::Flags;
+using Raindrop::Core::Utils::Flags;
 
 class FlagsTest : public ::testing::Test {
 protected:

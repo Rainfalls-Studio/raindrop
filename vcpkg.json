@@ -2,10 +2,10 @@
   "name": "raindrop",
   "version-semver": "0.1.0",
   "dependencies": [
+    "entt",
     "spdlog",
-    "entt"
+    "glm"
   ],
-  "default-features": [],
   "features": {
     "test": {
       "description": "Dependencies for testing",

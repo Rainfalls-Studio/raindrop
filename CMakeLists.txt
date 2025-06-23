@@ -18,25 +18,30 @@ include(cmake/variables.cmake)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_library(
-    Raindrop_lib STATIC
+    Raindrop STATIC
     ${SOURCES}
 )
 
 target_include_directories(
-    Raindrop_lib ${warning_guard}
+    Raindrop ${warning_guard}
     PUBLIC
     "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
 
-target_compile_features(Raindrop_lib PUBLIC cxx_std_17)
+target_compile_features(Raindrop PUBLIC cxx_std_17)
 
 find_package(spdlog CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
-target_link_libraries(Raindrop_lib
+find_package(SDL3 REQUIRED) # Not specified in vcpkg.json as it's not currently supported on all linux distros (such as mine)
+
+target_link_libraries(Raindrop
     PRIVATE
     spdlog::spdlog
     EnTT::EnTT
+    glm::glm
+    SDL3::SDL3
 )
 
 # ---- Install rules ----
