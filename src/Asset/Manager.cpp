@@ -16,9 +16,9 @@ namespace Raindrop::Asset{
 	Manager::~Manager(){}
 
 	void Manager::_createLogger(){
-		_logger = spdlog::get("Core::Internal::Asset");
+		_logger = spdlog::get("Core::Backend::Asset");
 		if (!_logger){
-			_logger = spdlog::stdout_color_mt("Core::Internal::Asset");
+			_logger = spdlog::stdout_color_mt("Core::Backend::Asset");
 		}
 	}
 

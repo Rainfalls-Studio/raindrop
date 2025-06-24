@@ -1,3 +1,4 @@
+#include "Raindrop/Asset/Manager.hpp"
 #include "Raindrop/Event/Manager.hpp"
 #include "Raindrop/Input/Manager.hpp"
 #include "Raindrop/Input/Storage.hpp"
@@ -22,6 +23,7 @@ class Testbed{
     public:
         Testbed(){
             _engine = std::make_shared<Raindrop::Engine>();
+            _assets = std::make_shared<Raindrop::Asset::Manager>(*_engine);
             _events = std::make_shared<Raindrop::Event::Manager>(*_engine);
             _inputs = std::make_shared<Raindrop::Input::Manager>(*_engine, _events);
             
@@ -64,6 +66,7 @@ class Testbed{
 
     private:
         std::shared_ptr<Raindrop::Engine> _engine;
+        std::shared_ptr<Raindrop::Asset::Manager> _assets;
         std::shared_ptr<Raindrop::Event::Manager> _events;
         std::shared_ptr<Raindrop::Input::Manager> _inputs;
         std::unique_ptr<Raindrop::Window::Window> _window;

@@ -2,6 +2,7 @@
 
 #include "../Window.hpp"
 #include <memory>
+#include <stdexcept>
 #include <type_traits>
 
 namespace Raindrop::Window{
@@ -39,5 +40,20 @@ namespace Raindrop::Window{
 	inline void Window::removeProperty() noexcept{
 		static_assert(std::is_base_of_v<Property, T>, "The property type must be derived from Property");
 		_properties.erase(typeid(T).hash_code());
+	}
+
+
+	template<typename T>
+	inline std::unique_ptr<T> Window::getSurfaceProvider(){
+		static_assert(std::is_base_of<SurfaceProvider, T>::value, "T type must be derived from SurfaceProvider");
+
+		auto base_ptr = std::make_unique<T>(*this);
+		T* derived_ptr = dynamic_cast<T*>(base_ptr.get());
+		if (!derived_ptr) {
+			throw std::runtime_error("Unsupported API");
+			return nullptr;
+		}
+		base_ptr.release();  // release ownership from base_ptr
+		return std::unique_ptr<T>(derived_ptr);
 	}
 }

@@ -5,8 +5,10 @@
 #include "../Engine.hpp"
 #include <glm/glm.hpp>
 #include <memory>
+#include <string_view>
 #include <unordered_map>
 #include "../Event/Manager.hpp"
+#include "Raindrop/Window/SurfaceProvider.hpp"
 #include <SDL3/SDL.h>
 
 namespace Raindrop::Window{
@@ -51,6 +53,11 @@ namespace Raindrop::Window{
 
 			template<typename T>
 			inline void removeProperty() noexcept;
+
+			std::unique_ptr<SurfaceProvider> getSurfaceProvider(std::string_view API);
+
+			template<typename T>
+			inline std::unique_ptr<T> getSurfaceProvider();
 
 		private:
 			Engine& _engine;

@@ -4,7 +4,9 @@
   "dependencies": [
     "entt",
     "spdlog",
-    "glm"
+    "glm",
+    "vk-bootstrap",
+    "vulkan-memory-allocator"
   ],
   "features": {
     "test": {

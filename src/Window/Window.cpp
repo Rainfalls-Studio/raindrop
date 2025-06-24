@@ -1,17 +1,55 @@
 #include "Raindrop/Window/Window.hpp"
 #include "Raindrop/Event/Manager.hpp"
 #include "Raindrop/Input/Key.hpp"
-#include "Raindrop/Input/KeyState.hpp"
 #include "Raindrop/Input/MouseEvents.hpp"
 #include "Raindrop/Input/KeyEvents.hpp"
+#include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
+#include "Raindrop/Window/SurfaceProviders/Metal.hpp"
 #include "Raindrop/Window/WindowEvents.hpp"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include <SDL3/SDL_metal.h>
+#include <SDL3/SDL_vulkan.h>
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL.h>
 #include <stdexcept>
-
+#include <string_view>
 
 namespace Raindrop::Window{
+
+	class SDL2VulkanSurfaceProvider : public SurfaceProviders::Vulkan{
+		public:
+            SDL2VulkanSurfaceProvider(Window& window) : SurfaceProviders::Vulkan(window){}
+
+            virtual char const* const* getInstanceExtensions(uint32_t* count) override{
+				return SDL_Vulkan_GetInstanceExtensions(count);
+			}
+
+            virtual bool createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) override {
+				return SDL_Vulkan_CreateSurface(static_cast<SDL_Window*>(_window.getNativeHandle()), instance, allocator, surface);
+			}
+
+            virtual void destroySurface(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks* allocator) override{
+				SDL_Vulkan_DestroySurface(instance, surface, allocator);
+			}
+	};
+
+	class SDL2MetalSurfaceProvider : public SurfaceProviders::Metal{
+		public:
+            SDL2MetalSurfaceProvider(Window& window) : SurfaceProviders::Metal(window){}
+
+            virtual SDL_MetalView createView() override{
+				return SDL_Metal_CreateView(static_cast<SDL_Window*>(_window.getNativeHandle()));
+			}
+
+            virtual void destroyView(SDL_MetalView view) override{
+				return SDL_Metal_DestroyView(view);
+			}
+
+            virtual void* getLayer(SDL_MetalView view) override{
+				return SDL_Metal_GetLayer(view);
+			}
+	};
+
     Window::Window(Engine& engine, std::shared_ptr<Event::Manager> event) :
             _engine{engine},
             _event{event},
@@ -115,6 +153,15 @@ namespace Raindrop::Window{
         return _handle;
     }
 
+	std::unique_ptr<SurfaceProvider> Window::getSurfaceProvider(std::string_view API){
+		if (API == "Vulkan"){
+			return std::make_unique<SDL2VulkanSurfaceProvider>(*this);
+		} else if (API == "Metal"){
+			return std::make_unique<SDL2MetalSurfaceProvider>(*this);
+		}
+
+		return nullptr;
+	}
     
 	void Window::events(){
 		// resetFlags();
