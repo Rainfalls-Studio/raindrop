@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Raindrop::Platform::Input{
+namespace Raindrop::Input{
 
 	/**
 	 * @brief From SDL_Scancode

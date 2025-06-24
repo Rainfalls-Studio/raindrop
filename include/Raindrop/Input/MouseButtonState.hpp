@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Raindrop::Platform::Input{
+namespace Raindrop::Input{
 	enum class MouseButtonState{
 		PRESSED,
 		RELEASED

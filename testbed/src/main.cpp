@@ -1,3 +1,4 @@
+#include "Raindrop/Event/Manager.hpp"
 #include "Raindrop/Window/Window.hpp"
 #include <Raindrop/Raindrop.hpp>
 #include <iostream>
@@ -6,12 +7,27 @@ class Testbed{
     public:
         Testbed(){
             _engine = std::make_shared<Raindrop::Engine>();
-            _window = std::make_unique<Raindrop::Window::Window>(*_engine);
+            _events = std::make_shared<Raindrop::Event::Manager>(*_engine);
+
+            _window = std::make_unique<Raindrop::Window::Window>(*_engine, _events);
+        }
+
+        void run(){
+            bool running = false;
+
+            while (running){
+                events();
+            }
         }
 
     private:
         std::shared_ptr<Raindrop::Engine> _engine;
+        std::shared_ptr<Raindrop::Event::Manager> _events;
         std::unique_ptr<Raindrop::Window::Window> _window;
+
+        void events(){
+
+        }
 
 };
 

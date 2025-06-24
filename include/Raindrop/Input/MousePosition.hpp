@@ -2,6 +2,6 @@
 
 #include "glm/fwd.hpp"
 
-namespace Raindrop::Platform::Input{
+namespace Raindrop::Input{
     using MousePosition = glm::i32vec2;
 }

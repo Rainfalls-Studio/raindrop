@@ -1,53 +1,37 @@
-#pragma once
-
 #include "../Manager.hpp"
-#include "Raindrop/Core/Internal/Event/Manager.hpp"
 
-namespace Raindrop::Core::Event{
-    inline Manager::Manager() : _impl{}{}
-    inline Manager::Manager(std::shared_ptr<Core::Internal::Event::Manager> impl) : _impl{impl}{}
+namespace Raindrop::Event{
+	template<typename EventType>
+	void Manager::subscribe(std::function<bool(const EventType&)> callback){
+		static_assert(std::is_base_of<Event, EventType>::value, "The event type has to be derived from Events::Event");
 
-    inline bool Manager::isValid() const noexcept{
-        return _impl != nullptr;
-    }
+		subscribe(
+			typeid(EventType).hash_code(),
+			CallbackInfo(
+				[callback](const Event& event) -> bool {
+					return callback(static_cast<const EventType&>(event));
+				}
+			)
+		);
+	}
 
-    inline void Manager::subscribe(const std::type_index& id, const CallbackInfo& info){
-        assertGet().subscribe(id, info);
-    }
+	template<typename EventType, typename ClassType>
+	void Manager::subscribe(ClassType& instance, bool (ClassType::*memberFunction)(const EventType&)) {
+		subscribe<EventType>([&instance, memberFunction](const EventType& event) -> bool {
+			return (instance.*memberFunction)(event);
+		});
+	}
 
-    inline void Manager::trigger(const std::type_index& id, const Event& event){
-        assertGet().trigger(id, event);
-    }
+	template<typename EventType, typename ClassType>
+	void Manager::subscribe(ClassType* instance, bool (ClassType::*memberFunction)(const EventType&)) {
+		subscribe<EventType>([instance, memberFunction](const EventType& event) -> bool {
+			return (instance->*memberFunction)(event);
+		});
+	}
 
-    template<typename EventType>
-    inline void Manager::subscribe(std::function<bool(const EventType&)> callback){
-        assertGet().subscribe<EventType>(callback);
-    }
-
-    template<typename EventType, typename ClassType>
-    inline void Manager::subscribe(ClassType& instance, bool (ClassType::*memberFunction)(const EventType&)){
-        assertGet().subscribe<EventType, ClassType>(instance, memberFunction);
-    }
-
-    template<typename EventType, typename ClassType>
-    inline void Manager::subscribe(ClassType* instance, bool (ClassType::*memberFunction)(const EventType&)){
-        assertGet().subscribe<EventType, ClassType>(instance, memberFunction);
-    }
-
-    template<typename T>
-    inline void Manager::trigger(const T& event){
-        assertGet().trigger<T>(event);
-    }
-
-    inline Core::Internal::Event::Manager* Manager::get(){
-        return _impl.get();
-    }
-
-    inline Core::Internal::Event::Manager& Manager::assertGet(){
-        Core::Internal::Event::Manager* ptr = get();
-
-        assert(ptr != nullptr && "The event manager interface is invalid");
-
-        return *ptr;
-    }
+	template<typename T>
+	void Manager::trigger(const T& event){
+		static_assert(std::is_base_of<Event, T>::value, "The event type has to be derived from Events::Event");
+		trigger(typeid(T).hash_code(), static_cast<const Event&>(event));
+	}
 }

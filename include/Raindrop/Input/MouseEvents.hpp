@@ -1,14 +1,15 @@
 #pragma once
 
-#include "../Input/MouseButton.hpp"
-#include "WindowEvents.hpp"
+#include "MouseButton.hpp"
+#include "MousePosition.hpp"
+#include "../Event/Event.hpp"
+#include <glm/glm.hpp>
 
-namespace Raindrop::Platform::Event{
+namespace Raindrop::Input{
 
-	class MouseMovedEvent : public WindowEvent{
+	class MouseMovedEvent : public Event::Event{
 		public:
-			MouseMovedEvent(Window::Window window, const glm::u32vec2& position, const glm::i32vec2& delta) :
-				WindowEvent(window),
+			MouseMovedEvent(const MousePosition& position, const glm::i32vec2& delta) :
 				_position{position},
 				_delta{delta}
 			{}
@@ -28,10 +29,9 @@ namespace Raindrop::Platform::Event{
 			glm::i32vec2 _delta;
 	};
 
-	class MouseButtonDownEvent : public WindowEvent{
+	class MouseButtonDownEvent : public Event::Event{
 		public:
-			MouseButtonDownEvent(Window::Window window, const Input::MouseButton& button, const std::uint32_t& clicks, const glm::u32vec2& position) : 
-				WindowEvent(window),
+			MouseButtonDownEvent(const Input::MouseButton& button, const std::uint32_t& clicks, const glm::u32vec2& position) : 
 				_button{button},
 				_clicks{clicks},
 				_position{position}
@@ -57,10 +57,9 @@ namespace Raindrop::Platform::Event{
 			glm::u32vec2 _position;
 	};
 
-	class MouseButtonUpEvent : public WindowEvent{
+	class MouseButtonUpEvent : public Event::Event{
 		public:
-			MouseButtonUpEvent(Window::Window window, const Input::MouseButton& button, const glm::u32vec2& position) : 
-				WindowEvent(window),
+			MouseButtonUpEvent(const Input::MouseButton& button, const glm::u32vec2& position) : 
 				_button{button},
 				_position{position}
 			{}
@@ -80,10 +79,9 @@ namespace Raindrop::Platform::Event{
 			glm::u32vec2 _position;
 	};
 
-	class MouseScrollEvent : public WindowEvent{
+	class MouseScrollEvent : public Event::Event{
 		public:
-			MouseScrollEvent(Window::Window window, const float& y) :
-				WindowEvent(window),
+			MouseScrollEvent(const float& y) :
 				_y{y}
 			{}
 

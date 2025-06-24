@@ -1,7 +1,21 @@
 #pragma once
 
-#include "Raindrop/Core/Internal/Asset/Asset.hpp"
+#include "Raindrop/config.hpp"
+#include <cstdint>
 
-namespace Raindrop::Core::Asset{
-    using Internal::Asset::Asset;
+namespace Raindrop::Asset{
+	class Asset{
+		public:
+			virtual ~Asset() = default;
+
+            virtual void load() = 0;
+
+            virtual void reload() = 0;
+
+            virtual void unload() = 0;
+
+            virtual std::uint32_t getMemoryUsage() const = 0;
+
+            
+	};
 }

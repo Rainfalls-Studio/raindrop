@@ -1,44 +1,56 @@
 #pragma once
 
-#include "Raindrop/Core/Internal/Event/Manager.hpp"
-#include "Event.hpp"
+#include <functional>
+#include <list>
+#include <typeinfo>
+#include <memory>
+#include <spdlog/spdlog.h>
 
-namespace Raindrop::Core::Event{
-    class Manager{
-        public:
-            using CallbackInfo = Core::Internal::Event::Manager::CallbackInfo;
+namespace Raindrop{
+	class Engine;
 
-            inline Manager();
-            inline Manager(std::shared_ptr<Core::Internal::Event::Manager> impl);
-            ~Manager() = default;
+	namespace Event{
+		class Event;
 
-            static Manager Create();
+		class Manager{
+			public:
+				struct CallbackInfo{
+					std::function<bool(const Event&)> callback;
+				};
 
-            inline bool isValid() const noexcept;
+				struct EventData{
+					std::list<CallbackInfo> callbacks;
+				};
 
-            inline void subscribe(const std::type_index& id, const CallbackInfo& info);
+				Manager(Engine& engine) noexcept;
+				~Manager();
+				
+				void subscribe(const std::size_t& id, const CallbackInfo& info);
+				// void unsubscribe(const std::type_index& id, const Listener* listener);
 
-            inline void trigger(const std::type_index& id, const Event& event);
+				void trigger(const std::size_t& id, const Event& event);
 
-			template<typename EventType>
-			inline void subscribe(std::function<bool(const EventType&)> callback);
 
-			template<typename EventType, typename ClassType>
-			inline void subscribe(ClassType& instance, bool (ClassType::*memberFunction)(const EventType&));
+				template<typename EventType>
+				void subscribe(std::function<bool(const EventType&)> callback);
 
-			template<typename EventType, typename ClassType>
-			inline void subscribe(ClassType* instance, bool (ClassType::*memberFunction)(const EventType&));
+				template<typename EventType, typename ClassType>
+				void subscribe(ClassType& instance, bool (ClassType::*memberFunction)(const EventType&));
 
-			template<typename T>
-			inline void trigger(const T& event);
+				template<typename EventType, typename ClassType>
+				void subscribe(ClassType* instance, bool (ClassType::*memberFunction)(const EventType&));
 
-            inline Core::Internal::Event::Manager* get();
+				template<typename T>
+				void trigger(const T& event);
 
-        private:
-            inline Internal::Event::Manager& assertGet();
+			private:
+				Engine &_engine;
+				std::shared_ptr<spdlog::logger> _logger;
+				std::unordered_map<std::size_t, EventData> _events;
 
-            std::shared_ptr<Internal::Event::Manager> _impl;
-    };
+				void _createLogger();
+		};
+	}
 }
 
 #include "inl/Manager.inl"
