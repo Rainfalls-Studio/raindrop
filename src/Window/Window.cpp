@@ -252,33 +252,33 @@ namespace Raindrop::Window{
 		}
 	}
 
-	void Window::terminatingEvent(SDL_Event& e){}
-	void Window::lowMemoryEvent(SDL_Event& e){}
+	void Window::terminatingEvent(SDL_Event&){}
+	void Window::lowMemoryEvent(SDL_Event&){}
 
-	void Window::willEnterBackgroundEvent(SDL_Event& e){}
-	void Window::didEnterBackgroundEvent(SDL_Event& e){}
-	void Window::willEnterForgroundEvent(SDL_Event& e){}
-	void Window::didEnterForgourndEvent(SDL_Event& e){}
+	void Window::willEnterBackgroundEvent(SDL_Event&){}
+	void Window::didEnterBackgroundEvent(SDL_Event&){}
+	void Window::willEnterForgroundEvent(SDL_Event&){}
+	void Window::didEnterForgourndEvent(SDL_Event&){}
 
-	void Window::localeChangedEvent(SDL_Event& e){}
-	void Window::systemThemChangedEvent(SDL_Event& e){}
+	void Window::localeChangedEvent(SDL_Event&){}
+	void Window::systemThemChangedEvent(SDL_Event&){}
 
-	void Window::displayOrientationEvent(SDL_Event& e){}
-	void Window::displayAddedEvent(SDL_Event& e){}
-	void Window::displayRemovedEvent(SDL_Event& e){}
-	void Window::displayMovedEvent(SDL_Event& e){}
-	void Window::displayContentScaleChangedEvent(SDL_Event& e){}
-	void Window::displayHDRStateChnagedEvent(SDL_Event& e){}
+	void Window::displayOrientationEvent(SDL_Event&){}
+	void Window::displayAddedEvent(SDL_Event&){}
+	void Window::displayRemovedEvent(SDL_Event&){}
+	void Window::displayMovedEvent(SDL_Event&){}
+	void Window::displayContentScaleChangedEvent(SDL_Event&){}
+	void Window::displayHDRStateChnagedEvent(SDL_Event&){}
 
-	void Window::windowShownEvent(SDL_Event& e){
+	void Window::windowShownEvent(SDL_Event&){
 		_event->trigger(WindowShown(*this));
 	}
 
-	void Window::windowHiddenEvent(SDL_Event& e){
+	void Window::windowHiddenEvent(SDL_Event&){
 		_event->trigger(WindowHidden(*this));
 	}
 
-	void Window::windowExposedEvent(SDL_Event& e){
+	void Window::windowExposedEvent(SDL_Event&){
 		// _event->trigger(WindowExposed(*this));
 	}
 
@@ -304,66 +304,66 @@ namespace Raindrop::Window{
 		_event->trigger(WindowResized(*this, size));
 	}
 
-	void Window::windowPixelSizeChangedEvent(SDL_Event& e){
+	void Window::windowPixelSizeChangedEvent(SDL_Event&){
 		
 	}
 
-	void Window::windowMinimizedEvent(SDL_Event& e){
+	void Window::windowMinimizedEvent(SDL_Event&){
 		_event->trigger(WindowMinimized(*this));
 	}
 
-	void Window::windowMaximizedEvent(SDL_Event& e){
+	void Window::windowMaximizedEvent(SDL_Event&){
 		_event->trigger(WindowMaximized(*this));
 	}
 
-	void Window::windowRestoredEvent(SDL_Event& e){
+	void Window::windowRestoredEvent(SDL_Event&){
 		_event->trigger(WindowRestored(*this));
 	}
 
-	void Window::windowMouseEnterEvent(SDL_Event& e){
+	void Window::windowMouseEnterEvent(SDL_Event&){
 		_event->trigger(WindowMouseEntered(*this));
 	}
 
-	void Window::windowMouseLeaveEvent(SDL_Event& e){
+	void Window::windowMouseLeaveEvent(SDL_Event&){
 		_event->trigger(WindowMouseLeaved(*this));
 	}
 
-	void Window::windowFocusGainedEvent(SDL_Event& e){
+	void Window::windowFocusGainedEvent(SDL_Event&){
 		_event->trigger(WindowFocusGained(*this));
 	}
 
-	void Window::windowFocusLostEvent(SDL_Event& e){
+	void Window::windowFocusLostEvent(SDL_Event&){
 		_event->trigger(WindowFocusLost(*this));
 	}
 
-	void Window::windowCloseRequestedEvent(SDL_Event& e){
+	void Window::windowCloseRequestedEvent(SDL_Event&){
 		_event->trigger(WindowCloseRequest(*this));
 	}
 
-	void Window::windowTakeFocusEvent(SDL_Event& e){}
-	void Window::windowHitTestEvent(SDL_Event& e){}
-	void Window::windowICCPROFChangedEvent(SDL_Event& e){}
-	void Window::windowDisplayChangedEvent(SDL_Event& e){}
-	void Window::windowDisplayScaleChangedEvent(SDL_Event& e){}
+	void Window::windowTakeFocusEvent(SDL_Event&){}
+	void Window::windowHitTestEvent(SDL_Event&){}
+	void Window::windowICCPROFChangedEvent(SDL_Event&){}
+	void Window::windowDisplayChangedEvent(SDL_Event&){}
+	void Window::windowDisplayScaleChangedEvent(SDL_Event&){}
 
-	void Window::windowOccludedEvent(SDL_Event& e){
+	void Window::windowOccludedEvent(SDL_Event&){
 		_event->trigger(WindowOccluded(*this));
 	}
 
-	void Window::windowEnterFullsreenEvent(SDL_Event& e){
+	void Window::windowEnterFullsreenEvent(SDL_Event&){
 		_event->trigger(WindowFullscreenEnter(*this));
 	}
 
-	void Window::windowLeaveFullscreenEvent(SDL_Event& e){
+	void Window::windowLeaveFullscreenEvent(SDL_Event&){
 		_event->trigger(WindowFullscreenLeave(*this));
 	}
 
-	void Window::windowDestroyedEvent(SDL_Event& e){
+	void Window::windowDestroyedEvent(SDL_Event&){
 		_event->trigger(WindowDestroyed());
 	}
 
-	void Window::windowPenEnterEvent(SDL_Event& e){}
-	void Window::windowPenLeaveEvent(SDL_Event& e){}
+	void Window::windowPenEnterEvent(SDL_Event&){}
+	void Window::windowPenLeaveEvent(SDL_Event&){}
 
 	void Window::keyDownEvent(SDL_Event& e){
 		Input::Key key = static_cast<Input::Key>(e.key.scancode);
@@ -376,9 +376,9 @@ namespace Raindrop::Window{
 		_event->trigger(Input::KeyUp(key));
 	}
 
-	void Window::textEditingEvent(SDL_Event& e){}
-	void Window::textInputEvent(SDL_Event& e){}
-	void Window::keymapChangedEvent(SDL_Event& e){}
+	void Window::textEditingEvent(SDL_Event&){}
+	void Window::textInputEvent(SDL_Event&){}
+	void Window::keymapChangedEvent(SDL_Event&){}
 
 	void Window::mouseMotionEvent(SDL_Event& e){
 		glm::u32vec2 position{
@@ -445,374 +445,374 @@ namespace Raindrop::Window{
 	// 	_context.getInternalContext().getEventManager().get("quit").trigger();
 	// }
 	
-	// void Window::terminatingEvent(SDL_Event& e){
+	// void Window::terminatingEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("terminating").trigger();
 	// }
 
-	// void Window::lowMemoryEvent(SDL_Event& e){
+	// void Window::lowMemoryEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("memory.low").trigger();
 	// }
 
-	// void Window::willEnterBackgroundEvent(SDL_Event& e){
+	// void Window::willEnterBackgroundEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("will_enter_background").trigger();
 	// }
 
-	// void Window::didEnterBackgroundEvent(SDL_Event& e){
+	// void Window::didEnterBackgroundEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("did_enter_background").trigger();
 	// }
 
-	// void Window::willEnterForgroundEvent(SDL_Event& e){
+	// void Window::willEnterForgroundEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("will_enter_forground").trigger();
 	// }
 
-	// void Window::didEnterForgourndEvent(SDL_Event& e){
+	// void Window::didEnterForgourndEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("did_enter_forground").trigger();
 	// }
 
-	// void Window::localeChangedEvent(SDL_Event& e){
+	// void Window::localeChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("locale.changed").trigger();
 	// }
 
-	// void Window::systemThemChangedEvent(SDL_Event& e){
+	// void Window::systemThemChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("system_theme.changed").trigger();
 	// }
 
-	// void Window::displayOrientationEvent(SDL_Event& e){
+	// void Window::displayOrientationEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("display.orientation").trigger(e.display.data1);
 	// }
 
-	// void Window::displayAddedEvent(SDL_Event& e){
+	// void Window::displayAddedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("display.added").trigger();
 	// }
 
-	// void Window::displayRemovedEvent(SDL_Event& e){
+	// void Window::displayRemovedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("display.removed").trigger();
 	// }
 
-	// void Window::displayMovedEvent(SDL_Event& e){
+	// void Window::displayMovedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("display.moved").trigger();
 	// }
 
-	// void Window::displayContentScaleChangedEvent(SDL_Event& e){
+	// void Window::displayContentScaleChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("display.content_scale.changed").trigger();
 	// }
 
-	// void Window::displayHDRStateChnagedEvent(SDL_Event& e){
+	// void Window::displayHDRStateChnagedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("display.HDR_state.changed").trigger();
 	// }
 
-	// void Window::windowShownEvent(SDL_Event& e){
+	// void Window::windowShownEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.shown").trigger();
 	// }
 
-	// void Window::windowHiddenEvent(SDL_Event& e){
+	// void Window::windowHiddenEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.hidden").trigger();
 	// }
 
-	// void Window::windowExposedEvent(SDL_Event& e){
+	// void Window::windowExposedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.exposed").trigger();
 	// }
 
-	// void Window::windowMovedEvent(SDL_Event& e){
+	// void Window::windowMovedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.moved").trigger();
 	// }
 
-	// void Window::windowResizedEvent(SDL_Event& e){
+	// void Window::windowResizedEvent(SDL_Event&){
 	// 	_resized = true;
 	// 	_context.getInternalContext().getEventManager().get("window.resized").trigger(Maths::ivec2(e.window.data1, e.window.data2));
 	// }
 
-	// void Window::windowPixelSizeChangedEvent(SDL_Event& e){
+	// void Window::windowPixelSizeChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.pixel_size.changed").trigger(Maths::ivec2(e.window.data1, e.window.data2));
 	// }
 
-	// void Window::windowMinimizedEvent(SDL_Event& e){
+	// void Window::windowMinimizedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.minimized").trigger();
 	// }
 
-	// void Window::windowMaximizedEvent(SDL_Event& e){
+	// void Window::windowMaximizedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.maximized").trigger();
 	// }
 
-	// void Window::windowRestoredEvent(SDL_Event& e){
+	// void Window::windowRestoredEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.restored").trigger();
 	// }
 
-	// void Window::windowMouseEnterEvent(SDL_Event& e){
+	// void Window::windowMouseEnterEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.mouse.enter").trigger();
 	// }
 
-	// void Window::windowMouseLeaveEvent(SDL_Event& e){
+	// void Window::windowMouseLeaveEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.mouse.leave").trigger();
 	// }
 
-	// void Window::windowFocusGainedEvent(SDL_Event& e){
+	// void Window::windowFocusGainedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.focus.gained").trigger();
 	// }
 
-	// void Window::windowFocusLostEvent(SDL_Event& e){
+	// void Window::windowFocusLostEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.focus.lost").trigger();
 	// }
 
-	// void Window::windowCloseRequestedEvent(SDL_Event& e){
+	// void Window::windowCloseRequestedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.close.requested").trigger();
 	// }
 
-	// void Window::windowTakeFocusEvent(SDL_Event& e){
+	// void Window::windowTakeFocusEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.focus.take").trigger();
 	// }
 
-	// void Window::windowHitTestEvent(SDL_Event& e){
+	// void Window::windowHitTestEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.hit_test").trigger();
 	// }
 
-	// void Window::windowICCPROFChangedEvent(SDL_Event& e){
+	// void Window::windowICCPROFChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.ICCPROF.changed").trigger();
 	// }
 
-	// void Window::windowDisplayChangedEvent(SDL_Event& e){
+	// void Window::windowDisplayChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.display.changed").trigger(e.window.data1);
 	// }
 
-	// void Window::windowDisplayScaleChangedEvent(SDL_Event& e){
+	// void Window::windowDisplayScaleChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.display.scale.changed").trigger();
 	// }
 
-	// void Window::windowOccludedEvent(SDL_Event& e){
+	// void Window::windowOccludedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.occluded").trigger();
 	// }
 
-	// void Window::windowEnterFullsreenEvent(SDL_Event& e){
+	// void Window::windowEnterFullsreenEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.fullscreen.enter").trigger();
 	// }
 
-	// void Window::windowLeaveFullscreenEvent(SDL_Event& e){
+	// void Window::windowLeaveFullscreenEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.fullscreen.leave").trigger();
 	// }
 
-	// void Window::windowDestroyedEvent(SDL_Event& e){
+	// void Window::windowDestroyedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.destroyed").trigger();
 	// }
 
-	// void Window::windowPenEnterEvent(SDL_Event& e){
+	// void Window::windowPenEnterEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.pen.enter").trigger();
 	// }
 
-	// void Window::windowPenLeaveEvent(SDL_Event& e){
+	// void Window::windowPenLeaveEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("window.pen.leave").trigger();
 	// }
 
-	// void Window::keyDownEvent(SDL_Event& e){
+	// void Window::keyDownEvent(SDL_Event&){
 	// 	const auto& keysym = e.key.keysym;
 	// 	_context.getInternalContext().getEventManager().get("key.down").trigger(SDL_ScancodeToKey(keysym.scancode), SDL_KeycodeToKey(keysym.sym), keysym.mod);
 	// }
 
-	// void Window::keyUpEvent(SDL_Event& e){
+	// void Window::keyUpEvent(SDL_Event&){
 	// 	const auto& keysym = e.key.keysym;
 	// 	_context.getInternalContext().getEventManager().get("key.up").trigger(SDL_ScancodeToKey(keysym.scancode), SDL_KeycodeToKey(keysym.sym), keysym.mod);
 	// }
 
-	// void Window::textEditingEvent(SDL_Event& e){
+	// void Window::textEditingEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("text.editing").trigger(e.edit.text, e.edit.start, e.edit->length);
 	// }
 
-	// void Window::textInputEvent(SDL_Event& e){
+	// void Window::textInputEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("text.input").trigger(e.text.text);
 	// }
 
-	// void Window::keymapChangedEvent(SDL_Event& e){
+	// void Window::keymapChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("keymap.changed").trigger();
 	// }
 
-	// void Window::mouseMotionEvent(SDL_Event& e){
+	// void Window::mouseMotionEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("mouse.motion").trigger(Maths::vec2(e.motion.x, e.motion.y), Maths::vec2(e.motion.xrel, e.motion.yrel));
 	// }
 
-	// void Window::mouseButtonDownEvent(SDL_Event& e){
+	// void Window::mouseButtonDownEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("mouse.button.down").trigger(e.button.button, e.button.clicks, Maths::vec2(e.button.x, e.button.y));
 	// }
 
-	// void Window::mouseButtonUpEvent(SDL_Event& e){
+	// void Window::mouseButtonUpEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("mouse.button.up").trigger(e.button.button, Maths::vec2(e.button.x, e.button.y));
 	// }
 
-	// void Window::mouseWheelEvent(SDL_Event& e){
+	// void Window::mouseWheelEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("mouse.wheel").trigger(Maths::vec2(e.wheel.x, e.wheel.y), Maths::vec2(e.wheel.mouse_x, e.wheel.mouse_y));
 	// }
 
-	// void Window::joystickAxisMotionEvent(SDL_Event& e){
+	// void Window::joystickAxisMotionEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("joystick.axis.motion").trigger(e.jaxis.axis, e.jaxis.value);
 	// }
 
-	// void Window::joystickHatMotionEvent(SDL_Event& e){
+	// void Window::joystickHatMotionEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("joystick.hat.motion").trigger(e.jhat.hat, e.jhat.value);
 	// }
 
-	// void Window::joystickButtonDownEvent(SDL_Event& e){
+	// void Window::joystickButtonDownEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("joystick.button.down").trigger(e.jbutton.button);
 	// }
 
-	// void Window::joystickButtonUpEvent(SDL_Event& e){
+	// void Window::joystickButtonUpEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("joystick.button.up").trigger(e.jbutton.button);
 	// }
 
-	// void Window::joystickAddedEvent(SDL_Event& e){
+	// void Window::joystickAddedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("joystick.added").trigger();
 	// }
 
-	// void Window::joystickRemovedEvent(SDL_Event& e){
+	// void Window::joystickRemovedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("joystick.removed").trigger();
 	// }
 
-	// void Window::joystickBatteryUpdatedEvent(SDL_Event& e){
+	// void Window::joystickBatteryUpdatedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("joystick.battery.updated").trigger(e.jbattery.level);
 	// }
 
-	// void Window::joystickUpdateCompletedEvent(SDL_Event& e){
+	// void Window::joystickUpdateCompletedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("joystick.update.complete").trigger();
 	// }
 
-	// void Window::gamepadAxisMotionEvent(SDL_Event& e){
+	// void Window::gamepadAxisMotionEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.axis.motion").trigger(e.gaxis.axis, e.gaxis.value);
 	// }
 
-	// void Window::gamepadButtonDownEvent(SDL_Event& e){
+	// void Window::gamepadButtonDownEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.button.down").trigger(e.gbutton.button);
 	// }
 
-	// void Window::gamepadButtonUpEvent(SDL_Event& e){
+	// void Window::gamepadButtonUpEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.button.up").trigger(e.gbutton.button);
 	// }
 
-	// void Window::gamepadAddedEvent(SDL_Event& e){
+	// void Window::gamepadAddedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.added").trigger();
 	// }
 
-	// void Window::gamepadRemovedEvent(SDL_Event& e){
+	// void Window::gamepadRemovedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.removed").trigger();
 	// }
 
-	// void Window::gamepadRemappedEvent(SDL_Event& e){
+	// void Window::gamepadRemappedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.remapped").trigger();
 	// }
 
-	// void Window::gamepadTouchpadDownEvent(SDL_Event& e){
+	// void Window::gamepadTouchpadDownEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.touchpad.down").trigger(Maths::vec2(e.gtouchpad.x, e.gtouchpad.y), e.gtouchpad.pressure);
 	// }
 	
-	// void Window::gamepadTouchpadMotionEvent(SDL_Event& e){
+	// void Window::gamepadTouchpadMotionEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.touchpad.motion").trigger(Maths::vec2(e.gtouchpad.x, e.gtouchpad.y), e.gtouchpad.pressure);
 	// }
 
-	// void Window::gamepadTouchpadUpEvent(SDL_Event& e){
+	// void Window::gamepadTouchpadUpEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.touchpad.up").trigger(Maths::vec2(e.gtouchpad.x, e.gtouchpad.y), e.gtouchpad.pressure);
 	// }
 
-	// void Window::gamepadSensorUpdateEvent(SDL_Event& e){
+	// void Window::gamepadSensorUpdateEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.sensor.update").trigger(e.gsensor.sensor_timestamp, Maths::vec3(e.gsensor.data[0], e.gsensor.data[1], e.gsensor.data[2]));
 	// }
 
-	// void Window::gamepadUpdateCompleteEvent(SDL_Event& e){
+	// void Window::gamepadUpdateCompleteEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.update.complete").trigger();
 	// }
 
-	// void Window::gamepadSteamHandleUpdatedEvent(SDL_Event& e){
+	// void Window::gamepadSteamHandleUpdatedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("gamepad.steam_handle_updated").trigger();
 	// }
 
-	// void Window::fingerDownEvent(SDL_Event& e){
+	// void Window::fingerDownEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("finger.down").trigger(e.tfinger.fingerID, Maths::vec2(e.tfinger.x, e.tfinger.y));
 	// }
 
-	// void Window::fingerUpEvent(SDL_Event& e){
+	// void Window::fingerUpEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("finger.up").trigger(e.tfinger.fingerID, Maths::vec2(e.tfinger.x, e.tfinger.y));
 	// }
 
-	// void Window::fingerMotionEvent(SDL_Event& e){
+	// void Window::fingerMotionEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("finger.motion").trigger(e.tfinger.fingerID, Maths::vec2(e.tfinger.x, e.tfinger.y), Maths::vec2(e.tfinger.dx, e.tfinger.dy));
 	// }
 
-	// void Window::clipboardUpdateEvent(SDL_Event& e){
+	// void Window::clipboardUpdateEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("clipboard.update").trigger();
 	// }
 
-	// void Window::dropFileEvent(SDL_Event& e){
+	// void Window::dropFileEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("drop.file").trigger();
 	// }
 
-	// void Window::dropTextEvent(SDL_Event& e){
+	// void Window::dropTextEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("drop.text").trigger();
 	// }
 
-	// void Window::dropBeginEvent(SDL_Event& e){
+	// void Window::dropBeginEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("drop.begin").trigger();
 	// }
 
-	// void Window::dropCompleteEvent(SDL_Event& e){
+	// void Window::dropCompleteEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("drop.complete").trigger();
 	// }
 
-	// void Window::dropPositionEvent(SDL_Event& e){
+	// void Window::dropPositionEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("drop.position").trigger();
 	// }
 
-	// void Window::audioDeviceAddedEvent(SDL_Event& e){
+	// void Window::audioDeviceAddedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("audio_device.added").trigger();
 	// }
 
-	// void Window::audioDeviceRemovedEvent(SDL_Event& e){
+	// void Window::audioDeviceRemovedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("audio_device.removed").trigger();
 	// }
 
-	// void Window::audioDeviceFormatChangedEvent(SDL_Event& e){
+	// void Window::audioDeviceFormatChangedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("audio_device.format_changed").trigger();
 	// }
 
-	// void Window::sensorUpdateEvent(SDL_Event& e){
+	// void Window::sensorUpdateEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("sensor.update").trigger();
 	// }
 
-	// void Window::penDownEvent(SDL_Event& e){
+	// void Window::penDownEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("pen.down").trigger();
 	// }
 
-	// void Window::penUpEvent(SDL_Event& e){
+	// void Window::penUpEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("pen.up").trigger();
 	// }
 
-	// void Window::penMotionEvent(SDL_Event& e){
+	// void Window::penMotionEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("pen.motion").trigger();
 	// }
 
-	// void Window::penButtonDownEvent(SDL_Event& e){
+	// void Window::penButtonDownEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("pen.button.down").trigger();
 	// }
 
-	// void Window::penButtonUpEvent(SDL_Event& e){
+	// void Window::penButtonUpEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("pen.button.up").trigger();
 	// }
 
-	// void Window::cameraDeviceAddedEvent(SDL_Event& e){
+	// void Window::cameraDeviceAddedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("camera_device.added").trigger();
 	// }
 
-	// void Window::cameraDeviceRemovedEvent(SDL_Event& e){
+	// void Window::cameraDeviceRemovedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("camera_device.removed").trigger();
 	// }
 
-	// void Window::cameraDeviceApprovedEvent(SDL_Event& e){
+	// void Window::cameraDeviceApprovedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("camera_device.approved").trigger();
 	// }
 
-	// void Window::cameraDeviceDeniedEvent(SDL_Event& e){
+	// void Window::cameraDeviceDeniedEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("camera_device.denied").trigger();
 	// }
 
-	// void Window::renderTargetsResetEvent(SDL_Event& e){
+	// void Window::renderTargetsResetEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("render_targets.reset").trigger();
 	// }
 
-	// void Window::renderDeviceResetEvent(SDL_Event& e){
+	// void Window::renderDeviceResetEvent(SDL_Event&){
 	// 	_context.getInternalContext().getEventManager().get("render_device.reset").trigger();
 	// }
 }

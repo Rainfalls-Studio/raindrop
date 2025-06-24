@@ -1,106 +1,82 @@
 #include "Raindrop/Event/Manager.hpp"
+#include "Raindrop/Input/Manager.hpp"
+#include "Raindrop/Input/Storage.hpp"
 #include "Raindrop/Window/Window.hpp"
+#include "Raindrop/Window/WindowEvents.hpp"
+#include "glm/fwd.hpp"
 #include <Raindrop/Raindrop.hpp>
 #include <iostream>
+
+class WindowStorage : public Raindrop::Input::StorageGroup{
+    public:
+        WindowStorage(){
+            definition.declare<glm::uvec2>("size", [this]() -> glm::uvec2& {return size;});
+            definition.declare<glm::uvec2>("position", [this]() -> glm::uvec2& {return position;});
+        }
+
+        glm::uvec2 size;
+        glm::uvec2 position;
+};
 
 class Testbed{
     public:
         Testbed(){
             _engine = std::make_shared<Raindrop::Engine>();
             _events = std::make_shared<Raindrop::Event::Manager>(*_engine);
+            _inputs = std::make_shared<Raindrop::Input::Manager>(*_engine, _events);
+            
+            try {
+                _window = std::make_unique<Raindrop::Window::Window>(*_engine, _events);
+            } catch (const std::exception& e) {
+                std::cerr << "Exception during window creation: " << e.what() << std::endl;
+            }
 
-            _window = std::make_unique<Raindrop::Window::Window>(*_engine, _events);
+            _inputs->declareStorage<WindowStorage>("window");
+
+            _inputs->onEvent<Raindrop::Window::WindowResized>(
+                [](Raindrop::Input::Storage& s, const Raindrop::Window::WindowResized& event){
+                    s.getGroup<WindowStorage>("window").size = event.getSize();
+            });
+
+            _inputs->onEvent<Raindrop::Window::WindowMoved>(
+                [](Raindrop::Input::Storage& s, const Raindrop::Window::WindowMoved& event){
+                    s.getGroup<WindowStorage>("window").position = event.getPosition();
+            });
         }
 
         void run(){
-            bool running = false;
+            bool running = true;
+
+            _events->subscribe<Raindrop::Window::WindowCloseRequest>(
+                [&running](auto) -> bool {
+                    running = false;
+                    return false;
+                }
+            );
+
 
             while (running){
                 events();
+
+                std::cout << _inputs->access<glm::uvec2>("window.position").x << std::endl;
             }
         }
 
     private:
         std::shared_ptr<Raindrop::Engine> _engine;
         std::shared_ptr<Raindrop::Event::Manager> _events;
+        std::shared_ptr<Raindrop::Input::Manager> _inputs;
         std::unique_ptr<Raindrop::Window::Window> _window;
 
         void events(){
-
+            _window->events();
         }
 
 };
 
 int main(){
     Testbed testbed;
+    testbed.run();
 
     return 0;
 }
-
-// int main(){
-//     auto engine = Raindrop::Engine::Create();
-
-//     // Create base subsystems
-//     auto event = Raindrop::Event::Manager::Create(engine);
-//     auto input = Raindrop::Input::Manager::Create(engine);
-//     auto asset = Raindrop::Asset::Manager::Create(engine);
-//     auto config = Raindrop::Config::Tree::Create(engine);
-//     auto scenes = Raindrop::Scene::Manager::Create(engine);
-
-//     // Create a new window and attach the subsystems.
-//     auto window = Raindrop::Window::Create();
-//     window.attach(
-//         event,
-//         input,
-//         config["window"]
-//     );
-    
-//     // Subscribe to the close window event
-//     bool running = true;
-//     event.subscribte<Raindrop::Event::Window::OnClose>(
-//         [](const Raindrop::Event::Window::OnClose& event){
-//             running = false;
-//         }
-//     );
-
-//     // Create a graphics engine
-//     auto graphicsEngine = Raindrop::Graphics::Engine::Create(engine);
-//     graphicsEngine.attach(
-//         event,
-//         config["graphics"],
-//         asset,
-//         window // it is possible for the window to close and reopen
-//     );
-
-//     auto layerSystem = Raindrop::Layer::Manager::Create(engine);
-//     layerSystem.attach(
-//         event // Events will be propagated from top to bottom
-//     );
-
-//     #ifdef RAINDROP_DEV_MODE
-//         auto debug = layerSystem.addLayer(Raindrop::Layer::OVERLAY, "debug");
-//         debug.attach(
-//             graphicsEngine.getRenderer("ImGUI"),
-//             asset,
-//             config["debug"]
-//         );
-//     #endif
-
-//     auto gameplay = layerSystem.addLayer(Raindrop::Layer::CONTENT, "gameplay");
-//     gameplay.attach(
-//         graphicsEngine.getRenderer("Prograde"), // The engine's renderer
-//         asset,
-//         config["graphics"]
-//     );
-
-
-//     while (running){
-//         input.poll();
-
-//         scenes.foreach([](const Raindrop::Scene::Scene& scene){
-
-//         });
-//     }
-
-//     return 0;
-// }

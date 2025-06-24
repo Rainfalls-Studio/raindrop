@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <list>
+#include <typeindex>
 #include <typeinfo>
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -25,10 +26,10 @@ namespace Raindrop{
 				Manager(Engine& engine) noexcept;
 				~Manager();
 				
-				void subscribe(const std::size_t& id, const CallbackInfo& info);
+				void subscribe(const std::type_index& id, const CallbackInfo& info);
 				// void unsubscribe(const std::type_index& id, const Listener* listener);
 
-				void trigger(const std::size_t& id, const Event& event);
+				void trigger(const std::type_index& id, const Event& event);
 
 
 				template<typename EventType>
@@ -46,7 +47,7 @@ namespace Raindrop{
 			private:
 				Engine &_engine;
 				std::shared_ptr<spdlog::logger> _logger;
-				std::unordered_map<std::size_t, EventData> _events;
+				std::unordered_map<std::type_index, EventData> _events;
 
 				void _createLogger();
 		};

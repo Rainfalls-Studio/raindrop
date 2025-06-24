@@ -12,17 +12,20 @@ namespace Raindrop::Event{
 
 	Manager::~Manager(){}
 	
-	void Manager::subscribe(const std::size_t& id, const CallbackInfo& info){
-		_events[id].callbacks.push_back(info);
+	void Manager::subscribe(const std::type_index& id, const CallbackInfo& info){
+		auto& event = _events[id];
+		
+		event.callbacks.push_back(info);
 	}
 
-	void Manager::trigger(const std::size_t& id, const Event& event){
+	void Manager::trigger(const std::type_index& id, const Event& event){
 		auto& callbacks = _events[id].callbacks;
+		
 		for (const auto& callback : callbacks){
 			try{
 				callback.callback(event);
 			} catch (const std::exception& e){
-				SPDLOG_LOGGER_WARN(_logger, "Callback for event \"{}\" throwed an exception : {}", id, e.what());
+				SPDLOG_LOGGER_WARN(_logger, "Callback for event \"{}\" throwed an exception : {}", id.name(), e.what());
 			}
 		}
 	}

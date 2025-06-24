@@ -12,7 +12,7 @@ namespace Raindrop::Window{
 	class WindowEvent : public Event::Event{
 		public:
 
-			WindowEvent(const Window& window) : Event(), _window{window}{};
+			WindowEvent(const Window& window) : Event(), _window{window}{}
 			~WindowEvent() = default;
 			
 			inline const Window& getWindow() const noexcept{
@@ -76,7 +76,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMoved : public WindowEvent{
 		public:
-			WindowMoved(Window window, const glm::u32vec2& position) : WindowEvent(window), _position{position}{}
+			WindowMoved(const Window& window, const glm::u32vec2& position) : WindowEvent(window), _position{position}{}
 			~WindowMoved() = default;
 
 			const glm::u32vec2& getPosition() const noexcept{
