@@ -3,6 +3,8 @@
 #include "Raindrop/Input/Key.hpp"
 #include "Raindrop/Input/MouseEvents.hpp"
 #include "Raindrop/Input/KeyEvents.hpp"
+#include "Raindrop/Window/Config.hpp"
+#include "Raindrop/Window/Flags.hpp"
 #include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
 #include "Raindrop/Window/SurfaceProviders/Metal.hpp"
 #include "Raindrop/Window/WindowEvents.hpp"
@@ -50,9 +52,30 @@ namespace Raindrop::Window{
 			}
 	};
 
-    Window::Window(Engine& engine, std::shared_ptr<Event::Manager> event) :
-            _engine{engine},
-            _event{event},
+	SDL_WindowFlags raindropToSDLWindowFlags(Flags flags){
+		SDL_WindowFlags out = 0;
+
+		if (flags & Flags::FULLSCREEN) out |= SDL_WINDOW_FULLSCREEN;
+		if (flags & Flags::BORDERLESS) out |= SDL_WINDOW_BORDERLESS;
+		if (flags & Flags::RESIZABLE) out |= SDL_WINDOW_RESIZABLE;
+		if (flags & Flags::MINIMIZED) out |= SDL_WINDOW_MINIMIZED;
+		if (flags & Flags::MAXIMIZED) out |= SDL_WINDOW_MAXIMIZED;
+		if (flags & Flags::MODAL) out |= SDL_WINDOW_MODAL;
+		if (flags & Flags::ALWAYS_ON_TOP) out |= SDL_WINDOW_ALWAYS_ON_TOP;
+		if (flags & Flags::UTILITY) out |= SDL_WINDOW_UTILITY;
+		if (flags & Flags::TOOLTIP) out |= SDL_WINDOW_TOOLTIP;
+		if (flags & Flags::POPUP_MENU) out |= SDL_WINDOW_POPUP_MENU;
+		if (flags & Flags::TRANSPARENT) out |= SDL_WINDOW_TRANSPARENT;
+		if (flags & Flags::HIDDEN) out |= SDL_WINDOW_HIDDEN;
+		if (flags & Flags::NOT_FOCUSABLE) out |= SDL_WINDOW_NOT_FOCUSABLE;
+		if (flags & Flags::MOUSE_CAPTURE) out |= SDL_WINDOW_MOUSE_CAPTURE;
+
+		return out;
+	}
+
+    Window::Window(const Config& config) :
+            _engine{config._engine},
+            _event{config._events},
             _handle{nullptr}{
         createLogger();
         if (SDL_WasInit(SDL_INIT_VIDEO) == 0){
@@ -69,16 +92,18 @@ namespace Raindrop::Window{
         SPDLOG_LOGGER_TRACE(_logger, "Creating SDL3 window ...");
 
         _handle = SDL_CreateWindow(
-            "Raindrop window",
-            800,
-            600,
-            SDL_WINDOW_VULKAN
+            config._title.c_str(),
+            config._size.x,
+            config._size.y,
+            raindropToSDLWindowFlags(config._flags)
         );
 
         if (!_handle){
             SPDLOG_LOGGER_ERROR(_logger, "Failed to create SDL3 window : %s", SDL_GetError());
             throw std::runtime_error("Failed to create window");
         }
+
+		setPosition(config._position);
 
         SPDLOG_LOGGER_TRACE(_logger, "SDL3 window created succsessfully");
     }

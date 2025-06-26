@@ -47,7 +47,7 @@ namespace Raindrop::Window{
 	inline std::unique_ptr<T> Window::getSurfaceProvider(){
 		static_assert(std::is_base_of<SurfaceProvider, T>::value, "T type must be derived from SurfaceProvider");
 
-		auto base_ptr = std::make_unique<T>(*this);
+		auto base_ptr = getSurfaceProvider(T::API());
 		T* derived_ptr = dynamic_cast<T*>(base_ptr.get());
 		if (!derived_ptr) {
 			throw std::runtime_error("Unsupported API");

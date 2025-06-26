@@ -1,11 +1,18 @@
 #include "Raindrop/Asset/Manager.hpp"
 #include "Raindrop/Event/Manager.hpp"
+#include "Raindrop/Graphics/Config.hpp"
+#include "Raindrop/Graphics/Engine.hpp"
 #include "Raindrop/Input/Manager.hpp"
 #include "Raindrop/Input/Storage.hpp"
+#include "Raindrop/Layer/Manager.hpp"
+#include "Raindrop/Window/Config.hpp"
+#include "Raindrop/Window/Manager.hpp"
+#include "Raindrop/Window/Position.hpp"
 #include "Raindrop/Window/Window.hpp"
 #include "Raindrop/Window/WindowEvents.hpp"
 #include "glm/fwd.hpp"
 #include <Raindrop/Raindrop.hpp>
+#include <exception>
 #include <iostream>
 
 class WindowStorage : public Raindrop::Input::StorageGroup{
@@ -23,15 +30,14 @@ class Testbed{
     public:
         Testbed(){
             _engine = std::make_shared<Raindrop::Engine>();
-            _assets = std::make_shared<Raindrop::Asset::Manager>(*_engine);
-            _events = std::make_shared<Raindrop::Event::Manager>(*_engine);
-            _inputs = std::make_shared<Raindrop::Input::Manager>(*_engine, _events);
             
-            try {
-                _window = std::make_unique<Raindrop::Window::Window>(*_engine, _events);
-            } catch (const std::exception& e) {
-                std::cerr << "Exception during window creation: " << e.what() << std::endl;
-            }
+            createAssetManager();
+            createEventManager();
+            createInputManager();
+            createWindowManager();
+            createWindow();
+            createLayerManager();
+            createGraphicsEngine();
 
             _inputs->declareStorage<WindowStorage>("window");
 
@@ -59,8 +65,8 @@ class Testbed{
 
             while (running){
                 events();
-
-                std::cout << _inputs->access<glm::uvec2>("window.position").x << std::endl;
+                update();
+                render();
             }
         }
 
@@ -69,17 +75,81 @@ class Testbed{
         std::shared_ptr<Raindrop::Asset::Manager> _assets;
         std::shared_ptr<Raindrop::Event::Manager> _events;
         std::shared_ptr<Raindrop::Input::Manager> _inputs;
-        std::unique_ptr<Raindrop::Window::Window> _window;
+        std::shared_ptr<Raindrop::Window::Manager> _windows;
+        std::shared_ptr<Raindrop::Graphics::Engine> _graphics;
+        std::shared_ptr<Raindrop::Layer::Manager> _layers;
 
-        void events(){
-            _window->events();
+        std::shared_ptr<Raindrop::Window::Window> _window;
+
+        void createAssetManager(){
+            _assets = std::make_shared<Raindrop::Asset::Manager>(*_engine);
         }
 
+        void createEventManager(){
+            _events = std::make_shared<Raindrop::Event::Manager>(*_engine);
+        }
+
+        void createInputManager(){
+            _inputs = std::make_shared<Raindrop::Input::Manager>(*_engine, _events);
+        }
+
+        void createWindowManager(){
+            _windows = std::make_shared<Raindrop::Window::Manager>(*_engine);
+        }
+
+        void createLayerManager(){
+            _layers = std::make_shared<Raindrop::Layer::Manager>(*_engine);
+        }
+
+        void createGraphicsEngine(){
+            Raindrop::Graphics::Config config(*_engine);
+
+            config
+                .setAssetManager(_assets)
+                .setLayerManager(_layers)
+                .setWindowManager(_windows);
+
+            _graphics = std::make_shared<Raindrop::Graphics::Engine>(config);
+        }
+
+        void createWindow(){
+            auto config = Raindrop::Window::Config::Default(*_engine);
+
+            config
+                .setPosition({Raindrop::Window::POSITION_CENTRED, Raindrop::Window::POSITION_CENTRED})
+                .setEventManager(_events);
+
+            _window = _windows->createWindow(config);
+        }
+
+        void events(){
+            _windows->foreach(
+                [](Raindrop::Window::Window& window){
+                    window.events();
+                }
+            );
+        }
+
+        void update(){
+
+        }
+
+        void render(){
+            // _windows->foreach([this](Raindrop::Window::Window& window){
+            //     _graphics->render(window);
+            // })
+        }
 };
 
 int main(){
-    Testbed testbed;
-    testbed.run();
+
+    try {
+        Testbed testbed;
+        testbed.run();
+    } catch (const std::exception &e){
+        std::cerr << "Exception: " << e.what() << std::endl;
+        return 1;
+    }
 
     return 0;
 }

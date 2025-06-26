@@ -22,13 +22,13 @@ add_library(
     ${SOURCES}
 )
 
+target_compile_features(Raindrop PUBLIC cxx_std_20)
+
 target_include_directories(
     Raindrop ${warning_guard}
     PUBLIC
     "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
-
-target_compile_features(Raindrop PUBLIC cxx_std_17)
 
 find_package(spdlog CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)

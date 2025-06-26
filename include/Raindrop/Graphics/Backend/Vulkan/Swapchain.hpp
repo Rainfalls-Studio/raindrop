@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Raindrop/pch.pch>
-#include <vulkan/vulkan_core.h>
+#include <memory>
+#include <vector>
+#include <vulkan/vulkan.h>
 #include "RenderPass.hpp"
 
 namespace Raindrop::Graphics{
@@ -81,7 +82,7 @@ namespace Raindrop::Graphics{
 
 				// Not released because the swapchain get continiously rebuilt
 				struct{
-					std::uint32_t frameCount;
+					uint32_t frameCount;
 					VkExtent2D extent;
 					VkPresentModeKHR presentMode;
 					VkSurfaceFormatKHR surfaceFormat;
@@ -104,7 +105,7 @@ namespace Raindrop::Graphics{
 				VkSurfaceFormatKHR findSurfaceFormat();
 				VkPresentModeKHR findPresentMode();
 				VkExtent2D findExtent();
-				std::uint32_t findFrameCount();
+				uint32_t findFrameCount();
 
 				void createRenderPass();
 				void createImageViews();

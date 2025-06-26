@@ -9,12 +9,13 @@
 #include <unordered_map>
 #include "../Event/Manager.hpp"
 #include "Raindrop/Window/SurfaceProvider.hpp"
+#include "Raindrop/Window/Config.hpp"
 #include <SDL3/SDL.h>
 
 namespace Raindrop::Window{
 	class Window{
 		public:
-			Window(Engine& engine, std::shared_ptr<Event::Manager> event);
+			Window(const Config& config);
 			~Window();
 
 			glm::ivec2 getSize() const;

@@ -1,31 +1,32 @@
 #pragma once
 
-#include "../Asset/Manager.hpp"
-#include "../Window/Window.hpp"
+#include "Raindrop/Asset/Manager.hpp"
+#include "Raindrop/Engine.hpp"
+#include "Raindrop/Graphics/Config.hpp"
+#include "Raindrop/Layer/Layer.hpp"
+#include "Raindrop/Layer/Manager.hpp"
+#include "Raindrop/Window/Manager.hpp"
+#include "Raindrop/Window/Window.hpp"
+#include "Backend/Device.hpp"
 
 namespace Raindrop::Graphics{
-    class Context;
-    class EngineConfig{
-        friend class Engine;
-        public:
-            EngineConfig(Raindrop::Engine& engine);
-
-            EngineConfig& setWindow(std::shared_ptr<Window::Window> window);
-            EngineConfig& setAssetManager(std::shared_ptr<Asset::Manager> assetManager);
-
-        private:
-            Raindrop::Engine& _engine;
-            std::shared_ptr<Window::Window> _window;
-            std::shared_ptr<Asset::Manager> _assetManager;
-    };
+    struct Context;
 
     class Engine{
         public:
-            Engine(EngineConfig& config);
+            Engine(const Config& config);
             ~Engine();
+
+            Raindrop::Engine& getEngine();
 
         private:
             Raindrop::Engine& _engine;
-            
+            std::shared_ptr<Asset::Manager> _assetManager;
+            std::shared_ptr<Window::Manager> _windows;
+            std::shared_ptr<Layer::Manager> _layers;
+
+            std::shared_ptr<Backend::Device> _device;
+
+            void createDevice();
     };
 }

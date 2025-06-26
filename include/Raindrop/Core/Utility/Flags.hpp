@@ -156,13 +156,13 @@ namespace Raindrop::Core::Utils{
 }
 
 #define RAINDROP_FLAG_CLASS(name, enumType) \
-    class name : public Raindrop::Utils::Flags<enumType>{ \
+    class name : public Raindrop::Core::Utils::Flags<enumType>{ \
         public: \
-            using Raindrop::Utils::Flags<enumType>::Flags; \
+            using Raindrop::Core::Utils::Flags<enumType>::Flags; \
             using enum enumType; \
     };\
     \
-    namespace Raindrop::Utils { \
+    namespace Raindrop::Core::Utils { \
         inline constexpr name::Bits operator|(enumType a, enumType b) noexcept { \
             return static_cast<name::Bits>(a) | static_cast<name::Bits>(b); \
         } \
@@ -172,13 +172,13 @@ namespace Raindrop::Core::Utils{
     }
 
 #define RAINDROP_FLAG(name, enumType) \
-    class name : public Raindrop::Utils::Flags<enumType>{ \
+    class name : public Raindrop::Core::Utils::Flags<enumType>{ \
         public: \
-            using Raindrop::Utils::Flags<enumType>::Flags; \
+            using Raindrop::Core::Utils::Flags<enumType>::Flags; \
             using enum enumType; \
     };\
     \
-    namespace Raindrop::Utils { \
+    namespace Raindrop::Core::Utils { \
         inline constexpr name::Bits operator|(enumType a, enumType b) noexcept { \
             return static_cast<name::Bits>(a) | static_cast<name::Bits>(b); \
         } \
