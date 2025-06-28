@@ -9,7 +9,9 @@
 #include "Raindrop/Window/SurfaceProviders/Metal.hpp"
 #include "Raindrop/Window/WindowEvents.hpp"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_metal.h>
+#include <SDL3/SDL_video.h>
 #include <SDL3/SDL_vulkan.h>
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL.h>
@@ -27,7 +29,11 @@ namespace Raindrop::Window{
 			}
 
             virtual bool createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) override {
-				return SDL_Vulkan_CreateSurface(static_cast<SDL_Window*>(_window.getNativeHandle()), instance, allocator, surface);
+				if (!SDL_Vulkan_CreateSurface(static_cast<SDL_Window*>(_window.getNativeHandle()), instance, allocator, surface)){
+					SPDLOG_ERROR("Failed to create Vulkan surface : {}", SDL_GetError());
+					return false;
+				}
+				return true;
 			}
 
             virtual void destroySurface(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks* allocator) override{
@@ -95,7 +101,7 @@ namespace Raindrop::Window{
             config._title.c_str(),
             config._size.x,
             config._size.y,
-            raindropToSDLWindowFlags(config._flags)
+            raindropToSDLWindowFlags(config._flags) | SDL_WINDOW_VULKAN
         );
 
         if (!_handle){

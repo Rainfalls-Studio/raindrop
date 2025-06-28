@@ -13,15 +13,15 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 			Device(const DeviceConfig& config);
 			virtual ~Device() override;
 
-			virtual std::shared_ptr<Buffer> createBuffer() override;
-			virtual std::shared_ptr<CommandList> createCommandList() override;
-			virtual std::shared_ptr<DescriptorSet> createDescriptorSet() override;
-			virtual std::shared_ptr<Framebuffer> createFramebuffer() override;
-			virtual std::shared_ptr<GraphicsPipeline> createGraphicsPipeline() override;
-			virtual std::shared_ptr<RenderPass> createRenderPass() override;
-			virtual std::shared_ptr<Sampler> createSampler() override;
-			virtual std::shared_ptr<Shader> createShader() override;
-			virtual std::shared_ptr<Texture> createTexture() override;
+			virtual std::shared_ptr<Backend::Buffer> createBuffer() override;
+			virtual std::shared_ptr<Backend::CommandList> createCommandList() override;
+			virtual std::shared_ptr<Backend::DescriptorSet> createDescriptorSet() override;
+			virtual std::shared_ptr<Backend::Framebuffer> createFramebuffer() override;
+			virtual std::shared_ptr<Backend::GraphicsPipeline> createGraphicsPipeline() override;
+			virtual std::shared_ptr<Backend::RenderPass> createRenderPass() override;
+			virtual std::shared_ptr<Backend::Sampler> createSampler() override;
+			virtual std::shared_ptr<Backend::Shader> createShader() override;
+			virtual std::shared_ptr<Backend::Texture> createTexture() override;
 
 		private:
 			Context _context;
@@ -34,5 +34,8 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 			void createInstance(std::shared_ptr<Window::SurfaceProviders::Vulkan> surfaceProvider);
 			void findPhysicalDevice(std::shared_ptr<Window::SurfaceProviders::Vulkan> surfaceProvider);
 			void createDevice();
+			void getQueues();
+
+			void createSwapchain(std::shared_ptr<Window::Window> window);
 	};
 }

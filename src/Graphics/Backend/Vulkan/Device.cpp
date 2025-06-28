@@ -1,5 +1,7 @@
 #include "Raindrop/Graphics/Backend/Vulkan/Device.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/DeviceConfig.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/Swapchain.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/WindowProperty.hpp"
 #include "Raindrop/Window/Config.hpp"
 #include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
 #include "Raindrop/Window/Window.hpp"
@@ -7,6 +9,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
 #include "vulkan/vulkan_core.h"
+#include <exception>
 #include <stdexcept>
 #include <span>
 #include <vector>
@@ -32,8 +35,11 @@ namespace Raindrop::Graphics::Backend::Vulkan{
             _windowManager{config._windowManager}
         {
 
+        createLogger();
+        SPDLOG_LOGGER_INFO(_context.logger, "Intializing Vulkan backend...");
+
         std::shared_ptr<Window::SurfaceProviders::Vulkan> provider = nullptr;
-        std::shared_ptr<Window::Window> _window;
+        std::shared_ptr<Window::Window> tempWindow;
         bool buildSwapchain = false;
 
         // If there is a window manager, the graphics engine will support present
@@ -41,28 +47,36 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
             // If there a now windows, it creates an empty one to ensure compatility, but will not initialize a swapchain as there is no need
             if (_windowManager->getSize() == 0){
-                _window = _windowManager->createWindow(Window::Config::Empty(_gfxEngine.getEngine()));
+                tempWindow = _windowManager->createWindow(Window::Config::Empty(_gfxEngine.getEngine()));
 
             } else {
-                _window = _windowManager->getWindows().front().lock();
+                tempWindow = _windowManager->getWindows().front().lock();
                 buildSwapchain = true;
             }
         }
 
-        if (_window){
-            provider = _window->getSurfaceProvider<Window::SurfaceProviders::Vulkan>();
+        if (tempWindow){
+            provider = tempWindow->getSurfaceProvider<Window::SurfaceProviders::Vulkan>();
         }
 
-        createLogger();
+
         createInstance(provider);
         findPhysicalDevice(provider);
         createDevice();
 
         if (buildSwapchain){
             SPDLOG_LOGGER_TRACE(_context.logger, "Building swapchain");
-        }
 
-        SPDLOG_LOGGER_INFO(_context.logger, "Intializing Vulkan backend...");
+            auto windows = _windowManager->getWindows();
+
+            for (auto weakWindow : windows){
+                auto window = weakWindow.lock();
+
+                if (!window) continue;
+
+                // createSwapchain(window);
+            }
+        }
     }
 
     Device::~Device(){
@@ -115,26 +129,18 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
         auto result = selector
             .prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
-            .select_devices();
+            .allow_any_gpu_device_type(false)
+            .select();
         
         if (!result){
             SPDLOG_LOGGER_ERROR(_context.logger, "Failed to find physical device : {} ", result.error().message());
             throw std::runtime_error(result.error().message());
         }
 
-        auto devices = result.value();
+        auto device = result.value();
 
-        if (devices.empty()){
-            SPDLOG_LOGGER_ERROR(_context.logger, "Failed to find any physical device");
-            throw std::runtime_error("Failed to find any physical device");
-        }
-
-        SPDLOG_LOGGER_TRACE(_context.logger, "Found {} devices. Picking first one", devices.size());
-        for (auto device : devices){
-            SPDLOG_LOGGER_TRACE(_context.logger, "\t - {}", device.name);
-        }
-
-        _context.physicalDevice = devices[0];
+        SPDLOG_LOGGER_INFO(_context.logger, "Physical device found: {} ", device.name);
+        _context.physicalDevice = device;
 
         if (surface != VK_NULL_HANDLE){
             surfaceProvider->destroySurface(_context.instance, surface, nullptr);
@@ -154,40 +160,69 @@ namespace Raindrop::Graphics::Backend::Vulkan{
         _context.device = result.value();
     }
 
+    void Device::createSwapchain(std::shared_ptr<Window::Window> window){
+        auto property = window->addProperty<WindowProperty>();
+
+        auto surfaceProvider = window->getSurfaceProvider<Window::SurfaceProviders::Vulkan>();
+
+        if (!surfaceProvider->createSurface(_context.instance, nullptr, &property->surface)){
+            throw std::runtime_error("Failed to create surface");
+        }
+
+    //     auto& swapchain = property->swapchain;
+
+    //     swapchain = std::make_unique<Swapchain>(_context, property->surface);
+    //     {
+    //         Window::Size size = window->getSize();
+    //         swapchain->wantExtent({
+    //             static_cast<uint32_t>(size.x),
+    //             static_cast<uint32_t>(size.y)
+    //         });
+    //     }
+
+    //     swapchain->wantFrameCount(2)
+    //         .wantSurfaceFormat({
+    //             .format = VK_FORMAT_R8G8B8A8_SRGB,
+    //             .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+    //         });
+    }
+
+    void Device::getQueues(){
+	}
     
-    std::shared_ptr<Buffer> Device::createBuffer(){
+    std::shared_ptr<Backend::Buffer> Device::createBuffer(){
         return nullptr;
     }
 
-    std::shared_ptr<CommandList> Device::createCommandList(){
+    std::shared_ptr<Backend::CommandList> Device::createCommandList(){
         return nullptr;
     }
 
-    std::shared_ptr<DescriptorSet> Device::createDescriptorSet(){
+    std::shared_ptr<Backend::DescriptorSet> Device::createDescriptorSet(){
         return nullptr;
     }
 
-    std::shared_ptr<Framebuffer> Device::createFramebuffer(){
+    std::shared_ptr<Backend::Framebuffer> Device::createFramebuffer(){
         return nullptr;
     }
 
-    std::shared_ptr<GraphicsPipeline> Device::createGraphicsPipeline(){
+    std::shared_ptr<Backend::GraphicsPipeline> Device::createGraphicsPipeline(){
         return nullptr;
     }
 
-    std::shared_ptr<RenderPass> Device::createRenderPass(){
+    std::shared_ptr<Backend::RenderPass> Device::createRenderPass(){
         return nullptr;
     }
 
-    std::shared_ptr<Sampler> Device::createSampler(){
+    std::shared_ptr<Backend::Sampler> Device::createSampler(){
         return nullptr;
     }
 
-    std::shared_ptr<Shader> Device::createShader(){
+    std::shared_ptr<Backend::Shader> Device::createShader(){
         return nullptr;
     }
 
-    std::shared_ptr<Texture> Device::createTexture(){
+    std::shared_ptr<Backend::Texture> Device::createTexture(){
         return nullptr;
     }
 }
