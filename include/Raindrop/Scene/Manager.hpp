@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Raindrop/Core/Utils/BehaviorRegistry.hpp"
 #include "Raindrop/Core/Utils/Registry.hpp"
 #include <cstdint>
 #include <memory>
@@ -7,12 +8,17 @@
 #include "../Engine.hpp"
 
 namespace Raindrop::Scene{
-    class Manager : public Core::Utils::Registry<uint32_t, std::shared_ptr<Scene>>{
+    class Manager : public Core::Utils::BehaviorRegistry<uint32_t, std::shared_ptr<Scene>>{
+        using Super = BehaviorRegistry<uint32_t, std::shared_ptr<Scene>>;
         public:
             Manager(Engine& engine);
 
+
+            std::pair<ID, std::shared_ptr<Scene>> createScene();
+
         private:
             Engine& _engine;
+            
     };
 
     using SceneID = Manager::ID;

@@ -5,7 +5,10 @@
 #include "Raindrop/Input/Manager.hpp"
 #include "Raindrop/Input/Storage.hpp"
 #include "Raindrop/Layer/Manager.hpp"
+#include "Raindrop/Scene/LayerBehavior.hpp"
+#include "Raindrop/Scene/LayerProperty.hpp"
 #include "Raindrop/Scene/Manager.hpp"
+#include "Raindrop/Scene/Scene.hpp"
 #include "Raindrop/Window/Config.hpp"
 #include "Raindrop/Window/Manager.hpp"
 #include "Raindrop/Window/Position.hpp"
@@ -40,6 +43,9 @@ class Testbed{
             createLayerManager();
             createSceneManager();
             createGraphicsEngine();
+            
+            addScene();
+            addLayer();
 
             _inputs->declareStorage<WindowStorage>("window");
 
@@ -84,6 +90,8 @@ class Testbed{
 
         std::shared_ptr<Raindrop::Window::Window> _window;
 
+        std::shared_ptr<Raindrop::Scene::Scene> _scene;
+
         void createAssetManager(){
             _assets = std::make_shared<Raindrop::Asset::Manager>(*_engine);
         }
@@ -106,6 +114,8 @@ class Testbed{
 
         void createSceneManager(){
             _scenes = std::make_shared<Raindrop::Scene::Manager>(*_engine);
+
+            _layers->addBehavior(std::make_shared<Raindrop::Scene::LayerBehavior>());
         }
 
         void createGraphicsEngine(){
@@ -129,6 +139,18 @@ class Testbed{
             _window = _windows->createWindow(config);
         }
 
+        void addScene(){
+            auto [id, scene]  = _scenes->createScene();
+            _scene = scene;
+        }
+
+        void addLayer(){
+           auto [id, layer] = _layers->createLayer(0.f);
+
+           auto sceneProp = layer->getProperty<Raindrop::Scene::LayerProperty>();
+           sceneProp->scene = _scene;
+        }
+
         void events(){
             _windows->foreach(
                 [](Raindrop::Window::Window& window){
@@ -138,7 +160,7 @@ class Testbed{
         }
 
         void update(){
-
+            
         }
 
         void render(){

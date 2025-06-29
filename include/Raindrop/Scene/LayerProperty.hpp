@@ -8,6 +8,6 @@ namespace Raindrop::Scene{
         public:
             virtual ~LayerProperty() override = default;
 
-            SceneID scene = INVALID_SCENE_ID;
+            std::shared_ptr<Scene> scene;
     };
 }

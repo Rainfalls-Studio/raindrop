@@ -1,8 +1,8 @@
 #pragma once
 
+#include <stdexcept>
 #include <type_traits>
 #include <unordered_map>
-#include <functional>
 
 namespace Raindrop::Core::Utils{
     template<typename Key, typename Value>
@@ -18,7 +18,7 @@ namespace Raindrop::Core::Utils{
                 clear();
             }
 
-            ~Registry() = default;
+            virtual ~Registry() = default;
 
             /**
              * @brief Gets the Value associated with the given ID
@@ -26,7 +26,7 @@ namespace Raindrop::Core::Utils{
              * @param id
              * @return Value& 
              */
-            Value& operator[](ID id){
+            virtual Value& operator[](ID id){
                 return get(id);
             }
 
@@ -36,7 +36,7 @@ namespace Raindrop::Core::Utils{
              * @param id 
              * @return const Value& 
              */
-            const Value& operator[](ID id) const{
+            virtual const Value& operator[](ID id) const{
                 return get(id);
             }
 
@@ -46,8 +46,12 @@ namespace Raindrop::Core::Utils{
              * @param id 
              * @return Value& 
              */
-            Value& get(ID id){
-                return _values[id];
+            virtual Value& get(ID id){
+                auto it = _values.find(id);
+                if (it == _values.end()){
+                    throw std::out_of_range("Registry::get: ID not found: " + std::to_string(id));
+                }
+                return it->second;
             }
 
             /**
@@ -56,8 +60,12 @@ namespace Raindrop::Core::Utils{
              * @param id 
              * @return const Value& 
              */
-            const Value& get(ID id) const{
-                return _values[id];
+            virtual const Value& get(ID id) const{
+                auto it = _values.find(id);
+                if (it == _values.end()){
+                    throw std::out_of_range("Registry::get: ID not found: " + std::to_string(id));
+                }
+                return it->second;
             }
 
             /**
@@ -66,7 +74,7 @@ namespace Raindrop::Core::Utils{
              * @param value the value to insert
              * @return ID 
              */
-            ID insert(const Value& value){
+            virtual ID insert(const Value& value){
                 ID id = createID();
                 _values[id] = value;
                 return id;
@@ -79,7 +87,7 @@ namespace Raindrop::Core::Utils{
              * @return true 
              * @return false 
              */
-            bool contains(ID id) const{
+            virtual bool contains(ID id) const{
                 return _values.count(id) == 1;
             }
 
@@ -88,7 +96,7 @@ namespace Raindrop::Core::Utils{
              * 
              * @param id 
              */
-            void remove(ID id){
+            virtual void remove(ID id){
                 _values.erase(id);
             }
 
@@ -96,23 +104,17 @@ namespace Raindrop::Core::Utils{
              * @brief Removes all values from the registry
              * 
              */
-            void clear(){
+            virtual void clear(){
                 _values.clear();
                 _nextID = 0;
             }
 
-            void foreach(const std::function<void(ID, const Value&)>& callback){
-
-            }
-
-        private:
+        protected:
             std::unordered_map<ID, Value> _values;
             ID _nextID;
 
             ID createID(){
                 return _nextID++;
             }
-
-            void freeID(ID id){}
     };
 }
