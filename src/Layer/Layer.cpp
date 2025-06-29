@@ -1,4 +1,5 @@
 #include "Raindrop/Layer/Layer.hpp"
+#include <stdexcept>
 
 namespace Raindrop::Layer{
     Layer::Layer(){}
@@ -7,20 +8,18 @@ namespace Raindrop::Layer{
         auto it = _properties.find(type);
 
         if (it == _properties.end()){
-            return nullptr;
+            throw std::out_of_range("Property not found");
         }
 
-        auto prop = it->second.lock();
-
-        if (!prop){
-            _properties.erase(it);
-            return nullptr;
-        }
-
-        return prop;
+        return it->second;
     }
 
     void Layer::addProperty(std::type_index type, std::shared_ptr<Property> property){
-        _properties[type] = property;
+        _properties[type] = std::move(property);
+    }
+
+
+    void Layer::removeProperty(std::type_index type){
+        _properties.erase(type);
     }
 }

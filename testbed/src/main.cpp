@@ -5,6 +5,7 @@
 #include "Raindrop/Input/Manager.hpp"
 #include "Raindrop/Input/Storage.hpp"
 #include "Raindrop/Layer/Manager.hpp"
+#include "Raindrop/Scene/Manager.hpp"
 #include "Raindrop/Window/Config.hpp"
 #include "Raindrop/Window/Manager.hpp"
 #include "Raindrop/Window/Position.hpp"
@@ -37,6 +38,7 @@ class Testbed{
             createWindowManager();
             createWindow();
             createLayerManager();
+            createSceneManager();
             createGraphicsEngine();
 
             _inputs->declareStorage<WindowStorage>("window");
@@ -78,6 +80,7 @@ class Testbed{
         std::shared_ptr<Raindrop::Window::Manager> _windows;
         std::shared_ptr<Raindrop::Graphics::Engine> _graphics;
         std::shared_ptr<Raindrop::Layer::Manager> _layers;
+        std::shared_ptr<Raindrop::Scene::Manager> _scenes;
 
         std::shared_ptr<Raindrop::Window::Window> _window;
 
@@ -99,6 +102,10 @@ class Testbed{
 
         void createLayerManager(){
             _layers = std::make_shared<Raindrop::Layer::Manager>(*_engine);
+        }
+
+        void createSceneManager(){
+            _scenes = std::make_shared<Raindrop::Scene::Manager>(*_engine);
         }
 
         void createGraphicsEngine(){

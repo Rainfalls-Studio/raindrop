@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Raindrop/Core/Utility/Flags.hpp"
+#include "Raindrop/Core/Utils/Flags.hpp"
 
 namespace Raindrop::Window{
     enum FlagBits{

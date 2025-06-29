@@ -20,8 +20,19 @@ namespace Raindrop::Layer{
             template<typename T>
             void addProperty(std::shared_ptr<T> property);
 
+            template<typename T>
+            std::shared_ptr<T> emplaceProperty();
+
+            template<typename T, typename... Args>
+            std::shared_ptr<T> emplaceProperty(Args... args);
+
+            void removeProperty(std::type_index type);
+
+            template<typename T>
+            void removeProperty();
+
         private:
-            std::unordered_map<std::type_index, std::weak_ptr<Property>> _properties;
+            std::unordered_map<std::type_index, std::shared_ptr<Property>> _properties;
     };
 }
 
