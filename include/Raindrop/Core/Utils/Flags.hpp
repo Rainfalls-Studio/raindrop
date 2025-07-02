@@ -156,9 +156,9 @@ namespace Raindrop::Core::Utils{
 }
 
 #define RAINDROP_FLAG_CLASS(name, enumType) \
-    class name : public Raindrop::Core::Utils::Flags<enumType>{ \
+    class name : public ::Raindrop::Core::Utils::Flags<enumType>{ \
         public: \
-            using Raindrop::Core::Utils::Flags<enumType>::Flags; \
+            using ::Raindrop::Core::Utils::Flags<enumType>::Flags; \
             using enum enumType; \
     };\
     \

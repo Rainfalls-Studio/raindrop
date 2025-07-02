@@ -1,9 +1,12 @@
 #pragma once
 
+#include <string>
+
 namespace Raindrop::Graphics::Backend{
     class Shader{
         public:
-
-        private:
+            struct Description{
+                std::string code;
+            };
     };
 }

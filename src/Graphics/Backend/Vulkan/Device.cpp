@@ -9,8 +9,8 @@
 #include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
 #include "Raindrop/Window/Window.hpp"
 #include "VkBootstrap.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks-inl.h"
 #include "vulkan/vulkan_core.h"
 #include <exception>
 #include <memory>
