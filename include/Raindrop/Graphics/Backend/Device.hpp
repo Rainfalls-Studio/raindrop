@@ -19,7 +19,7 @@ namespace Raindrop::Graphics{
             public:
                 virtual ~Device() = default;
 
-                virtual std::shared_ptr<Buffer> createBuffer() = 0;
+                virtual std::shared_ptr<Buffer> createBuffer(const Buffer::Description& description) = 0;
                 virtual std::shared_ptr<CommandList> createCommandList() = 0;
                 virtual std::shared_ptr<DescriptorSet> createDescriptorSet() = 0;
                 virtual std::shared_ptr<Framebuffer> createFramebuffer() = 0;

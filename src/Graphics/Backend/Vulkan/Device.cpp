@@ -1,8 +1,11 @@
 #include "Raindrop/Graphics/Backend/Vulkan/Device.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/DeviceConfig.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/Queue/Queue.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/Swapchain.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/WindowContext.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/WindowProperty.hpp"
 #include "Raindrop/Window/Config.hpp"
+#include "Raindrop/Window/Size.hpp"
 #include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
 #include "Raindrop/Window/Window.hpp"
 #include "VkBootstrap.h"
@@ -10,6 +13,7 @@
 #include "spdlog/spdlog.h"
 #include "vulkan/vulkan_core.h"
 #include <exception>
+#include <memory>
 #include <stdexcept>
 #include <span>
 #include <vector>
@@ -59,10 +63,10 @@ namespace Raindrop::Graphics::Backend::Vulkan{
             provider = tempWindow->getSurfaceProvider<Window::SurfaceProviders::Vulkan>();
         }
 
-
         createInstance(provider);
         findPhysicalDevice(provider);
         createDevice();
+        getQueues();
 
         if (buildSwapchain){
             SPDLOG_LOGGER_TRACE(_context.logger, "Building swapchain");
@@ -74,15 +78,22 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
                 if (!window) continue;
 
-                // createSwapchain(window);
+                createSwapchain(window);
             }
         }
     }
 
     Device::~Device(){
+        vkDeviceWaitIdle(_context.device);
 
+        if (_context.physicalDevice.surface){
+            vkb::destroy_surface(_context.instance, _context.physicalDevice.surface);
+        }
+
+        vkb::destroy_device(_context.device);
+        vkb::destroy_instance(_context.instance);
     }
-
+    
     void Device::createLogger(){
         _context.logger = spdlog::stdout_color_mt("Raindrop::Graphics::Backend::Vulkan");
     }
@@ -102,7 +113,10 @@ namespace Raindrop::Graphics::Backend::Vulkan{
     
         auto result = builder
             .set_engine_name("Raindrop")
-            .set_debug_callback(&debugCallback)
+            #ifndef NDEBUG
+                .set_debug_callback(&debugCallback)
+                .enable_validation_layers()
+            #endif
             .build();
 
         if (!result){
@@ -141,10 +155,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
         SPDLOG_LOGGER_INFO(_context.logger, "Physical device found: {} ", device.name);
         _context.physicalDevice = device;
-
-        if (surface != VK_NULL_HANDLE){
-            surfaceProvider->destroySurface(_context.instance, surface, nullptr);
-        }
     }
 
     void Device::createDevice(){
@@ -162,35 +172,43 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
     void Device::createSwapchain(std::shared_ptr<Window::Window> window){
         auto property = window->addProperty<WindowProperty>();
+        property->context = std::make_unique<WindowContext>(_context, window);
 
-        auto surfaceProvider = window->getSurfaceProvider<Window::SurfaceProviders::Vulkan>();
+        Window::Size size = window->getSize();
 
-        if (!surfaceProvider->createSurface(_context.instance, nullptr, &property->surface)){
-            throw std::runtime_error("Failed to create surface");
-        }
-
-    //     auto& swapchain = property->swapchain;
-
-    //     swapchain = std::make_unique<Swapchain>(_context, property->surface);
-    //     {
-    //         Window::Size size = window->getSize();
-    //         swapchain->wantExtent({
-    //             static_cast<uint32_t>(size.x),
-    //             static_cast<uint32_t>(size.y)
-    //         });
-    //     }
-
-    //     swapchain->wantFrameCount(2)
-    //         .wantSurfaceFormat({
-    //             .format = VK_FORMAT_R8G8B8A8_SRGB,
-    //             .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
-    //         });
+        property->context->
+            wantExtent({static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y)})
+            .wantFrameCount(2)
+            .wantSurfaceFormat({
+                .format = VK_FORMAT_R8G8B8A8_SRGB,
+                .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+            })
+            .wantPresentMode(VK_PRESENT_MODE_MAILBOX_KHR)
+            .rebuildSwapchain();
     }
 
     void Device::getQueues(){
+        auto& device = _context.device;
+        auto graphics = device.get_queue_index(vkb::QueueType::graphics);
+        device.get_queue(vkb::QueueType::graphics);
+
+        auto initQueue = [device](const vkb::QueueType& type) -> Queue::Queue {
+			// We can skip queue check because we already did that
+			return Queue::Queue{ 
+                    .family = device.get_queue_index(type).value(),
+					.queue = device.get_queue(type).value()
+				};
+		};
+
+		_context.graphics = initQueue(vkb::QueueType::graphics);
+		_context.present = initQueue(vkb::QueueType::present);
+		_context.transfer = initQueue(vkb::QueueType::transfer);
 	}
     
-    std::shared_ptr<Backend::Buffer> Device::createBuffer(){
+    std::shared_ptr<Backend::Buffer> Device::createBuffer(const Buffer::Description& description){
+        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(_context, description);
+        _context.allocator;
+        
         return nullptr;
     }
 

@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <string_view>
+#include <typeindex>
 #include <unordered_map>
 #include "../Event/Manager.hpp"
 #include "Raindrop/Window/SurfaceProvider.hpp"
@@ -43,6 +44,8 @@ namespace Raindrop::Window{
 			template<typename T>
 			inline std::shared_ptr<T> addProperty();
 
+			void addProperty(std::type_index type, std::shared_ptr<Property> property);
+
 			template<typename T>
 			inline std::shared_ptr<T> getProperty();
 
@@ -65,7 +68,7 @@ namespace Raindrop::Window{
 			std::shared_ptr<spdlog::logger> _logger;
 			std::shared_ptr<Event::Manager> _event;
 			void* _handle;
-			std::unordered_map<std::size_t, std::weak_ptr<Property>> _properties;
+			std::unordered_map<std::type_index, std::shared_ptr<Property>> _properties;
 
 			void createLogger();
 

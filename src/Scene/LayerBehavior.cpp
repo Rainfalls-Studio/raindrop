@@ -6,7 +6,6 @@ namespace Raindrop::Scene{
     void LayerBehavior::onCreation(Layer::LayerID, const std::shared_ptr<Layer::Layer>& layer){
         std::shared_ptr<LayerProperty> property = std::make_shared<LayerProperty>();
         layer->addProperty(property);
-        std::cout << "aaaaaaaa" << std::endl;
     }
 
     void LayerBehavior::onDestruction(Layer::LayerID, const std::shared_ptr<Layer::Layer>& layer){

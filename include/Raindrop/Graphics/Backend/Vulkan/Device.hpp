@@ -3,6 +3,7 @@
 #include <VkBootstrap.h>
 #include "../Device.hpp"
 #include "Context.hpp"
+#include "Raindrop/Graphics/Backend/Buffer.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/DeviceConfig.hpp"
 #include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
 #include "Raindrop/Window/Window.hpp"
@@ -13,7 +14,7 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 			Device(const DeviceConfig& config);
 			virtual ~Device() override;
 
-			virtual std::shared_ptr<Backend::Buffer> createBuffer() override;
+			virtual std::shared_ptr<Backend::Buffer> createBuffer(const Buffer::Description& description) override;
 			virtual std::shared_ptr<Backend::CommandList> createCommandList() override;
 			virtual std::shared_ptr<Backend::DescriptorSet> createDescriptorSet() override;
 			virtual std::shared_ptr<Backend::Framebuffer> createFramebuffer() override;

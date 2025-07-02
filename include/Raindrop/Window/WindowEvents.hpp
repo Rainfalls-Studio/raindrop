@@ -29,7 +29,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowResized : public WindowEvent{
 		public:
-			WindowResized(Window window, const glm::u32vec2& size) : WindowEvent(window), _size{size}{}
+			WindowResized(const Window& window, const glm::u32vec2& size) : WindowEvent(window), _size{size}{}
 			~WindowResized() = default;
 
 			const glm::u32vec2& getSize() const noexcept{

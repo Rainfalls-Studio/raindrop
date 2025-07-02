@@ -92,7 +92,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 				std::vector<VkPresentModeKHR> presentModes;
 			} _support;
 
-
 			VkClearColorValue _clearColor;
 
 			void querySupport();

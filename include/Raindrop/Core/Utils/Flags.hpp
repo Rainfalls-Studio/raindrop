@@ -162,14 +162,12 @@ namespace Raindrop::Core::Utils{
             using enum enumType; \
     };\
     \
-    namespace Raindrop::Core::Utils { \
-        inline constexpr name::Bits operator|(enumType a, enumType b) noexcept { \
-            return static_cast<name::Bits>(a) | static_cast<name::Bits>(b); \
-        } \
-        inline constexpr name::Bits operator|(name::Bits a, enumType b) noexcept { \
-            return a | static_cast<name::Bits>(b); \
-        } \
-    }
+    inline constexpr friend name::Bits operator|(enumType a, enumType b) noexcept { \
+        return static_cast<name::Bits>(a) | static_cast<name::Bits>(b); \
+    } \
+    inline constexpr friend name::Bits operator|(name::Bits a, enumType b) noexcept { \
+        return a | static_cast<name::Bits>(b); \
+    } \
 
 #define RAINDROP_FLAG(name, enumType) \
     class name : public Raindrop::Core::Utils::Flags<enumType>{ \

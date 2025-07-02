@@ -1,16 +1,15 @@
 #pragma once
 
+#include "Raindrop/Graphics/Backend/Vulkan/WindowContext.hpp"
 #include "Raindrop/Window/Property.hpp"
-#include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
-#include "Swapchain.hpp"
-#include "vulkan/vulkan_core.h"
 #include <memory>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
     class WindowProperty : public Raindrop::Window::Property{
         public:
-            VkSurfaceKHR surface;
-            // std::unique_ptr<Swapchain> swapchain;
+            WindowProperty(Window::Window& _window) : Raindrop::Window::Property(_window){}
+
+            std::unique_ptr<WindowContext> context;
             
     };
 }

@@ -193,6 +193,10 @@ namespace Raindrop::Window{
 
 		return nullptr;
 	}
+
+	void Window::addProperty(std::type_index type, std::shared_ptr<Property> property){
+		_properties[type] = property;
+	}
     
 	void Window::events(){
 		// resetFlags();

@@ -2,44 +2,48 @@
 
 #include "../Window.hpp"
 #include <memory>
+#include <ratio>
 #include <stdexcept>
 #include <type_traits>
 
 namespace Raindrop::Window{
 	template<typename T, typename... Args>
 	inline std::shared_ptr<T> Window::addProperty(Args&&... args){
-		static_assert(std::is_base_of_v<Property, T>, "The property type must be derived from Property");
-		return std::make_shared<T>(std::forward<Args>(args)...);
+		static_assert(std::is_base_of<Property, T>::value, "The property type must be derived from Property");
+		std::shared_ptr<T> property = std::make_shared<T>(*this, std::forward<Args>(args)...);
+		addProperty(typeid(T), std::static_pointer_cast<Property>(property));
 	}
 
 	template<typename T>
 	inline std::shared_ptr<T> Window::addProperty(){
-		static_assert(std::is_base_of_v<Property, T>, "The property type must be derived from Property");
-		return std::make_shared<T>();
+		static_assert(std::is_base_of<Property, T>::value, "The property type must be derived from Property");
+		std::shared_ptr<T> property = std::make_shared<T>(*this);
+		addProperty(typeid(T), std::static_pointer_cast<Property>(property));
+		return property;
 	}
 
 	template<typename T>
 	inline std::shared_ptr<T> Window::getProperty(){
-		static_assert(std::is_base_of_v<Property, T>, "The property type must be derived from Property");
-		return std::dynamic_pointer_cast<T>(_properties.find(typeid(T).hash_code())->second.lock());
+		static_assert(std::is_base_of<Property, T>::value, "The property type must be derived from Property");
+		return std::dynamic_pointer_cast<T>(_properties.find(typeid(T))->second);
 	}
 
 	template<typename T>
 	inline const std::shared_ptr<T> Window::getProperty() const{
-		static_assert(std::is_base_of_v<Property, T>, "The property type must be derived from Property");
-		return std::dynamic_pointer_cast<const T>(_properties.find(typeid(T).hash_code())->second.lock());
+		static_assert(std::is_base_of<Property, T>::value, "The property type must be derived from Property");
+		return std::dynamic_pointer_cast<const T>(_properties.find(typeid(T))->second);
 	}
 
 	template<typename T>
 	inline bool Window::hasProperty() const noexcept{
-		static_assert(std::is_base_of_v<Property, T>, "The property type must be derived from Property");
-		return _properties.find(typeid(T).hash_code()) != _properties.end();
+		static_assert(std::is_base_of<Property, T>::value, "The property type must be derived from Property");
+		return _properties.find(typeid(T)) != _properties.end();
 	}
 
 	template<typename T>
 	inline void Window::removeProperty() noexcept{
-		static_assert(std::is_base_of_v<Property, T>, "The property type must be derived from Property");
-		_properties.erase(typeid(T).hash_code());
+		static_assert(std::is_base_of<Property, T>::value, "The property type must be derived from Property");
+		_properties.erase(typeid(T));
 	}
 
 
