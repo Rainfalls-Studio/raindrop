@@ -2,7 +2,7 @@
 #include "Raindrop/Window/Flags.hpp"
 #include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
 #include "spdlog/spdlog.h"
-#include "vulkan/vulkan_core.h"
+#include <vulkan/vulkan.h>
 #include <stdexcept>
 
 namespace Raindrop::Graphics::Backend::Vulkan{

@@ -10,6 +10,7 @@ namespace Raindrop::Graphics::Backend{
         SAMPLE_16 = 1 << 4,
         SAMPLE_32 = 1 << 5,
         SAMPLE_64 = 1 << 6,
+        __SIZE__
     };
 
     RAINDROP_FLAG(SampleCount, SampleCountBits);

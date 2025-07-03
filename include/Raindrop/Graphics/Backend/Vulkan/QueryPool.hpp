@@ -1,22 +1,22 @@
 #pragma once
 
-#include "../DescriptorSet.hpp"
+#include "../QueryPool.hpp"
 #include "Context.hpp"
 #include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
-    class DescriptorSet : public Backend::DescriptorSet{
+    class QueryPool : public Backend::QueryPool{
         public:
-            DescriptorSet(Context& context, const Description& description);
-            virtual ~DescriptorSet() override;
+            QueryPool(Context& context, const Description& description);
+            virtual ~QueryPool() override;
 
-            VkDescriptorSet get() const noexcept;
+            VkQueryPool get() const noexcept;
 
             virtual void* getHandle() const noexcept override;
             virtual API getAPI() const noexcept override;
         
         private:
             Context& _context;
-            VkDescriptorSet _descriptorSet;
+            VkQueryPool _queryPool;
     };
 }

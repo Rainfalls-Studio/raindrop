@@ -1,22 +1,22 @@
 #pragma once
 
-#include "../DescriptorSet.hpp"
+#include "../BufferView.hpp"
 #include "Context.hpp"
 #include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
-    class DescriptorSet : public Backend::DescriptorSet{
+    class BufferView : public Backend::BufferView{
         public:
-            DescriptorSet(Context& context, const Description& description);
-            virtual ~DescriptorSet() override;
+            BufferView(Context& context, const Description& description);
+            virtual ~BufferView() override;
 
-            VkDescriptorSet get() const noexcept;
+            VkBufferView get() const noexcept;
 
             virtual void* getHandle() const noexcept override;
             virtual API getAPI() const noexcept override;
         
         private:
             Context& _context;
-            VkDescriptorSet _descriptorSet;
+            VkBufferView _BufferView;
     };
 }

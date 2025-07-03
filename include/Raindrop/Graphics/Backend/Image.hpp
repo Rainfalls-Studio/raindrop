@@ -5,6 +5,7 @@
 #include "Extent.hpp"
 #include "Queue.hpp"
 #include "SampleCount.hpp"
+#include "API.hpp"
 #include <list>
 #include <memory>
 
@@ -15,6 +16,7 @@ namespace Raindrop::Graphics::Backend{
                 NONE = 0,
                 MUTABLE_FORMAT = 1 << 0,
                 COMPATIBLE_CUBE = 1 << 1,
+                __SIZE__
             };
 
             RAINDROP_FLAG_CLASS(Flags, FlagBits)
@@ -38,6 +40,7 @@ namespace Raindrop::Graphics::Backend{
                 VIDEO_ENCORE_DST = 1 << 14,
                 VIDEO_ENCORE_DPB = 1 << 15,
                 ATTACHMENT_FEEDBACK_LOOP = 1 << 16,
+                __SIZE__
             };
 
             RAINDROP_FLAG_CLASS(Usage, UsageBits)
@@ -93,7 +96,8 @@ namespace Raindrop::Graphics::Backend{
                 MEMORY_PLANE_0 = 1 << 7,
                 MEMORY_PLANE_1 = 1 << 8,
                 MEMORY_PLANE_2 = 1 << 9,
-                MEMORY_PLANE_3 = 1 << 10
+                MEMORY_PLANE_3 = 1 << 10,
+                __SIZE__
             };
 
             RAINDROP_FLAG_CLASS(Aspect, AspectBits)
@@ -119,5 +123,10 @@ namespace Raindrop::Graphics::Backend{
                 Layout layout;
                 std::list<std::shared_ptr<Queue>> queues;
             };
+
+            virtual ~Image() = default;
+
+            virtual void* getHandle() const noexcept = 0;
+            virtual API getAPI() const noexcept = 0;
     };
 }

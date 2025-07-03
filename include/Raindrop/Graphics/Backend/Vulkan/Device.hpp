@@ -20,7 +20,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 			virtual std::shared_ptr<Backend::Framebuffer> createFramebuffer() override;
 			virtual std::shared_ptr<Backend::GraphicsPipeline> createGraphicsPipeline() override;
 			virtual std::shared_ptr<Backend::RenderPass> createRenderPass() override;
-			virtual std::shared_ptr<Backend::Sampler> createSampler() override;
 			virtual std::shared_ptr<Backend::Shader> createShader() override;
 
 		private:

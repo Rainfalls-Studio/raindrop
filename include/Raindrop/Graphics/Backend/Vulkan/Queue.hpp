@@ -1,22 +1,20 @@
 #pragma once
 
-#include "../Image.hpp"
+#include "../Queue.hpp"
 #include "Context.hpp"
-#include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
-    class Image : public Backend::Image{
+    class Queue : public Backend::Queue{
         public:
-            Image(Context& context, const Description& description);
-            virtual ~Image() override;
+            Queue(Context& context);
+            virtual ~Queue() override;
 
-            VkImage get() const noexcept;
+            virtual Capabilities getCapabilities() const override;
 
             virtual void* getHandle() const noexcept override;
             virtual API getAPI() const noexcept override;
-        
+
         private:
             Context& _context;
-            VkImage _image;
     };
 }

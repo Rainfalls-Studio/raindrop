@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "API.hpp"
 
 namespace Raindrop::Graphics::Backend{
     class Shader{
@@ -8,5 +9,10 @@ namespace Raindrop::Graphics::Backend{
             struct Description{
                 std::string code;
             };
+
+            virtual ~Shader() = default;
+
+            virtual void* getHandle() const noexcept = 0;
+            virtual API getAPI() const noexcept = 0;
     };
 }

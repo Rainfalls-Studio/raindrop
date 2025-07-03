@@ -1,66 +1,22 @@
 #pragma once
 
-#include <Raindrop/pch.pch>
+#include "../DescriptorSetLayout.hpp"
+#include "Context.hpp"
+#include <vulkan/vulkan.h>
 
-namespace Raindrop::Graphics{
-	class Context;
+namespace Raindrop::Graphics::Backend::Vulkan{
+    class DescriptorSetLayout : public Backend::DescriptorSetLayout{
+        public:
+            DescriptorSetLayout(Context& context, const Description& description);
+            virtual ~DescriptorSetLayout() override;
 
-	namespace Core::Descriptor{
-		class DescriptorSetLayout{
-			public:
-				class Binding{
-					public:
-						Binding(VkDescriptorSetLayoutBinding& info, std::vector<VkSampler>& immutableSampler) noexcept;
+            VkDescriptorSetLayout get() const noexcept;
 
-						Binding& setBinding(const std::uint32_t& binding) noexcept;
-						Binding& setDescriptorType(const VkDescriptorType& type) noexcept;
-						Binding& setDescriptorCount(const std::uint32_t &count) noexcept;
-						Binding& setShaderStage(const VkShaderStageFlags& stages) noexcept;
-						Binding& setImmutableSamplers(const std::vector<VkSampler>& samplers);
-
-						VkDescriptorSetLayoutBinding& get() noexcept;
-
-					private:
-						VkDescriptorSetLayoutBinding& _info;
-						std::vector<VkSampler>& _immutableSampler;
-				};
-
-				static std::shared_ptr<DescriptorSetLayout> create(Context& context);
-
-				DescriptorSetLayout() noexcept;
-				~DescriptorSetLayout();
-
-				DescriptorSetLayout(const DescriptorSetLayout&) = delete;
-				DescriptorSetLayout& operator=(const DescriptorSetLayout&) = delete;
-
-				DescriptorSetLayout(DescriptorSetLayout&& other);
-				DescriptorSetLayout& operator=(DescriptorSetLayout&& other);
-
-				friend void swap(DescriptorSetLayout& A, DescriptorSetLayout& B);
-
-				void prepare(Context& context);
-				void initialize();
-				void release();
-
-				DescriptorSetLayout& setFlags(const VkDescriptorSetLayoutCreateFlags& flags) noexcept;
-				Binding addBinding();
-
-				const VkDescriptorSetLayout& get() const noexcept;
-				VkDescriptorSetLayout& get() noexcept;
-
-			private:
-				Context* _context;
-				VkDescriptorSetLayout _layout;
-
-				struct BuildInfo{
-					VkDescriptorSetLayoutCreateFlags flags;
-					std::vector<VkDescriptorSetLayoutBinding> bindings;
-					std::vector<VkSampler> immutableSamplers;
-				};
-
-				std::unique_ptr<BuildInfo> _info;
-
-				BuildInfo& getInfo();
-		};
-	}
+            virtual void* getHandle() const noexcept override;
+            virtual API getAPI() const noexcept override;
+        
+        private:
+            Context& _context;
+            VkDescriptorSetLayout _descriptorSetLayout;
+    };
 }

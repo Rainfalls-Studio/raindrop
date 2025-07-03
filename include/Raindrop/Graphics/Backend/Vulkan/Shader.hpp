@@ -1,22 +1,22 @@
 #pragma once
 
-#include "../DescriptorSet.hpp"
+#include "../Shader.hpp"
 #include "Context.hpp"
 #include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
-    class DescriptorSet : public Backend::DescriptorSet{
+    class Shader : public Backend::Shader{
         public:
-            DescriptorSet(Context& context, const Description& description);
-            virtual ~DescriptorSet() override;
+            Shader(Context& context, const Description& description);
+            virtual ~Shader() override;
 
-            VkDescriptorSet get() const noexcept;
+            VkShaderModule get() const noexcept;
 
             virtual void* getHandle() const noexcept override;
             virtual API getAPI() const noexcept override;
         
         private:
             Context& _context;
-            VkDescriptorSet _descriptorSet;
+            VkShaderModule _shader;
     };
 }

@@ -4,7 +4,7 @@ namespace Raindrop::Graphics::Backend{
     class Format{
         public:
             enum FormatType{
-                UNDEFINED = 0,
+                UNDEFINED,
                 R4G4_UNORM_PACK8,
                 R4G4B4A4_UNORM_PACK16,
                 B4G4R4A4_UNORM_PACK16,
@@ -255,8 +255,6 @@ namespace Raindrop::Graphics::Backend{
                 PVRTC2_4BPP_SRGB_BLOCK
             };
 
-            using enum FormatType;
-
             Format(FormatType format = UNDEFINED);
             Format(const Format& other);
             Format(Format&& other);
@@ -264,6 +262,8 @@ namespace Raindrop::Graphics::Backend{
             Format& operator=(FormatType format);
             Format& operator=(const Format& other);
             Format& operator=(Format&& other);
+
+            operator FormatType() const noexcept;
             
         private:
             FormatType _format;

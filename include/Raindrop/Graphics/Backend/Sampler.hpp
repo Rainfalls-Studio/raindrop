@@ -1,5 +1,6 @@
 #pragma once
 
+#include "API.hpp"
 #include "Raindrop/Core/Utils/Flags.hpp"
 #include "Compare.hpp"
 #include "Filter.hpp"
@@ -11,7 +12,8 @@ namespace Raindrop::Graphics::Backend{
                 NONE = 0,
                 SUBSAMPLED = 1 << 0,
                 SUBSAMPLED_COARSE_RECONSTRUCTION = 1 << 1,
-                NON_SEAMLESS_CUBE_MAP = 1 << 2
+                NON_SEAMLESS_CUBE_MAP = 1 << 2,
+                __SIZE__
             };
 
             RAINDROP_FLAG_CLASS(Flags, FlagBits)
@@ -45,5 +47,8 @@ namespace Raindrop::Graphics::Backend{
             };
 
             virtual ~Sampler() = default;
+
+            virtual void* getHandle() const noexcept = 0;
+            virtual API getAPI() const noexcept = 0;
     };
 }

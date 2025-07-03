@@ -1,9 +1,8 @@
 #include "Raindrop/Graphics/Backend/Vulkan/Device.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/Buffer.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/DeviceConfig.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/Queue/Queue.hpp"
-#include "Raindrop/Graphics/Backend/Vulkan/Swapchain.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/WindowContext.hpp"
-#include "Raindrop/Graphics/Backend/Vulkan/WindowProperty.hpp"
 #include "Raindrop/Window/Config.hpp"
 #include "Raindrop/Window/Size.hpp"
 #include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
@@ -11,7 +10,7 @@
 #include "VkBootstrap.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks-inl.h"
-#include "vulkan/vulkan_core.h"
+#include <vulkan/vulkan.h>
 #include <exception>
 #include <memory>
 #include <stdexcept>
@@ -170,21 +169,8 @@ namespace Raindrop::Graphics::Backend::Vulkan{
         _context.device = result.value();
     }
 
-    void Device::createSwapchain(std::shared_ptr<Window::Window> window){
-        auto property = window->addProperty<WindowProperty>();
-        property->context = std::make_unique<WindowContext>(_context, window);
-
-        Window::Size size = window->getSize();
-
-        property->context->
-            wantExtent({static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y)})
-            .wantFrameCount(2)
-            .wantSurfaceFormat({
-                .format = VK_FORMAT_R8G8B8A8_SRGB,
-                .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
-            })
-            .wantPresentMode(VK_PRESENT_MODE_MAILBOX_KHR)
-            .rebuildSwapchain();
+    void Device::createSwapchain(std::shared_ptr<Window::Window>){
+        
     }
 
     void Device::getQueues(){
@@ -206,10 +192,8 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 	}
     
     std::shared_ptr<Backend::Buffer> Device::createBuffer(const Buffer::Description& description){
-        // std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(_context, description);
-        // _context.allocator;
-        
-        return nullptr;
+        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(_context, description);
+        return std::static_pointer_cast<Backend::Buffer>(buffer);
     }
 
     std::shared_ptr<Backend::CommandList> Device::createCommandList(){
@@ -229,10 +213,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
     }
 
     std::shared_ptr<Backend::RenderPass> Device::createRenderPass(){
-        return nullptr;
-    }
-
-    std::shared_ptr<Backend::Sampler> Device::createSampler(){
         return nullptr;
     }
 

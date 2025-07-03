@@ -159,7 +159,9 @@ namespace Raindrop::Core::Utils{
     class name : public ::Raindrop::Core::Utils::Flags<enumType>{ \
         public: \
             using ::Raindrop::Core::Utils::Flags<enumType>::Flags; \
+            using Bit = enumType; \
             using enum enumType; \
+            using UnderlyingType = typename std::underlying_type<enumType>::type; \
     };\
     \
     inline constexpr friend name::Bits operator|(enumType a, enumType b) noexcept { \
@@ -173,7 +175,9 @@ namespace Raindrop::Core::Utils{
     class name : public Raindrop::Core::Utils::Flags<enumType>{ \
         public: \
             using Raindrop::Core::Utils::Flags<enumType>::Flags; \
+            using Bit = enumType; \
             using enum enumType; \
+            using UnderlyingType = typename std::underlying_type<enumType>::type; \
     };\
     \
     namespace Raindrop::Core::Utils { \

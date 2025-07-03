@@ -1,82 +1,71 @@
 #pragma once
 
 #include <memory>
+#include <stdexcept>
 #include <vector>
 #include <vulkan/vulkan.h>
-#include "RenderPass.hpp"
+#include "../Swapchain.hpp"
+#include "Semaphore.hpp"
+#include "translation.hpp"
+#include "Surface.hpp"
+#include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
+	template<>
+	VkPresentModeKHR toVulkan(Backend::Swapchain::PresentMode &&value){
+		using enum Backend::Swapchain::PresentMode;
+		switch (value){
+			case IMMEDIATE: return VK_PRESENT_MODE_IMMEDIATE_KHR;
+			case MAILBOX: return VK_PRESENT_MODE_MAILBOX_KHR;
+			case FIFO: return VK_PRESENT_MODE_FIFO_KHR;
+		}
+		throw std::runtime_error("Unknown present mode");
+	}
+
 	struct Context;
-	class Swapchain{
+	class Swapchain : public Backend::Swapchain{
 		public:
-			struct Frame{
-				VkFramebuffer framebuffer = VK_NULL_HANDLE;
-				VkSemaphore imageAvailable = VK_NULL_HANDLE;
-				VkSemaphore imageFinished = VK_NULL_HANDLE;
-				VkFence inFlightFence = VK_NULL_HANDLE;
-				VkFence imageInFlight = VK_NULL_HANDLE;
-				VkImage image = VK_NULL_HANDLE;
-				VkImageView imageView = VK_NULL_HANDLE;
-			};
+			Swapchain(Context& context, const Description& description);
+			virtual ~Swapchain() override;
 
-			enum FrameCount{
-				SINGLE_BUFFERING = 1,
-				DOUBLE_BUFFERING = 2,
-				TRIPLE_BUFFERING = 3
-			};
+            virtual uint32_t getImageCount() const override;
 
-			Swapchain(Context& context, VkSurfaceKHR surface);
-			~Swapchain();
+            virtual Format getFormat() const override;
 
-			void rebuildSwapchain();
+            virtual Extent2D getExtent() const override;
 
-			Swapchain& wantExtent(VkExtent2D extent);
-			Swapchain& wantFrameCount(uint32_t count);
-			Swapchain& wantPresentMode(VkPresentModeKHR presentMode);
-			Swapchain& wantSurfaceFormat(VkSurfaceFormatKHR surfaceFormat);
+            virtual const std::vector<std::shared_ptr<Image>>& getImages() const override;
 
-			VkResult acquireNextImage();
-			VkResult submitCommandBuffer(std::vector<VkCommandBuffer> buffers);
+            virtual void rebuild() override;
 
-			uint32_t getFrameCount() const;
-			uint32_t getCurrentFrameIndex() const;
-			uint32_t getNextFrameIndex() const;
+			virtual uint32_t acquireNextImage(
+				uint32_t& imageIndex,
+                std::shared_ptr<Semaphore> signalSemaphore = nullptr,
+                std::shared_ptr<Fence> signalFence = nullptr,
+                uint32_t timeout = UINT32_MAX
+            ) override;
 
-			const std::shared_ptr<RenderPass>& getRenderPass() const;
+			virtual void present(
+                std::shared_ptr<Queue> queue,
+                uint32_t imageIndex,
+                const std::vector<std::shared_ptr<Semaphore>>& waitSemaphores = {}
+            ) override;
 
-			void beginRenderPass(VkCommandBuffer commandBuffer);
-			void endRenderPass(VkCommandBuffer commandBuffer);
+            virtual void setPresentMode(PresentMode mode) override;
 
-			void setClearColor(VkClearColorValue color);
-
-			Frame& getFrameData(uint32_t id);
-			Frame& getCurrentFrameData();
-			std::vector<Frame>& getFramesData();
+			VkSwapchainKHR get() const noexcept;
 
 		private:
-			struct SwapchainData{
-				Context& context;
-				VkSwapchainKHR swapchain;
-				std::vector<Frame> frames;
-
-				SwapchainData(Context& context);
-				~SwapchainData();
-			};
-
 			Context& _context;
-			VkSurfaceKHR _surface;
+			std::shared_ptr<Surface> _surface;
 
-			std::unique_ptr<SwapchainData> _swapchain;
-			std::unique_ptr<SwapchainData> _oldSwapchain;
-
-			std::shared_ptr<RenderPass> _renderPass;
-			uint32_t _currentFrame;
-			uint32_t _nextFrame;
-
-			uint32_t _frameCount;
-			VkExtent2D _extent;
-			VkPresentModeKHR _presentMode;
-			VkSurfaceFormatKHR _surfaceFormat;
+			VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
+			
+			uint32_t _frameCount = 0;
+			VkExtent2D _extent = {0, 0};
+			VkPresentModeKHR _presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+			VkSurfaceFormatKHR _surfaceFormat = {VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
+			std::vector<VkImage> _images;
 
 			// Not released because the swapchain get continiously rebuilt
 			struct{
@@ -86,28 +75,10 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 				VkSurfaceFormatKHR surfaceFormat;
 			} _buildInfo;
 
-			struct{
-				VkSurfaceCapabilitiesKHR capabilities;
-				std::vector<VkSurfaceFormatKHR> formats;
-				std::vector<VkPresentModeKHR> presentModes;
-			} _support;
-
-			VkClearColorValue _clearColor;
-
-			void querySupport();
-			void querySupportCapabilities();
-			void querySupportFormats();
-			void querySupportPresentModes();
 			
 			VkSurfaceFormatKHR findSurfaceFormat();
 			VkPresentModeKHR findPresentMode();
 			VkExtent2D findExtent();
 			uint32_t findFrameCount();
-
-			void createRenderPass();
-			void createImageViews();
-			void getSwapchainImages();
-			void createFramebuffers();
-			void createSyncObjects();
 	};
 }

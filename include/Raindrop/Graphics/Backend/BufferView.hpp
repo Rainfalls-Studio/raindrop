@@ -3,6 +3,7 @@
 #include <memory>
 #include "Buffer.hpp"
 #include "Format.hpp"
+#include "API.hpp"
 
 namespace Raindrop::Graphics::Backend{
     class BufferView{
@@ -18,5 +19,8 @@ namespace Raindrop::Graphics::Backend{
             };
             
             virtual ~BufferView() = default;
+
+            virtual void* getHandle() const noexcept = 0;
+            virtual API getAPI() const noexcept = 0;
     };
 }

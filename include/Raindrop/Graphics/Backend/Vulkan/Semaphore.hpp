@@ -1,22 +1,22 @@
 #pragma once
 
-#include "../DescriptorSet.hpp"
+#include "../Semaphore.hpp"
 #include "Context.hpp"
 #include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
-    class DescriptorSet : public Backend::DescriptorSet{
+    class Semaphore : public Backend::Semaphore{
         public:
-            DescriptorSet(Context& context, const Description& description);
-            virtual ~DescriptorSet() override;
+            Semaphore(Context& context);
+            virtual ~Semaphore() override;
 
-            VkDescriptorSet get() const noexcept;
+            VkSemaphore get() const noexcept;
 
             virtual void* getHandle() const noexcept override;
             virtual API getAPI() const noexcept override;
         
         private:
             Context& _context;
-            VkDescriptorSet _descriptorSet;
+            VkSemaphore _semaphore;
     };
 }

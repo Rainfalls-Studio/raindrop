@@ -1,22 +1,22 @@
 #pragma once
 
-#include "../DescriptorSet.hpp"
+#include "../PipelineCache.hpp"
 #include "Context.hpp"
 #include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
-    class DescriptorSet : public Backend::DescriptorSet{
+    class PipelineCache : public Backend::PipelineCache{
         public:
-            DescriptorSet(Context& context, const Description& description);
-            virtual ~DescriptorSet() override;
+            PipelineCache(Context& context, const Description& description);
+            virtual ~PipelineCache() override;
 
-            VkDescriptorSet get() const noexcept;
+            VkPipelineCache get() const noexcept;
 
             virtual void* getHandle() const noexcept override;
             virtual API getAPI() const noexcept override;
         
         private:
             Context& _context;
-            VkDescriptorSet _descriptorSet;
+            VkPipelineCache _pipelineCache;
     };
 }

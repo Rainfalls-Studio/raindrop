@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "API.hpp"
 #include "Buffer.hpp"
 #include "CommandList.hpp"
 #include "DescriptorSet.hpp"
@@ -52,6 +53,9 @@ namespace Raindrop::Graphics{
                 virtual std::shared_ptr<Fence> createFence(const Fence::Description& description) = 0;
                 virtual std::shared_ptr<Semaphore> createSemaphore() = 0;
                 virtual std::shared_ptr<TimelineSemaphore> createTimelineSemaphore(const TimelineSemaphore::Description& description) = 0;
+
+                virtual void* getHandle() const noexcept = 0;
+                virtual API getAPI() const noexcept = 0;
         };
     }
 }

@@ -23,4 +23,8 @@ namespace Raindrop::Graphics::Backend{
         std::swap(_format, other._format);
         return *this;
     }
+
+    Format::operator FormatType() const noexcept{
+        return _format;
+    }
 }

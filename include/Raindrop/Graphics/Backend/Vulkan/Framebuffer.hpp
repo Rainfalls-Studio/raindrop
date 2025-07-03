@@ -1,47 +1,22 @@
 #pragma once
 
-#include "types.hpp"
-#include "pch.pch"
-#include <Raindrop/Object.hpp>
+#include "../Framebuffer.hpp"
+#include "Context.hpp"
+#include <vulkan/vulkan.h>
 
-namespace Raindrop::Graphics{
-	class Framebuffer : public Object{
-		public:
-			static std::shared_ptr<Framebuffer> create(Raindrop::Context& context);
+namespace Raindrop::Graphics::Backend::Vulkan{
+    class Framebuffer : public Backend::Framebuffer{
+        public:
+            Framebuffer(Context& context, const Description& description);
+            virtual ~Framebuffer() override;
 
-			Framebuffer() noexcept;
-			~Framebuffer();
+            VkFramebuffer get() const noexcept;
 
-			Framebuffer& prepare(Context& context);
-			void initialize();
-			void release();
-
-			const VkFramebuffer& get() const noexcept;
-
-			Framebuffer& setFlags(const VkFramebufferCreateFlags& flags);
-			Framebuffer& setWidth(const std::uint32_t& width);
-			Framebuffer& setHeight(const std::uint32_t& height);
-			Framebuffer& setLayers(const std::uint32_t& layers);
-			Framebuffer& setSize(const std::uint32_t& width, const std::uint32_t& height = 1, const std::uint32_t& layers = 1);
-			Framebuffer& setRenderPass(const std::shared_ptr<RenderPass>& renderPass);
-			Framebuffer& setAttachments(const std::list<std::shared_ptr<ImageView>>& attachments);
-
-		private:
-			struct BuildInfo{
-				VkFramebufferCreateFlags flags;
-				std::uint32_t width;
-				std::uint32_t height;
-				std::uint32_t layers;
-				std::shared_ptr<RenderPass> renderPass;
-				std::list<std::shared_ptr<ImageView>> attachments;
-			};
-
-			Context* _context;
-			VkFramebuffer _framebuffer;
-			std::shared_ptr<RenderPass> _renderPass;
-			std::list<std::shared_ptr<ImageView>> _attachments;
-
-			std::unique_ptr<BuildInfo> _info;
-			BuildInfo& getInfo();
-	};
+            virtual void* getHandle() const noexcept override;
+            virtual API getAPI() const noexcept override;
+        
+        private:
+            Context& _context;
+            VkFramebuffer _framebuffer;
+    };
 }

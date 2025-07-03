@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <list>
 #include "Raindrop/Core/Utils/Flags.hpp"
-#include "Raindrop/Graphics/Backend/Queue.hpp"
+#include "Queue.hpp"
+#include "API.hpp"
 
 namespace Raindrop::Graphics::Backend{
     class Buffer{
@@ -31,7 +32,8 @@ namespace Raindrop::Graphics::Backend{
                 RESOURCE_DESCRIPTOR_BUFFER = 1 << 18,
                 PUSH_DESCRIPTORS_DESCRIPTOR_BUFFER = 1 << 19,
                 MICROMAP_BUILD_INPUT_READ_ONLY = 1 << 20,
-                MICROMAP_STORAGE = 1 << 21
+                MICROMAP_STORAGE = 1 << 21,
+                __SIZE__
             };
 
             RAINDROP_FLAG_CLASS(Usage, Buffer::UsageBits)
@@ -53,6 +55,7 @@ namespace Raindrop::Graphics::Backend{
             virtual void flush(Size size = SIZE_WHOLE, Size offset = 0) = 0;
             virtual void invalidate(Size size = SIZE_WHOLE, Size offset = 0) = 0;
 
-            virtual void* getHandle() const = 0;
+            virtual void* getHandle() const noexcept = 0;
+            virtual API getAPI() const noexcept = 0;
     };
 }

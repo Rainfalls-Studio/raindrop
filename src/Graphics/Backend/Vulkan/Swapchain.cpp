@@ -1,6 +1,7 @@
-#include "Raindrop/Graphics/Backend/Vulkan/Builder/RenderPass.hpp"
-#include <Raindrop/Graphics/Backend/Vulkan/Swapchain.hpp>
-#include <Raindrop/Graphics/Backend/Vulkan/Context.hpp>
+#include "Raindrop/Graphics/Backend/Vulkan/Swapchain.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/Context.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/Surface.hpp"
+#include "spdlog/spdlog.h"
 
 #include <stdexcept>
 #include <vulkan/vk_enum_string_helper.h>
@@ -9,174 +10,27 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
-	Swapchain::SwapchainData::SwapchainData(Context& context_) :
-		context{context_},
-		swapchain{VK_NULL_HANDLE},
-		frames{}
-	{}
 
-	Swapchain::SwapchainData::~SwapchainData(){
-		auto& device = context.device;
-
-		for (auto &frame : frames){
-			if (frame.framebuffer != VK_NULL_HANDLE){
-				vkDestroyFramebuffer(device, frame.framebuffer, nullptr);
-				frame.framebuffer = VK_NULL_HANDLE;
-			}
-
-			if (frame.imageView != VK_NULL_HANDLE){
-				vkDestroyImageView(device, frame.imageView, nullptr);
-				frame.imageView = VK_NULL_HANDLE;
-			}
-
-			if (frame.imageAvailable != VK_NULL_HANDLE){
-				vkDestroySemaphore(device, frame.imageAvailable, nullptr);
-				frame.imageAvailable = VK_NULL_HANDLE;
-			}
-
-			if (frame.imageFinished != VK_NULL_HANDLE){
-				vkDestroySemaphore(device, frame.imageFinished, nullptr);
-				frame.imageFinished = VK_NULL_HANDLE;
-			}
-
-			if (frame.inFlightFence != VK_NULL_HANDLE){
-				vkDestroyFence(device, frame.inFlightFence, nullptr);
-				frame.inFlightFence = VK_NULL_HANDLE;
-			}
-		}
-
-		if (swapchain){
-			vkDestroySwapchainKHR(device, swapchain, nullptr);
-			swapchain = VK_NULL_HANDLE;
-		}
-
-		frames.clear();
-	}
-
-	Swapchain::Swapchain(Context& context, VkSurfaceKHR surface) : 
-		_context{context},
-		_surface{surface},
-		_swapchain{},
-		_oldSwapchain{},
-		_renderPass{},
-		_currentFrame{0},
-		_nextFrame{0},
-		_frameCount{0},
-		_extent{
-			.width = 0,
-			.height = 0
-		},
-		_presentMode{VK_PRESENT_MODE_IMMEDIATE_KHR},
-		_surfaceFormat{
-			.format = VK_FORMAT_UNDEFINED,
-			.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
-		},
-		_buildInfo{
-			.frameCount = 0,
-			.extent = {0, 0},
-			.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR,
-			.surfaceFormat{
-				.format = VK_FORMAT_UNDEFINED,
-				.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
-			},
-		},
-		_support{
-			.capabilities{},
-			.formats{},
-			.presentModes{}
-		},
-		_clearColor{
-			.uint32{0, 0, 0, 0}
-		}
-	{
-		querySupport();
+	Swapchain::Swapchain(Context& context, const Description& description) :  _context{context}{
+		_surface = description.surface;
 
 		_frameCount = findFrameCount();
 		_extent = findExtent();
 		_presentMode = findPresentMode();
 		_surfaceFormat = findSurfaceFormat();
-		
-		createRenderPass();
 	}
 
 	Swapchain::~Swapchain(){
-		_context.logger->info("Destroying swapchain...");
+		SPDLOG_LOGGER_TRACE(_context.logger, "Destroying swapchain...");
 		
-		_oldSwapchain.reset();
-		_swapchain.reset();
-		_renderPass.reset();
-	}
-
-	void Swapchain::querySupport(){
-		querySupportCapabilities();
-		querySupportFormats();
-		querySupportPresentModes();
-	}
-
-	void Swapchain::querySupportCapabilities(){
-		const auto& physicalDevice = _context.physicalDevice;
-
-		if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, _surface, &_support.capabilities) != VK_SUCCESS){
-			throw std::runtime_error("Failed to query surface swapchain capabilities");
+		if (_swapchain){
+			vkDestroySwapchainKHR(_context.device, _swapchain, nullptr);
+			_swapchain = VK_NULL_HANDLE;
 		}
 	}
 
-	void Swapchain::querySupportFormats(){
-		const auto& physicalDevice = _context.physicalDevice;
-
-		uint32_t count = 0;
-
-		if (vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, _surface, &count, nullptr) != VK_SUCCESS){
-			throw std::runtime_error("Failed to query surface swapchain formats");
-		}
-
-		_support.formats.resize(static_cast<std::size_t>(count));
-
-		if (vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, _surface, &count, _support.formats.data()) != VK_SUCCESS){
-			throw std::runtime_error("Failed to query surface swapchain formats");
-		}
-	}
-
-	void Swapchain::querySupportPresentModes(){
-		const auto& physicalDevice = _context.physicalDevice;
-
-		uint32_t count = 0;
-
-		if (vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, _surface, &count, nullptr) != VK_SUCCESS){
-			throw std::runtime_error("Failed to query surface swapchain present modes");
-		}
-
-		_support.presentModes.resize(static_cast<std::size_t>(count));
-
-		if (vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, _surface, &count, _support.presentModes.data()) != VK_SUCCESS){
-			throw std::runtime_error("Failed to query surface swapchain present modes");
-		}
-	}
-
-	void Swapchain::createRenderPass(){
-		Builder::RenderPassBuilder builder(_context);
-
-		auto attachment = builder.addAttachment()
-			.setFormat(_surfaceFormat.format)
-			.setLoadOperation(VK_ATTACHMENT_LOAD_OP_CLEAR)
-			.setStoreOperation(VK_ATTACHMENT_STORE_OP_STORE)
-			.setStencilLoadOperation(VK_ATTACHMENT_LOAD_OP_DONT_CARE)
-			.setStencilStoreOperation(VK_ATTACHMENT_STORE_OP_DONT_CARE)
-			.setInitialLayout(VK_IMAGE_LAYOUT_UNDEFINED)
-			.setFinalLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-		
-		auto subpass = builder.addSubpass()
-			.addColorAttachment(attachment, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-		
-		auto dependency = builder.addDependency()
-			.setSrcSubpass(Builder::RenderPassBuilder::SubpassDescription::External)
-			.setSrcAccess(VK_ACCESS_NONE)
-			.setSrcStage(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT)
-			.setDstSubpass(subpass)
-			.setDstAccess(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT)
-			.setDstStage(VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-		
-		_renderPass = builder.create();
+	VkSwapchainKHR Swapchain::get() const noexcept{
+		return _swapchain;
 	}
 
 	VkSurfaceFormatKHR Swapchain::findSurfaceFormat(){
@@ -188,6 +42,7 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		 */
 		
 		const auto& wanted = _buildInfo.surfaceFormat;
+		// const auto& support = _surface->();
 
 		VkSurfaceFormatKHR bestFormat = _support.formats[0];
 		uint32_t bestFormatScore = 0;
@@ -368,110 +223,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		}
 	}
 
-	void Swapchain::createImageViews(){
-		auto& device = _context.device;
-
-		for (auto &frame : _swapchain->frames){
-			VkImageViewCreateInfo viewInfo{};
-
-			viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-			viewInfo.image = frame.image;
-			viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			viewInfo.format = _surfaceFormat.format;
-
-			viewInfo.subresourceRange = {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-				.baseMipLevel = 0,
-				.levelCount = 1,
-				.baseArrayLayer = 0,
-				.layerCount = 1
-			};
-
-			if (vkCreateImageView(device, &viewInfo, nullptr, &frame.imageView) != VK_SUCCESS){
-				throw std::runtime_error("Failed to create swapchain attachment image view");
-			}
-		}
-	}
-
-	void Swapchain::createFramebuffers(){
-		auto& device = _context.device;
-
-		for (auto &frame : _swapchain->frames){
-			VkFramebufferCreateInfo framebufferInfo = {};
-
-			framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-			framebufferInfo.renderPass = _renderPass->get();
-			framebufferInfo.attachmentCount = 1;
-			framebufferInfo.pAttachments = &frame.imageView;
-			framebufferInfo.width = _extent.width;
-			framebufferInfo.height = _extent.height;
-			framebufferInfo.layers = 1;
-
-			if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &frame.framebuffer) != VK_SUCCESS){
-				throw std::runtime_error("Failed to create swapchain framebuffer");
-			}
-		}
-	}
-
-	void Swapchain::createSyncObjects(){
-		auto& device = _context.device;
-
-		VkSemaphoreCreateInfo semaphoreInfo = {};
-		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-		VkFenceCreateInfo fenceInfo = {};
-		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-		for (auto &frame : _swapchain->frames) {
-			if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &frame.imageAvailable) != VK_SUCCESS){
-				throw std::runtime_error("Failed to create swapchain attachment image available semahore");
-			}
-
-			if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &frame.imageFinished) != VK_SUCCESS){
-				throw std::runtime_error("Failed to create swapchain attachment image available semahore");
-			}
-			
-			if (vkCreateFence(device, &fenceInfo, nullptr, &frame.inFlightFence) != VK_SUCCESS){
-				throw std::runtime_error("Failed to create swapchain attachment in flight fence");
-			}
-		}
-	}
-
-	void Swapchain::beginRenderPass(VkCommandBuffer commandBuffer){
-		VkRenderPassBeginInfo renderPassBeginInfo{};
-
-		renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassBeginInfo.renderPass = _renderPass->get();
-		renderPassBeginInfo.framebuffer = _swapchain->frames[_currentFrame].framebuffer;
-
-		renderPassBeginInfo.renderArea.offset = {0, 0};
-		renderPassBeginInfo.renderArea.extent = _extent;
-
-		VkClearValue clearValue = VkClearValue{_clearColor};
-
-		renderPassBeginInfo.clearValueCount = 1;
-		renderPassBeginInfo.pClearValues = &clearValue;
-
-		vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
-		viewport.width =  static_cast<float>(_extent.width);
-		viewport.height = static_cast<float>(_extent.height);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-		VkRect2D scissor{{0, 0}, _extent};
-
-		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-	}
-
-	void Swapchain::endRenderPass(VkCommandBuffer commandBuffer){
-    	vkCmdEndRenderPass(commandBuffer);
-	}
-
 	VkResult Swapchain::acquireNextImage(){
 		auto& device = _context.device;
 
@@ -536,37 +287,5 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
 		_currentFrame = (_currentFrame + 1) % _frameCount;
 		return VK_ERROR_UNKNOWN;
-	}
-
-	void Swapchain::setClearColor(VkClearColorValue color){
-		_clearColor = color;
-	}
-
-	Swapchain::Frame& Swapchain::getFrameData(uint32_t id){
-		return _swapchain->frames[id];
-	}
-
-	Swapchain::Frame& Swapchain::getCurrentFrameData(){
-		return _swapchain->frames[_currentFrame];
-	}
-
-	std::vector<Swapchain::Frame>& Swapchain::getFramesData(){
-		return _swapchain->frames;
-	}
-
-	uint32_t Swapchain::getFrameCount() const{
-		return _frameCount;
-	}
-
-	uint32_t Swapchain::getCurrentFrameIndex() const{
-		return _currentFrame;
-	}
-
-	uint32_t Swapchain::getNextFrameIndex() const{
-		return _nextFrame;
-	}
-
-	const std::shared_ptr<RenderPass>& Swapchain::getRenderPass() const{
-		return _renderPass;
 	}
 }

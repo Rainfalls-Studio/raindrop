@@ -1,14 +1,15 @@
 #pragma once
 
-#include "../Sampler.hpp"
+#include "../TimelineSemaphore.hpp"
 #include "Context.hpp"
+#include "vulkan/vulkan_core.h"
 #include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
-    class Sampler : public Backend::Sampler{
+    class TimelineSemaphore : public Backend::TimelineSemaphore{
         public:
-            Sampler(Context& context, const Description& description);
-            virtual ~Sampler() override;
+            TimelineSemaphore(Context& context, const Description& description);
+            virtual ~TimelineSemaphore() override;
 
             VkSemaphore get() const noexcept;
 
@@ -17,6 +18,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
         
         private:
             Context& _context;
-            VkSampler _sampler;
+            VkSemaphore _semaphore;
     };
 }

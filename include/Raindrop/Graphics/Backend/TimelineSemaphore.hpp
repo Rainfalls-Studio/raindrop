@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "API.hpp"
 
 namespace Raindrop::Graphics::Backend{
     class TimelineSemaphore{
@@ -12,5 +13,8 @@ namespace Raindrop::Graphics::Backend{
             };
 
             virtual void signal(uint32_t value) = 0;
+
+            virtual void* getHandle() const noexcept = 0;
+            virtual API getAPI() const noexcept = 0;
     };
 }

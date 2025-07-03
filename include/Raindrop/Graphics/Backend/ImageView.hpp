@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Image.hpp"
+#include "API.hpp"
 #include "Raindrop/Graphics/Backend/Component.hpp"
 #include "Raindrop/Graphics/Backend/Format.hpp"
 #include <memory>
@@ -27,5 +28,8 @@ namespace Raindrop::Graphics::Backend{
             };
 
             virtual ~ImageView() = default;
+
+            virtual void* getHandle() const noexcept = 0;
+            virtual API getAPI() const noexcept = 0;
     };
 }

@@ -1,25 +1,30 @@
 #pragma once
 
-#include "Raindrop/pch.pch"
-#include "Instance.hpp"
+#include "../Surface.hpp"
+#include "Context.hpp"
+#include <vulkan/vulkan.h>
 
-namespace Raindrop::Graphics{
-	class Context;
+namespace Raindrop::Graphics::Backend::Vulkan{
+	struct Context;
+	class Surface : public Backend::Surface{
+		public:
+			Surface(Context& context);
+			virtual ~Surface() override;
 
-	namespace Backend::Vulkan{
-		class Surface{
-			public:
-				Surface(Context& instance, SDL_Window* window) noexcept;
-				~Surface();
+			VkSurfaceKHR get() const noexcept;
+			const VkSurfaceCapabilitiesKHR& getCapabilities() const noexcept;
+			const std::vector<VkSurfaceFormatKHR>& getFormats() const noexcept;
+			const std::vector<VkPresentModeKHR>& getCresentModes() const noexcept;
 
-				const VkSurfaceKHR& get() const noexcept; 
+            virtual void* getHandle() const noexcept override;
+            virtual API getAPI() const noexcept override;
 
-			private:
-				Context* _context;
-				VkSurfaceKHR _surface;
+		private:
+			Context& _context;
+			VkSurfaceKHR _surface;
 
-				void _create(SDL_Window* window);
-
-		};
-	}
+			VkSurfaceCapabilitiesKHR _capabilities;
+			std::vector<VkSurfaceFormatKHR> _formats;
+			std::vector<VkPresentModeKHR> _presentModes;
+	};
 }

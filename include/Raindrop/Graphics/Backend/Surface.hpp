@@ -1,15 +1,10 @@
 #pragma once
 
-#include "API.hpp"
-
+#include "Raindrop/Graphics/Backend/API.hpp"
 namespace Raindrop::Graphics::Backend{
-    class PipelineLayout{
+    class Surface{
         public:
-            struct Description{
-
-            };
-
-            virtual ~PipelineLayout() = default;
+            virtual ~Surface() = default;
 
             virtual void* getHandle() const noexcept = 0;
             virtual API getAPI() const noexcept = 0;
