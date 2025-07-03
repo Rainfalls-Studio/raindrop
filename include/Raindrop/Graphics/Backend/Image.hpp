@@ -17,7 +17,7 @@ namespace Raindrop::Graphics::Backend{
                 COMPATIBLE_CUBE = 1 << 1,
             };
 
-            RAINDROP_FLAG_CLASS(Flags, FlagBits);
+            RAINDROP_FLAG_CLASS(Flags, FlagBits)
 
             enum class UsageBits{
                 NONE = 0,
@@ -96,7 +96,7 @@ namespace Raindrop::Graphics::Backend{
                 MEMORY_PLANE_3 = 1 << 10
             };
 
-            RAINDROP_FLAG_CLASS(Aspect, AspectBits);
+            RAINDROP_FLAG_CLASS(Aspect, AspectBits)
 
             struct SubresourceRange{
                 Aspect aspect;

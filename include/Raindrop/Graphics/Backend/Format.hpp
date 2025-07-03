@@ -1,8 +1,5 @@
 #pragma once
 
-#include "vulkan/vulkan_core.h"
-#include <cstdint>
-
 namespace Raindrop::Graphics::Backend{
     class Format{
         public:
@@ -267,62 +264,7 @@ namespace Raindrop::Graphics::Backend{
             Format& operator=(FormatType format);
             Format& operator=(const Format& other);
             Format& operator=(Format&& other);
-
-            bool isSFloat() noexcept;
-            bool isSInt() noexcept;
-            bool isSNorm() noexcept;
-            bool isSScaled() noexcept;
-            bool isUFloat() noexcept;
-            bool isUInt() noexcept;
-            bool isUNorm() noexcept;
-            bool isUScaled() noexcept;
-            bool isSampledInt() noexcept;
-            bool isSampledFloat() noexcept;
-            bool isCompressed_ASTC_HDR() noexcept;
-            bool isCompressed_ASTC_LDR() noexcept;
-            bool isCompressed_BC() noexcept;
-            bool isCompressed_EAC() noexcept;
-            bool isCompressed_ETC2() noexcept;
-            bool isCompressed_PVRTC() noexcept;
-            bool isCompressed() noexcept;
-            bool isPacked() noexcept;
-            bool isXChromaSubsampled() noexcept;
-            bool isYChromaSubsampled() noexcept;
-            bool isSinglePlane_422() noexcept;
-            bool isMultiplane() noexcept;
-            bool is8Bit() noexcept;
-            bool is16Bit() noexcept;
-            bool is32Bit() noexcept;
-            bool is64Bit() noexcept;
-            bool isColor() noexcept;
-            bool isDepthOnly() noexcept;
-            bool isStencilOnly() noexcept;
-            bool requiresYbcbrConversion() noexcept;
-            bool isNotCompressed() noexcept;
-            bool isNotMultiplane() noexcept;
-            bool isNotPacked() noexcept;
-            bool isNotSinglePlane() noexcept;
-
-            bool hasDepth() noexcept;
-            bool hasStencil() noexcept;
-            bool hasRed() noexcept;
-            bool hasGreen() noexcept;
-            bool hasBlue() noexcept;
-            bool hasAlpha() noexcept;
-
-            bool hasNotAlpha() noexcept;
-            bool hasNotBlue() noexcept;
-            bool hasNotGreen() noexcept;
-            bool hasNotRed() noexcept;
-            bool hasNotDepth() noexcept;
-            bool hasNotStencil() noexcept;
-
-            uint32_t getComponentCount() noexcept;
-            uint32_t getPlaneCount() noexcept;
-            uint32_t getDepthSize() noexcept;
-            uint32_t getStencilSize() noexcept;
-            uint32_t getSize() noexcept;
-        
+            
         private:
             FormatType _format;
     };

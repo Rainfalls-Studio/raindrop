@@ -13,8 +13,10 @@ namespace Raindrop::Graphics::Backend{
                 VIDEO_ENCORE = 1 << 4,
             };
 
-            RAINDROP_FLAG_CLASS(Capabilities, CapabilitiesBits);
+            RAINDROP_FLAG_CLASS(Capabilities, CapabilitiesBits)
 
+            virtual ~Queue() = default;
+            
             virtual Capabilities getCapabilities() const = 0;
     };
 }

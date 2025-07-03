@@ -1,9 +1,8 @@
 #pragma once
 
 namespace Raindrop::Graphics::Backend{
-    class AccelerationStructure{
+    class Semaphore{
         public:
-
-        private:
+            virtual ~Semaphore() = default;
     };
 }

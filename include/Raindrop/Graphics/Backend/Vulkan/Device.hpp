@@ -22,7 +22,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 			virtual std::shared_ptr<Backend::RenderPass> createRenderPass() override;
 			virtual std::shared_ptr<Backend::Sampler> createSampler() override;
 			virtual std::shared_ptr<Backend::Shader> createShader() override;
-			virtual std::shared_ptr<Backend::Texture> createTexture() override;
 
 		private:
 			Context _context;

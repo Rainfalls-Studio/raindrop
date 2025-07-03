@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Raindrop::Graphics::Backend{
-    class AccelerationStructure{
+    class Event{
         public:
 
         private:

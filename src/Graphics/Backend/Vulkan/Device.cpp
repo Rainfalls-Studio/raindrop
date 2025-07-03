@@ -206,8 +206,8 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 	}
     
     std::shared_ptr<Backend::Buffer> Device::createBuffer(const Buffer::Description& description){
-        std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(_context, description);
-        _context.allocator;
+        // std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(_context, description);
+        // _context.allocator;
         
         return nullptr;
     }
@@ -237,10 +237,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
     }
 
     std::shared_ptr<Backend::Shader> Device::createShader(){
-        return nullptr;
-    }
-
-    std::shared_ptr<Backend::Texture> Device::createTexture(){
         return nullptr;
     }
 }

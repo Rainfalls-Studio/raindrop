@@ -34,7 +34,7 @@ namespace Raindrop::Graphics::Backend{
                 MICROMAP_STORAGE = 1 << 21
             };
 
-            RAINDROP_FLAG_CLASS(Usage, Buffer::UsageBits);
+            RAINDROP_FLAG_CLASS(Usage, Buffer::UsageBits)
             
             using Size = uint32_t;
             static constexpr Size SIZE_WHOLE = ~static_cast<Size>(0);

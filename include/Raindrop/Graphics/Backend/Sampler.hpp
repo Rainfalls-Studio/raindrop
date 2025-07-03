@@ -14,7 +14,7 @@ namespace Raindrop::Graphics::Backend{
                 NON_SEAMLESS_CUBE_MAP = 1 << 2
             };
 
-            RAINDROP_FLAG_CLASS(Flags, FlagBits);
+            RAINDROP_FLAG_CLASS(Flags, FlagBits)
 
             enum class MipmapMode{
                 NEAREST = 0,

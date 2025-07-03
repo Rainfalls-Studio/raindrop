@@ -1,15 +1,16 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Raindrop::Graphics::Backend{
-    class Extent1D{
-
+    struct Extent2D{
+        uint32_t width;
+        uint32_t height;
     };
 
-    class Extent2D{
-
-    };
-
-    class Extent3D{
-
+    struct Extent3D{
+        uint32_t width;
+        uint32_t height;
+        uint32_t depth;
     };
 }
