@@ -6,7 +6,7 @@ namespace Raindrop::Graphics::Backend{
     class AccelerationStructure{
         public:
             struct Description{
-
+                
             };
             
             virtual ~AccelerationStructure() = default;

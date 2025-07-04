@@ -1,23 +1,27 @@
 #include "Raindrop/Graphics/Backend/Vulkan/Swapchain.hpp"
+#include "Raindrop/Graphics/Backend/API.hpp"
+#include "Raindrop/Graphics/Backend/Semaphore.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/Semaphore.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/Fence.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/Context.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/Surface.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/translation.hpp"
 #include "spdlog/spdlog.h"
-
+#include <cassert>
+#include <memory>
 #include <stdexcept>
 #include <vulkan/vk_enum_string_helper.h>
-
-#include <iostream>
 #include <vulkan/vulkan_core.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
 
-	Swapchain::Swapchain(Context& context, const Description& description) :  _context{context}{
-		_surface = description.surface;
+	Swapchain::Swapchain(Context& context, const std::shared_ptr<Surface>& surface) :  _context{context}{
+		// Ensure the surface is from the same API
+		if (surface->getAPI() != API::VULKAN){
+			throw std::runtime_error("The surface is not from the Vulkan API");
+		}
 
-		_frameCount = findFrameCount();
-		_extent = findExtent();
-		_presentMode = findPresentMode();
-		_surfaceFormat = findSurfaceFormat();
+		_surface = surface;
 	}
 
 	Swapchain::~Swapchain(){
@@ -33,7 +37,7 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		return _swapchain;
 	}
 
-	VkSurfaceFormatKHR Swapchain::findSurfaceFormat(){
+	VkSurfaceFormatKHR Swapchain::findSurfaceFormat(const VkSurfaceFormatKHR& target){
 
 		/**
 		 * I thought it would be better to find the most suitable
@@ -41,17 +45,16 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		 * if we fail to find the requested format
 		 */
 		
-		const auto& wanted = _buildInfo.surfaceFormat;
-		// const auto& support = _surface->();
+		const auto& support = _surface->getFormats();
 
-		VkSurfaceFormatKHR bestFormat = _support.formats[0];
+		VkSurfaceFormatKHR bestFormat = support[0];
 		uint32_t bestFormatScore = 0;
 
-		for (const auto& format : _support.formats){
+		for (const auto& format : support){
 			uint32_t score = 0;
 
-			score += int(format.colorSpace == wanted.colorSpace);
-			score += int(format.format == wanted.format);
+			score += int(format.colorSpace == target.colorSpace);
+			score += int(format.format == target.format);
 
 			if (score > bestFormatScore){
 				bestFormat = format;
@@ -62,21 +65,20 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		return bestFormat;
 	}
 
-	VkPresentModeKHR Swapchain::findPresentMode(){
-		const auto& wanted = _buildInfo.presentMode;
+	VkPresentModeKHR Swapchain::findPresentMode(VkPresentModeKHR target){
+		const auto& support = _surface->getPresentModes();
 
-		for (const auto& mode : _support.presentModes){
-			if (mode == wanted){
+		for (const auto& mode : support){
+			if (mode == target){
 				return mode;
 			}
 		}
 
-		return _support.presentModes[0];
+		return support[0];
 	}
 
-	VkExtent2D Swapchain::findExtent(){
-		const auto& wanted = _buildInfo.extent;
-		auto& capabilities = _support.capabilities;
+	VkExtent2D Swapchain::findExtent(const VkExtent2D& target){
+		auto capabilities = _surface->getCapabilities();
 
 		VkExtent2D extent;
 
@@ -84,76 +86,56 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 			return capabilities.currentExtent;
 		}
 
-		extent.width = std::clamp(wanted.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
-		extent.height = std::clamp(wanted.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+		extent.width = std::clamp(target.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+		extent.height = std::clamp(target.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 
 		return extent;
 	}
 
-	std::uint32_t Swapchain::findFrameCount(){
-		const auto& capabilities = _support.capabilities;
-		return std::clamp(_buildInfo.frameCount, capabilities.minImageCount, capabilities.maxImageCount == 0 ? UINT32_MAX : capabilities.maxImageCount);
+	std::uint32_t Swapchain::findImageCount(uint32_t target){
+		const auto& capabilities = _surface->getCapabilities();
+		return std::clamp(target, capabilities.minImageCount, capabilities.maxImageCount == 0 ? UINT32_MAX : capabilities.maxImageCount);
 	}
 
-
-	Swapchain& Swapchain::wantExtent(VkExtent2D extent){
-		_buildInfo.extent = extent;
-		return *this;
-	}
-
-	Swapchain& Swapchain::wantFrameCount(uint32_t count){
-		_buildInfo.frameCount = count;
-		return *this;
-	}
-
-	Swapchain& Swapchain::wantPresentMode(VkPresentModeKHR presentMode){
-		_buildInfo.presentMode = presentMode;
-		return *this;
-	}
-
-	Swapchain& Swapchain::wantSurfaceFormat(VkSurfaceFormatKHR surfaceFormat){
-		_buildInfo.surfaceFormat = surfaceFormat;
-		return *this;
-	}
-
-	void Swapchain::rebuildSwapchain(){
+	void Swapchain::rebuild(const Description& description){
 		auto& device = _context.device;
+
+		auto oldSurfaceFormat = _surfaceFormat;
+		
+		_imageCount = findImageCount(description.imageCount);
+		_extent = findExtent(toVulkan<VkExtent2D>(description.extent));
+		_presentMode = findPresentMode(toVulkan<VkPresentModeKHR>(description.presentMode));
+		_surfaceFormat = findSurfaceFormat({toVulkan<VkFormat>(description.format), VK_COLOR_SPACE_SRGB_NONLINEAR_KHR});
 
 		_context.logger->info("Rebuilding swapchain...");
 		
-		// maye vkQueueWaitIdle(device.presentQueue.queue);
+		// maybe use vkQueueWaitIdle(device.presentQueue.queue);
 		// device->waitIdle();
 		vkDeviceWaitIdle(device);
-		
-		std::swap(_swapchain, _oldSwapchain);
-		_swapchain = std::make_unique<SwapchainData>(_context);
 
-		querySupport();
+		VkSwapchainKHR oldSwapchain = _swapchain;
 
-		VkSurfaceFormatKHR surfaceFormat = findSurfaceFormat();
-		const bool hasFormatChanged = surfaceFormat.format != _surfaceFormat.format;
-		const bool hasColorSpaceChanged = surfaceFormat.colorSpace != _surfaceFormat.colorSpace;
+		const bool hasFormatChanged = oldSurfaceFormat.format != _surfaceFormat.format;
+		const bool hasColorSpaceChanged = oldSurfaceFormat.colorSpace != _surfaceFormat.colorSpace;
 
 		if (hasColorSpaceChanged || hasFormatChanged){
-			_context.logger->error(
+			SPDLOG_LOGGER_ERROR(_context.logger,
 				"The swapchain surface format and / or color space has changed\n"
 				"\t - Format (before/after) : {} / {}\n"
 				"\t - Colorspace (before/after) : {} / {}",
-				string_VkFormat(_surfaceFormat.format), string_VkFormat(surfaceFormat.format),
-				string_VkColorSpaceKHR(_surfaceFormat.colorSpace), string_VkColorSpaceKHR(surfaceFormat.colorSpace)
+				string_VkFormat(_surfaceFormat.format), string_VkFormat(oldSurfaceFormat.format),
+				string_VkColorSpaceKHR(_surfaceFormat.colorSpace), string_VkColorSpaceKHR(oldSurfaceFormat.colorSpace)
 			);
 			throw std::runtime_error("The surface format and/or color space has changed");
 		}
 
-		_frameCount = findFrameCount();
-		_extent = findExtent();
-		_presentMode = findPresentMode();
+		auto capabilities = _surface->getCapabilities();
 		
 		VkSwapchainCreateInfoKHR info{};
 		info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		info.surface = _surface;
-		info.oldSwapchain = _oldSwapchain != nullptr ? _oldSwapchain->swapchain : VK_NULL_HANDLE;
-		info.preTransform = _support.capabilities.currentTransform;
+		info.surface = _surface->get();
+		info.oldSwapchain = oldSwapchain;
+		info.preTransform = capabilities.currentTransform;
 		info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		info.presentMode = _presentMode;
 		info.clipped = VK_TRUE;
@@ -173,119 +155,113 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 			info.pQueueFamilyIndices = nullptr;
 		}
 		
-		info.minImageCount = _frameCount;
+		info.minImageCount = _imageCount;
 		info.imageFormat = _surfaceFormat.format;
 		info.imageColorSpace = _surfaceFormat.colorSpace;
 		info.imageExtent = _extent;
 		info.imageArrayLayers = 1;
 		info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		if (vkCreateSwapchainKHR(device, &info, nullptr, &_swapchain->swapchain) != VK_SUCCESS){
+		if (vkCreateSwapchainKHR(device, &info, nullptr, &_swapchain) != VK_SUCCESS){
 			throw std::runtime_error("Failed to create swapchain");
 		}
-		_oldSwapchain.reset();
 
 		getSwapchainImages();
-		createImageViews();
-		createFramebuffers();
 
-		createSyncObjects();
-
-		_currentFrame = 0;
-		_context.logger->info("The vulkan swapchain has been rebuilt without any critical error");
+		SPDLOG_LOGGER_TRACE(_context.logger, "The vulkan swapchain has been rebuilt without any critical error");
 	}
 
 	void Swapchain::getSwapchainImages(){
 		auto& device = _context.device;
 
 		uint32_t imageCount = 0;
-		if (vkGetSwapchainImagesKHR(device, _swapchain->swapchain, &imageCount, nullptr) != VK_SUCCESS){
+		if (vkGetSwapchainImagesKHR(device, _swapchain, &imageCount, nullptr) != VK_SUCCESS){
 			throw std::runtime_error("Failed to get swapchain images");
 		}
 
-		if (imageCount != _frameCount){
-			_context.logger->info("The number of swapchain frame changed from {} to {}", _frameCount, imageCount);
+		if (imageCount != _imageCount){
+			_context.logger->info("The number of swapchain frame changed from {} to {}", _imageCount, imageCount);
 		}
 
-		_frameCount = imageCount;
+		_imageCount = imageCount;
 
-		std::vector<VkImage> images(_frameCount);
-		if (vkGetSwapchainImagesKHR(device, _swapchain->swapchain, &_frameCount, images.data()) != VK_SUCCESS){
+		_images.resize(_imageCount);
+		if (vkGetSwapchainImagesKHR(device, _swapchain, &_imageCount, _images.data()) != VK_SUCCESS){
 			throw std::runtime_error("Failed to get swapchain images");
 		}
-
-		// forcefully reload everything to ensure proper destroy
-		_swapchain->frames.clear();
-		_swapchain->frames.resize(_frameCount);
-
-		for (uint32_t i=0; i<_frameCount; i++){
-			_swapchain->frames[i].image = images[i];
-		}
 	}
 
-	VkResult Swapchain::acquireNextImage(){
+	uint32_t Swapchain::acquireNextImage(std::shared_ptr<Backend::Semaphore> signalSemaphore, std::shared_ptr<Backend::Fence> signalFence, uint32_t timeout){
+		assert(signalSemaphore ? signalSemaphore->getAPI() == API::VULKAN : true && "The semaphore must be from the Vulkan API");
+		assert(signalFence ? signalFence->getAPI() == API::VULKAN : true && "The fence must be from the Vulkan API");
+
+		VkSemaphore semaphore = signalSemaphore ? std::static_pointer_cast<Semaphore>(signalSemaphore)->get() : VK_NULL_HANDLE;
+		VkFence fence = signalFence ? std::static_pointer_cast<Fence>(signalFence)->get() : VK_NULL_HANDLE;
+
 		auto& device = _context.device;
 
-		if (vkWaitForFences(device, 1, &_swapchain->frames[_currentFrame].inFlightFence, VK_TRUE, UINT64_MAX) != VK_SUCCESS){
-			throw std::runtime_error("Failed to wait for swapchain attachment in flight fence");
-		}
+		uint32_t nextFrame = 0;
 
-		VkResult result = vkAcquireNextImageKHR(device, _swapchain->swapchain, UINT64_MAX, _swapchain->frames[_currentFrame].imageAvailable, VK_NULL_HANDLE, &_nextFrame);
-		return result;
+		VkResult result = vkAcquireNextImageKHR(
+			device,
+			_swapchain,
+			timeout,
+			semaphore,
+			fence,
+			&nextFrame
+		);
+
+		if (result == VK_SUBOPTIMAL_KHR) _suboptimal = true;
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) _outOfDate = true;
+		// TODO: check errors
+
+		return nextFrame;
 	}
 
-	VkResult Swapchain::submitCommandBuffer(std::vector<VkCommandBuffer> buffers){
-		auto& device = _context.device;
-		
-		if (_swapchain->frames[_nextFrame].imageInFlight != VK_NULL_HANDLE){
-			if (vkWaitForFences(device, 1, &_swapchain->frames[_nextFrame].imageInFlight, VK_TRUE, UINT64_MAX) != VK_SUCCESS){
-				throw std::runtime_error("Failed to wait for swapchain attachment in flight fence");
-			}
-		}
-		
-		_swapchain->frames[_nextFrame].imageInFlight = _swapchain->frames[_currentFrame].inFlightFence;
-
-
-		VkSemaphore waitSemaphores[] = {_swapchain->frames[_currentFrame].imageAvailable};
-		VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-		VkSemaphore signalSemaphores[] = {_swapchain->frames[_currentFrame].imageFinished};
-
-		VkSubmitInfo submitInfo = {};
-		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-		submitInfo.waitSemaphoreCount = 1;
-		submitInfo.pWaitSemaphores = waitSemaphores;
-		submitInfo.pWaitDstStageMask = waitStages;
-
-		submitInfo.commandBufferCount = static_cast<uint32_t>(buffers.size());
-		submitInfo.pCommandBuffers = buffers.data();
-
-		submitInfo.signalSemaphoreCount = 1;
-		submitInfo.pSignalSemaphores = signalSemaphores;
-
-		if (vkResetFences(device, 1, &_swapchain->frames[_currentFrame].inFlightFence) != VK_SUCCESS){
-			throw std::runtime_error("Failed to reset swapchain attachment in flight fence");
-		}
-
-		// if (vkQueueSubmit(device->graphicsQueue.queue, 1, &submitInfo, _swapchain->frames[_currentFrame].inFlightFence) != VK_SUCCESS){
-		// 	throw std::runtime_error("Faile to submit graphics command buffer");
-		// }
+	void Swapchain::present(std::shared_ptr<Backend::Queue> queue, uint32_t imageIndex, std::shared_ptr<Backend::Semaphore> waitSemaphore){
+		assert(queue && "A valid queue must be provided");
+		assert(queue->getAPI() == API::VULKAN && "The queue must be from the Vulkan API");
+		// assert(queue->getCapabilities() & Queue::Capabilities::PRESENT && "The queue must support presenting images");
+		assert(imageIndex < _imageCount && imageIndex > 0 && "Invalid image index"); 
+		assert(waitSemaphore ? waitSemaphore->getAPI() == API::VULKAN : true && "The semaphore must be from the Vulkan API");
 
 		VkPresentInfoKHR presentInfo = {};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-		presentInfo.waitSemaphoreCount = 1;
-		presentInfo.pWaitSemaphores = signalSemaphores;
+		VkSemaphore semaphore = waitSemaphore ? std::static_pointer_cast<Semaphore>(waitSemaphore)->get() : VK_NULL_HANDLE;
 
-		VkSwapchainKHR swapChains[] = {_swapchain->swapchain};
+		if (semaphore){
+			presentInfo.waitSemaphoreCount = 1;
+			presentInfo.pWaitSemaphores = &semaphore;
+		}
+
 		presentInfo.swapchainCount = 1;
-		presentInfo.pSwapchains = swapChains;
+		presentInfo.pSwapchains = &_swapchain;
+		presentInfo.pImageIndices = &imageIndex;
 
-		presentInfo.pImageIndices = &_nextFrame;
-
+		// TODO
 		// VkResult result = vkQueuePresentKHR(device->presentQueue.queue, &presentInfo);
 
-		_currentFrame = (_currentFrame + 1) % _frameCount;
-		return VK_ERROR_UNKNOWN;
+		VkResult result;
+
+		if (result == VK_SUBOPTIMAL_KHR) _suboptimal = true;
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) _outOfDate = true;
+	}
+
+
+	bool Swapchain::isSuboptimal() const noexcept{
+		return _suboptimal;
+	}
+
+	bool Swapchain::isOutOfDate() const noexcept{
+		return _outOfDate;
+	}
+
+	void* Swapchain::getHandle() const noexcept{
+		return static_cast<void*>(_swapchain);
+	}
+
+	API Swapchain::getAPI() const noexcept{
+		return API::VULKAN;
 	}
 }

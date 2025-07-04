@@ -1,7 +1,7 @@
 #include "Raindrop/Graphics/Backend/Vulkan/Device.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/Buffer.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/DeviceConfig.hpp"
-#include "Raindrop/Graphics/Backend/Vulkan/Queue/Queue.hpp"
+#include "Raindrop/Graphics/Backend/Vulkan/Queue.hpp"
 #include "Raindrop/Graphics/Backend/Vulkan/WindowContext.hpp"
 #include "Raindrop/Window/Config.hpp"
 #include "Raindrop/Window/Size.hpp"
@@ -178,17 +178,17 @@ namespace Raindrop::Graphics::Backend::Vulkan{
         auto graphics = device.get_queue_index(vkb::QueueType::graphics);
         device.get_queue(vkb::QueueType::graphics);
 
-        auto initQueue = [device](const vkb::QueueType& type) -> Queue::Queue {
-			// We can skip queue check because we already did that
-			return Queue::Queue{ 
-                    .family = device.get_queue_index(type).value(),
-					.queue = device.get_queue(type).value()
-				};
-		};
+        // auto initQueue = [device](const vkb::QueueType& type) -> Queue::Queue {
+		// 	// We can skip queue check because we already did that
+		// 	return Queue::Queue{ 
+        //             .family = device.get_queue_index(type).value(),
+		// 			.queue = device.get_queue(type).value()
+		// 		};
+		// };
 
-		_context.graphics = initQueue(vkb::QueueType::graphics);
-		_context.present = initQueue(vkb::QueueType::present);
-		_context.transfer = initQueue(vkb::QueueType::transfer);
+		// _context.graphics = initQueue(vkb::QueueType::graphics);
+		// _context.present = initQueue(vkb::QueueType::present);
+		// _context.transfer = initQueue(vkb::QueueType::transfer);
 	}
     
     std::shared_ptr<Backend::Buffer> Device::createBuffer(const Buffer::Description& description){

@@ -5,6 +5,10 @@
 namespace Raindrop::Graphics::Backend{
     class RenderPass{
         public:
+            struct Description{
+
+            };
+
             virtual ~RenderPass() = default;
 
             virtual void* getHandle() const noexcept = 0;

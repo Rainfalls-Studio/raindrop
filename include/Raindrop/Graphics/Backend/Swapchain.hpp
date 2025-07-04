@@ -27,10 +27,10 @@ namespace Raindrop::Graphics::Backend{
             };
 
             struct Description{
-                std::shared_ptr<Surface> surface;
                 uint32_t imageCount;
                 Format format;
                 PresentMode presentMode;
+                Extent2D extent;
             };
 
             virtual ~Swapchain() = default;
@@ -64,22 +64,22 @@ namespace Raindrop::Graphics::Backend{
             virtual const std::vector<std::shared_ptr<Image>>& getImages() const = 0;
 
             /**
-            * @brief Rebuild the swapchain, should be used after window resize
-             * 
+             * @brief Rebuild the swapchain, should be used after window resize
+             *
+             * @param description The description of the new swapchain
+             * @warning The format of the swapchain can't change
              */
-            virtual void rebuild() = 0;
+            virtual void rebuild(const Description& description) = 0;
             
             /**
              * @brief Get the next image in the swapchain
              * 
-             * @param imageIndex The index of the next available image
              * @param signalSemaphore The semaphore to signal once the image is available
              * @param signalFence The fence to signal once the image is available
              * @param timeout The time to waite (in nanoseconds) 
              * @return uint32_t 
              */
             virtual uint32_t acquireNextImage(
-                uint32_t& imageIndex,
                 std::shared_ptr<Semaphore> signalSemaphore = nullptr,
                 std::shared_ptr<Fence> signalFence = nullptr,
                 uint32_t timeout = UINT32_MAX
@@ -95,7 +95,7 @@ namespace Raindrop::Graphics::Backend{
             virtual void present(
                 std::shared_ptr<Queue> queue,
                 uint32_t imageIndex,
-                const std::vector<std::shared_ptr<Semaphore>>& waitSemaphores = {}
+                std::shared_ptr<Semaphore> waitSemaphores = nullptr
             ) = 0;
             
             /**
@@ -104,6 +104,17 @@ namespace Raindrop::Graphics::Backend{
              * @param mode 
              */
             virtual void setPresentMode(PresentMode mode) = 0;
+            
+            /**
+             * @brief A subotimal swapchain is a swapchain that can still present to a surface but will prefably be rebuilt
+             */
+            virtual bool isSuboptimal() const noexcept = 0;
+
+            /**
+             * @brief An out of date swapchain is a swapchain that can't present to a surface and need to be rebuilt in order to present again
+             * 
+             */
+            virtual bool isOutOfDate() const noexcept = 0;
 
             virtual void* getHandle() const noexcept = 0;
             virtual API getAPI() const noexcept = 0;

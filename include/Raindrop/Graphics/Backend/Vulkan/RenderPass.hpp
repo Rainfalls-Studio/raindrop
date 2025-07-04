@@ -1,29 +1,23 @@
 #pragma once
 
+#include "../RenderPass.hpp"
 #include <vulkan/vulkan.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
 	struct Context;
 
-	class RenderPass{
+	class RenderPass : public Backend::RenderPass{
 		public:
-			
-
-			RenderPass(Context& context, VkRenderPass renderPass) noexcept;
-			~RenderPass();
-
-			RenderPass(const RenderPass&) = delete;
-			RenderPass& operator=(const RenderPass&) = delete;
-
-			RenderPass(RenderPass&& other);
-			RenderPass& operator=(RenderPass&& other);
+			RenderPass(Context& context, const Description& description);
+			virtual ~RenderPass() override;
 
 			const VkRenderPass& get() const noexcept;
 
-			friend void swap(RenderPass& A, RenderPass& B);
+            virtual void* getHandle() const noexcept override;
+            virtual API getAPI() const noexcept override;
 
 		private:
-			Context* _context;
+			Context& _context;
 			VkRenderPass _renderPass;
 	};
 }

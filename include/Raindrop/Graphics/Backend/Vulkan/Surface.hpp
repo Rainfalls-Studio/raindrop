@@ -12,9 +12,9 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 			virtual ~Surface() override;
 
 			VkSurfaceKHR get() const noexcept;
-			const VkSurfaceCapabilitiesKHR& getCapabilities() const noexcept;
-			const std::vector<VkSurfaceFormatKHR>& getFormats() const noexcept;
-			const std::vector<VkPresentModeKHR>& getCresentModes() const noexcept;
+			VkSurfaceCapabilitiesKHR getCapabilities() const noexcept;
+			std::vector<VkSurfaceFormatKHR> getFormats() const noexcept;
+			std::vector<VkPresentModeKHR> getPresentModes() const noexcept;
 
             virtual void* getHandle() const noexcept override;
             virtual API getAPI() const noexcept override;
@@ -22,9 +22,5 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		private:
 			Context& _context;
 			VkSurfaceKHR _surface;
-
-			VkSurfaceCapabilitiesKHR _capabilities;
-			std::vector<VkSurfaceFormatKHR> _formats;
-			std::vector<VkPresentModeKHR> _presentModes;
 	};
 }

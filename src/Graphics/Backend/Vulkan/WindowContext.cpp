@@ -98,7 +98,8 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
         VkCommandPoolCreateInfo info{};
         info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        info.queueFamilyIndex = _context.graphics.family;
+        // info.queueFamilyIndex = _context.graphics.family;
+        // TODO
 
         if (vkCreateCommandPool(device, &info, nullptr, &_commandPool) != VK_SUCCESS){
             SPDLOG_LOGGER_ERROR(_context.logger, "Failed to create command pool");
@@ -159,20 +160,20 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		info.presentMode = _presentMode;
 		info.clipped = VK_TRUE;
 
-		uint32_t queueFamilyIndices[] = {
-			_context.graphics.family,
-			_context.present.family,
-		};
+		// uint32_t queueFamilyIndices[] = {
+		// 	_context.graphics.family,
+		// 	_context.present.family,
+		// };
 
-		if (queueFamilyIndices[0] != queueFamilyIndices[1]){
-			info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-			info.queueFamilyIndexCount = 2;
-			info.pQueueFamilyIndices = queueFamilyIndices;
-		} else {
-			info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-			info.queueFamilyIndexCount = 0;
-			info.pQueueFamilyIndices = nullptr;
-		}
+		// if (queueFamilyIndices[0] != queueFamilyIndices[1]){
+		// 	info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+		// 	info.queueFamilyIndexCount = 2;
+		// 	info.pQueueFamilyIndices = queueFamilyIndices;
+		// } else {
+		// 	info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		// 	info.queueFamilyIndexCount = 0;
+		// 	info.pQueueFamilyIndices = nullptr;
+		// }
 
 		info.minImageCount = _frameCount;
 		info.imageFormat = _surfaceFormat.format;
@@ -578,14 +579,14 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		}
 
         // Submit the command buffer
-        if (vkQueueSubmit(
-            _context.graphics.queue,
-            1,
-            &submitInfo,
-            _frames[_currentFrame].inFlightFence
-        ) != VK_SUCCESS){
-			throw std::runtime_error("Faile to submit graphics command buffer");
-		}
+        // if (vkQueueSubmit(
+        //     _context.graphics.queue,
+        //     1,
+        //     &submitInfo,
+        //     _frames[_currentFrame].inFlightFence
+        // ) != VK_SUCCESS){
+		// 	throw std::runtime_error("Faile to submit graphics command buffer");
+		// }
 
 		VkPresentInfoKHR presentInfo = {};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -599,7 +600,7 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		presentInfo.pImageIndices = &_nextFrame;
 
         // present the frame when the render is ready
-		result = vkQueuePresentKHR(_context.present.queue, &presentInfo);
+		// result = vkQueuePresentKHR(_context.present.queue, &presentInfo);
 		_currentFrame = (_currentFrame + 1) % _frameCount;
         
         bool windowResized = false;

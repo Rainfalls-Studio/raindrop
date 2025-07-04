@@ -25,7 +25,7 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 	struct Context;
 	class Swapchain : public Backend::Swapchain{
 		public:
-			Swapchain(Context& context, const Description& description);
+			Swapchain(Context& context, const std::shared_ptr<Surface>& surface);
 			virtual ~Swapchain() override;
 
             virtual uint32_t getImageCount() const override;
@@ -36,49 +36,51 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
             virtual const std::vector<std::shared_ptr<Image>>& getImages() const override;
 
-            virtual void rebuild() override;
+            virtual void rebuild(const Description& description) override;
 
 			virtual uint32_t acquireNextImage(
-				uint32_t& imageIndex,
-                std::shared_ptr<Semaphore> signalSemaphore = nullptr,
-                std::shared_ptr<Fence> signalFence = nullptr,
+                std::shared_ptr<Backend::Semaphore> signalSemaphore = nullptr,
+                std::shared_ptr<Backend::Fence> signalFence = nullptr,
                 uint32_t timeout = UINT32_MAX
             ) override;
 
 			virtual void present(
-                std::shared_ptr<Queue> queue,
+                std::shared_ptr<Backend::Queue> queue,
                 uint32_t imageIndex,
-                const std::vector<std::shared_ptr<Semaphore>>& waitSemaphores = {}
+                std::shared_ptr<Backend::Semaphore> waitSemaphore = nullptr
             ) override;
 
             virtual void setPresentMode(PresentMode mode) override;
 
 			VkSwapchainKHR get() const noexcept;
 
+            virtual bool isSuboptimal() const noexcept override;
+            virtual bool isOutOfDate() const noexcept override;
+
+            virtual void* getHandle() const noexcept override;
+            virtual API getAPI() const noexcept override;
+			
 		private:
 			Context& _context;
 			std::shared_ptr<Surface> _surface;
 
 			VkSwapchainKHR _swapchain = VK_NULL_HANDLE;
 			
-			uint32_t _frameCount = 0;
+			uint32_t _imageCount = 0;
 			VkExtent2D _extent = {0, 0};
 			VkPresentModeKHR _presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
 			VkSurfaceFormatKHR _surfaceFormat = {VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR};
 			std::vector<VkImage> _images;
-
-			// Not released because the swapchain get continiously rebuilt
-			struct{
-				uint32_t frameCount;
-				VkExtent2D extent;
-				VkPresentModeKHR presentMode;
-				VkSurfaceFormatKHR surfaceFormat;
-			} _buildInfo;
-
 			
-			VkSurfaceFormatKHR findSurfaceFormat();
-			VkPresentModeKHR findPresentMode();
-			VkExtent2D findExtent();
-			uint32_t findFrameCount();
+			bool _suboptimal;
+			bool _outOfDate;
+
+			VkSurfaceFormatKHR findSurfaceFormat(const VkSurfaceFormatKHR& target);
+			VkPresentModeKHR findPresentMode(VkPresentModeKHR target);
+			VkExtent2D findExtent(const VkExtent2D& target);
+			uint32_t findImageCount(uint32_t target);
+
+
+			void getSwapchainImages();
 	};
 }

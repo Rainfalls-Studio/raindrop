@@ -172,7 +172,7 @@ namespace Raindrop::Core::Utils{
     } \
 
 #define RAINDROP_FLAG(name, enumType) \
-    class name : public Raindrop::Core::Utils::Flags<enumType>{ \
+    class name : public ::Raindrop::Core::Utils::Flags<enumType>{ \
         public: \
             using Raindrop::Core::Utils::Flags<enumType>::Flags; \
             using Bit = enumType; \
@@ -180,11 +180,10 @@ namespace Raindrop::Core::Utils{
             using UnderlyingType = typename std::underlying_type<enumType>::type; \
     };\
     \
-    namespace Raindrop::Core::Utils { \
-        inline constexpr name::Bits operator|(enumType a, enumType b) noexcept { \
-            return static_cast<name::Bits>(a) | static_cast<name::Bits>(b); \
-        } \
-        inline constexpr name::Bits operator|(name::Bits a, enumType b) noexcept { \
-            return a | static_cast<name::Bits>(b); \
-        } \
+    inline constexpr name::Bits operator|(enumType a, enumType b) noexcept { \
+        return static_cast<name::Bits>(a) | static_cast<name::Bits>(b); \
+    } \
+    inline constexpr name::Bits operator|(name::Bits a, enumType b) noexcept { \
+        return a | static_cast<name::Bits>(b); \
     }
+
