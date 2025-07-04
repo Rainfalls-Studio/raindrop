@@ -13,14 +13,29 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		public:
 			Device(const DeviceConfig& config);
 			virtual ~Device() override;
+			
+			virtual std::vector<std::shared_ptr<QueueFamily>> getFamilies() const override;
 
-			virtual std::shared_ptr<Backend::Buffer> createBuffer(const Buffer::Description& description) override;
-			virtual std::shared_ptr<Backend::CommandList> createCommandList() override;
-			virtual std::shared_ptr<Backend::DescriptorSet> createDescriptorSet() override;
-			virtual std::shared_ptr<Backend::Framebuffer> createFramebuffer() override;
-			virtual std::shared_ptr<Backend::GraphicsPipeline> createGraphicsPipeline() override;
-			virtual std::shared_ptr<Backend::RenderPass> createRenderPass() override;
-			virtual std::shared_ptr<Backend::Shader> createShader() override;
+			virtual std::shared_ptr<Buffer> createBuffer(const Buffer::Description& description) override;
+			virtual std::shared_ptr<BufferView> createBufferView(const BufferView::Description& description) override;
+			virtual std::shared_ptr<Image> createImage(const Image::Description& description) override;
+			virtual std::shared_ptr<ImageView> createImageView(const ImageView::Description& description) override;
+			virtual std::shared_ptr<CommandPool> createCommandPool(const CommandPool::Description& description) override;
+			virtual std::shared_ptr<DescriptorSetLayout> createDescriptorSetLayout(const DescriptorSetLayout::Description& description) override;
+			virtual std::shared_ptr<DescriptorPool> createDescriptorPool(const DescriptorPool::Description& description) override;
+			virtual std::shared_ptr<DescriptorSet> createDescriptorSet(const DescriptorSet::Description& description) override;
+			virtual std::shared_ptr<Framebuffer> createFramebuffer(const Framebuffer::Description& description) override;
+			virtual std::shared_ptr<GraphicsPipeline> createGraphicsPipeline(const GraphicsPipeline::Description& description) override;
+			virtual std::shared_ptr<ComputePipeline> createComputePipeline(const ComputePipeline::Description& description) override;
+			virtual std::shared_ptr<RenderPass> createRenderPass(const RenderPass::Description& description) override;
+			virtual std::shared_ptr<Sampler> createSampler(const Sampler::Description& description) override;
+			virtual std::shared_ptr<Shader> createShader(const Shader::Description& description) override;
+			virtual std::shared_ptr<Fence> createFence(const Fence::Description& description) override;
+			virtual std::shared_ptr<Semaphore> createSemaphore() override;
+			virtual std::shared_ptr<TimelineSemaphore> createTimelineSemaphore(const TimelineSemaphore::Description& description) override;
+
+			virtual void* getHandle() const noexcept override;
+			virtual API getAPI() const noexcept override;
 
 		private:
 			Context _context;

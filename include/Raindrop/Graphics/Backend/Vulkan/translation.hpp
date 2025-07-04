@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Raindrop/Graphics/Backend/Extent.hpp"
 #include "vulkan/vulkan_core.h"
 namespace Raindrop::Graphics::Backend::Vulkan{
     template<typename T, typename U>
@@ -8,16 +7,6 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 
     template<typename T, typename U>
     T toRaindrop(U&& value);
-
-    template<>
-    VkExtent2D toVulkan(Extent2D&& extent){
-        return VkExtent2D{extent.width, extent.height};
-    }
-    
-    template<>
-    VkExtent3D toVulkan(Extent3D&& extent){
-        return VkExtent3D{extent.width, extent.height, extent.depth};
-    }
 }
 
 #define RAINDROP_TO_VK_FLAG(vkFlag, VkBit, RNDFlag) \

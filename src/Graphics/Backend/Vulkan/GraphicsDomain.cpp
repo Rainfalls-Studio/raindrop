@@ -6,6 +6,16 @@
 #include <cassert>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
+    template<>
+    VkSubpassContents toVulkan(SubpassContent&& content){
+        using enum SubpassContent;
+        switch (content){
+            case INLINE: return VK_SUBPASS_CONTENTS_INLINE;
+            case SECONDARY: return VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS;
+        }
+        throw std::runtime_error("Unknown subpass contents");
+    }
+
     void GraphicsDomain::beginRenderPass(const RenderPassBeginInfo& info){
         assert(info.renderPass && "renderPass must be valid");
         assert(info.renderPass->getAPI() == API::VULKAN && "renderPass must be from the vulkan API");

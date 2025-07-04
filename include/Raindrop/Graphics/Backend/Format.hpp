@@ -244,15 +244,7 @@ namespace Raindrop::Graphics::Backend{
                 ASTC_12x10_SFLOAT_BLOCK,
                 ASTC_12x12_SFLOAT_BLOCK,
                 A1B5G5R5_UNORM_PACK16,
-                A8_UNORM,
-                PVRTC1_2BPP_UNORM_BLOCK,
-                PVRTC1_4BPP_UNORM_BLOCK,
-                PVRTC2_2BPP_UNORM_BLOCK,
-                PVRTC2_4BPP_UNORM_BLOCK,
-                PVRTC1_2BPP_SRGB_BLOCK,
-                PVRTC1_4BPP_SRGB_BLOCK,
-                PVRTC2_2BPP_SRGB_BLOCK,
-                PVRTC2_4BPP_SRGB_BLOCK
+                A8_UNORM
             };
 
             Format(FormatType format = UNDEFINED);

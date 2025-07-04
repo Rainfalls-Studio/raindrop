@@ -9,18 +9,10 @@
 
 namespace Raindrop::Graphics::Backend::Vulkan{
     template<>
-    VkCommandPoolCreateFlagBits toVulkan(Backend::CommandPool::FlagBits&& bit){
-        using enum Backend::CommandPool::FlagBits;
-        switch (bit){
-            case NONE: return VkCommandPoolCreateFlagBits(0);
-            case TRANSIENT: return VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
-            case RESET: return VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-            default: break;
-        }
-        throw std::runtime_error("Undefined command pool flag");
-    }
+    VkCommandPoolCreateFlagBits toVulkan(Backend::CommandPool::FlagBits&& bit);
 
-    RAINDROP_TO_VK_FLAG(VkCommandPoolCreateFlags, VkCommandPoolCreateFlagBits, Backend::CommandPool::Flags)
+    template<>
+    VkCommandPoolCreateFlags toVulkan(Backend::CommandPool::Flags&& bit);
 
     class CommandPool : public Backend::CommandPool{
         public:

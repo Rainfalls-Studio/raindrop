@@ -14,6 +14,16 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
+	template<>
+	VkPresentModeKHR toVulkan(Backend::Swapchain::PresentMode &&value){
+		using enum Backend::Swapchain::PresentMode;
+		switch (value){
+			case IMMEDIATE: return VK_PRESENT_MODE_IMMEDIATE_KHR;
+			case MAILBOX: return VK_PRESENT_MODE_MAILBOX_KHR;
+			case FIFO: return VK_PRESENT_MODE_FIFO_KHR;
+		}
+		throw std::runtime_error("Unknown present mode");
+	}
 
 	Swapchain::Swapchain(Context& context, const std::shared_ptr<Surface>& surface) :  _context{context}{
 		// Ensure the surface is from the same API

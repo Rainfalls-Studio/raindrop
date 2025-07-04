@@ -11,22 +11,11 @@
 
 namespace Raindrop::Graphics::Backend::Vulkan{
     template<>
-    VkQueueFlagBits toVulkan(Backend::QueueFamily::CapabilitiesBits&& bit){
-        using enum Backend::QueueFamily::CapabilitiesBits;
-        switch (bit){
-            case NONE: return VkQueueFlagBits(0);
-            case GRAPHICS: return VK_QUEUE_GRAPHICS_BIT;
-            case COMPUTE: return VK_QUEUE_COMPUTE_BIT;
-            case TRANSFER: return VK_QUEUE_TRANSFER_BIT;
-            case VIDEO_DECODE: return VK_QUEUE_VIDEO_DECODE_BIT_KHR;
-            case VIDEO_ENCODE: return VK_QUEUE_VIDEO_ENCODE_BIT_KHR;
-            case SPARSE_BINDING: return VK_QUEUE_SPARSE_BINDING_BIT;
-            default: break;
-        }
-        throw std::runtime_error("Undefined queue family capability");
-    }
+    VkQueueFlagBits toVulkan(Backend::QueueFamily::CapabilitiesBits&& bit);
 
-    RAINDROP_TO_VK_FLAG(VkQueueFlags, VkQueueFlagBits, Backend::QueueFamily::Capabilities)
+    template<>
+    VkQueueFlags toVulkan(Backend::QueueFamily::Capabilities&& bit);
+
 
     class QueueFamily : public Backend::QueueFamily {
         public:

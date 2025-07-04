@@ -190,33 +190,85 @@ namespace Raindrop::Graphics::Backend::Vulkan{
 		// _context.present = initQueue(vkb::QueueType::present);
 		// _context.transfer = initQueue(vkb::QueueType::transfer);
 	}
-    
+
+    std::vector<std::shared_ptr<QueueFamily>> Device::getFamilies() const{
+
+    }
+
     std::shared_ptr<Backend::Buffer> Device::createBuffer(const Buffer::Description& description){
         std::shared_ptr<Buffer> buffer = std::make_shared<Buffer>(_context, description);
         return std::static_pointer_cast<Backend::Buffer>(buffer);
     }
 
-    std::shared_ptr<Backend::CommandList> Device::createCommandList(){
-        return nullptr;
+    std::shared_ptr<Backend::BufferView> Device::createBufferView(const BufferView::Description& description){
+
     }
 
-    std::shared_ptr<Backend::DescriptorSet> Device::createDescriptorSet(){
-        return nullptr;
+    std::shared_ptr<Backend::Image> Device::createImage(const Image::Description& description){
+
     }
 
-    std::shared_ptr<Backend::Framebuffer> Device::createFramebuffer(){
-        return nullptr;
+    std::shared_ptr<Backend::ImageView> Device::createImageView(const ImageView::Description& description){
+
     }
 
-    std::shared_ptr<Backend::GraphicsPipeline> Device::createGraphicsPipeline(){
-        return nullptr;
+    std::shared_ptr<Backend::CommandPool> Device::createCommandPool(const CommandPool::Description& description){
+
     }
 
-    std::shared_ptr<Backend::RenderPass> Device::createRenderPass(){
-        return nullptr;
+    std::shared_ptr<Backend::DescriptorSetLayout> Device::createDescriptorSetLayout(const DescriptorSetLayout::Description& description){
+
     }
 
-    std::shared_ptr<Backend::Shader> Device::createShader(){
-        return nullptr;
+    std::shared_ptr<Backend::DescriptorPool> Device::createDescriptorPool(const DescriptorPool::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::DescriptorSet> Device::createDescriptorSet(const DescriptorSet::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::Framebuffer> Device::createFramebuffer(const Framebuffer::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::GraphicsPipeline> Device::createGraphicsPipeline(const GraphicsPipeline::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::ComputePipeline> Device::createComputePipeline(const ComputePipeline::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::RenderPass> Device::createRenderPass(const RenderPass::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::Sampler> Device::createSampler(const Sampler::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::Shader> Device::createShader(const Shader::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::Fence> Device::createFence(const Fence::Description& description){
+
+    }
+
+    std::shared_ptr<Backend::Semaphore> Device::createSemaphore(){
+
+    }
+
+    std::shared_ptr<Backend::TimelineSemaphore> Device::createTimelineSemaphore(const TimelineSemaphore::Description& description){
+
+    }
+    
+    void* Device::getHandle() const noexcept{
+        return static_cast<void*>(_context.device.device);
+    }
+
+    API Device::getAPI() const noexcept{
+        return API::VULKAN;
     }
 }

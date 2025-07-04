@@ -9,6 +9,21 @@
 #include <stdexcept>
 
 namespace Raindrop::Graphics::Backend::Vulkan{
+    template<>
+    VkCommandPoolCreateFlagBits toVulkan(Backend::CommandPool::FlagBits&& bit){
+        using enum Backend::CommandPool::FlagBits;
+        switch (bit){
+            case NONE: return VkCommandPoolCreateFlagBits(0);
+            case TRANSIENT: return VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
+            case RESET: return VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+            default: break;
+        }
+        throw std::runtime_error("Undefined command pool flag");
+    }
+
+    RAINDROP_TO_VK_FLAG(VkCommandPoolCreateFlags, VkCommandPoolCreateFlagBits, Backend::CommandPool::Flags)
+
+
     CommandPool::CommandPool(Context& context, const Description& description) : _context{context}{
         assert(description.family && "A valid queue family must be provided");
         assert(description.family->getAPI() == API::VULKAN && "The queue family must be from the Vulkan API");

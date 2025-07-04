@@ -12,15 +12,7 @@
 
 namespace Raindrop::Graphics::Backend::Vulkan{
 	template<>
-	VkPresentModeKHR toVulkan(Backend::Swapchain::PresentMode &&value){
-		using enum Backend::Swapchain::PresentMode;
-		switch (value){
-			case IMMEDIATE: return VK_PRESENT_MODE_IMMEDIATE_KHR;
-			case MAILBOX: return VK_PRESENT_MODE_MAILBOX_KHR;
-			case FIFO: return VK_PRESENT_MODE_FIFO_KHR;
-		}
-		throw std::runtime_error("Unknown present mode");
-	}
+	VkPresentModeKHR toVulkan(Backend::Swapchain::PresentMode &&value);
 
 	struct Context;
 	class Swapchain : public Backend::Swapchain{

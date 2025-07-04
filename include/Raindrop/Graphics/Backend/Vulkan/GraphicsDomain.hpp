@@ -9,15 +9,9 @@
 
 namespace Raindrop::Graphics::Backend::Vulkan{
     template<>
-    VkSubpassContents toVulkan(SubpassContent&& content){
-        using enum SubpassContent;
-        switch (content){
-            case INLINE: return VK_SUBPASS_CONTENTS_INLINE;
-            case SECONDARY: return VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS;
-        }
-        throw std::runtime_error("Unknown subpass contents");
-    }
+    VkSubpassContents toVulkan(SubpassContent&& content);
 
+    
     class GraphicsDomain : public Backend::GraphicsDomain{
         public: 
             GraphicsDomain(VkCommandBuffer commandBuffer);
