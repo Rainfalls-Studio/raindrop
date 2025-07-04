@@ -5,8 +5,6 @@
 #include "Raindrop/Input/KeyEvents.hpp"
 #include "Raindrop/Window/Config.hpp"
 #include "Raindrop/Window/Flags.hpp"
-#include "Raindrop/Window/SurfaceProviders/Vulkan.hpp"
-#include "Raindrop/Window/SurfaceProviders/Metal.hpp"
 #include "Raindrop/Window/WindowEvents.hpp"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include <SDL3/SDL_error.h>
@@ -16,47 +14,8 @@
 #include <spdlog/spdlog.h>
 #include <SDL3/SDL.h>
 #include <stdexcept>
-#include <string_view>
 
 namespace Raindrop::Window{
-
-	class SDL2VulkanSurfaceProvider : public SurfaceProviders::Vulkan{
-		public:
-            SDL2VulkanSurfaceProvider(Window& window) : SurfaceProviders::Vulkan(window){}
-
-            virtual char const* const* getInstanceExtensions(uint32_t* count) override{
-				return SDL_Vulkan_GetInstanceExtensions(count);
-			}
-
-            virtual bool createSurface(VkInstance instance, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface) override {
-				if (!SDL_Vulkan_CreateSurface(static_cast<SDL_Window*>(_window.getNativeHandle()), instance, allocator, surface)){
-					SPDLOG_ERROR("Failed to create Vulkan surface : {}", SDL_GetError());
-					return false;
-				}
-				return true;
-			}
-
-            virtual void destroySurface(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks* allocator) override{
-				SDL_Vulkan_DestroySurface(instance, surface, allocator);
-			}
-	};
-
-	class SDL2MetalSurfaceProvider : public SurfaceProviders::Metal{
-		public:
-            SDL2MetalSurfaceProvider(Window& window) : SurfaceProviders::Metal(window){}
-
-            virtual SDL_MetalView createView() override{
-				return SDL_Metal_CreateView(static_cast<SDL_Window*>(_window.getNativeHandle()));
-			}
-
-            virtual void destroyView(SDL_MetalView view) override{
-				return SDL_Metal_DestroyView(view);
-			}
-
-            virtual void* getLayer(SDL_MetalView view) override{
-				return SDL_Metal_GetLayer(view);
-			}
-	};
 
 	SDL_WindowFlags raindropToSDLWindowFlags(Flags flags){
 		SDL_WindowFlags out = 0;
@@ -82,7 +41,7 @@ namespace Raindrop::Window{
     Window::Window(const Config& config) :
             _engine{config._engine},
             _event{config._events},
-            _handle{nullptr}{
+            _window{nullptr}{
         createLogger();
         if (SDL_WasInit(SDL_INIT_VIDEO) == 0){
             SPDLOG_LOGGER_TRACE(_logger, "Initializing SDL3 ...");
@@ -97,14 +56,14 @@ namespace Raindrop::Window{
 
         SPDLOG_LOGGER_TRACE(_logger, "Creating SDL3 window ...");
 
-        _handle = SDL_CreateWindow(
+        _window = SDL_CreateWindow(
             config._title.c_str(),
             config._size.x,
             config._size.y,
             raindropToSDLWindowFlags(config._flags) | SDL_WINDOW_VULKAN
         );
 
-        if (!_handle){
+        if (!_window){
             SPDLOG_LOGGER_ERROR(_logger, "Failed to create SDL3 window : %s", SDL_GetError());
             throw std::runtime_error("Failed to create window");
         }
@@ -122,9 +81,9 @@ namespace Raindrop::Window{
     }
 
     Window::~Window(){
-        if (_handle){
+        if (_window){
             SPDLOG_LOGGER_TRACE(_logger, "Destroying SDL3 Window");
-            SDL_DestroyWindow(static_cast<SDL_Window*>(_handle));
+            SDL_DestroyWindow(_window);
         }
         
         int count;
@@ -138,30 +97,30 @@ namespace Raindrop::Window{
 
     glm::ivec2 Window::getSize() const{
         int w, h;
-        SDL_GetWindowSizeInPixels(static_cast<SDL_Window*>(_handle), &w, &h);
+        SDL_GetWindowSizeInPixels(_window, &w, &h);
         return glm::ivec2(w, h);
     }
 
     glm::ivec2 Window::getPosition() const{
         int x, y;
-        SDL_GetWindowPosition(static_cast<SDL_Window*>(_handle), &x, &y);
+        SDL_GetWindowPosition(_window, &x, &y);
         return glm::ivec2(x, y);
     }
 
     const char* Window::getTitle() const{
-        return SDL_GetWindowTitle(static_cast<SDL_Window*>(_handle));
+        return SDL_GetWindowTitle(_window);
     }
 
     bool Window::isFullscreen() const{
-        return SDL_GetWindowFlags(static_cast<SDL_Window*>(_handle)) & SDL_WINDOW_FULLSCREEN;
+        return SDL_GetWindowFlags(_window) & SDL_WINDOW_FULLSCREEN;
     }
 
     bool Window::isMinimized() const{
-        return SDL_GetWindowFlags(static_cast<SDL_Window*>(_handle)) & SDL_WINDOW_MINIMIZED;
+        return SDL_GetWindowFlags(_window) & SDL_WINDOW_MINIMIZED;
     }
 
     bool Window::isMaximized() const{
-        return SDL_GetWindowFlags(static_cast<SDL_Window*>(_handle)) & SDL_WINDOW_MAXIMIZED;
+        return SDL_GetWindowFlags(_window) & SDL_WINDOW_MAXIMIZED;
     }
 
     bool Window::resized() const{
@@ -173,29 +132,21 @@ namespace Raindrop::Window{
     }
     
     void Window::setSize(glm::ivec2 size){
-        SDL_SetWindowSize(static_cast<SDL_Window*>(_handle), size.x, size.y);
+        SDL_SetWindowSize(_window, size.x, size.y);
     }
 
     void Window::setPosition(glm::ivec2 position){
-        SDL_SetWindowPosition(static_cast<SDL_Window*>(_handle), position.x, position.y);
+        SDL_SetWindowPosition(_window, position.x, position.y);
     }
 
-    void* Window::getNativeHandle() const{
-        return _handle;
-    }
+	vk::SurfaceKHR Window::createSurface(vk::Instance instance){
+		VkSurfaceKHR surface;
 
-	std::unique_ptr<SurfaceProvider> Window::getSurfaceProvider(std::string_view API){
-		if (API == "Vulkan"){
-			return std::make_unique<SDL2VulkanSurfaceProvider>(*this);
-		} else if (API == "Metal"){
-			return std::make_unique<SDL2MetalSurfaceProvider>(*this);
+		if (SDL_Vulkan_CreateSurface(_window, instance, nullptr, &surface) == false){
+			throw std::runtime_error("Failed to create window + " + std::string(SDL_GetError()));
 		}
-
-		return nullptr;
-	}
-
-	void Window::addProperty(std::type_index type, std::shared_ptr<Property> property){
-		_properties[type] = property;
+		
+		return surface;
 	}
     
 	void Window::events(){
@@ -280,7 +231,7 @@ namespace Raindrop::Window{
 				case SDL_EVENT_GAMEPAD_TOUCHPAD_UP: gamepadTouchpadUpEvent(e); break;
 				case SDL_EVENT_GAMEPAD_SENSOR_UPDATE: gamepadSensorUpdateEvent(e); break;
 				case SDL_EVENT_GAMEPAD_UPDATE_COMPLETE: gamepadUpdateCompleteEvent(e); break;
-				case SDL_EVENT_GAMEPAD_STEAM_HANDLE_UPDATED: gamepadSteamHandleUpdatedEvent(e); break;
+				case SDL_EVENT_GAMEPAD_STEAM_WINDOW_UPDATED: gamepadSteamHandleUpdatedEvent(e); break;
 			#endif
 			
 			#ifdef EVENT_FINGER
@@ -799,7 +750,7 @@ namespace Raindrop::Window{
 	// }
 
 	// void Window::gamepadSteamHandleUpdatedEvent(SDL_Event&){
-	// 	_context.getInternalContext().getEventManager().get("gamepad.steam_handle_updated").trigger();
+	// 	_context.getInternalContext().getEventManager().get("gamepad.steam_window_updated").trigger();
 	// }
 
 	// void Window::fingerDownEvent(SDL_Event&){

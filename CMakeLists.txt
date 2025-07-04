@@ -42,13 +42,15 @@ find_package(SDL3 REQUIRED) # Not specified in vcpkg.json as it's not currently 
 target_link_libraries(Raindrop
     PRIVATE
     spdlog::spdlog
-    EnTT::EnTT
     glm::glm
     SDL3::SDL3
     Vulkan::Vulkan
     vk-bootstrap::vk-bootstrap
     vk-bootstrap::vk-bootstrap-compiler-warnings
     GPUOpen::VulkanMemoryAllocator
+
+    PUBLIC
+    EnTT::EnTT
 )
 
 # ---- Install rules ----

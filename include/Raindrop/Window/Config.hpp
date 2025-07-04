@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../Engine.hpp"
 #include <string>
 #include "Raindrop/Event/Manager.hpp"
-#include "Raindrop/Window/Flags.hpp"
-#include "Raindrop/Window/Position.hpp"
-#include "Raindrop/Window/Size.hpp"
+#include "Flags.hpp"
+#include "Position.hpp"
+#include "Size.hpp"
 
 namespace Raindrop::Window{
     class Config{

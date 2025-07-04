@@ -1,17 +1,11 @@
 #pragma once
 
-#include "Raindrop/Window/Context.hpp"
-#include "Raindrop/Window/Property.hpp"
-#include "../Engine.hpp"
-#include <glm/glm.hpp>
+#include <SDL3/SDL_video.h>
 #include <memory>
-#include <string_view>
-#include <typeindex>
-#include <unordered_map>
 #include "../Event/Manager.hpp"
-#include "Raindrop/Window/SurfaceProvider.hpp"
-#include "Raindrop/Window/Config.hpp"
+#include "Config.hpp"
 #include <SDL3/SDL.h>
+#include <vulkan/vulkan.hpp>
 
 namespace Raindrop::Window{
 	class Window{
@@ -34,41 +28,15 @@ namespace Raindrop::Window{
 			void setSize(glm::ivec2 size);
 			void setPosition(glm::ivec2 position);
 
-			void* getNativeHandle() const;
-
 			void events();
 
-			template<typename T, typename... Args>
-			inline std::shared_ptr<T> addProperty(Args&&... args);
-
-			template<typename T>
-			inline std::shared_ptr<T> addProperty();
-
-			void addProperty(std::type_index type, std::shared_ptr<Property> property);
-
-			template<typename T>
-			inline std::shared_ptr<T> getProperty();
-
-			template<typename T>
-			inline const std::shared_ptr<T> getProperty() const;
-
-			template<typename T>
-			inline bool hasProperty() const noexcept;
-
-			template<typename T>
-			inline void removeProperty() noexcept;
-
-			std::unique_ptr<SurfaceProvider> getSurfaceProvider(std::string_view API);
-
-			template<typename T>
-			inline std::unique_ptr<T> getSurfaceProvider();
+			vk::SurfaceKHR createSurface(vk::Instance instance);
 
 		private:
 			Engine& _engine;
 			std::shared_ptr<spdlog::logger> _logger;
 			std::shared_ptr<Event::Manager> _event;
-			void* _handle;
-			std::unordered_map<std::type_index, std::shared_ptr<Property>> _properties;
+			SDL_Window* _window;
 
 			void createLogger();
 
@@ -183,5 +151,3 @@ namespace Raindrop::Window{
 
 	};
 }
-
-#include "inl/Window.inl"
