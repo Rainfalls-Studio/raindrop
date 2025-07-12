@@ -1,140 +1,45 @@
-#include "Raindrop/Components/Scene.hpp"
-#include "Raindrop/Systems/Scene.hpp"
 #include <Raindrop/Raindrop.hpp>
-#include <iostream>
 
-// class WindowStorage : public Raindrop::Input::StorageGroup{
-//     public:
-//         WindowStorage(){
-//             definition.declare<glm::uvec2>("size", [this]() -> glm::uvec2& {return size;});
-//             definition.declare<glm::uvec2>("position", [this]() -> glm::uvec2& {return position;});
-//         }
-
-//         glm::uvec2 size;
-//         glm::uvec2 position;
-// };
-
-class Testbed{
+class Testbed : public Raindrop::System::ISystem{
     public:
-        Testbed(){
+        Testbed(){}
+        virtual ~Testbed() override = default;
 
-            _engine = std::make_shared<Raindrop::Engine>();
-            _engine->addSystem<Raindrop::Systems::Scene>();
-
-            Raindrop::Layer layer = _engine->createLayer();
-            layer.add<Raindrop::Components::Scene>();
-            
-
-            // createAssetManager();
-            // createEventManager();
-            // createInputManager();
-            // createWindowManager();
-            // createWindow();
-            // createSceneManager();
-
-            // _inputs->declareStorage<WindowStorage>("window");
-
-            // _inputs->onEvent<Raindrop::Window::WindowResized>(
-            //     [](Raindrop::Input::Storage& s, const Raindrop::Window::WindowResized& event){
-            //         s.getGroup<WindowStorage>("window").size = event.getSize();
-            // });
-
-            // _inputs->onEvent<Raindrop::Window::WindowMoved>(
-            //     [](Raindrop::Input::Storage& s, const Raindrop::Window::WindowMoved& event){
-            //         s.getGroup<WindowStorage>("window").position = event.getPosition();
-            // });
+        virtual void initialize(Raindrop::Engine& engine) override{
+            _engine = &engine;
+            auto& systems = engine.getSystemManager();
+            systems.getSystem<Raindrop::Event::EventSystem>()->getManager().subscribe<Raindrop::Window::WindowCloseRequest>([&engine](const auto&) -> bool {engine.stop(); return false;});
         }
 
-        // void run(){
-        //     bool running = true;
+        virtual std::vector<Dependency> dependencies() const override{
+            return {
+                {typeid(Raindrop::Event::EventSystem)}
+            };
+        }
 
-        //     _events->subscribe<Raindrop::Window::WindowCloseRequest>(
-        //         [&running](auto) -> bool {
-        //             running = false;
-        //             return false;
-        //         }
-        //     );
+        virtual void update() override{
+            // _engine->stop();
+        }
 
-
-        //     while (running){
-        //         events();
-        //         update();
-        //         render();
-        //     }
-        // }
+        virtual const char* name() const override{
+            return "Testbed";
+        }
 
     private:
-        std::shared_ptr<Raindrop::Engine> _engine;
-        // std::shared_ptr<Raindrop::Asset::Manager> _assets;
-        // std::shared_ptr<Raindrop::Event::Manager> _events;
-        // std::shared_ptr<Raindrop::Input::Manager> _inputs;
-        // std::shared_ptr<Raindrop::Window::Manager> _windows;
-        // std::shared_ptr<Raindrop::Scene::Manager> _scenes;
-
-        // std::shared_ptr<Raindrop::Window::Window> _window;
-
-        // std::shared_ptr<Raindrop::Scene::Scene> _scene;
-
-        // void createAssetManager(){
-        //     _assets = std::make_shared<Raindrop::Asset::Manager>(*_engine);
-        // }
-
-        // void createEventManager(){
-        //     _events = std::make_shared<Raindrop::Event::Manager>(*_engine);
-        // }
-
-        // void createInputManager(){
-        //     _inputs = std::make_shared<Raindrop::Input::Manager>(*_engine, _events);
-        // }
-
-        // void createWindowManager(){
-        //     _windows = std::make_shared<Raindrop::Window::Manager>(*_engine);
-        // }
-
-
-        // void createSceneManager(){
-        //     _scenes = std::make_shared<Raindrop::Scene::Manager>(*_engine);
-
-        // }
-
-        // void createWindow(){
-        //     auto config = Raindrop::Window::Config::Default(*_engine);
-
-        //     config
-        //         .setPosition({Raindrop::Window::POSITION_CENTRED, Raindrop::Window::POSITION_CENTRED})
-        //         .setEventManager(_events);
-
-        //     _window = _windows->createWindow(config);
-        // }
-
-        // void events(){
-        //     _windows->foreach(
-        //         [](Raindrop::Window::Window& window){
-        //             window.events();
-        //         }
-        //     );
-        // }
-
-        // void update(){
-            
-        // }
-
-        // void render(){
-        //     // _windows->foreach([this](Raindrop::Window::Window& window){
-        //     //     _graphics->render(window);
-        //     // })
-        // }
+        Raindrop::Engine* _engine;
 };
 
 int main(){
+    Raindrop::Engine engine;
 
-    try {
-        Testbed testbed;
-        // testbed.run();
-    } catch (const std::exception &e){
-        std::cerr << "Exception: " << e.what() << std::endl;
-        return 1;
-    }
+    auto& systems = engine.getSystemManager();
+
+    systems.emplaceSystem<Raindrop::Window::WindowSystem>();
+    systems.emplaceSystem<Raindrop::Event::EventSystem>();
+    systems.emplaceSystem<Raindrop::Graphics::RenderSystem>();
+    systems.emplaceSystem<Testbed>();
+
+    engine.run();
 
     return 0;
 }

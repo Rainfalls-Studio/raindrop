@@ -1,43 +1,23 @@
 #pragma once
 
-#include <memory>
-#include "LayerRegistry.hpp"
-#include "Layer.hpp"
-#include "System.hpp"
+#include "Layer/Manager.hpp"
+#include "System/Manager.hpp"
 
 namespace Raindrop{
     class Engine{
         public:
             Engine();
 
-            static std::shared_ptr<Engine> Create();
+            void run();
+            void stop();
 
-            // =========== system ==============
+            Layer::Manager& getLayerManager() noexcept;
+            System::Manager& getSystemManager() noexcept;
 
-            template<typename T, typename... Args>
-            void addSystem(Args&&... args){
-                static_assert(std::is_base_of<System, T>::value, "T must be derived from System");
-                addSystem(std::make_shared<T>(std::forward<Args>(args)...));
-            }
+        private: 
+            System::Manager _systems;
+            Layer::Manager _layers;
 
-            template<typename T>
-            void addSystem(){
-                static_assert(std::is_base_of<System, T>::value, "T must be derived from System");
-                addSystem(std::make_shared<T>());
-            }
-
-            void addSystem(std::shared_ptr<System> system);
-
-            // =========== layers ==============
-
-            LayerRegistry& getLayerRegistry() noexcept;
-
-            inline Layer createLayer(){
-                return getLayerRegistry().createLayer();
-            }
-
-        private:
-            LayerRegistry _layers;
-            std::list<std::shared_ptr<System>> _system;
+            bool _running;
     };
 }

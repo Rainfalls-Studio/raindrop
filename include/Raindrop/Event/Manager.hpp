@@ -3,7 +3,6 @@
 #include <functional>
 #include <list>
 #include <typeindex>
-#include <typeinfo>
 #include <memory>
 #include <spdlog/spdlog.h>
 
@@ -45,7 +44,7 @@ namespace Raindrop{
 				void trigger(const T& event);
 
 			private:
-				Engine &_engine;
+				Engine& _engine;
 				std::shared_ptr<spdlog::logger> _logger;
 				std::unordered_map<std::type_index, EventData> _events;
 

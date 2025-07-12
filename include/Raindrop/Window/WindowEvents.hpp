@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Event/Event.hpp"
-#include "Window.hpp"
+#include "Raindrop/Event/Event.hpp"
+#include <glm/glm.hpp>
 
 namespace Raindrop::Window{
 
@@ -11,16 +11,8 @@ namespace Raindrop::Window{
 	 */
 	class WindowEvent : public Event::Event{
 		public:
-
-			WindowEvent(const Window& window) : Event(), _window{window}{}
+			WindowEvent() : Event(){}
 			~WindowEvent() = default;
-			
-			inline const Window& getWindow() const noexcept{
-				return _window;
-			}
-
-		protected:
-			const Window& _window;
 	};
 
 	/**
@@ -29,7 +21,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowResized : public WindowEvent{
 		public:
-			WindowResized(const Window& window, const glm::u32vec2& size) : WindowEvent(window), _size{size}{}
+			WindowResized(const glm::u32vec2& size) : _size{size}{}
 			~WindowResized() = default;
 
 			const glm::u32vec2& getSize() const noexcept{
@@ -46,7 +38,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowShown : public WindowEvent{
 		public:
-			WindowShown(const Window& window) : WindowEvent(window){}
+			WindowShown(){}
 			~WindowShown() = default;
 	};
 
@@ -56,7 +48,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowHidden : public WindowEvent{
 		public:
-			WindowHidden(const Window& window) : WindowEvent(window){}
+			WindowHidden(){}
 			~WindowHidden() = default;
 	};
 
@@ -66,7 +58,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowExposed : public WindowEvent{
 		public:
-			WindowExposed(const Window& window) : WindowEvent(window){}
+			WindowExposed(){}
 			~WindowExposed() = default;
 	};
 
@@ -76,15 +68,15 @@ namespace Raindrop::Window{
 	 */
 	class WindowMoved : public WindowEvent{
 		public:
-			WindowMoved(const Window& window, const glm::u32vec2& position) : WindowEvent(window), _position{position}{}
+			WindowMoved(const glm::ivec2& position) : _position{position}{}
 			~WindowMoved() = default;
 
-			const glm::u32vec2& getPosition() const noexcept{
+			const glm::ivec2& getPosition() const noexcept{
 				return _position;
 			}
 		
 		private:
-			glm::u32vec2 _position;
+			glm::ivec2 _position;
 	};
 
 	/**
@@ -93,7 +85,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMinimized : public WindowEvent{
 		public:
-			WindowMinimized(const Window& window) : WindowEvent(window){}
+			WindowMinimized(){}
 			~WindowMinimized() = default;
 	};
 
@@ -103,7 +95,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMaximized : public WindowEvent{
 		public:
-			WindowMaximized(const Window& window) : WindowEvent(window){}
+			WindowMaximized(){}
 			~WindowMaximized() = default;
 	};
 
@@ -113,7 +105,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMouseEntered : public WindowEvent{
 		public:
-			WindowMouseEntered(const Window& window) : WindowEvent(window){}
+			WindowMouseEntered(){}
 			~WindowMouseEntered() = default;
 	};
 
@@ -123,7 +115,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMouseLeaved : public WindowEvent{
 		public:
-			WindowMouseLeaved(const Window& window) : WindowEvent(window){}
+			WindowMouseLeaved(){}
 			~WindowMouseLeaved() = default;
 	};
 
@@ -133,7 +125,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowRestored : public WindowEvent{
 		public:
-			WindowRestored(const Window& window) : WindowEvent(window){}
+			WindowRestored(){}
 			~WindowRestored() = default;
 	};
 
@@ -143,7 +135,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFocusGained : public WindowEvent{
 		public:
-			WindowFocusGained(const Window& window) : WindowEvent(window){}
+			WindowFocusGained(){}
 			~WindowFocusGained() = default;
 	};
 
@@ -153,7 +145,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFocusLost : public WindowEvent{
 		public:
-			WindowFocusLost(const Window& window) : WindowEvent(window){}
+			WindowFocusLost(){}
 			~WindowFocusLost() = default;
 	};
 
@@ -163,7 +155,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowCloseRequest : public WindowEvent{
 		public:
-			WindowCloseRequest(const Window& window) : WindowEvent(window){}
+			WindowCloseRequest(){}
 			~WindowCloseRequest() = default;
 	};
 
@@ -173,7 +165,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFocusTake : public WindowEvent{
 		public:
-			WindowFocusTake(const Window& window) : WindowEvent(window){}
+			WindowFocusTake(){}
 			~WindowFocusTake() = default;
 	};
 
@@ -183,7 +175,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowOccluded : public WindowEvent{
 		public:
-			WindowOccluded(const Window& window) : WindowEvent(window){}
+			WindowOccluded(){}
 			~WindowOccluded() = default;
 	};
 
@@ -193,7 +185,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFullscreenLeave : public WindowEvent{
 		public:
-			WindowFullscreenLeave(const Window& window) : WindowEvent(window){}
+			WindowFullscreenLeave(){}
 			~WindowFullscreenLeave() = default;
 	};
 
@@ -203,7 +195,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFullscreenEnter : public WindowEvent{
 		public:
-			WindowFullscreenEnter(const Window& window) : WindowEvent(window){}
+			WindowFullscreenEnter(){}
 			~WindowFullscreenEnter() = default;
 	};
 
