@@ -25,6 +25,9 @@ namespace Raindrop::System{
             virtual void preShutdown();
             virtual void shutdown();
 
+            virtual void top();
+            virtual void bottom();
+
             virtual void preEvent();
             virtual void event();
             virtual void postEvent();

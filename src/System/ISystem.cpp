@@ -6,6 +6,9 @@ namespace Raindrop::System{
     void ISystem::preShutdown(){}
     void ISystem::shutdown(){}
 
+    void ISystem::top(){}
+    void ISystem::bottom(){}
+
     void ISystem::preEvent(){}
     void ISystem::event(){}
     void ISystem::postEvent(){}

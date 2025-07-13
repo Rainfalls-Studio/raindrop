@@ -16,4 +16,8 @@ namespace Raindrop::Layer{
     entt::basic_registry<LayerHandle>& Manager::getRegistry() noexcept{
         return _layers;
     }
+
+    bool Manager::isValid(LayerHandle handle) const{
+        return _layers.valid(handle);
+    }
 }

@@ -37,8 +37,16 @@ int main(){
     systems.emplaceSystem<Raindrop::Window::WindowSystem>();
     systems.emplaceSystem<Raindrop::Event::EventSystem>();
     systems.emplaceSystem<Raindrop::Graphics::RenderSystem>();
+    systems.emplaceSystem<Raindrop::Scene::SceneSystem>();
     systems.emplaceSystem<Testbed>();
 
+    auto& layers = engine.getLayerManager();
+    
+    Raindrop::Layer::Layer gameplay = layers.createLayer();
+    auto& scene = gameplay.emplaceModule<Raindrop::Scene::LayerModule>().scene;
+
+    Raindrop::Scene::Entity entity = scene.createEntity();
+    
     engine.run();
 
     return 0;

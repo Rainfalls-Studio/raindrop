@@ -9,6 +9,8 @@ namespace Raindrop{
         _running = true;
 
         while (_running){
+            _systems.foreach([](System::ISystem& sys){sys.top();});
+
             _systems.foreach([](System::ISystem& sys){sys.preEvent();});
             _systems.foreach([](System::ISystem& sys){sys.event();});
             _systems.foreach([](System::ISystem& sys){sys.postEvent();});
@@ -20,6 +22,8 @@ namespace Raindrop{
             _systems.foreach([](System::ISystem& sys){sys.preRender();});
             _systems.foreach([](System::ISystem& sys){sys.render();});
             _systems.foreach([](System::ISystem& sys){sys.postRender();});
+
+            _systems.foreach([](System::ISystem& sys){sys.bottom();});
         }
 
         _systems.foreach([this](System::ISystem& sys){sys.preShutdown();});

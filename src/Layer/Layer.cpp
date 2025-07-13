@@ -34,7 +34,8 @@ namespace Raindrop::Layer{
     }
 
     bool Layer::isValid() const noexcept{
-        return _handle != INVALID_LAYER_HANDLE && _manager != nullptr;
+        if (_handle == INVALID_LAYER_HANDLE || _manager == nullptr) return false;
+        return _manager->isValid(_handle);
     }
 
     LayerHandle Layer::getHandle() const noexcept{

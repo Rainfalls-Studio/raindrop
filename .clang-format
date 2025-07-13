@@ -1,4 +1,3 @@
----
 Language: Cpp
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
@@ -274,4 +273,3 @@ WhitespaceSensitiveMacros:
   - STRINGIZE
   - PP_STRINGIZE
   - BOOST_PP_STRINGIZE
-...

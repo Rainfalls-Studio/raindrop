@@ -1,5 +1,6 @@
 #include "Raindrop/System/Manager.hpp"
 #include <queue>
+#include <stdexcept>
 
 namespace Raindrop::System{
     Manager::Manager(){}
