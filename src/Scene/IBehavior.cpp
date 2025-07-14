@@ -1,7 +1,10 @@
 #include "Raindrop/Scene/IBehavior.hpp"
 
 namespace Raindrop::Scene{
-    void IBehavior::initialize(){}
+    void IBehavior::onCreate(Entity&){}
+    void IBehavior::onDestroy(Entity&){}
+
+    void IBehavior::initialize(Scene&){}
     void IBehavior::shutdown(){}
 
     void IBehavior::preEvent(){}

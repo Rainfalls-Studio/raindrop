@@ -1,11 +1,16 @@
 #pragma once
 
+#include "Scene.hpp"
+
 namespace Raindrop::Scene{
     class IBehavior{
         public:
             virtual ~IBehavior() = default;
 
-            virtual void initialize();
+            virtual void onCreate(Entity& entity);
+            virtual void onDestroy(Entity& entity);
+
+            virtual void initialize(Scene& scene);
             virtual void shutdown();
 
             virtual void preEvent();

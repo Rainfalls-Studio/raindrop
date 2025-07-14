@@ -1,4 +1,5 @@
 #include <Raindrop/Raindrop.hpp>
+#include "Raindrop/Builtin/Components/Tag.hpp"
 
 class Testbed : public Raindrop::System::ISystem{
     public:
@@ -9,11 +10,16 @@ class Testbed : public Raindrop::System::ISystem{
             _engine = &engine;
             auto& systems = engine.getSystemManager();
             systems.getSystem<Raindrop::Event::EventSystem>()->getManager().subscribe<Raindrop::Window::WindowCloseRequest>([&engine](const auto&) -> bool {engine.stop(); return false;});
+            createGameplayLayer();
+        }
+
+        virtual void postInitialize() override{
         }
 
         virtual std::vector<Dependency> dependencies() const override{
             return {
-                {typeid(Raindrop::Event::EventSystem)}
+                {typeid(Raindrop::Event::EventSystem)},
+                {typeid(Raindrop::Scene::SceneSystem)},
             };
         }
 
@@ -23,6 +29,20 @@ class Testbed : public Raindrop::System::ISystem{
 
         virtual const char* name() const override{
             return "Testbed";
+        }
+
+        void createGameplayLayer(){
+            auto& layers = _engine->getLayerManager();
+            
+            Raindrop::Layer::Layer gameplay = layers.createLayer();
+            auto& scene = gameplay.emplaceModule<Raindrop::Scene::LayerModule>().scene;
+
+            scene.emplaceBehavior<Raindrop::Builtin::Behaviors::TagAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Builtin::Behaviors::TransformAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Builtin::Behaviors::HierarchyAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Builtin::Behaviors::HierarchyTransformPropagator>();
+
+            Raindrop::Scene::Entity entity = scene.createEntity();
         }
 
     private:
@@ -40,13 +60,6 @@ int main(){
     systems.emplaceSystem<Raindrop::Scene::SceneSystem>();
     systems.emplaceSystem<Testbed>();
 
-    auto& layers = engine.getLayerManager();
-    
-    Raindrop::Layer::Layer gameplay = layers.createLayer();
-    auto& scene = gameplay.emplaceModule<Raindrop::Scene::LayerModule>().scene;
-
-    Raindrop::Scene::Entity entity = scene.createEntity();
-    
     engine.run();
 
     return 0;

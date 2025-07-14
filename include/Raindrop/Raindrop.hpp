@@ -16,3 +16,8 @@
 #include "Scene/IBehavior.hpp"
 #include "Scene/Entity.hpp"
 #include "Scene/SceneSystem.hpp"
+
+#include "Builtin/Behaviors/HierarchyAttacherBehavior.hpp"
+#include "Builtin/Behaviors/TagAttacherBehavior.hpp"
+#include "Builtin/Behaviors/TransformAttacherBehavior.hpp"
+#include "Builtin/Behaviors/HierarchyTransformPropagator.hpp"

@@ -5,6 +5,7 @@
 namespace Raindrop::Scene{
     class Entity{
         public:
+
             Entity();
             Entity(Scene* scene, EntityHandle handle);
 

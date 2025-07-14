@@ -6,7 +6,7 @@ namespace Raindrop::Graphics{
 
     }
 
-    void RenderSystem::initialize(Engine& engine){
+    void RenderSystem::initialize(Engine&){
 
     }
 

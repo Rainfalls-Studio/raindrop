@@ -2,13 +2,13 @@
 
 #include <cstdint>
 #include <entt/entt.hpp>
-#include "IBehavior.hpp"
 
 namespace Raindrop::Scene{
     using EntityHandle = uint32_t;
     static constexpr EntityHandle INVALID_ENTITY_HANDLE = ~static_cast<EntityHandle>(0);
 
     class Entity;
+    class IBehavior;
 
     class Scene{
         public:
@@ -17,6 +17,8 @@ namespace Raindrop::Scene{
 
             Entity createEntity();
             void destroy(Entity entity);
+
+            Entity getEntity(EntityHandle handle);
 
             bool isValid(EntityHandle handle) const;
 
@@ -27,7 +29,7 @@ namespace Raindrop::Scene{
 
             template<typename Components, typename... Args>
             inline decltype(auto) emplaceComponent(EntityHandle handle, Args&&... args){
-                return _registry.get<Components, Args...>(handle, std::forward<Args>(args)...);
+                return _registry.emplace<Components, Args...>(handle, std::forward<Args>(args)...);
             }
 
             template<typename T, typename... Args>
@@ -36,6 +38,14 @@ namespace Raindrop::Scene{
                 addBehavior(behavior);
                 return behavior;
             }
+
+            template<typename T, typename... Others>
+            inline decltype(auto) view(){
+                return _registry.view<T, Others...>();
+            }
+
+            void initialize();
+            void shutdown();
 
             void preUpdate();
             void update();
@@ -48,10 +58,14 @@ namespace Raindrop::Scene{
             void addBehavior(const std::shared_ptr<IBehavior>& behavior);
             void addExternalBehavior(const std::shared_ptr<IBehavior>& behavior);
 
+            entt::basic_registry<EntityHandle>& getRegistry();
+
         private:
             entt::basic_registry<EntityHandle> _registry;
 
             std::list<std::shared_ptr<IBehavior>> _owned;
             std::list<std::weak_ptr<IBehavior>> _external;
+
+            void foreachBehavior(const std::function<void(IBehavior&)>& callback);
     };
 }

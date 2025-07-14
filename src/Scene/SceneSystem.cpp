@@ -8,10 +8,14 @@ namespace Raindrop::Scene{
         _engine = &engine;
     }
 
-    void SceneSystem::postInitialize(){}
+    void SceneSystem::postInitialize(){
+        foreachLayer([](Scene& scene){scene.initialize();});
+    }
     
+    void SceneSystem::preShutdown(){
+        foreachLayer([](Scene& scene){scene.shutdown();});
+    }
 
-    void SceneSystem::preShutdown(){}
     void SceneSystem::shutdown(){
         _engine = nullptr;
     }
