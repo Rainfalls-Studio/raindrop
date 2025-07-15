@@ -2,7 +2,7 @@
 
 #include "Raindrop/System/ISystem.hpp"
 #include "Raindrop/Layer/Manager.hpp"
-#include "LayerModule.hpp"
+#include "SceneModule.hpp"
 
 namespace Raindrop::Scene{
     class SceneSystem : public System::ISystem{
@@ -30,7 +30,7 @@ namespace Raindrop::Scene{
         
         private:
             Engine* _engine;
-            decltype(std::declval<Layer::Manager>().view<LayerModule>()) _layers;
+            decltype(std::declval<Layer::Manager>().view<SceneModule>()) _layers;
 
             void foreachLayer(const std::function<void(Scene&)>& func);
     };

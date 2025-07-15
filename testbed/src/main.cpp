@@ -35,7 +35,7 @@ class Testbed : public Raindrop::System::ISystem{
             auto& layers = _engine->getLayerManager();
             
             Raindrop::Layer::Layer gameplay = layers.createLayer();
-            auto& scene = gameplay.emplaceModule<Raindrop::Scene::LayerModule>().scene;
+            auto& scene = gameplay.emplaceModule<Raindrop::Scene::SceneModule>().scene;
 
             scene.emplaceBehavior<Raindrop::Builtin::Behaviors::TagAttacherBehavior>();
             scene.emplaceBehavior<Raindrop::Builtin::Behaviors::TransformAttacherBehavior>();

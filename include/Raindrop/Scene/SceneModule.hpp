@@ -3,7 +3,7 @@
 #include "Scene.hpp"
 
 namespace Raindrop::Scene{
-    class LayerModule{
+    class SceneModule{
         public:
             Scene scene;
     };

@@ -1,5 +1,5 @@
 #include "Raindrop/Scene/SceneSystem.hpp"
-#include "Raindrop/Scene/LayerModule.hpp"
+#include "Raindrop/Scene/SceneModule.hpp"
 #include "Raindrop/Layer/Layer.hpp"
 #include "Raindrop/Engine.hpp"
 
@@ -24,12 +24,12 @@ namespace Raindrop::Scene{
         for (auto handle : _layers){
 
             auto layer = _engine->getLayerManager().getLayer(handle);
-            func(layer.getModules<LayerModule>().scene);
+            func(layer.getModules<SceneModule>().scene);
         }
     }
 
     void SceneSystem::top(){
-        _layers = _engine->getLayerManager().view<LayerModule>();
+        _layers = _engine->getLayerManager().view<SceneModule>();
     }
 
     void SceneSystem::bottom(){}

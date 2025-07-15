@@ -12,7 +12,7 @@
 #include "Layer/Layer.hpp"
 
 #include "Scene/Scene.hpp"
-#include "Scene/LayerModule.hpp"
+#include "Scene/SceneModule.hpp"
 #include "Scene/IBehavior.hpp"
 #include "Scene/Entity.hpp"
 #include "Scene/SceneSystem.hpp"
