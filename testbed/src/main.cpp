@@ -1,5 +1,4 @@
 #include <Raindrop/Raindrop.hpp>
-#include "Raindrop/Builtin/Components/Tag.hpp"
 
 class Testbed : public Raindrop::System::ISystem{
     public:
@@ -10,16 +9,16 @@ class Testbed : public Raindrop::System::ISystem{
             _engine = &engine;
             auto& systems = engine.getSystemManager();
             systems.getSystem<Raindrop::Event::EventSystem>()->getManager().subscribe<Raindrop::Window::WindowCloseRequest>([&engine](const auto&) -> bool {engine.stop(); return false;});
-            createGameplayLayer();
-        }
 
-        virtual void postInitialize() override{
+            createGameplayLayer();
+            createDebugLayer();
         }
 
         virtual std::vector<Dependency> dependencies() const override{
             return {
-                {typeid(Raindrop::Event::EventSystem)},
-                {typeid(Raindrop::Scene::SceneSystem)},
+                Dependency::Make<Raindrop::Event::EventSystem>(),
+                Dependency::Make<Raindrop::Scene::SceneSystem>(),
+                Dependency::Make<Raindrop::Graphics::RenderSystem>(),
             };
         }
 
@@ -45,13 +44,26 @@ class Testbed : public Raindrop::System::ISystem{
             Raindrop::Scene::Entity entity = scene.createEntity();
         }
 
+        void createDebugLayer(){
+            auto& layers = _engine->getLayerManager();
+            
+            Raindrop::Layer::Layer debug = layers.createLayer();
+            auto& scene = debug.emplaceModule<Raindrop::Scene::SceneModule>().scene;
+
+            scene.emplaceBehavior<Raindrop::Builtin::Behaviors::TagAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Builtin::Behaviors::TransformAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Builtin::Behaviors::HierarchyAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Builtin::Behaviors::HierarchyTransformPropagator>();
+
+            Raindrop::Scene::Entity entity = scene.createEntity();
+        }
+
     private:
         Raindrop::Engine* _engine;
 };
 
 int main(){
     Raindrop::Engine engine;
-
     auto& systems = engine.getSystemManager();
 
     systems.emplaceSystem<Raindrop::Window::WindowSystem>();

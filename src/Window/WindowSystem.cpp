@@ -17,6 +17,10 @@ namespace Raindrop::Window{
         _window = std::make_unique<Window>();
     }
 
+    std::unique_ptr<Window> WindowSystem::createEmptyWindow(){
+        return std::make_unique<Window>();
+    }
+
     void WindowSystem::shutdown(){
         SDL_Quit();
     }

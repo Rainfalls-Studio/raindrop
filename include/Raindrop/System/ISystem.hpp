@@ -11,6 +11,16 @@ namespace Raindrop::System{
     class ISystem{
         public:
             struct Dependency{
+                inline constexpr Dependency(const std::type_index& _type, bool _optional = false) :
+                    type{_type},
+                    optional{_optional}
+                {}
+
+                template<typename T>
+                inline static Dependency Make(bool _optional = false){
+                    return Dependency(typeid(T), _optional);
+                } 
+
                 std::type_index type;
 
                 // If marked optional. If the dependency is registred, it will initialize after it. If not, it will just skip it.

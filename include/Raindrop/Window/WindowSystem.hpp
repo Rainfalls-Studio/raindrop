@@ -17,6 +17,7 @@ namespace Raindrop::Window{
             virtual const char* name() const override;
 
             Window& getWindow();
+            std::unique_ptr<Window> createEmptyWindow();
         
         private:
             Engine* _engine;
