@@ -1,7 +1,9 @@
 #pragma once
 
+#include "Window.hpp"
 #include "Raindrop/Event/Event.hpp"
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace Raindrop::Window{
 
@@ -11,8 +13,15 @@ namespace Raindrop::Window{
 	 */
 	class WindowEvent : public Event::Event{
 		public:
-			WindowEvent() : Event(){}
+			inline WindowEvent(const std::shared_ptr<Window>& window) noexcept : Event(), _window{window} {}
 			~WindowEvent() = default;
+
+			inline const std::shared_ptr<Window>& getWindow() const{
+				return _window;
+			}
+		
+		private:
+			std::shared_ptr<Window> _window;
 	};
 
 	/**
@@ -21,10 +30,10 @@ namespace Raindrop::Window{
 	 */
 	class WindowResized : public WindowEvent{
 		public:
-			WindowResized(const glm::u32vec2& size) : _size{size}{}
+			inline WindowResized(const std::shared_ptr<Window>& window, const glm::u32vec2& size) noexcept : WindowEvent(window), _size{size}{}
 			~WindowResized() = default;
 
-			const glm::u32vec2& getSize() const noexcept{
+			inline const glm::u32vec2& getSize() const noexcept{
 				return _size;
 			}
 
@@ -38,7 +47,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowShown : public WindowEvent{
 		public:
-			WindowShown(){}
+			inline WindowShown(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowShown() = default;
 	};
 
@@ -48,7 +57,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowHidden : public WindowEvent{
 		public:
-			WindowHidden(){}
+			inline WindowHidden(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowHidden() = default;
 	};
 
@@ -58,7 +67,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowExposed : public WindowEvent{
 		public:
-			WindowExposed(){}
+			inline WindowExposed(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowExposed() = default;
 	};
 
@@ -68,7 +77,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMoved : public WindowEvent{
 		public:
-			WindowMoved(const glm::ivec2& position) : _position{position}{}
+			inline WindowMoved(const std::shared_ptr<Window>& window, const glm::ivec2& position) noexcept : WindowEvent(window), _position{position}{}
 			~WindowMoved() = default;
 
 			const glm::ivec2& getPosition() const noexcept{
@@ -85,7 +94,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMinimized : public WindowEvent{
 		public:
-			WindowMinimized(){}
+			inline WindowMinimized(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowMinimized() = default;
 	};
 
@@ -95,7 +104,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMaximized : public WindowEvent{
 		public:
-			WindowMaximized(){}
+			inline WindowMaximized(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowMaximized() = default;
 	};
 
@@ -105,7 +114,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMouseEntered : public WindowEvent{
 		public:
-			WindowMouseEntered(){}
+			inline WindowMouseEntered(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowMouseEntered() = default;
 	};
 
@@ -115,7 +124,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowMouseLeaved : public WindowEvent{
 		public:
-			WindowMouseLeaved(){}
+			inline WindowMouseLeaved(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowMouseLeaved() = default;
 	};
 
@@ -125,7 +134,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowRestored : public WindowEvent{
 		public:
-			WindowRestored(){}
+			inline WindowRestored(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowRestored() = default;
 	};
 
@@ -135,7 +144,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFocusGained : public WindowEvent{
 		public:
-			WindowFocusGained(){}
+			inline WindowFocusGained(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowFocusGained() = default;
 	};
 
@@ -145,7 +154,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFocusLost : public WindowEvent{
 		public:
-			WindowFocusLost(){}
+			inline WindowFocusLost(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowFocusLost() = default;
 	};
 
@@ -155,7 +164,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowCloseRequest : public WindowEvent{
 		public:
-			WindowCloseRequest(){}
+			inline WindowCloseRequest(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowCloseRequest() = default;
 	};
 
@@ -165,7 +174,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFocusTake : public WindowEvent{
 		public:
-			WindowFocusTake(){}
+			inline WindowFocusTake(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowFocusTake() = default;
 	};
 
@@ -175,7 +184,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowOccluded : public WindowEvent{
 		public:
-			WindowOccluded(){}
+			inline WindowOccluded(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowOccluded() = default;
 	};
 
@@ -185,7 +194,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFullscreenLeave : public WindowEvent{
 		public:
-			WindowFullscreenLeave(){}
+			inline WindowFullscreenLeave(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowFullscreenLeave() = default;
 	};
 
@@ -195,7 +204,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowFullscreenEnter : public WindowEvent{
 		public:
-			WindowFullscreenEnter(){}
+			inline WindowFullscreenEnter(const std::shared_ptr<Window>& window) noexcept : WindowEvent(window){}
 			~WindowFullscreenEnter() = default;
 	};
 
@@ -205,7 +214,7 @@ namespace Raindrop::Window{
 	 */
 	class WindowDestroyed : public Event::Event{
 		public:
-			WindowDestroyed() : Event(){}
+			inline WindowDestroyed() noexcept : Event(){}
 			~WindowDestroyed() = default;
 	};
 }

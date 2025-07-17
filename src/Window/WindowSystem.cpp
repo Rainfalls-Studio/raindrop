@@ -6,186 +6,227 @@
 #include <SDL3/SDL.h>
 
 namespace Raindrop::Window{
-
     void WindowSystem::initialize(Engine& engine){
         _engine = &engine;
 
         if (SDL_Init(SDL_INIT_VIDEO) == false){
             throw std::runtime_error("Failed to initialize SDL");
         }
-
-        _window = std::make_unique<Window>();
     }
 
-    std::unique_ptr<Window> WindowSystem::createEmptyWindow(){
-        return std::make_unique<Window>();
+    std::shared_ptr<Window> WindowSystem::createWindow(const WindowConfig& config){
+        std::shared_ptr<Window> win = std::make_shared<Window>(config);
+        _windows[SDL_GetWindowID(win->getWindow())] = win;
+        return win;
     }
 
     void WindowSystem::shutdown(){
         SDL_Quit();
     }
 
-    void terminatingEvent(Event::Manager&, SDL_Event&){}
-    void lowMemoryEvent(Event::Manager&, SDL_Event&){}
-    void willEnterBackgroundEvent(Event::Manager&, SDL_Event&){}
-    void didEnterBackgroundEvent(Event::Manager&, SDL_Event&){}
-    void willEnterForgroundEvent(Event::Manager&, SDL_Event&){}
-    void didEnterForgourndEvent(Event::Manager&, SDL_Event&){}
-    void localeChangedEvent(Event::Manager&, SDL_Event&){}
-    void systemThemChangedEvent(Event::Manager&, SDL_Event&){}
-    void displayOrientationEvent(Event::Manager&, SDL_Event&){}
-    void displayAddedEvent(Event::Manager&, SDL_Event&){}
-    void displayRemovedEvent(Event::Manager&, SDL_Event&){}
-    void displayMovedEvent(Event::Manager&, SDL_Event&){}
-    void displayContentScaleChangedEvent(Event::Manager&, SDL_Event&){}
-    void displayHDRStateChnagedEvent(Event::Manager&, SDL_Event&){}
+    struct EventInfo{
+        Event::Manager& manager;
+        SDL_Event& e;
+        std::unordered_map<SDL_WindowID, std::weak_ptr<Window>>& windows;
+    };
 
-    void windowShownEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowShown());
+    void terminatingEvent(EventInfo&){}
+    void lowMemoryEvent(EventInfo&){}
+    void willEnterBackgroundEvent(EventInfo&){}
+    void didEnterBackgroundEvent(EventInfo&){}
+    void willEnterForgroundEvent(EventInfo&){}
+    void didEnterForgourndEvent(EventInfo&){}
+    void localeChangedEvent(EventInfo&){}
+    void systemThemChangedEvent(EventInfo&){}
+    void displayOrientationEvent(EventInfo&){}
+    void displayAddedEvent(EventInfo&){}
+    void displayRemovedEvent(EventInfo&){}
+    void displayMovedEvent(EventInfo&){}
+    void displayContentScaleChangedEvent(EventInfo&){}
+    void displayHDRStateChnagedEvent(EventInfo&){}
+
+    void windowShownEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowShown(window));
     }
 
-    void windowHiddenEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowHidden());
+    void windowHiddenEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowHidden(window));
     }
 
-    void windowExposedEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowExposed());
+    void windowExposedEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowExposed(window));
 
     }
 
-    void windowMovedEvent(Event::Manager& manager, SDL_Event& event){
+    void windowMovedEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+
         glm::ivec2 pos{
-            static_cast<int>(event.window.data1),
-            static_cast<int>(event.window.data2)
+            static_cast<int>(info.e.window.data1),
+            static_cast<int>(info.e.window.data2)
         };
 
-        manager.trigger(WindowMoved(pos));
+        info.manager.trigger(WindowMoved(window, pos));
     }
 
-    void windowResizedEvent(Event::Manager& manager, SDL_Event& event){
+    void windowResizedEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+
         glm::uvec2 size{
-            static_cast<unsigned int>(event.window.data1),
-            static_cast<unsigned int>(event.window.data2)
+            static_cast<unsigned int>(info.e.window.data1),
+            static_cast<unsigned int>(info.e.window.data2)
         };
 
-        manager.trigger(WindowResized(size));
+        info.manager.trigger(WindowResized(window, size));
     }
 
-    void windowPixelSizeChangedEvent(Event::Manager&, SDL_Event&){}
+    void windowPixelSizeChangedEvent(EventInfo&){}
 
-    void windowMinimizedEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowMinimized());
+    void windowMinimizedEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowMinimized(window));
     }
 
-    void windowMaximizedEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowMaximized());
+    void windowMaximizedEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowMaximized(window));
     }
 
-    void windowRestoredEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowRestored());
+    void windowRestoredEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowRestored(window));
     }
 
-    void windowMouseEnterEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowMouseEntered());
+    void windowMouseEnterEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowMouseEntered(window));
     }
 
-    void windowMouseLeaveEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowMouseLeaved());
+    void windowMouseLeaveEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowMouseLeaved(window));
     }
 
-    void windowFocusGainedEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowFocusGained());
+    void windowFocusGainedEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowFocusGained(window));
     }
 
-    void windowFocusLostEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowFocusLost());
+    void windowFocusLostEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowFocusLost(window));
     }
 
-    void windowCloseRequestedEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowCloseRequest());
+    void windowCloseRequestedEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowCloseRequest(window));
     }
 
-    void windowTakeFocusEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowFocusTake());
+    void windowTakeFocusEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowFocusTake(window));
     }
 
-    void windowHitTestEvent(Event::Manager&, SDL_Event&){}
-    void windowICCPROFChangedEvent(Event::Manager&, SDL_Event&){}
-    void windowDisplayChangedEvent(Event::Manager&, SDL_Event&){}
-    void windowDisplayScaleChangedEvent(Event::Manager&, SDL_Event&){}
+    void windowHitTestEvent(EventInfo&){}
+    void windowICCPROFChangedEvent(EventInfo&){}
+    void windowDisplayChangedEvent(EventInfo&){}
+    void windowDisplayScaleChangedEvent(EventInfo&){}
 
-    void windowOccludedEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowOccluded());
+    void windowOccludedEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowOccluded(window));
     }
 
-    void windowEnterFullsreenEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowFullscreenEnter());
+    void windowEnterFullsreenEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowFullscreenEnter(window));
     }
 
-    void windowLeaveFullscreenEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowFullscreenLeave());
+    void windowLeaveFullscreenEvent(EventInfo& info){
+        std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
+        assert(window);
+        info.manager.trigger(WindowFullscreenLeave(window));
     }
 
-    void windowDestroyedEvent(Event::Manager& manager, SDL_Event&){
-        manager.trigger(WindowDestroyed());
+    void windowDestroyedEvent(EventInfo& info){
+        info.manager.trigger(WindowDestroyed());
     }
 
-    void windowPenEnterEvent(Event::Manager&, SDL_Event&){}
-    void windowPenLeaveEvent(Event::Manager&, SDL_Event&){}
-    void keyDownEvent(Event::Manager&, SDL_Event&){}
-    void keyUpEvent(Event::Manager&, SDL_Event&){}
-    void textEditingEvent(Event::Manager&, SDL_Event&){}
-    void textInputEvent(Event::Manager&, SDL_Event&){}
-    void keymapChangedEvent(Event::Manager&, SDL_Event&){}
-    void mouseMotionEvent(Event::Manager&, SDL_Event&){}
-    void mouseButtonDownEvent(Event::Manager&, SDL_Event&){}
-    void mouseButtonUpEvent(Event::Manager&, SDL_Event&){}
-    void mouseWheelEvent(Event::Manager&, SDL_Event&){}
-    void quitEvent(Event::Manager&, SDL_Event&){}
-    void joystickAxisMotionEvent(Event::Manager&, SDL_Event&){}
-    void joystickHatMotionEvent(Event::Manager&, SDL_Event&){}
-    void joystickButtonDownEvent(Event::Manager&, SDL_Event&){}
-    void joystickButtonUpEvent(Event::Manager&, SDL_Event&){}
-    void joystickAddedEvent(Event::Manager&, SDL_Event&){}
-    void joystickRemovedEvent(Event::Manager&, SDL_Event&){}
-    void joystickBatteryUpdatedEvent(Event::Manager&, SDL_Event&){}
-    void joystickUpdateCompletedEvent(Event::Manager&, SDL_Event&){}
-    void gamepadAxisMotionEvent(Event::Manager&, SDL_Event&){}
-    void gamepadButtonDownEvent(Event::Manager&, SDL_Event&){}
-    void gamepadButtonUpEvent(Event::Manager&, SDL_Event&){}
-    void gamepadAddedEvent(Event::Manager&, SDL_Event&){}
-    void gamepadRemovedEvent(Event::Manager&, SDL_Event&){}
-    void gamepadRemappedEvent(Event::Manager&, SDL_Event&){}
-    void gamepadTouchpadDownEvent(Event::Manager&, SDL_Event&){}
-    void gamepadTouchpadMotionEvent(Event::Manager&, SDL_Event&){}
-    void gamepadTouchpadUpEvent(Event::Manager&, SDL_Event&){}
-    void gamepadSensorUpdateEvent(Event::Manager&, SDL_Event&){}
-    void gamepadUpdateCompleteEvent(Event::Manager&, SDL_Event&){}
-    void gamepadSteamHandleUpdatedEvent(Event::Manager&, SDL_Event&){}
-    void fingerDownEvent(Event::Manager&, SDL_Event&){}
-    void fingerUpEvent(Event::Manager&, SDL_Event&){}
-    void fingerMotionEvent(Event::Manager&, SDL_Event&){}
-    void clipboardUpdateEvent(Event::Manager&, SDL_Event&){}
-    void dropFileEvent(Event::Manager&, SDL_Event&){}
-    void dropTextEvent(Event::Manager&, SDL_Event&){}
-    void dropBeginEvent(Event::Manager&, SDL_Event&){}
-    void dropCompleteEvent(Event::Manager&, SDL_Event&){}
-    void dropPositionEvent(Event::Manager&, SDL_Event&){}
-    void audioDeviceAddedEvent(Event::Manager&, SDL_Event&){}
-    void audioDeviceRemovedEvent(Event::Manager&, SDL_Event&){}
-    void audioDeviceFormatChangedEvent(Event::Manager&, SDL_Event&){}
-    void sensorUpdateEvent(Event::Manager&, SDL_Event&){}
-    void penDownEvent(Event::Manager&, SDL_Event&){}
-    void penUpEvent(Event::Manager&, SDL_Event&){}
-    void penMotionEvent(Event::Manager&, SDL_Event&){}
-    void penButtonDownEvent(Event::Manager&, SDL_Event&){}
-    void penButtonUpEvent(Event::Manager&, SDL_Event&){}
-    void cameraDeviceAddedEvent(Event::Manager&, SDL_Event&){}
-    void cameraDeviceRemovedEvent(Event::Manager&, SDL_Event&){}
-    void cameraDeviceApprovedEvent(Event::Manager&, SDL_Event&){}
-    void cameraDeviceDeniedEvent(Event::Manager&, SDL_Event&){}
-    void renderTargetsResetEvent(Event::Manager&, SDL_Event&){}
-    void renderDeviceResetEvent(Event::Manager&, SDL_Event&){}
+    void windowPenEnterEvent(EventInfo&){}
+    void windowPenLeaveEvent(EventInfo&){}
+    void keyDownEvent(EventInfo&){}
+    void keyUpEvent(EventInfo&){}
+    void textEditingEvent(EventInfo&){}
+    void textInputEvent(EventInfo&){}
+    void keymapChangedEvent(EventInfo&){}
+    void mouseMotionEvent(EventInfo&){}
+    void mouseButtonDownEvent(EventInfo&){}
+    void mouseButtonUpEvent(EventInfo&){}
+    void mouseWheelEvent(EventInfo&){}
+    void quitEvent(EventInfo&){}
+    void joystickAxisMotionEvent(EventInfo&){}
+    void joystickHatMotionEvent(EventInfo&){}
+    void joystickButtonDownEvent(EventInfo&){}
+    void joystickButtonUpEvent(EventInfo&){}
+    void joystickAddedEvent(EventInfo&){}
+    void joystickRemovedEvent(EventInfo&){}
+    void joystickBatteryUpdatedEvent(EventInfo&){}
+    void joystickUpdateCompletedEvent(EventInfo&){}
+    void gamepadAxisMotionEvent(EventInfo&){}
+    void gamepadButtonDownEvent(EventInfo&){}
+    void gamepadButtonUpEvent(EventInfo&){}
+    void gamepadAddedEvent(EventInfo&){}
+    void gamepadRemovedEvent(EventInfo&){}
+    void gamepadRemappedEvent(EventInfo&){}
+    void gamepadTouchpadDownEvent(EventInfo&){}
+    void gamepadTouchpadMotionEvent(EventInfo&){}
+    void gamepadTouchpadUpEvent(EventInfo&){}
+    void gamepadSensorUpdateEvent(EventInfo&){}
+    void gamepadUpdateCompleteEvent(EventInfo&){}
+    void gamepadSteamHandleUpdatedEvent(EventInfo&){}
+    void fingerDownEvent(EventInfo&){}
+    void fingerUpEvent(EventInfo&){}
+    void fingerMotionEvent(EventInfo&){}
+    void clipboardUpdateEvent(EventInfo&){}
+    void dropFileEvent(EventInfo&){}
+    void dropTextEvent(EventInfo&){}
+    void dropBeginEvent(EventInfo&){}
+    void dropCompleteEvent(EventInfo&){}
+    void dropPositionEvent(EventInfo&){}
+    void audioDeviceAddedEvent(EventInfo&){}
+    void audioDeviceRemovedEvent(EventInfo&){}
+    void audioDeviceFormatChangedEvent(EventInfo&){}
+    void sensorUpdateEvent(EventInfo&){}
+    void penDownEvent(EventInfo&){}
+    void penUpEvent(EventInfo&){}
+    void penMotionEvent(EventInfo&){}
+    void penButtonDownEvent(EventInfo&){}
+    void penButtonUpEvent(EventInfo&){}
+    void cameraDeviceAddedEvent(EventInfo&){}
+    void cameraDeviceRemovedEvent(EventInfo&){}
+    void cameraDeviceApprovedEvent(EventInfo&){}
+    void cameraDeviceDeniedEvent(EventInfo&){}
+    void renderTargetsResetEvent(EventInfo&){}
+    void renderDeviceResetEvent(EventInfo&){}
 
     void WindowSystem::event(){
         std::shared_ptr<Event::EventSystem> events;
@@ -201,132 +242,138 @@ namespace Raindrop::Window{
         SDL_Event e;
         auto& manager = events->getManager();
 
+        EventInfo info{
+            .manager = manager,
+            .e = e,
+            .windows = _windows
+        };
+
         while (SDL_PollEvent(&e)){
 			switch (e.type){
 
-			case SDL_EVENT_TERMINATING: terminatingEvent(manager, e); break;
-			case SDL_EVENT_LOW_MEMORY: lowMemoryEvent(manager, e); break;
+			case SDL_EVENT_TERMINATING: terminatingEvent(info); break;
+			case SDL_EVENT_LOW_MEMORY: lowMemoryEvent(info); break;
 
-			case SDL_EVENT_WILL_ENTER_BACKGROUND: willEnterBackgroundEvent(manager, e); break;
-			case SDL_EVENT_DID_ENTER_BACKGROUND: didEnterBackgroundEvent(manager, e); break;
-			case SDL_EVENT_WILL_ENTER_FOREGROUND: willEnterForgroundEvent(manager, e); break;
-			case SDL_EVENT_DID_ENTER_FOREGROUND: didEnterForgourndEvent(manager, e); break;
+			case SDL_EVENT_WILL_ENTER_BACKGROUND: willEnterBackgroundEvent(info); break;
+			case SDL_EVENT_DID_ENTER_BACKGROUND: didEnterBackgroundEvent(info); break;
+			case SDL_EVENT_WILL_ENTER_FOREGROUND: willEnterForgroundEvent(info); break;
+			case SDL_EVENT_DID_ENTER_FOREGROUND: didEnterForgourndEvent(info); break;
 
-			case SDL_EVENT_LOCALE_CHANGED: localeChangedEvent(manager, e); break;
-			case SDL_EVENT_SYSTEM_THEME_CHANGED: systemThemChangedEvent(manager, e); break;
-			case SDL_EVENT_DISPLAY_ORIENTATION: displayOrientationEvent(manager, e); break;
-			case SDL_EVENT_DISPLAY_ADDED: displayAddedEvent(manager, e); break;
-			case SDL_EVENT_DISPLAY_REMOVED: displayRemovedEvent(manager, e); break;
-			case SDL_EVENT_DISPLAY_MOVED: displayMovedEvent(manager, e); break;
-			case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED: displayContentScaleChangedEvent(manager, e); break;
+			case SDL_EVENT_LOCALE_CHANGED: localeChangedEvent(info); break;
+			case SDL_EVENT_SYSTEM_THEME_CHANGED: systemThemChangedEvent(info); break;
+			case SDL_EVENT_DISPLAY_ORIENTATION: displayOrientationEvent(info); break;
+			case SDL_EVENT_DISPLAY_ADDED: displayAddedEvent(info); break;
+			case SDL_EVENT_DISPLAY_REMOVED: displayRemovedEvent(info); break;
+			case SDL_EVENT_DISPLAY_MOVED: displayMovedEvent(info); break;
+			case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED: displayContentScaleChangedEvent(info); break;
 
-			case SDL_EVENT_WINDOW_SHOWN: windowShownEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_HIDDEN: windowHiddenEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_EXPOSED: windowExposedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_MOVED: windowMovedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_RESIZED: windowResizedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: windowPixelSizeChangedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_MINIMIZED: windowMinimizedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_MAXIMIZED: windowMaximizedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_RESTORED: windowRestoredEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_MOUSE_ENTER: windowMouseEnterEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_MOUSE_LEAVE: windowMouseLeaveEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_FOCUS_GAINED: windowFocusGainedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_FOCUS_LOST: windowFocusLostEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_CLOSE_REQUESTED: windowCloseRequestedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_HIT_TEST: windowHitTestEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_ICCPROF_CHANGED: windowICCPROFChangedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_DISPLAY_CHANGED: windowDisplayChangedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED: windowDisplayScaleChangedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_OCCLUDED: windowOccludedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_ENTER_FULLSCREEN: windowEnterFullsreenEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN: windowLeaveFullscreenEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_DESTROYED: windowDestroyedEvent(manager, e); break;
-			case SDL_EVENT_WINDOW_HDR_STATE_CHANGED: displayHDRStateChnagedEvent(manager, e); break;
+			case SDL_EVENT_WINDOW_SHOWN: windowShownEvent(info); break;
+			case SDL_EVENT_WINDOW_HIDDEN: windowHiddenEvent(info); break;
+			case SDL_EVENT_WINDOW_EXPOSED: windowExposedEvent(info); break;
+			case SDL_EVENT_WINDOW_MOVED: windowMovedEvent(info); break;
+			case SDL_EVENT_WINDOW_RESIZED: windowResizedEvent(info); break;
+			case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED: windowPixelSizeChangedEvent(info); break;
+			case SDL_EVENT_WINDOW_MINIMIZED: windowMinimizedEvent(info); break;
+			case SDL_EVENT_WINDOW_MAXIMIZED: windowMaximizedEvent(info); break;
+			case SDL_EVENT_WINDOW_RESTORED: windowRestoredEvent(info); break;
+			case SDL_EVENT_WINDOW_MOUSE_ENTER: windowMouseEnterEvent(info); break;
+			case SDL_EVENT_WINDOW_MOUSE_LEAVE: windowMouseLeaveEvent(info); break;
+			case SDL_EVENT_WINDOW_FOCUS_GAINED: windowFocusGainedEvent(info); break;
+			case SDL_EVENT_WINDOW_FOCUS_LOST: windowFocusLostEvent(info); break;
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED: windowCloseRequestedEvent(info); break;
+			case SDL_EVENT_WINDOW_HIT_TEST: windowHitTestEvent(info); break;
+			case SDL_EVENT_WINDOW_ICCPROF_CHANGED: windowICCPROFChangedEvent(info); break;
+			case SDL_EVENT_WINDOW_DISPLAY_CHANGED: windowDisplayChangedEvent(info); break;
+			case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED: windowDisplayScaleChangedEvent(info); break;
+			case SDL_EVENT_WINDOW_OCCLUDED: windowOccludedEvent(info); break;
+			case SDL_EVENT_WINDOW_ENTER_FULLSCREEN: windowEnterFullsreenEvent(info); break;
+			case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN: windowLeaveFullscreenEvent(info); break;
+			case SDL_EVENT_WINDOW_DESTROYED: windowDestroyedEvent(info); break;
+			case SDL_EVENT_WINDOW_HDR_STATE_CHANGED: displayHDRStateChnagedEvent(info); break;
 
-			case SDL_EVENT_KEY_DOWN: keyDownEvent(manager, e); break;
-			case SDL_EVENT_KEY_UP: keyUpEvent(manager, e); break;
-			case SDL_EVENT_TEXT_EDITING: textEditingEvent(manager, e); break;
-			case SDL_EVENT_TEXT_INPUT: textInputEvent(manager, e); break;
-			case SDL_EVENT_KEYMAP_CHANGED: keymapChangedEvent(manager, e); break;
+			case SDL_EVENT_KEY_DOWN: keyDownEvent(info); break;
+			case SDL_EVENT_KEY_UP: keyUpEvent(info); break;
+			case SDL_EVENT_TEXT_EDITING: textEditingEvent(info); break;
+			case SDL_EVENT_TEXT_INPUT: textInputEvent(info); break;
+			case SDL_EVENT_KEYMAP_CHANGED: keymapChangedEvent(info); break;
 		
-			case SDL_EVENT_MOUSE_MOTION: mouseMotionEvent(manager, e); break;
-			case SDL_EVENT_MOUSE_BUTTON_DOWN: mouseButtonDownEvent(manager, e); break;
-			case SDL_EVENT_MOUSE_BUTTON_UP: mouseButtonUpEvent(manager, e); break;
-			case SDL_EVENT_MOUSE_WHEEL: mouseWheelEvent(manager, e); break;
+			case SDL_EVENT_MOUSE_MOTION: mouseMotionEvent(info); break;
+			case SDL_EVENT_MOUSE_BUTTON_DOWN: mouseButtonDownEvent(info); break;
+			case SDL_EVENT_MOUSE_BUTTON_UP: mouseButtonUpEvent(info); break;
+			case SDL_EVENT_MOUSE_WHEEL: mouseWheelEvent(info); break;
 
 			#ifdef EVENT_JOYSTICK
-				case SDL_EVENT_JOYSTICK_AXIS_MOTION: joystickAxisMotionEvent(manager, e); break;
-				case SDL_EVENT_JOYSTICK_HAT_MOTION: joystickHatMotionEvent(manager, e); break;
-				case SDL_EVENT_JOYSTICK_BUTTON_DOWN: joystickButtonDownEvent(manager, e); break;
-				case SDL_EVENT_JOYSTICK_BUTTON_UP: joystickButtonUpEvent(manager, e); break;
-				case SDL_EVENT_JOYSTICK_ADDED: joystickAddedEvent(manager, e); break;
-				case SDL_EVENT_JOYSTICK_REMOVED: joystickRemovedEvent(manager, e); break;
-				case SDL_EVENT_JOYSTICK_BATTERY_UPDATED: joystickBatteryUpdatedEvent(manager, e); break;
-				case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE: joystickUpdateCompletedEvent(manager, e); break;
+				case SDL_EVENT_JOYSTICK_AXIS_MOTION: joystickAxisMotionEvent(info); break;
+				case SDL_EVENT_JOYSTICK_HAT_MOTION: joystickHatMotionEvent(info); break;
+				case SDL_EVENT_JOYSTICK_BUTTON_DOWN: joystickButtonDownEvent(info); break;
+				case SDL_EVENT_JOYSTICK_BUTTON_UP: joystickButtonUpEvent(info); break;
+				case SDL_EVENT_JOYSTICK_ADDED: joystickAddedEvent(info); break;
+				case SDL_EVENT_JOYSTICK_REMOVED: joystickRemovedEvent(info); break;
+				case SDL_EVENT_JOYSTICK_BATTERY_UPDATED: joystickBatteryUpdatedEvent(info); break;
+				case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE: joystickUpdateCompletedEvent(info); break;
 			#endif
 
 			#ifdef EVENT_GAMEPAD
-				case SDL_EVENT_GAMEPAD_AXIS_MOTION: gamepadAxisMotionEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_BUTTON_DOWN: gamepadButtonDownEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_BUTTON_UP: gamepadButtonUpEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_ADDED: gamepadAddedEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_REMOVED: gamepadRemovedEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_REMAPPED: gamepadRemappedEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_TOUCHPAD_DOWN: gamepadTouchpadDownEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_TOUCHPAD_MOTION: gamepadTouchpadMotionEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_TOUCHPAD_UP: gamepadTouchpadUpEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_SENSOR_UPDATE: gamepadSensorUpdateEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_UPDATE_COMPLETE: gamepadUpdateCompleteEvent(manager, e); break;
-				case SDL_EVENT_GAMEPAD_STEAM_WINDOW_UPDATED: gamepadSteamHandleUpdatedEvent(manager, e); break;
+				case SDL_EVENT_GAMEPAD_AXIS_MOTION: gamepadAxisMotionEvent(info); break;
+				case SDL_EVENT_GAMEPAD_BUTTON_DOWN: gamepadButtonDownEvent(info); break;
+				case SDL_EVENT_GAMEPAD_BUTTON_UP: gamepadButtonUpEvent(info); break;
+				case SDL_EVENT_GAMEPAD_ADDED: gamepadAddedEvent(info); break;
+				case SDL_EVENT_GAMEPAD_REMOVED: gamepadRemovedEvent(info); break;
+				case SDL_EVENT_GAMEPAD_REMAPPED: gamepadRemappedEvent(info); break;
+				case SDL_EVENT_GAMEPAD_TOUCHPAD_DOWN: gamepadTouchpadDownEvent(info); break;
+				case SDL_EVENT_GAMEPAD_TOUCHPAD_MOTION: gamepadTouchpadMotionEvent(info); break;
+				case SDL_EVENT_GAMEPAD_TOUCHPAD_UP: gamepadTouchpadUpEvent(info); break;
+				case SDL_EVENT_GAMEPAD_SENSOR_UPDATE: gamepadSensorUpdateEvent(info); break;
+				case SDL_EVENT_GAMEPAD_UPDATE_COMPLETE: gamepadUpdateCompleteEvent(info); break;
+				case SDL_EVENT_GAMEPAD_STEAM_WINDOW_UPDATED: gamepadSteamHandleUpdatedEvent(info); break;
 			#endif
 			
 			#ifdef EVENT_FINGER
-				case SDL_EVENT_FINGER_DOWN: fingerDownEvent(manager, e); break;
-				case SDL_EVENT_FINGER_UP: fingerUpEvent(manager, e); break;
-				case SDL_EVENT_FINGER_MOTION: fingerMotionEvent(manager, e); break;
+				case SDL_EVENT_FINGER_DOWN: fingerDownEvent(info); break;
+				case SDL_EVENT_FINGER_UP: fingerUpEvent(info); break;
+				case SDL_EVENT_FINGER_MOTION: fingerMotionEvent(info); break;
 			#endif
 		
 			#ifdef EVENT_CLIPBOARD
-				case SDL_EVENT_CLIPBOARD_UPDATE: clipboardUpdateEvent(manager, e); break;
+				case SDL_EVENT_CLIPBOARD_UPDATE: clipboardUpdateEvent(info); break;
 			#endif
 
 			#ifdef EVENT_TEXT
-				case SDL_EVENT_DROP_FILE: dropFileEvent(manager, e); break;
-				case SDL_EVENT_DROP_TEXT: dropTextEvent(manager, e); break;
-				case SDL_EVENT_DROP_BEGIN: dropBeginEvent(manager, e); break;
-				case SDL_EVENT_DROP_COMPLETE: dropCompleteEvent(manager, e); break;
-				case SDL_EVENT_DROP_POSITION: dropPositionEvent(manager, e); break;
+				case SDL_EVENT_DROP_FILE: dropFileEvent(info); break;
+				case SDL_EVENT_DROP_TEXT: dropTextEvent(info); break;
+				case SDL_EVENT_DROP_BEGIN: dropBeginEvent(info); break;
+				case SDL_EVENT_DROP_COMPLETE: dropCompleteEvent(info); break;
+				case SDL_EVENT_DROP_POSITION: dropPositionEvent(info); break;
 			#endif
 
 			#ifdef EVENT_AUDIO
-				case SDL_EVENT_AUDIO_DEVICE_ADDED: audioDeviceAddedEvent(manager, e); break;
-				case SDL_EVENT_AUDIO_DEVICE_REMOVED: audioDeviceRemovedEvent(manager, e); break;
-				case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED: audioDeviceFormatChangedEvent(manager, e); break;
+				case SDL_EVENT_AUDIO_DEVICE_ADDED: audioDeviceAddedEvent(info); break;
+				case SDL_EVENT_AUDIO_DEVICE_REMOVED: audioDeviceRemovedEvent(info); break;
+				case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED: audioDeviceFormatChangedEvent(info); break;
 			#endif
 
 			#ifdef EVENR_SENSOR
-				case SDL_EVENT_SENSOR_UPDATE: sensorUpdateEvent(manager, e); break;
+				case SDL_EVENT_SENSOR_UPDATE: sensorUpdateEvent(info); break;
 			#endif
 
 			#ifdef EVENT_PEN
-				case SDL_EVENT_PEN_DOWN: penDownEvent(manager, e); break;
-				case SDL_EVENT_PEN_UP: penUpEvent(manager, e); break;
-				case SDL_EVENT_PEN_MOTION: penMotionEvent(manager, e); break;
-				case SDL_EVENT_PEN_BUTTON_DOWN: penButtonDownEvent(manager, e); break;
-				case SDL_EVENT_PEN_BUTTON_UP: penButtonUpEvent(manager, e); break;
+				case SDL_EVENT_PEN_DOWN: penDownEvent(info); break;
+				case SDL_EVENT_PEN_UP: penUpEvent(info); break;
+				case SDL_EVENT_PEN_MOTION: penMotionEvent(info); break;
+				case SDL_EVENT_PEN_BUTTON_DOWN: penButtonDownEvent(info); break;
+				case SDL_EVENT_PEN_BUTTON_UP: penButtonUpEvent(info); break;
 			#endif
 
 			#ifdef EVENT_CAMERA
-				case SDL_EVENT_CAMERA_DEVICE_ADDED: cameraDeviceAddedEvent(manager, e); break;
-				case SDL_EVENT_CAMERA_DEVICE_REMOVED: cameraDeviceRemovedEvent(manager, e); break;
-				case SDL_EVENT_CAMERA_DEVICE_APPROVED: cameraDeviceApprovedEvent(manager, e); break;
-				case SDL_EVENT_CAMERA_DEVICE_DENIED: cameraDeviceDeniedEvent(manager, e); break;
+				case SDL_EVENT_CAMERA_DEVICE_ADDED: cameraDeviceAddedEvent(info); break;
+				case SDL_EVENT_CAMERA_DEVICE_REMOVED: cameraDeviceRemovedEvent(info); break;
+				case SDL_EVENT_CAMERA_DEVICE_APPROVED: cameraDeviceApprovedEvent(info); break;
+				case SDL_EVENT_CAMERA_DEVICE_DENIED: cameraDeviceDeniedEvent(info); break;
 			#endif
 			
 			#ifdef EVENT_RENDER
-				case SDL_EVENT_RENDER_TARGETS_RESET: renderTargetsResetEvent(manager, e); break;
-				case SDL_EVENT_RENDER_DEVICE_RESET: renderDeviceResetEvent(manager, e); break;
+				case SDL_EVENT_RENDER_TARGETS_RESET: renderTargetsResetEvent(info); break;
+				case SDL_EVENT_RENDER_DEVICE_RESET: renderDeviceResetEvent(info); break;
 			#endif
 			}
 		}
@@ -335,10 +382,4 @@ namespace Raindrop::Window{
     const char* WindowSystem::name() const{
         return "SDL3 windowing system";
     }
-
-    Window& WindowSystem::getWindow(){
-        assert(_window && "The system must be initialized");
-        return *_window;
-    }
-
 }

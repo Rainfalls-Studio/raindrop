@@ -5,10 +5,12 @@
 #include <string_view>
 #include <vulkan/vulkan.hpp>
 
+#include "WindowConfig.hpp"
+
 namespace Raindrop::Window{
     class Window{
         public:
-            Window();
+            Window(const WindowConfig& config);
             ~Window();
 
             SDL_Window* getWindow() const;
@@ -18,5 +20,6 @@ namespace Raindrop::Window{
 
         private:
             SDL_Window* _window;
+            SDL_WindowID _id;
     };
 }

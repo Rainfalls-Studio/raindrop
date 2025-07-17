@@ -8,8 +8,17 @@ class Testbed : public Raindrop::System::ISystem{
         virtual void initialize(Raindrop::Engine& engine) override{
             _engine = &engine;
             auto& systems = engine.getSystemManager();
-            systems.getSystem<Raindrop::Event::EventSystem>()->getManager().subscribe<Raindrop::Window::WindowCloseRequest>([&engine](const auto&) -> bool {engine.stop(); return false;});
 
+            systems.getSystem<Raindrop::Event::EventSystem>()->getManager().subscribe<Raindrop::Window::WindowCloseRequest>(
+                [this](const Raindrop::Window::WindowCloseRequest& event) -> bool {
+                    if (event.getWindow() == _window){
+                        _engine->stop();
+                    }
+                    return false;
+                }
+            );
+
+            createWindow();
             createGameplayLayer();
             createDebugLayer();
         }
@@ -19,6 +28,7 @@ class Testbed : public Raindrop::System::ISystem{
                 Dependency::Make<Raindrop::Event::EventSystem>(),
                 Dependency::Make<Raindrop::Scene::SceneSystem>(),
                 Dependency::Make<Raindrop::Graphics::RenderSystem>(),
+                Dependency::Make<Raindrop::Window::WindowSystem>(),
             };
         }
 
@@ -28,6 +38,23 @@ class Testbed : public Raindrop::System::ISystem{
 
         virtual const char* name() const override{
             return "Testbed";
+        }
+
+        void createWindow(){
+            auto& systems = _engine->getSystemManager();
+            auto windowSys = systems.getSystem<Raindrop::Window::WindowSystem>();
+
+            using Raindrop::Window::WindowFlags;
+
+            Raindrop::Window::WindowConfig config {
+                .resolution = {800, 600},
+                .position = {0, 0},
+                .title = "testbed",
+                .flags = {
+                    WindowFlags::RESIZABLE
+                }
+            };
+            _window = windowSys->createWindow(config);
         }
 
         void createGameplayLayer(){
@@ -60,6 +87,7 @@ class Testbed : public Raindrop::System::ISystem{
 
     private:
         Raindrop::Engine* _engine;
+        std::shared_ptr<Raindrop::Window::Window> _window;
 };
 
 int main(){

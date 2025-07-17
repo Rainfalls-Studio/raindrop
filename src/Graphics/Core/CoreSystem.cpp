@@ -35,12 +35,12 @@ namespace Raindrop::Graphics::Core{
 
 
         InitData init;
-        std::unique_ptr<Window::Window> empty;
+        std::shared_ptr<Window::Window> empty;
         
         // If there no windowing system, render is headless mode
         if (system){
             SPDLOG_LOGGER_TRACE(_logger, "Creating empty window for vulkan initilization");
-            empty = system->createEmptyWindow();
+            empty = system->createWindow(Window::WindowConfig::Empty());
         }
 
         init.window = empty.get();
@@ -122,7 +122,7 @@ namespace Raindrop::Graphics::Core{
         _physicalDevice = _vkbPhysicalDevice;
     }
 
-    void CoreSystem::createDevice(InitData& init){
+    void CoreSystem::createDevice(InitData&){
         vkb::DeviceBuilder builder(_vkbPhysicalDevice);
 
         auto result = builder.build();

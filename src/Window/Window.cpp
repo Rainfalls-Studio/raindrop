@@ -3,9 +3,27 @@
 #include <SDL3/SDL_vulkan.h>
 
 namespace Raindrop::Window{
+    SDL_WindowFlags raindropToSDLFlags(WindowFlags flags){
+        SDL_WindowFlags out = 0;
 
-    Window::Window(){
-        _window = SDL_CreateWindow("window", 800, 600, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+        if (flags & WindowFlags::FULLSCREEN) out |= SDL_WINDOW_FULLSCREEN;
+        if (flags & WindowFlags::BORDERLESS) out |= SDL_WINDOW_BORDERLESS;
+        if (flags & WindowFlags::RESIZABLE) out |= SDL_WINDOW_RESIZABLE;
+        if (flags & WindowFlags::UTILITY) out |= SDL_WINDOW_UTILITY;
+        if (flags & WindowFlags::TRANSPARENT) out |= SDL_WINDOW_TRANSPARENT;
+        if (flags & WindowFlags::NOT_FOCUSABLE) out |= SDL_WINDOW_NOT_FOCUSABLE;
+        if (flags & WindowFlags::HIDDEN) out |= SDL_WINDOW_HIDDEN;
+
+        return out;
+    }
+
+    Window::Window(const WindowConfig& config){
+        _window = SDL_CreateWindow(
+            config.title.c_str(),
+            config.resolution.x,
+            config.resolution.y,
+            raindropToSDLFlags(config.flags) | SDL_WINDOW_VULKAN
+        );
 
         if (!_window){
             throw std::runtime_error("Failed to create SDL window : " + std::string(SDL_GetError()));
@@ -32,7 +50,6 @@ namespace Raindrop::Window{
         }
         
         return exts;
-
     }
 
     vk::SurfaceKHR Window::createSurface(vk::Instance instance){
