@@ -1,5 +1,6 @@
 #include "Raindrop/Graphics/GraphicsEngine.hpp"
 #include "Raindrop/Graphics/Core/CoreSystem.hpp"
+#include "Raindrop/Graphics/Output/OutputSystem.hpp"
 #include "Raindrop/Graphics/WindowSystem/WindowSystem.hpp"
 #include "Raindrop/Window/WindowSystem.hpp"
 
@@ -10,6 +11,7 @@ namespace Raindrop::Graphics{
         _manager = std::make_unique<System::Manager>();
 
         _manager->emplaceSystem<Core::CoreSystem>();
+        _manager->emplaceSystem<Output::OutputSystem>();
         
         try {
             engine.getSystemManager().getSystem<Window::WindowSystem>();

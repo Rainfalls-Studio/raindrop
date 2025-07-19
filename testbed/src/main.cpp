@@ -41,11 +41,14 @@ class Testbed : public Raindrop::System::ISystem{
         }
 
         void createWindow(){
+            // Get systems
             auto& systems = _engine->getSystemManager();
             auto windowSys = systems.getSystem<Raindrop::Window::WindowSystem>();
+            auto renderSys = systems.getSystem<Raindrop::Graphics::RenderSystem>();
 
             using Raindrop::Window::WindowFlags;
 
+            // Create a window
             Raindrop::Window::WindowConfig config {
                 .resolution = {800, 600},
                 .position = {0, 0},
@@ -55,6 +58,10 @@ class Testbed : public Raindrop::System::ISystem{
                 }
             };
             _window = windowSys->createWindow(config);
+
+            // Register it in the graphics window system
+            auto windowRenderSys = renderSys->getRenderSystem<Raindrop::Graphics::WindowSystem::WindowSystem>();
+            windowRenderSys->registerWindow(_window);
         }
 
         void createGameplayLayer(){

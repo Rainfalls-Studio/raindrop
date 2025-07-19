@@ -20,6 +20,11 @@ namespace Raindrop::Graphics{
 
             virtual const char* name() const override;
             virtual std::vector<Dependency> dependencies() const override;
+
+            template<typename T>
+            inline std::shared_ptr<T> getRenderSystem(){
+                return _engine->getSystemManager().getSystem<T>();
+            }
         
         private:
             std::unique_ptr<GraphicsEngine> _engine;

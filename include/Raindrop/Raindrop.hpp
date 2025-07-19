@@ -8,6 +8,8 @@
 #include "Event/EventSystem.hpp"
 
 #include "Graphics/RenderSystem.hpp"
+#include "Graphics/Core/CoreSystem.hpp"
+#include "Graphics/WindowSystem/WindowSystem.hpp"
 
 #include "Layer/Layer.hpp"
 

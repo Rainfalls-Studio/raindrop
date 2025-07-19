@@ -1,10 +1,11 @@
 #pragma once
 
-#include <unordered_map>
+#include <list>
 #include <memory>
 #include <spdlog/logger.h>
 #include "Raindrop/Graphics/System/IRenderSystem.hpp"
-#include "Raindrop/Window/WindowSystem.hpp"
+#include "Raindrop/Window/Window.hpp"
+#include "../Core/CoreSystem.hpp"
 #include "WindowContext.hpp"
 
 namespace Raindrop::Graphics::WindowSystem{
@@ -20,13 +21,18 @@ namespace Raindrop::Graphics::WindowSystem{
 
             virtual const char* name() const override;
             virtual std::vector<Dependency> dependencies() const override;
+
+            void registerWindow(std::shared_ptr<Window::Window> window);
             
         private:
             GraphicsEngine* _engine;
             std::shared_ptr<spdlog::logger> _logger;
-            std::unordered_map<Raindrop::Window::Window*, std::unique_ptr<WindowContext>> _contexts;
-            std::weak_ptr<Raindrop::Window::WindowSystem> _windowSystem;
+
+            std::shared_ptr<WindowContext> _window;
 
             void createLogger();
+            void createWorker();
+            void buildContext(WindowContext& ctx);
+            void destroyContext(WindowContext& ctx);
     };
 }

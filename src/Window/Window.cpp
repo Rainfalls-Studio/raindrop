@@ -20,8 +20,8 @@ namespace Raindrop::Window{
     Window::Window(const WindowConfig& config){
         _window = SDL_CreateWindow(
             config.title.c_str(),
-            config.resolution.x,
-            config.resolution.y,
+            static_cast<int>(config.resolution.x),
+            static_cast<int>(config.resolution.y),
             raindropToSDLFlags(config.flags) | SDL_WINDOW_VULKAN
         );
 
@@ -59,5 +59,22 @@ namespace Raindrop::Window{
         }
 
         return vk::SurfaceKHR(surface);
+    }
+
+    glm::u32vec2 Window::getResolution() const{
+        int w, h;
+        if (SDL_GetWindowSizeInPixels(_window, &w, &h) == false){
+            throw std::runtime_error(SDL_GetError());
+        }
+        return glm::u32vec2{w, h};
+    }
+
+    std::string_view Window::getTitle() const{
+        return std::string_view(SDL_GetWindowTitle(_window));
+    }
+
+    Display Window::getDisplay() const{
+        SDL_DisplayID id = SDL_GetDisplayForWindow(_window);
+        return Display(id);
     }
 }

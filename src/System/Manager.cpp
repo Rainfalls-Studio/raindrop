@@ -35,7 +35,15 @@ namespace Raindrop::System{
     }
 
     std::shared_ptr<ISystem> Manager::getSystem(const std::type_index& type) const{
-        return _infos.at(_systems.at(type)).system;
+        auto it = _systems.find(type);
+
+        if (it == _systems.end()){
+            return nullptr;
+        }
+
+        SystemID id = it->second;
+
+        return _infos.at(id).system;
     }
     
     void Manager::foreach(const std::function<void(ISystem&)>& callback){
