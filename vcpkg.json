@@ -3,10 +3,11 @@
   "version-semver": "0.1.0",
   "dependencies": [
     "entt",
-    "spdlog",
     "glm",
+    "spdlog",
     "vk-bootstrap",
-    "vulkan-memory-allocator"
+    "vulkan-memory-allocator",
+    "rendergraph"
   ],
   "features": {
     "test": {

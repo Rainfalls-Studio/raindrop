@@ -1,22 +1,26 @@
 #pragma once
 
-#include "Layer/Manager.hpp"
-#include "System/Manager.hpp"
+#include <memory>
+#include "Core/Systems/Manager.hpp"
+#include "Core/Layers/Manager.hpp"
+#include "Core/Scheduler/Scheduler.hpp"
 
 namespace Raindrop{
     class Engine{
         public:
             Engine();
 
-            void run();
+            void start();
             void stop();
 
-            Layer::Manager& getLayerManager() noexcept;
-            System::Manager& getSystemManager() noexcept;
+            Systems::Manager& getSystemManager() noexcept;
+            Layers::Manager& getLayerManager() noexcept;
+            Scheduler::Scheduler& getScheduler() noexcept;
 
-        private: 
-            System::Manager _systems;
-            Layer::Manager _layers;
+        private:
+            Systems::Manager _systems;
+            Layers::Manager _layers;
+            Scheduler::Scheduler _scheduler;
 
             bool _running;
     };

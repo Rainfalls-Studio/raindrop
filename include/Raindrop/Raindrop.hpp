@@ -2,24 +2,13 @@
 
 #include "Engine.hpp"
 
-#include "Window/WindowSystem.hpp"
-#include "Window/WindowEvents.hpp"
+#include "Core/Layers/Layer.hpp"
 
-#include "Event/EventSystem.hpp"
+// builtin systems
 
-#include "Graphics/RenderSystem.hpp"
-#include "Graphics/Core/CoreSystem.hpp"
-#include "Graphics/WindowSystem/WindowSystem.hpp"
+#include "Systems/Event/EventSystem.hpp"
 
-#include "Layer/Layer.hpp"
+#include "Systems/Window/WindowSystem.hpp"
+#include "Systems/Window/WindowEvents.hpp"
 
-#include "Scene/Scene.hpp"
-#include "Scene/SceneModule.hpp"
-#include "Scene/IBehavior.hpp"
-#include "Scene/Entity.hpp"
-#include "Scene/SceneSystem.hpp"
-
-#include "Builtin/Behaviors/HierarchyAttacherBehavior.hpp"
-#include "Builtin/Behaviors/TagAttacherBehavior.hpp"
-#include "Builtin/Behaviors/TransformAttacherBehavior.hpp"
-#include "Builtin/Behaviors/HierarchyTransformPropagator.hpp"
+#include "Systems/Render/RenderSystem.hpp"

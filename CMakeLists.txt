@@ -15,14 +15,14 @@ include(cmake/variables.cmake)
 
 # ---- Declare library ----
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES "source/*.cpp")
 
 add_library(
     Raindrop STATIC
     ${SOURCES}
 )
 
-target_compile_features(Raindrop PUBLIC cxx_std_20)
+target_compile_features(Raindrop PUBLIC cxx_std_23)
 
 target_include_directories(
     Raindrop ${warning_guard}
@@ -36,6 +36,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(vk-bootstrap CONFIG REQUIRED)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
+find_package(RenderGraph REQUIRED)
 
 find_package(SDL3 REQUIRED) # Not specified in vcpkg.json as it's not currently supported on all linux distros (such as mine)
 
@@ -48,6 +49,7 @@ target_link_libraries(Raindrop
     vk-bootstrap::vk-bootstrap
     vk-bootstrap::vk-bootstrap-compiler-warnings
     GPUOpen::VulkanMemoryAllocator
+    crg::RenderGraph
 
     PUBLIC
     EnTT::EnTT
