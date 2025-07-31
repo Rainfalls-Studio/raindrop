@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Raindrop/Core/Systems/ISystem.hpp"
+#include "Raindrop/Core/Modules/IModule.hpp"
 #include "Manager.hpp"
 
 namespace Raindrop{
@@ -8,12 +8,12 @@ namespace Raindrop{
 }
 
 namespace Raindrop::Event{
-    class EventSystem : public Systems::ISystem{
+    class EventModule : public Modules::IModule{
         public:
-            EventSystem();
-            virtual ~EventSystem() = default;
+            EventModule();
+            virtual ~EventModule() = default;
 
-            virtual std::expected<void, Error> initialize(Engine& engine) override;
+            virtual Modules::Result initialize(Modules::InitHelper& init) override;
             virtual void shutdown() override;
 
             virtual std::string name() const noexcept override;

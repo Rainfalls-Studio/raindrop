@@ -2,7 +2,7 @@
 
 #include <system_error>
 
-namespace Raindrop::Systems{
+namespace Raindrop::Modules{
     enum class ErrorCodes{
 
         // When a cyclic dependency has been found
@@ -29,5 +29,5 @@ namespace Raindrop::Systems{
 
 namespace std{
     template <>
-    struct is_error_code_enum<Raindrop::Systems::ErrorCodes> : true_type{};
+    struct is_error_code_enum<Raindrop::Modules::ErrorCodes> : true_type{};
 }

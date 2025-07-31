@@ -1,22 +1,26 @@
 #pragma once
 
-#include "Raindrop/Core/Systems/ISystem.hpp"
+#include "Raindrop/Core/Modules/IModule.hpp"
 #include "Raindrop/Core/Scheduler/Subscription.hpp"
 #include "WindowConfig.hpp"
 #include "Window.hpp"
 #include <memory>
 #include <unordered_map>
 
-namespace Raindrop::Window{
-    class WindowSystem : public Systems::ISystem{
-        public:
-            virtual ~WindowSystem() = default;
+namespace Raindrop{
+    class Engine;
+}
 
-            virtual std::expected<void, Error> initialize(Engine& engine) override;
+namespace Raindrop::Window{
+    class WindowModule : public Modules::IModule{
+        public:
+            virtual ~WindowModule() = default;
+
+            virtual Modules::Result initialize(Modules::InitHelper& init) override;
             virtual void shutdown() override;
 
             virtual std::string name() const noexcept override;
-            virtual std::vector<Systems::Dependency> dependencies() const noexcept override;
+            virtual Modules::DependencyList dependencies() const noexcept override;
 
             void event();
 

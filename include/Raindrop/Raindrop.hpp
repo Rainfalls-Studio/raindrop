@@ -2,13 +2,14 @@
 
 #include "Engine.hpp"
 
+#include "Core/Modules/InitHelper.hpp"
 #include "Core/Layers/Layer.hpp"
 
-// builtin systems
+// builtin Modules
 
-#include "Systems/Event/EventSystem.hpp"
+#include "Modules/Event/EventModule.hpp"
 
-#include "Systems/Window/WindowSystem.hpp"
-#include "Systems/Window/WindowEvents.hpp"
+#include "Modules/Window/WindowModule.hpp"
+#include "Modules/Window/WindowEvents.hpp"
 
-#include "Systems/Render/RenderSystem.hpp"
+#include "Modules/Render/RenderModule.hpp"

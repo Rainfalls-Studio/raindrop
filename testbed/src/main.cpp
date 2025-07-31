@@ -1,17 +1,18 @@
 #include <Raindrop/Raindrop.hpp>
 
 
-class Testbed : public Raindrop::Systems::ISystem{
+class Testbed : public Raindrop::Modules::IModule{
     public:
 
         Testbed(){}
         virtual ~Testbed() override = default;
 
-        virtual std::expected<void, Raindrop::Error> initialize(Raindrop::Engine& engine) override{
-            _engine = &engine;
-            auto& systems = engine.getSystemManager();
+        virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
+            _engine = &init.engine();
 
-            systems.getSystemAs<Raindrop::Event::EventSystem>("Event")->getManager().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
+            auto& modules = init.getModules();
+
+            modules.getModuleAs<Raindrop::Event::EventModule>("Event")->getManager().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
                 [this](const Raindrop::Window::Events::WindowCloseRequest& event) -> bool {
                     if (event.getWindow() == _window){
                         _engine->stop();
@@ -24,15 +25,15 @@ class Testbed : public Raindrop::Systems::ISystem{
             createGameplayLayer();
             createDebugLayer();
 
-            auto& scheduler = engine.getScheduler();
+            auto& scheduler = _engine->getScheduler();
 
             updateSubscription = scheduler.subscribe([this]{update();}, Raindrop::Scheduler::Priority::UPDATE);
 
-            return {};
+            return Raindrop::Modules::Result::Success();
         }
 
-        virtual std::vector<Raindrop::Systems::Dependency> dependencies() const noexcept override{
-            using Raindrop::Systems::Dependency;
+        virtual Raindrop::Modules::DependencyList dependencies() const noexcept override{
+            using Raindrop::Modules::Dependency;
 
             return {
                 Dependency("Event"),
@@ -47,17 +48,17 @@ class Testbed : public Raindrop::Systems::ISystem{
         }
 
         void createWindow(){
-            // Get systems
-            auto& systems = _engine->getSystemManager();
+            // Get Modules
+            auto& Modules = _engine->getModuleManager();
 
-            // auto [windowSys, renderSys] = systems.getSystemsAs<
+            // auto [windowSys, renderSys] = Modules.getModulesAs<
             //     Raindrop::Window::WindowSystem,
             //     Raindrop::Render::RenderSystem>(
             //         "Window",
             //         "Render"
             //     );
 
-            auto windowSys = systems.getSystemAs<Raindrop::Window::WindowSystem>("Window");
+            auto windowSys = Modules.getModuleAs<Raindrop::Window::WindowModule>("Window");
 
             using Raindrop::Window::WindowFlags;
 
@@ -118,13 +119,13 @@ class Testbed : public Raindrop::Systems::ISystem{
 
 int main(){
     Raindrop::Engine engine;
-    auto& systems = engine.getSystemManager();
+    auto& Modules = engine.getModuleManager();
 
-    systems.registerSystem<Raindrop::Window::WindowSystem>();
-    systems.registerSystem<Raindrop::Event::EventSystem>();
-    // systems.registerSystem<Raindrop::Render::RenderSystem>();
-    // systems.registerSystem<Raindrop::Scene::SceneSystem>();
-    systems.registerSystem<Testbed>();
+    Modules.registerModule<Raindrop::Window::WindowModule>();
+    Modules.registerModule<Raindrop::Event::EventModule>();
+    // Modules.registerSystem<Raindrop::Render::RenderSystem>();
+    // Modules.registerSystem<Raindrop::Scene::SceneSystem>();
+    Modules.registerModule<Testbed>();
 
     engine.start();
 

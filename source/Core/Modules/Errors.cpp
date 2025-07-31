@@ -1,7 +1,7 @@
-#include "Raindrop/Core/Systems/Errors.hpp"
+#include "Raindrop/Core/Modules/Errors.hpp"
 #include <system_error>
 
-namespace Raindrop::Systems{
+namespace Raindrop::Modules{
     class SystemErrorCategory : public std::error_category{
         public:
             const char* name() const noexcept override{

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "Core/Systems/Manager.hpp"
+#include "Core/Modules/Manager.hpp"
 #include "Core/Layers/Manager.hpp"
 #include "Core/Scheduler/Scheduler.hpp"
 
@@ -13,12 +13,12 @@ namespace Raindrop{
             void start();
             void stop();
 
-            Systems::Manager& getSystemManager() noexcept;
+            Modules::Manager& getModuleManager() noexcept;
             Layers::Manager& getLayerManager() noexcept;
             Scheduler::Scheduler& getScheduler() noexcept;
 
         private:
-            Systems::Manager _systems;
+            Modules::Manager _modules;
             Layers::Manager _layers;
             Scheduler::Scheduler _scheduler;
 

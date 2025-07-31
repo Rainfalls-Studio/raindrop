@@ -1,4 +1,4 @@
-#include "Raindrop/Systems/Window/WindowConfig.hpp"
+#include "Raindrop/Modules/Window/WindowConfig.hpp"
 
 namespace Raindrop::Window{
     WindowConfig WindowConfig::Empty() noexcept{

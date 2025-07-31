@@ -4,32 +4,29 @@
 
 namespace Raindrop{
     Engine::Engine() : 
-        _systems(*this),
+        _modules(*this),
         _layers(*this),
         _scheduler(*this)
     {}
 
     void Engine::start(){
-        if (auto result = _systems.initialize(); !result){
-            auto& error = result.error(); 
-            spdlog::error("Failed to initialize systems with error {} : {}", error.message(), error.reason());
-            return;
-        }
+
+        spdlog::info("Starting mainloop...");
 
         _running = true;
         while (_running){
             _scheduler.trigger();
         }
 
-        _systems.shutdown();
+        _modules.shutdown();
     }
 
     void Engine::stop(){
         _running = false;
     }
 
-    Systems::Manager& Engine::getSystemManager() noexcept{
-        return _systems;
+    Modules::Manager& Engine::getModuleManager() noexcept{
+        return _modules;
     }
 
     Layers::Manager& Engine::getLayerManager() noexcept{

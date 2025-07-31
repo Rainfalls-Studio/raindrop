@@ -1,37 +1,37 @@
-#include "Raindrop/Systems/Window/WindowSystem.hpp"
-#include "Raindrop/Systems/Window/WindowEvents.hpp"
-#include "Raindrop/Systems/Event/EventSystem.hpp"
+#include "Raindrop/Modules/Window/WindowModule.hpp"
+#include "Raindrop/Modules/Window/WindowEvents.hpp"
+#include "Raindrop/Modules/Event/EventModule.hpp"
+#include "Raindrop/Core/Modules/InitHelper.hpp"
 #include "Raindrop/Engine.hpp"
-#include <stdexcept>
 #include <SDL3/SDL.h>
 
 namespace Raindrop::Window{
-    std::expected<void, Error> WindowSystem::initialize(Engine& engine){
-        _engine = &engine;
+    Modules::Result WindowModule::initialize(Modules::InitHelper& init){
+        _engine = &init.engine();
 
         if (SDL_Init(SDL_INIT_VIDEO) == false){
-            throw std::runtime_error("Failed to initialize SDL");
+            return Modules::Result::Error("Failed to initialize SDL3");
         }
 
-        eventSubscription = engine.getScheduler().subscribe([this]{event();}, Scheduler::Priority::EVENT);
+        eventSubscription = _engine->getScheduler().subscribe([this]{event();}, Scheduler::Priority::EVENT);
         
-        return {};
+        return Modules::Result::Success();
     }
 
-    std::vector<Systems::Dependency> WindowSystem::dependencies() const noexcept{
+    Modules::DependencyList WindowModule::dependencies() const noexcept{
         return {
-            Systems::Dependency("Event")
+            Modules::Dependency("Event")
         };
     }
 
 
-    std::shared_ptr<Window> WindowSystem::createWindow(const WindowConfig& config){
+    std::shared_ptr<Window> WindowModule::createWindow(const WindowConfig& config){
         std::shared_ptr<Window> win = std::make_shared<Window>(config);
         _windows[SDL_GetWindowID(win->getWindow())] = win;
         return win;
     }
 
-    void WindowSystem::shutdown(){
+    void WindowModule::shutdown(){
         SDL_Quit();
     }
 
@@ -239,9 +239,9 @@ namespace Raindrop::Window{
     void renderTargetsResetEvent(EventInfo&){}
     void renderDeviceResetEvent(EventInfo&){}
 
-    void WindowSystem::event(){
-        std::shared_ptr<Event::EventSystem> events;
-        events = _engine->getSystemManager().getSystemAs<Event::EventSystem>("Event");
+    void WindowModule::event(){
+        std::shared_ptr<Event::EventModule> events;
+        events = _engine->getModuleManager().getModuleAs<Event::EventModule>("Event");
 
         SDL_Event e;
         auto& manager = events->getManager();
@@ -383,7 +383,7 @@ namespace Raindrop::Window{
 		}
     }
 
-    std::string WindowSystem::name() const noexcept{
+    std::string WindowModule::name() const noexcept{
         return "Window";
     }
 }
