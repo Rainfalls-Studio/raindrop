@@ -12,6 +12,7 @@ namespace Raindrop::Modules{
     class Manager{
         public:
             Manager(Engine& engine);
+            ~Manager();
 
             void registerModule(const SharedModule& module);
 

@@ -1,6 +1,7 @@
 #include "Raindrop/Modules/Window/Window.hpp"
 #include <stdexcept>
 #include <SDL3/SDL_vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 namespace Raindrop::Window{
     SDL_WindowFlags raindropToSDLFlags(WindowFlags flags){
@@ -52,10 +53,10 @@ namespace Raindrop::Window{
         return exts;
     }
 
-    vk::SurfaceKHR Window::createSurface(vk::Instance instance){
+    std::expected<vk::SurfaceKHR, Error> Window::createSurface(vk::Instance instance){
         VkSurfaceKHR surface;
         if (SDL_Vulkan_CreateSurface(_window, instance, nullptr, &surface) == false){
-            throw std::runtime_error("Failed to create surface : " + std::string(SDL_GetError()));
+            return std::unexpected(Error(std::make_error_code(std::errc::invalid_argument), SDL_GetError()));
         }
 
         return vk::SurfaceKHR(surface);

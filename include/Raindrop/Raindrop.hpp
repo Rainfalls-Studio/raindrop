@@ -12,4 +12,4 @@
 #include "Modules/Window/WindowModule.hpp"
 #include "Modules/Window/WindowEvents.hpp"
 
-#include "Modules/Render/RenderModule.hpp"
+#include "Modules/Render/RenderCoreModule.hpp"

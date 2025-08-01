@@ -23,8 +23,10 @@ namespace Raindrop::Modules{
             virtual Name name() const noexcept = 0;
             inline virtual DependencyList dependencies() const noexcept {return {};}
 
-            inline virtual Result dependencyReload(Name) {return Result::Level::ERROR;}
-            inline virtual Result dependencyShutdown(Name) {return Result::Level::ERROR;}
+            inline virtual Result dependencyReload(const Name&) {return Result::Level::SUCCESS;}
+            inline virtual Result dependencyShutdown(const Name&) {return Result::Level::SUCCESS;}
+            
+            inline virtual bool critical() const noexcept {return false;}
     };
 
     using SharedModule = std::shared_ptr<IModule>;

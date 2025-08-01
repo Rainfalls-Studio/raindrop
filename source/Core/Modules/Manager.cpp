@@ -7,6 +7,10 @@
 
 namespace Raindrop::Modules{
     Manager::Manager(Engine& engine) : _engine{engine}{}
+    
+    Manager::~Manager(){
+        shutdown();
+    }
 
     void Manager::registerModule(const SharedModule& module){
         auto& node = _nodes[module->name()];
@@ -39,9 +43,14 @@ namespace Raindrop::Modules{
 
         // if dependencies are met. initialize module
         if (dependenciesRequirements){
-            initializeModule(node); 
+            initializeModule(node);
         }
 
+        if (node.module->critical() && node.status != Status::INITIALIZED){
+            spdlog::critical("Failed to initialize critical module \"{}\" !", nodeName);
+            throw std::runtime_error("Failed to initialize critical module");
+        }
+        
         propagateInitialization(node);
     }
 
@@ -201,6 +210,10 @@ namespace Raindrop::Modules{
             if (!node.dependents.empty()) continue;
 
             // if not, reset
+            if (node.module){
+                node.module->shutdown();
+            }
+            
             node.module = nullptr;
 
             // push dependents and remove self from dependents

@@ -5,6 +5,7 @@
 #include <string_view>
 #include <vulkan/vulkan.hpp>
 
+#include "Raindrop/Core/Error.hpp"
 #include "WindowConfig.hpp"
 #include "Display.hpp"
 
@@ -21,7 +22,7 @@ namespace Raindrop::Window{
             Display getDisplay() const;
 
 			std::vector<std::string_view> getInstanceExtensions();
-			vk::SurfaceKHR createSurface(vk::Instance instance);
+			std::expected<vk::SurfaceKHR, Error> createSurface(vk::Instance instance);
 
         private:
             SDL_Window* _window;

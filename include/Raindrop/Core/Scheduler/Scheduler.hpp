@@ -28,6 +28,6 @@ namespace Raindrop::Scheduler{
                 bool operator<(const SubscriptionWrapper& other) const noexcept;
             };
 
-            std::set<SubscriptionWrapper> _subscriptions;
+            std::multiset<SubscriptionWrapper> _subscriptions;
     };
 }

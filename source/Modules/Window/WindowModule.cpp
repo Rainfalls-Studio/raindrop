@@ -13,6 +13,8 @@ namespace Raindrop::Window{
             return Modules::Result::Error("Failed to initialize SDL3");
         }
 
+        spdlog::info("Initialized SDL3");
+
         eventSubscription = _engine->getScheduler().subscribe([this]{event();}, Scheduler::Priority::EVENT);
         
         return Modules::Result::Success();
@@ -58,26 +60,26 @@ namespace Raindrop::Window{
 
     void windowShownEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowShown(window));
     }
 
     void windowHiddenEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowHidden(window));
     }
 
     void windowExposedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowExposed(window));
 
     }
 
     void windowMovedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
 
         glm::ivec2 pos{
             static_cast<int>(info.e.window.data1),
@@ -89,7 +91,7 @@ namespace Raindrop::Window{
 
     void windowResizedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
 
         glm::uvec2 size{
             static_cast<unsigned int>(info.e.window.data1),
@@ -103,55 +105,55 @@ namespace Raindrop::Window{
 
     void windowMinimizedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowMinimized(window));
     }
 
     void windowMaximizedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowMaximized(window));
     }
 
     void windowRestoredEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowRestored(window));
     }
 
     void windowMouseEnterEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowMouseEntered(window));
     }
 
     void windowMouseLeaveEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowMouseLeaved(window));
     }
 
     void windowFocusGainedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowFocusGained(window));
     }
 
     void windowFocusLostEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowFocusLost(window));
     }
 
     void windowCloseRequestedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowCloseRequest(window));
     }
 
     void windowTakeFocusEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowFocusTake(window));
     }
 
@@ -162,19 +164,19 @@ namespace Raindrop::Window{
 
     void windowOccludedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowOccluded(window));
     }
 
     void windowEnterFullsreenEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowFullscreenEnter(window));
     }
 
     void windowLeaveFullscreenEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
-        assert(window);
+        if (!window) return;
         info.manager.trigger(Events::WindowFullscreenLeave(window));
     }
 

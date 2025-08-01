@@ -10,17 +10,6 @@ class Testbed : public Raindrop::Modules::IModule{
         virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
             _engine = &init.engine();
 
-            auto& modules = init.getModules();
-
-            modules.getModuleAs<Raindrop::Event::EventModule>("Event")->getManager().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
-                [this](const Raindrop::Window::Events::WindowCloseRequest& event) -> bool {
-                    if (event.getWindow() == _window){
-                        _engine->stop();
-                    }
-                    return false;
-                }
-            );
-
             createWindow();
             createGameplayLayer();
             createDebugLayer();
@@ -47,18 +36,22 @@ class Testbed : public Raindrop::Modules::IModule{
             return "Testbed";
         }
 
+        virtual bool critical() const noexcept override {
+            return true;
+        }
+
         void createWindow(){
             // Get Modules
             auto& Modules = _engine->getModuleManager();
 
-            // auto [windowSys, renderSys] = Modules.getModulesAs<
-            //     Raindrop::Window::WindowSystem,
-            //     Raindrop::Render::RenderSystem>(
-            //         "Window",
-            //         "Render"
-            //     );
+            auto [windowMod, eventMod] = Modules.getModulesAs<
+                Raindrop::Window::WindowModule,
+                Raindrop::Event::EventModule>(
+                    "Window",
+                    "Event"
+                );
 
-            auto windowSys = Modules.getModuleAs<Raindrop::Window::WindowModule>("Window");
+            // auto windowSys = Modules.getModuleAs<Raindrop::Window::WindowModule>("Window");
 
             using Raindrop::Window::WindowFlags;
 
@@ -71,11 +64,17 @@ class Testbed : public Raindrop::Modules::IModule{
                     WindowFlags::RESIZABLE
                 }
             };
-            _window = windowSys->createWindow(config);
+            _window = windowMod->createWindow(config);
+            
 
-            // Register it in the graphics window system
-            // auto windowRenderSys = renderSys->getRenderSystem<Raindrop::Graphics::WindowSystem::WindowSystem>();
-            // windowRenderSys->registerWindow(_window);
+            eventMod->getManager().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
+                [this](const Raindrop::Window::Events::WindowCloseRequest& event) -> bool {
+                    if (event.getWindow() == _window){
+                        _engine->stop();
+                    }
+                    return false;
+                }
+            );
         }
 
         void createGameplayLayer(){
@@ -107,7 +106,18 @@ class Testbed : public Raindrop::Modules::IModule{
         }
 
         void update(){
+            std::this_thread::sleep_for(std::chrono::milliseconds(16));
+        }
+
+
+        virtual Raindrop::Modules::Result dependencyReload(const Name& dependency) override {
+            spdlog::info(dependency);
             
+            if (dependency == "Window"){
+                createWindow();
+                return Raindrop::Modules::Result::Success();
+            }
+            return Raindrop::Modules::Result::Success();
         }
 
     private:
@@ -118,13 +128,15 @@ class Testbed : public Raindrop::Modules::IModule{
 };
 
 int main(){
+    spdlog::set_level(spdlog::level::trace);
+
     Raindrop::Engine engine;
     auto& Modules = engine.getModuleManager();
 
     Modules.registerModule<Raindrop::Window::WindowModule>();
     Modules.registerModule<Raindrop::Event::EventModule>();
-    // Modules.registerSystem<Raindrop::Render::RenderSystem>();
-    // Modules.registerSystem<Raindrop::Scene::SceneSystem>();
+    Modules.registerModule<Raindrop::Render::RenderCoreModule>();
+    // Modules.registerModule<Raindrop::Scene::SceneSystem>();
     Modules.registerModule<Testbed>();
 
     engine.start();
