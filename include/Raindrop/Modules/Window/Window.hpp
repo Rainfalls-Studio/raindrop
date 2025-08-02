@@ -4,6 +4,7 @@
 #include <vector>
 #include <string_view>
 #include <vulkan/vulkan.hpp>
+#include <memory>
 
 #include "Raindrop/Core/Error.hpp"
 #include "WindowConfig.hpp"
@@ -28,4 +29,7 @@ namespace Raindrop::Window{
             SDL_Window* _window;
             SDL_WindowID _id;
     };
+
+    using SharedWindow = std::shared_ptr<Window>;
+    using WeakWindow = std::weak_ptr<Window>;
 }

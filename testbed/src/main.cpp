@@ -26,8 +26,8 @@ class Testbed : public Raindrop::Modules::IModule{
 
             return {
                 Dependency("Event"),
-                // Dependency("Scene"),
-                // Dependency("Render"),
+                Dependency("RenderOutput"),
+                Dependency("RenderGraph"),
                 Dependency("Window")
             };
         }
@@ -44,14 +44,14 @@ class Testbed : public Raindrop::Modules::IModule{
             // Get Modules
             auto& Modules = _engine->getModuleManager();
 
-            auto [windowMod, eventMod] = Modules.getModulesAs<
+            auto [windowMod, eventMod, renderOutputMod] = Modules.getModulesAs<
                 Raindrop::Window::WindowModule,
-                Raindrop::Event::EventModule>(
+                Raindrop::Event::EventModule,
+                Raindrop::Render::RenderOutputModule>(
                     "Window",
-                    "Event"
+                    "Event",
+                    "RenderOutput"
                 );
-
-            // auto windowSys = Modules.getModuleAs<Raindrop::Window::WindowModule>("Window");
 
             using Raindrop::Window::WindowFlags;
 
@@ -65,7 +65,8 @@ class Testbed : public Raindrop::Modules::IModule{
                 }
             };
             _window = windowMod->createWindow(config);
-            
+
+            renderOutputMod->registerOutput<Raindrop::Render::WindowRenderOutput>("main", _window);
 
             eventMod->getManager().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
                 [this](const Raindrop::Window::Events::WindowCloseRequest& event) -> bool {
@@ -136,6 +137,8 @@ int main(){
     Modules.registerModule<Raindrop::Window::WindowModule>();
     Modules.registerModule<Raindrop::Event::EventModule>();
     Modules.registerModule<Raindrop::Render::RenderCoreModule>();
+    Modules.registerModule<Raindrop::Render::RenderOutputModule>();
+    Modules.registerModule<Raindrop::Render::RenderGraphModule>();
     // Modules.registerModule<Raindrop::Scene::SceneSystem>();
     Modules.registerModule<Testbed>();
 

@@ -10,7 +10,6 @@ namespace Raindrop{
     {}
 
     void Engine::start(){
-
         spdlog::info("Starting mainloop...");
 
         _running = true;

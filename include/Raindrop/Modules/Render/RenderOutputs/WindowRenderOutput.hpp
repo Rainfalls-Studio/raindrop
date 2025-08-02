@@ -1,0 +1,79 @@
+#pragma once
+
+#include "../IRenderOutput.hpp"
+#include "Raindrop/Modules/Window/Window.hpp"
+#include <VkBootstrap.h>
+#include <vulkan/vulkan.hpp>
+
+namespace Raindrop::Render{
+    class WindowRenderOutput : public IRenderOutput{
+        public:
+            WindowRenderOutput(Window::SharedWindow window);
+            virtual ~WindowRenderOutput() = default;
+
+            virtual void initialize(RenderCoreModule& core) override;
+            virtual void shutdown() override;
+        
+        private:
+            RenderCoreModule* _core;
+            Window::WeakWindow _window;
+
+            struct Swapchain{
+                struct Frame{
+                    vk::Framebuffer framebuffer = VK_NULL_HANDLE;
+                    vk::Semaphore imageAvailable = VK_NULL_HANDLE;
+                    vk::Semaphore imageFinished = VK_NULL_HANDLE;
+                    vk::Fence inFlightFence = VK_NULL_HANDLE;
+                    vk::Fence imageInFlight = VK_NULL_HANDLE;
+                    vk::Image image = VK_NULL_HANDLE;
+                    vk::ImageView imageView = VK_NULL_HANDLE;
+                };
+                
+                RenderCoreModule& core;
+                vk::SwapchainKHR swapchain;
+                std::vector<Frame> frames;
+                
+                Swapchain(RenderCoreModule& core, vk::SwapchainKHR swapchain);
+                ~Swapchain();
+            };
+
+            struct SwapchainSupport{
+                vk::SurfaceCapabilitiesKHR capabilities;
+                vk::ColorSpaceKHR colorSpace;
+                std::vector<vk::SurfaceFormatKHR> formats;
+                std::vector<vk::PresentModeKHR> presentModes;
+
+                inline bool supported() const noexcept {
+                    return !formats.empty() && !presentModes.empty();
+                }
+            };
+            
+            std::unique_ptr<Swapchain> _swapchain;
+            vk::SurfaceKHR _surface;
+            vk::RenderPass _renderPass;
+            vk::SurfaceFormatKHR _surfaceFormat;
+            vk::PresentModeKHR _presentMode;
+			vk::ClearColorValue _clearColor;
+            vk::Extent2D _extent;
+            SwapchainSupport _support;
+            uint32_t _frameCount;
+
+            vk::SurfaceFormatKHR _wantedSurfaceFormat;
+            vk::PresentModeKHR _wantedPresentMode;
+            uint32_t _wantedFrameCount;
+
+            void findPresentMode();
+            void findSurfaceFormat();
+            void findFrameCount();
+            void findExtent(const vk::Extent2D& wanted);
+
+            std::expected<void, Error> createSurface();
+            std::expected<void, Error> rebuildSwapchain();
+            std::expected<void, Error> createRenderPass();
+            std::expected<void, Error> getSupport();
+            std::expected<void, Error> getSwapchainImages();
+            std::expected<void, Error> createImageViews();
+            std::expected<void, Error> createFramebuffers();
+            std::expected<void, Error> createSyncObjects();
+    };
+}

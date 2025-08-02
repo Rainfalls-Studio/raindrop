@@ -24,6 +24,30 @@ namespace Raindrop::Render{
             virtual Modules::Result dependencyReload(const Name& name) override;
             virtual Modules::Result dependencyShutdown(const Name& name) override;
 
+            inline vk::Instance instance() const noexcept{
+                return _vkInstance;
+            }
+
+            inline vk::Device device() const noexcept{
+                return _vkDevice;
+            }
+
+            inline vk::PhysicalDevice physicalDevice() const noexcept{
+                return _vkPhysicalDevice;
+            }
+
+            inline vkb::Instance vkbInstance() const noexcept{
+                return _instance;
+            }
+
+            inline vkb::Device vkbDevice() const noexcept{
+                return _device;
+            }
+
+            inline vkb::PhysicalDevice vkbPhysicalDevice() const noexcept{
+                return _physicalDevice;
+            }
+
         private:
             struct InitData{
                 std::shared_ptr<Window::Window> window;
