@@ -9,8 +9,69 @@ namespace Raindrop{
 }
 
 namespace Raindrop::Render{
+    class Queue{
+        friend class RenderCoreModule;
+        public:
+            Queue() = default;
+
+            inline vk::Queue operator->() const noexcept{
+                return _queue;
+            }
+
+            inline vk::Queue operator*() const noexcept{
+                return _queue;
+            }
+
+            inline vk::QueueFlags flags() const noexcept{
+                return _flags;
+            }
+
+            inline uint32_t familyIndex() const noexcept{
+                return _family;
+            }
+
+        private:
+            inline Queue(vk::Device device, vk::Queue queue, vk::QueueFlags flags, uint32_t family) : 
+                _device{device},
+                _queue{queue},
+                _flags{flags},
+                _family{family}
+            {}
+
+            vk::Device _device;
+            vk::Queue _queue;
+            vk::QueueFlags _flags;
+            uint32_t _family;
+    };
+
     class RenderCoreModule : public Modules::IModule{
         public:
+            enum class ErrorCode{
+                FAILED_INSTANCE_CREATION,
+                MISSING_INSTANCE_EXTENSIONS,
+                MISSING_LAYER,
+                FAILED_SURFACE_CREATION,
+                NO_PRESENT_SUPPORT,
+                NO_SUITABLE_PHYSICAL_DEVICE,
+                NO_COMPATIBLE_QUEUE_FAMILY,
+                FAILED_LOGICAL_DEVICE_CREATION
+            };
+
+            static std::error_category& error_category();
+
+            static inline std::error_code make_error_code(ErrorCode e){
+                return {static_cast<int>(e), error_category()};
+            }
+
+            static inline std::error_code FailedInstanceCreationError() {return make_error_code(ErrorCode::FAILED_INSTANCE_CREATION);}
+            static inline std::error_code MissingInstanceExtensionError() {return make_error_code(ErrorCode::MISSING_INSTANCE_EXTENSIONS);}
+            static inline std::error_code MissingLayerError() {return make_error_code(ErrorCode::MISSING_LAYER);}
+            static inline std::error_code FailedSurfaceCreationError() {return make_error_code(ErrorCode::FAILED_SURFACE_CREATION);}
+            static inline std::error_code NoPresentSupportError() {return make_error_code(ErrorCode::NO_PRESENT_SUPPORT);}
+            static inline std::error_code NoSuitablePhysicalDeviceError() {return make_error_code(ErrorCode::NO_SUITABLE_PHYSICAL_DEVICE);}
+            static inline std::error_code NoCompatibleQueueFamilyError() {return make_error_code(ErrorCode::NO_COMPATIBLE_QUEUE_FAMILY);}
+            static inline std::error_code FailedLogicalDeviceCreationError() {return make_error_code(ErrorCode::FAILED_LOGICAL_DEVICE_CREATION);}
+
             RenderCoreModule();
             virtual ~RenderCoreModule() = default;
 
@@ -48,6 +109,22 @@ namespace Raindrop::Render{
                 return _physicalDevice;
             }
 
+            inline Queue& graphicsQueue() noexcept{
+                return _graphicsQueue;
+            }
+
+            inline Queue& computeQueue() noexcept{
+                return _computeQueue;
+            }
+
+            inline Queue& transferQueue() noexcept{
+                return _transferQueue;
+            }
+
+            inline Queue& presentQueue() noexcept{
+                return _presentQueue;
+            }
+
         private:
             struct InitData{
                 std::shared_ptr<Window::Window> window;
@@ -65,11 +142,17 @@ namespace Raindrop::Render{
             vk::PhysicalDevice _vkPhysicalDevice;
             vk::Device _vkDevice;
 
+            Queue _graphicsQueue;
+            Queue _computeQueue;
+            Queue _transferQueue;
+            Queue _presentQueue;
+
             void destroyVulkan();
             Modules::Result initVulkan();
 
-            std::expected<void, std::error_code> createInstance(InitData& init);
-            std::expected<void, std::error_code> findPhysicalDevice(InitData& init);
-            std::expected<void, std::error_code> createDevice(InitData& init);
+            std::expected<void, Error> createInstance(InitData& init);
+            std::expected<void, Error> findPhysicalDevice(InitData& init);
+            std::expected<void, Error> createDevice(InitData& init);
+            std::expected<void, Error> findQueues();
     };
 }

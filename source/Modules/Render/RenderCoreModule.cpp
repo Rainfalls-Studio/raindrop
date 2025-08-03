@@ -20,6 +20,34 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
 
 
 namespace Raindrop::Render{
+    class RenderCoreErrorCategory : public std::error_category{
+        public:
+            const char* name() const noexcept override{
+                return "Render Core";
+            }
+
+            std::string message(int ev) const override{
+                using ErrorCode = RenderCoreModule::ErrorCode;
+
+                switch (static_cast<ErrorCode>(ev)){
+                    case ErrorCode::FAILED_INSTANCE_CREATION: return "Failed instance creation";
+                    case ErrorCode::MISSING_INSTANCE_EXTENSIONS: return "Missing instance extension";
+                    case ErrorCode::MISSING_LAYER: return "Missing layer";
+                    case ErrorCode::FAILED_SURFACE_CREATION: return "Failed surface creation";
+                    case ErrorCode::NO_PRESENT_SUPPORT: return "No present support";
+                    case ErrorCode::NO_SUITABLE_PHYSICAL_DEVICE: return "No suitable physical device";
+                    case ErrorCode::NO_COMPATIBLE_QUEUE_FAMILY: return "No compatible queue family";
+                    case ErrorCode::FAILED_LOGICAL_DEVICE_CREATION: return "Failed logical device creation";
+                    default: return "Unknown system error";
+                }
+            }
+    };
+
+    std::error_category& RenderCoreModule::error_category(){
+        static RenderCoreErrorCategory category;
+        return category;
+    }
+
     RenderCoreModule::RenderCoreModule(){}
 
     Modules::Result RenderCoreModule::initialize(Modules::InitHelper& helper){
@@ -66,7 +94,8 @@ namespace Raindrop::Render{
         auto result =
             createInstance(init)
             .and_then([this, &init]{return findPhysicalDevice(init);})
-            .and_then([this, &init]{return createDevice(init);});
+            .and_then([this, &init]{return createDevice(init);})
+            .and_then([this] {return findQueues();});
         
         if (!result){
             auto& error = result.error();
@@ -82,7 +111,7 @@ namespace Raindrop::Render{
         return Modules::Result::Success();
     }
 
-    std::expected<void, std::error_code> RenderCoreModule::createInstance(InitData& init){
+    std::expected<void, Error> RenderCoreModule::createInstance(InitData& init){
         vkb::InstanceBuilder builder;
 
         if (init.window){
@@ -104,7 +133,7 @@ namespace Raindrop::Render{
         if (!result){
             const auto& error = result.error();
             spdlog::error("Failed to create vulkan instance : {}", error.message());
-            return std::unexpected(error);
+            return std::unexpected(Error(FailedInstanceCreationError(), "Failed to create vulkan instance : {}", error.message()));
         }
 
         _instance = *result;
@@ -113,7 +142,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, std::error_code> RenderCoreModule::findPhysicalDevice(InitData& init){
+    std::expected<void, Error> RenderCoreModule::findPhysicalDevice(InitData& init){
         vkb::PhysicalDeviceSelector selector(_instance);
         
         if (init.window){
@@ -123,7 +152,7 @@ namespace Raindrop::Render{
             if (!result){
                 auto& error = result.error();
                 spdlog::error("Failed to create window surface {} : {} ", error.message(), error.reason());
-                return std::unexpected(error.code());
+                return std::unexpected(Error(FailedSurfaceCreationError(), "Failed to create window surface : {}, {}", error.message(), error.reason()));
             }
 
             init.surface = *result;
@@ -136,8 +165,9 @@ namespace Raindrop::Render{
             .select();
         
         if (!result){
-            spdlog::error("Failed to find physical device : {} ", result.error().message());
-            return std::unexpected(result.error());
+            const auto& error = result.error();
+            spdlog::error("Failed to find physical device : {} ", error.message());
+            return std::unexpected(Error(NoSuitablePhysicalDeviceError(), "Failed to find physical device : {}", error.message()));
         }
 
         auto device = result.value();
@@ -150,13 +180,15 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, std::error_code> RenderCoreModule::createDevice(InitData&){
+    std::expected<void, Error> RenderCoreModule::createDevice(InitData&){
         vkb::DeviceBuilder builder(_physicalDevice);
 
         auto result = builder.build();
 
         if (!result){
-            return std::unexpected(result.error());
+            const auto& error = result.error();
+            spdlog::error("Failed to create logical device : {}", error.message());
+            return std::unexpected(Error(FailedLogicalDeviceCreationError(), "Failed to create logical device : {}", error.message()));
         }
 
         _device = *result;
@@ -193,5 +225,47 @@ namespace Raindrop::Render{
         }
 
         return Modules::Result::Success();
+    }
+
+    std::expected<void, Error> RenderCoreModule::findQueues(){
+        auto getQueue = [this] (Queue& queue, vkb::QueueType type) -> std::expected<void, Error> {
+            auto vkbQueue = _device.get_queue(type);
+            auto index = _device.get_queue_index(type);
+
+            if (!vkbQueue || !index){
+                const auto& error = vkbQueue.error();
+
+                std::string str_type;
+                switch (type){
+                    case vkb::QueueType::present: str_type="present"; break; 
+                    case vkb::QueueType::compute: str_type="compute"; break; 
+                    case vkb::QueueType::graphics: str_type="graphics"; break; 
+                    case vkb::QueueType::transfer: str_type="transfer"; break; 
+                }
+
+                return std::unexpected(Error(NoCompatibleQueueFamilyError(), "Failed to find \"{}\" queue family : {}", str_type, error.message()));
+            }
+
+            vk::QueueFlags flags;
+            switch (type){
+                case vkb::QueueType::compute: flags=vk::QueueFlagBits::eCompute; break; 
+                case vkb::QueueType::graphics: flags=vk::QueueFlagBits::eGraphics; break; 
+                case vkb::QueueType::transfer: flags=vk::QueueFlagBits::eTransfer; break;
+                default: break; 
+            }
+
+            queue = Queue(_vkDevice, vkbQueue.value(), flags, index.value());
+            return {};
+        };
+
+        auto result = getQueue(_computeQueue, vkb::QueueType::compute)
+            .and_then([this, getQueue]{return getQueue(_graphicsQueue, vkb::QueueType::graphics);})
+            .and_then([this, getQueue]{return getQueue(_presentQueue, vkb::QueueType::present);})
+            .and_then([this, getQueue]{return getQueue(_transferQueue, vkb::QueueType::transfer);});
+
+        if (!result){
+            return std::unexpected(result.error());
+        }
+        return {};
     }
 }

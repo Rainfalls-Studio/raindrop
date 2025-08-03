@@ -205,6 +205,7 @@ namespace Raindrop::Render{
         findFrameCount();
         findExtent({resolution.x, resolution.y});
 
+
         vk::SwapchainCreateInfoKHR info;
         info.setSurface(_surface)
             .setOldSwapchain(_swapchain ? _swapchain->swapchain : nullptr)
@@ -217,6 +218,20 @@ namespace Raindrop::Render{
             .setImageArrayLayers(1)
             .setImageUsage(vk::ImageUsageFlagBits::eColorAttachment)
             .setPreTransform(_support.capabilities.currentTransform);
+        
+        Queue& presentQueue = _core->presentQueue();
+        Queue& graphicsQueue = _core->graphicsQueue();
+
+        uint32_t families[] = {presentQueue.familyIndex(), graphicsQueue.familyIndex()};
+
+        if (families[0] != families[1]){
+            info.setQueueFamilyIndexCount(2)
+                .setPQueueFamilyIndices(families)
+                .setImageSharingMode(vk::SharingMode::eConcurrent);
+        } else {
+            info.setImageSharingMode(vk::SharingMode::eExclusive);
+        }
+
 
         vk::SwapchainKHR newSwapchain;
         try{
