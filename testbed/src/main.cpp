@@ -107,6 +107,11 @@ class Testbed : public Raindrop::Modules::IModule{
         }
 
         void update(){
+            static size_t counter = 0;
+            if (counter++ == 200){
+                // TEST
+                // _engine->getModuleManager().registerModule<Raindrop::Render::RenderOutputModule>();
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
 
@@ -124,7 +129,7 @@ class Testbed : public Raindrop::Modules::IModule{
     private:
         Raindrop::Engine* _engine;
         std::shared_ptr<Raindrop::Window::Window> _window;
-
+        
         Raindrop::Scheduler::Subscription updateSubscription;
 };
 
@@ -139,6 +144,7 @@ int main(){
     Modules.registerModule<Raindrop::Render::RenderCoreModule>();
     Modules.registerModule<Raindrop::Render::RenderOutputModule>();
     Modules.registerModule<Raindrop::Render::RenderGraphModule>();
+    Modules.registerModule<Raindrop::Render::RenderSchedulerModule>();
     // Modules.registerModule<Raindrop::Scene::SceneSystem>();
     Modules.registerModule<Testbed>();
 

@@ -7,16 +7,19 @@ namespace Raindrop{
         _modules(*this),
         _layers(*this),
         _scheduler(*this)
-    {}
+    {
+        spdlog::info("===================== Startup =====================");
+    }
 
     void Engine::start(){
-        spdlog::info("Starting mainloop...");
+        spdlog::info("===================== Starting mainloop =====================");
 
         _running = true;
         while (_running){
             _scheduler.trigger();
         }
 
+        spdlog::info("===================== Shutdown =====================");
         _modules.shutdown();
     }
 

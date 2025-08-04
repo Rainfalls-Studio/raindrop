@@ -17,6 +17,7 @@ namespace Raindrop::Scheduler{
                 PRE_RENDER,
                 RENDER,
                 POST_RENDER,
+                PRESENT,
                 BOTTOM
             };
 

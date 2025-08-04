@@ -3,6 +3,7 @@
 #include "Raindrop/Core/Modules/IModule.hpp"
 #include "IRenderOutput.hpp"
 #include "RenderCoreModule.hpp"
+#include "RenderSchedulerModule.hpp"
 #include "Raindrop/Engine.hpp"
 
 namespace Raindrop::Render{
@@ -36,6 +37,8 @@ namespace Raindrop::Render{
 
             SharedRenderOutput getOutput(const IRenderOutput::Name& name);
 
+            void setMainOutput(const IRenderOutput::Name& name);
+
             template<typename T>
             std::shared_ptr<T> getOutputAs(const IRenderOutput::Name& name){
                 static_assert(std::is_base_of<IRenderOutput, T>::value, "The type T must be derived from IRenderOutput");
@@ -58,12 +61,43 @@ namespace Raindrop::Render{
             }
         
         private:
+            struct RenderOutputInfo{
+                SharedRenderOutput output;
+                IRenderOutput::Name name;
+                bool available = false;
+                bool enabled = true;
+
+                inline bool valid() const noexcept{
+                    return output != nullptr && enabled;
+                }
+            };
+
             Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;
-            RenderOutputMap _outputs;
+            std::unordered_map<IRenderOutput::Name, std::shared_ptr<RenderOutputInfo>> _outputs;
+            
+            // The output that will allow pacing. If invalid, it will select the first registred output
+            IRenderOutput::Name _mainOutputName = "main";
+            std::shared_ptr<RenderOutputInfo> _mainOutput;
+
+            void findMainOutput();
+            std::shared_ptr<RenderOutputInfo> findFirstValid();
 
             void initializeAllOutputs();
             void shutdownAllOutputs();
             void rebuildAllOutputs();
+
+            void prepareRender();
+            RenderSchedulerModule::PreRenderResult preRender();
+            void postRender(const RenderSchedulerModule::RenderResult& results);
+
+            enum class RenderOutputResult{
+                SUCCESS,
+                SKIP,
+                ERROR
+            };
+
+            RenderOutputResult acquireRenderOutput(std::shared_ptr<RenderOutputInfo> info, uint64_t timeout = UINT64_MAX);
+            RenderOutputResult presentRenderOutput(std::shared_ptr<RenderOutputInfo> info, const RenderSchedulerModule::RenderResult& results);
     };
 }

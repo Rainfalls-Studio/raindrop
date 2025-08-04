@@ -12,10 +12,23 @@ namespace Raindrop::Render{
 
             virtual ~IRenderOutput() = default;
 
+            struct PreRenderResult{
+                vk::Semaphore wait;
+                vk::PipelineStageFlags waitStageFlags;
+            };
+
             virtual void initialize(RenderCoreModule& engine) = 0;
             virtual void shutdown() = 0;
 
-            // virtual void present(vk::Image image, vk::Semaphore readySemaphore = {});
+            virtual std::expected<bool, Error> acquire(uint64_t timeout = UINT64_MAX) = 0;
+            virtual std::expected<PreRenderResult, Error> preRender(uint64_t timeout = UINT64_MAX) = 0;
+            virtual std::expected<void, Error> present(vk::Semaphore waitSemaphore) = 0;
+
+            virtual uint32_t getCurrentBufferIndex() const = 0;
+            virtual uint32_t getBufferCount() const = 0;
+
+            virtual void begin(vk::CommandBuffer cmd, vk::SubpassContents subpassContents = vk::SubpassContents::eInline) = 0;
+            virtual void end(vk::CommandBuffer cmd) = 0;
     };
 
     using SharedRenderOutput = std::shared_ptr<IRenderOutput>;

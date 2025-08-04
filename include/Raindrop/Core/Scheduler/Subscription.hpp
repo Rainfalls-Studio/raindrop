@@ -5,14 +5,18 @@
 namespace Raindrop::Scheduler{
     class Subscription{
         public:
-            constexpr Subscription() noexcept : _data{}{}
-            constexpr Subscription(SharedSubscriptionData data) : _data{data}{}
+            constexpr inline Subscription() noexcept : _data{}{}
+            constexpr inline Subscription(SharedSubscriptionData data) : _data{data}{}
 
             Subscription(const Subscription&) = delete;
             Subscription(Subscription&&) = default;
 
             Subscription& operator=(const Subscription&) = delete;
             Subscription& operator=(Subscription&&) = default;
+
+            inline void unsubscribe(){
+                _data.reset();
+            }
 
         private:
             SharedSubscriptionData _data;

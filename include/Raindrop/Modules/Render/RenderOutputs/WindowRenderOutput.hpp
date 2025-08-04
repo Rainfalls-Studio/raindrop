@@ -13,6 +13,18 @@ namespace Raindrop::Render{
 
             virtual void initialize(RenderCoreModule& core) override;
             virtual void shutdown() override;
+
+            virtual std::expected<bool, Error> acquire(uint64_t timeout = UINT64_MAX) override;
+            virtual std::expected<PreRenderResult, Error> preRender(uint64_t timeout = UINT64_MAX) override;
+            virtual std::expected<void, Error> present(vk::Semaphore waitSemaphore) override;
+
+            virtual uint32_t getCurrentBufferIndex() const override;
+            virtual uint32_t getBufferCount() const override;
+
+            virtual void begin(vk::CommandBuffer cmd, vk::SubpassContents subpassContents = vk::SubpassContents::eInline) override;
+            virtual void end(vk::CommandBuffer cmd) override;
+
+            void invalidate();
         
         private:
             RenderCoreModule* _core;
@@ -57,6 +69,9 @@ namespace Raindrop::Render{
             vk::Extent2D _extent;
             SwapchainSupport _support;
             uint32_t _frameCount;
+            uint32_t _currentFrame;
+
+            bool _rebuildPending;
 
             vk::SurfaceFormatKHR _wantedSurfaceFormat;
             vk::PresentModeKHR _wantedPresentMode;

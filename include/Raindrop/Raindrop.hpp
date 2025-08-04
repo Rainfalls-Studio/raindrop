@@ -15,4 +15,5 @@
 #include "Modules/Render/RenderCoreModule.hpp"
 #include "Modules/Render/RenderOutputModule.hpp"
 #include "Modules/Render/RenderGraphModule.hpp"
+#include "Modules/Render/RenderSchedulerModule.hpp"
 #include "Modules/Render/RenderOutputs/WindowRenderOutput.hpp"

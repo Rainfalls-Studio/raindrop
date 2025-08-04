@@ -190,11 +190,13 @@ namespace Raindrop::Modules{
     }
 
     void Manager::shutdown(){
+        spdlog::info("Shuting down modules...");
+
         std::queue<IModule::Name> queue;
 
         // push leafs
         for (auto& [name, node] : _nodes){
-            if (node.dependencies.size() == 0){
+            if (node.dependents.size() == 0){
                 queue.push(name);
             }
         }
@@ -211,6 +213,7 @@ namespace Raindrop::Modules{
 
             // if not, reset
             if (node.module){
+                spdlog::info("Shuting down module \"{}\"...", node.name());
                 node.module->shutdown();
             }
             

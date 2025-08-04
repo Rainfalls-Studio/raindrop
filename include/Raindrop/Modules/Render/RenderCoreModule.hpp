@@ -14,8 +14,8 @@ namespace Raindrop::Render{
         public:
             Queue() = default;
 
-            inline vk::Queue operator->() const noexcept{
-                return _queue;
+            inline const vk::Queue* operator->() const noexcept{
+                return &_queue;
             }
 
             inline vk::Queue operator*() const noexcept{
