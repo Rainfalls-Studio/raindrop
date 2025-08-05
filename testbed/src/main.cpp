@@ -10,6 +10,22 @@ class Testbed : public Raindrop::Modules::IModule{
         virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
             _engine = &init.engine();
 
+            {
+                auto renderGraph = init.getDependencyAs<Raindrop::Render::RenderGraphModule>("RenderGraph");
+                
+                renderGraph->getFrameGraph()->createPass("WindowClear", crg::RunnablePassCreator(
+                    [this](const crg::FramePass& pass, crg::GraphContext& ctx, crg::RunnableGraph& graph) -> crg::RunnablePassPtr {
+                        return std::make_unique<Raindrop::Render::BlitToRenderOutputPass>(
+                            *_engine,
+                            pass,
+                            ctx,
+                            graph,
+                            "main"
+                        );
+                    }
+                ));
+            }
+
             createWindow();
             createGameplayLayer();
             createDebugLayer();

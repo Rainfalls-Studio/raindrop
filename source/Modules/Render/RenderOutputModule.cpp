@@ -189,7 +189,13 @@ namespace Raindrop::Render{
     
     RenderOutputModule::RenderOutputResult RenderOutputModule::presentRenderOutput(std::shared_ptr<RenderOutputInfo> info, const RenderSchedulerModule::RenderResult& results){
         if (info->valid()){
-            auto result = info->output->present(results.signal);
+            
+            IRenderOutput::RenderResult renderResults{
+                results.signal,
+                results.fence
+            };
+
+            auto result = info->output->postRender(renderResults);
 
             if (!result){
                 const auto& error = result.error();
@@ -227,8 +233,9 @@ namespace Raindrop::Render{
 
         auto out = *result;
         RenderSchedulerModule::PreRenderResult preSubmitResult{
-            .wait = out.wait,
-            .waitStageFlags = out.waitStageFlags
+            out.wait,
+            out.waitStageFlags,
+            out.currentFrame
         };
             
         return preSubmitResult;

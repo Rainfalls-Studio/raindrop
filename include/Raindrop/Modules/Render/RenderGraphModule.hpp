@@ -3,8 +3,10 @@
 #include "Raindrop/Core/Modules/IModule.hpp"
 #include "Raindrop/Engine.hpp"
 #include "RenderCoreModule.hpp"
+#include "RenderSchedulerModule.hpp"
 
 #include <RenderGraph/FrameGraphPrerequisites.hpp>
+#include <RenderGraph/FrameGraph.hpp>
 
 namespace Raindrop::Render{
     class RenderGraphModule : public Modules::IModule{
@@ -21,14 +23,21 @@ namespace Raindrop::Render{
             inline virtual Modules::Result dependencyReload(const Name& dep) override;
             inline virtual Modules::Result dependencyShutdown(const Name& dep) override;
 
+            void setBufferCount(uint32_t count);
             crg::FrameGraph* getFrameGraph();
 
         private:
             Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;
+            std::shared_ptr<RenderSchedulerModule> _scheduler;
+
+            bool _pendingRecompile = true;
+
             std::unique_ptr<crg::GraphContext> _context;
             std::unique_ptr<crg::ResourceHandler> _resourceHandler;
             std::unique_ptr<crg::FrameGraph> _frameGraph;
+
+            std::vector<crg::RunnableGraphPtr> _runnableGraphs;
 
             Modules::Result buildContext();
             void buildResourceHandler();
@@ -37,5 +46,10 @@ namespace Raindrop::Render{
             void destroyFrameGraph();
             void destroyResourceHandler();
             void destroyContext();
+
+            void scheduleFrameGraph();
+            RenderSchedulerModule::RenderResult render(const RenderSchedulerModule::PreRenderResult& preRender);
+
+            void compileRenderGraph();
     };
 }

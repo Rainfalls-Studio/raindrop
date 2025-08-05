@@ -17,3 +17,4 @@
 #include "Modules/Render/RenderGraphModule.hpp"
 #include "Modules/Render/RenderSchedulerModule.hpp"
 #include "Modules/Render/RenderOutputs/WindowRenderOutput.hpp"
+#include "Modules/Render/Passes/BlitToRenderOutput.hpp"

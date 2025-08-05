@@ -16,13 +16,16 @@ namespace Raindrop::Render{
 
             virtual std::expected<bool, Error> acquire(uint64_t timeout = UINT64_MAX) override;
             virtual std::expected<PreRenderResult, Error> preRender(uint64_t timeout = UINT64_MAX) override;
-            virtual std::expected<void, Error> present(vk::Semaphore waitSemaphore) override;
+            virtual std::expected<void, Error> postRender(const RenderResult& result) override;
 
             virtual uint32_t getCurrentBufferIndex() const override;
             virtual uint32_t getBufferCount() const override;
 
             virtual void begin(vk::CommandBuffer cmd, vk::SubpassContents subpassContents = vk::SubpassContents::eInline) override;
             virtual void end(vk::CommandBuffer cmd) override;
+
+            virtual vk::Image image() const override;
+            virtual vk::Extent2D extent() const override;
 
             void invalidate();
         
@@ -32,14 +35,11 @@ namespace Raindrop::Render{
 
             struct Swapchain{
                 struct Frame{
-                    vk::Framebuffer framebuffer = VK_NULL_HANDLE;
                     vk::Semaphore imageAvailable = VK_NULL_HANDLE;
-                    vk::Semaphore imageFinished = VK_NULL_HANDLE;
-                    vk::Fence inFlightFence = VK_NULL_HANDLE;
-                    vk::Fence imageInFlight = VK_NULL_HANDLE;
-                    vk::Image image = VK_NULL_HANDLE;
-                    vk::ImageView imageView = VK_NULL_HANDLE;
+                    vk::Fence fence = VK_NULL_HANDLE;
                 };
+
+                std::vector<vk::Image> images; 
                 
                 RenderCoreModule& core;
                 vk::SwapchainKHR swapchain;
@@ -62,14 +62,15 @@ namespace Raindrop::Render{
             
             std::unique_ptr<Swapchain> _swapchain;
             vk::SurfaceKHR _surface;
-            vk::RenderPass _renderPass;
             vk::SurfaceFormatKHR _surfaceFormat;
             vk::PresentModeKHR _presentMode;
 			vk::ClearColorValue _clearColor;
             vk::Extent2D _extent;
             SwapchainSupport _support;
             uint32_t _frameCount;
+
             uint32_t _currentFrame;
+            uint32_t _currentImage;
 
             bool _rebuildPending;
 
@@ -84,11 +85,8 @@ namespace Raindrop::Render{
 
             std::expected<void, Error> createSurface();
             std::expected<void, Error> rebuildSwapchain();
-            std::expected<void, Error> createRenderPass();
             std::expected<void, Error> getSupport();
             std::expected<void, Error> getSwapchainImages();
-            std::expected<void, Error> createImageViews();
-            std::expected<void, Error> createFramebuffers();
             std::expected<void, Error> createSyncObjects();
     };
 }

@@ -28,6 +28,7 @@ namespace Raindrop::Render{
             struct PreRenderResult{
                 vk::Semaphore wait;
                 vk::PipelineStageFlags waitStageFlags;
+                uint32_t currentFrame;
             };
 
             struct RenderResult{
