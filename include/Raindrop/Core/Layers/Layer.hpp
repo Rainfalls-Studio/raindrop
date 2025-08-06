@@ -23,14 +23,14 @@ namespace Raindrop::Layers{
             LayerHandle getHandle() const noexcept;
             Manager* getManager() const noexcept;
 
-            template<typename... Modules>
-            inline decltype(auto) getModules(){
-                return _manager->getModules<Modules...>(getHandle());
+            template<typename... Traits>
+            inline decltype(auto) getTraits(){
+                return _manager->getTraits<Traits...>(getHandle());
             }
 
-            template<typename Modules, typename... Args>
-            inline decltype(auto) emplaceModule(Args&&... args){
-                return _manager->emplaceModule<Modules, Args...>(getHandle(), std::forward<Args>(args)...);
+            template<typename Traits, typename... Args>
+            inline decltype(auto) emplaceTrait(Args&&... args){
+                return _manager->emplaceTrait<Traits, Args...>(getHandle(), std::forward<Args>(args)...);
             }
 
         private:

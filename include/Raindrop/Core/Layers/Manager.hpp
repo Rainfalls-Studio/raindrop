@@ -21,24 +21,24 @@ namespace Raindrop::Layers{
             Layer createLayer();
             Layer getLayer(LayerHandle handle);
 
-            template<typename... Modules>
-            inline decltype(auto) getModules(LayerHandle handle){
-                return _layers.get<Modules...>(handle);
+            template<typename... Traits>
+            inline decltype(auto) getTraits(LayerHandle handle){
+                return _layers.get<Traits...>(handle);
             }
 
-            template<typename Module, typename... Args>
-            inline decltype(auto) emplaceModule(LayerHandle handle, Args&&... args){
-                return _layers.emplace<Module, Args...>(handle, std::forward<Args>(args)...);
+            template<typename Trait, typename... Args>
+            inline decltype(auto) emplaceTrait(LayerHandle handle, Args&&... args){
+                return _layers.emplace<Trait, Args...>(handle, std::forward<Args>(args)...);
             }
 
-            template<typename Module, typename... Others>
+            template<typename Trait, typename... Others>
             inline decltype(auto) view(){
-                return _layers.view<Module, Others...>();
+                return _layers.view<Trait, Others...>();
             }
 
-            template<typename Module>
+            template<typename Trait>
             inline decltype(auto) group(){
-                return _layers.group<Module>();
+                return _layers.group<Trait>();
             }
 
             entt::basic_registry<LayerHandle>& getRegistry() noexcept;

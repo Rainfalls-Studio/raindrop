@@ -44,7 +44,8 @@ class Testbed : public Raindrop::Modules::IModule{
                 Dependency("Event"),
                 Dependency("RenderOutput"),
                 Dependency("RenderGraph"),
-                Dependency("Window")
+                Dependency("Window"),
+                Dependency("Scene")
             };
         }
 
@@ -95,31 +96,29 @@ class Testbed : public Raindrop::Modules::IModule{
         }
 
         void createGameplayLayer(){
-            // auto& layers = _engine->getLayerManager();
+            auto& layers = _engine->getLayerManager();
+            auto sceneModule = _engine->getModuleManager().getModuleAs<Raindrop::Scene::SceneModule>("Scene");
             
-            // Raindrop::Layers::Layer gameplay = layers.createLayer();
-            // auto& scene = gameplay.emplaceModule<Raindrop::Scene::SceneModule>().scene;
+            Raindrop::Layers::Layer gameplay = layers.createLayer();
+            auto& scene = sceneModule->emplaceTrait(gameplay).scene;
 
-            // scene.emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
-            // scene.emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
-            // scene.emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
-            // scene.emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>();
-
-            // Raindrop::Scene::Entity entity = scene.createEntity();
+            scene.emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>();
         }
 
         void createDebugLayer(){
-            // auto& layers = _engine->getLayerManager();
+            auto& layers = _engine->getLayerManager();
+            auto sceneModule = _engine->getModuleManager().getModuleAs<Raindrop::Scene::SceneModule>("Scene");
             
-            // Raindrop::Layer::Layer debug = layers.createLayer();
-            // auto& scene = debug.emplaceModule<Raindrop::Scene::SceneModule>().scene;
+            Raindrop::Layers::Layer debug = layers.createLayer();
+            auto& scene = sceneModule->emplaceTrait(debug).scene;
 
-            // scene.emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
-            // scene.emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
-            // scene.emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
-            // scene.emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>();
-
-            // Raindrop::Scene::Entity entity = scene.createEntity();
+            scene.emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
+            scene.emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>();
         }
 
         void update(){
@@ -161,7 +160,7 @@ int main(){
     Modules.registerModule<Raindrop::Render::RenderOutputModule>();
     Modules.registerModule<Raindrop::Render::RenderGraphModule>();
     Modules.registerModule<Raindrop::Render::RenderSchedulerModule>();
-    // Modules.registerModule<Raindrop::Scene::SceneSystem>();
+    Modules.registerModule<Raindrop::Scene::SceneModule>();
     Modules.registerModule<Testbed>();
 
     engine.start();
