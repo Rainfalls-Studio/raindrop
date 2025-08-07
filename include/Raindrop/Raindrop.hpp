@@ -32,3 +32,6 @@
 
 #include "Modules/Filesystem/FilesystemModule.hpp"
 #include "Modules/Filesystem/Providers/FolderProvider.hpp"
+
+#include "Modules/Asset/AssetModule.hpp"
+#include "Modules/Asset/Factory.hpp"

@@ -167,6 +167,7 @@ int main(){
     modules.registerModule<Raindrop::Render::RenderSchedulerModule>();
     modules.registerModule<Raindrop::Scene::SceneModule>();
     modules.registerModule<Raindrop::Filesystem::FilesystemModule>();
+    modules.registerModule<Raindrop::Asset::AssetModule>();
     modules.registerModule<Testbed>();
 
     engine.start();
