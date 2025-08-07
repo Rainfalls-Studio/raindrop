@@ -1,6 +1,5 @@
 #include <Raindrop/Raindrop.hpp>
 
-
 class Testbed : public Raindrop::Modules::IModule{
     public:
 
@@ -9,6 +8,11 @@ class Testbed : public Raindrop::Modules::IModule{
 
         virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
             _engine = &init.engine();
+
+            auto filesystem = init.getDependencyAs<Raindrop::Filesystem::FilesystemModule>("Filesystem");
+            Raindrop::Filesystem::Path parent = filesystem->getExecutableDirectory().parent();
+
+            filesystem->mount<Raindrop::Filesystem::FolderProvider>("{root}", 10, parent);
 
             {
                 auto renderGraph = init.getDependencyAs<Raindrop::Render::RenderGraphModule>("RenderGraph");
@@ -45,7 +49,8 @@ class Testbed : public Raindrop::Modules::IModule{
                 Dependency("RenderOutput"),
                 Dependency("RenderGraph"),
                 Dependency("Window"),
-                Dependency("Scene")
+                Dependency("Scene"),
+                Dependency("Filesystem")
             };
         }
 
@@ -152,16 +157,17 @@ int main(){
     spdlog::set_level(spdlog::level::trace);
 
     Raindrop::Engine engine;
-    auto& Modules = engine.getModuleManager();
+    auto& modules = engine.getModuleManager();
 
-    Modules.registerModule<Raindrop::Window::WindowModule>();
-    Modules.registerModule<Raindrop::Event::EventModule>();
-    Modules.registerModule<Raindrop::Render::RenderCoreModule>();
-    Modules.registerModule<Raindrop::Render::RenderOutputModule>();
-    Modules.registerModule<Raindrop::Render::RenderGraphModule>();
-    Modules.registerModule<Raindrop::Render::RenderSchedulerModule>();
-    Modules.registerModule<Raindrop::Scene::SceneModule>();
-    Modules.registerModule<Testbed>();
+    modules.registerModule<Raindrop::Window::WindowModule>();
+    modules.registerModule<Raindrop::Event::EventModule>();
+    modules.registerModule<Raindrop::Render::RenderCoreModule>();
+    modules.registerModule<Raindrop::Render::RenderOutputModule>();
+    modules.registerModule<Raindrop::Render::RenderGraphModule>();
+    modules.registerModule<Raindrop::Render::RenderSchedulerModule>();
+    modules.registerModule<Raindrop::Scene::SceneModule>();
+    modules.registerModule<Raindrop::Filesystem::FilesystemModule>();
+    modules.registerModule<Testbed>();
 
     engine.start();
 

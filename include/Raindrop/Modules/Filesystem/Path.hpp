@@ -3,152 +3,76 @@
 #include "Types.hpp"
 #include <vector>
 #include <stdexcept>
+#include <filesystem>
 
 namespace Raindrop::Filesystem{
-    template<typename Derived>
-    class PathBase{
+    class Path{
         public:
+            Path() = default;
+
+            Path(const char* str) : _storage{str}{}
+            Path(const String& str) : _storage{str}{}
+            Path(const std::filesystem::path& path) : _storage{path}{}
+
             void clear(){
-                getSelf().str().clear();
+                _storage.clear();
             }
 
             bool empty() const{
-                return getSelf().str().empty();
+                return _storage.empty();
             }
 
-            StringView filename() const{
-                auto& s = getSelf().str();
-                size_t pos = s.find_last_of('/');
-                return pos == String::npos ? s : s.substr(pos + 1);
+            String filename() const{
+                return String(_storage.filename());
             }
 
-            StringView extension() const{
-                auto& s = getSelf().str();
-                size_t pos = s.find_last_of('.');
-                return pos == String::npos ? s : s.substr(pos + 1);
+            String extension() const{
+                return String(_storage.extension());
             }
 
-            PathBase<Derived> parent(){
-                auto& s = getSelf().str();
-                size_t pos = s.find_last_of('/');
-                return pos == String::npos ? *this : PathBase<Derived>(s.substr(0, pos));
+            Path parent() const {
+                return String(_storage.parent_path());
             }
 
-            PathBase<Derived> isAbsolute() const{
-                auto& s = getSelf().str();
-                return s[0] == '/';
+            bool isAbsolute() const{
+                return _storage.is_absolute();
             }
 
-            PathBase<Derived> isRelative() const{
-                auto& s = getSelf().str();
-                return !isAbsolute() && !s.empty() && s[0] != '/';
-            }
-
-            PathBase<Derived> isRoot() const{
-                auto& s = getSelf().str();
-                return s == "/";
+            bool isRelative() const{
+                return _storage.is_relative();
             }
 
             Size size() const{
-                return getSelf().str().size();
+                return _storage.native().size();
             }
 
-            bool isPrefixOf(const PathBase& other) const {
-                const std::string& prefix = getSelf().str();
-                const std::string& target = other.getSelf().str();
-
-                if (target.size() < prefix.size()) return false;
-                if (target.compare(0, prefix.size(), prefix) != 0) return false;
-
-                // Ensure prefix matches whole component (avoid "{sources}" matching "{sourcesExtra}")
-                if (target.size() == prefix.size()) return true;
-                return target[prefix.size()] == '/' || target[prefix.size()] == '\\';
+            Path relativeTo(const Path& other) const{
+                return Path(_storage.lexically_relative(other._storage));
             }
 
-            std::vector<StringView> components() const{
-                std::vector<StringView> result;
-                size_t pos = 0;
-                while ((pos = getSelf().str().find('/', pos)) != String::npos) {
-                    result.push_back(getSelf().str().substr(pos + 1));
-                    pos++;
-                }
-                if (!getSelf().str().empty())
-                    result.push_back(getSelf().str());
-                return result;
-            }
+            bool isPrefixOf(const Path& other) const{
+                auto normA = std::filesystem::weakly_canonical(_storage);
+                auto normB = std::filesystem::weakly_canonical(other._storage);
 
-            void setComponents(const std::vector<StringView>& components){
-                getSelf().str().clear();
-                for (const auto& component : components) {
-                    getSelf().str() += component;
-                    if (!components.empty() && component != components.back())
-                        getSelf().str() += '/';
-                }
-            }
+                auto itA = normA.begin();
+                auto itB = normB.begin();
 
-            PathBase relativeTo(const PathBase& other) const{
-                const auto& full = this->components(); 
-                const auto& base = other.components();
-
-                if (base.size() > full.size())
-                    throw std::runtime_error("Base path longer than target path");
-
-                for (size_t i = 0; i < base.size(); ++i) {
-                    if (full[i] != base[i])
-                        throw std::runtime_error("Base path is not a prefix of target path");
+                for (; itA != normA.end(); ++itA, ++itB) {
+                    if (itB == normB.end() || *itA != *itB)
+                        return false;
                 }
 
-                PathBase result;
-                result.setComponents({full.begin() + static_cast<ssize_t>(base.size()), full.end()});
-                return result;
+                return true;
             }
 
-            decltype(auto) str() { return getSelf().str(); }
-            decltype(auto) str() const { return getSelf().str(); }
+            decltype(auto) str() { return _storage.string(); }
+            decltype(auto) str() const { return _storage.string(); }
 
-            PathBase operator/(const PathBase& other){
-                std::string lhs = getSelf().str();
-                std::string rhs = other.getSelf().str();
-
-                if (!lhs.empty() && lhs.back() == '/') lhs.pop_back();
-                if (!rhs.empty() && rhs.front() == '/') rhs.erase(0, 1);
-
-                return Derived(lhs + '/' + rhs);
+            Path operator/(const Path& other){
+                return Path(_storage / other._storage);
             }
 
         protected:
-            Derived& getSelf(){
-                return static_cast<Derived&>(*this);
-            }
-
-            const Derived& getSelf() const{
-                return static_cast<const Derived&>(*this);
-            }
-    };
-
-    class PathView : public PathBase<PathView>{
-        public:
-            template<typename T>
-            PathView(const PathBase<T>& path) : view{path.str()}{}
-            PathView(const StringView& path) : view{path}{}
-            
-            StringView view;
-
-        public:
-            StringView str() const {return view;}
-            StringView str() {return view;}
-    };
-
-    class Path : public PathBase<Path>{
-        public:
-            template<typename T>
-            Path(const PathBase<T>& path) : storage{path.str()}{}
-            Path(const String& path) : storage{path}{}
-
-            String storage;
-
-        public:
-            const String& str() const {return storage;}
-            String& str() {return storage;}
+            std::filesystem::path _storage;
     };
 }
