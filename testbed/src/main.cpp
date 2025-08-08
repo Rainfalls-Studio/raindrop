@@ -100,6 +100,24 @@ class Testbed : public Raindrop::Modules::IModule{
             );
         }
 
+        void setupGameplayLoop(){
+            auto& scheduler = _engine->getScheduler();
+
+            auto updateLoop = scheduler.createLoop("Gameplay update")
+                .setFrequency(30_Hz)
+                .addStage<Raindrop::Scene::SceneUpdateStage>(_gameplay) // runs scene behaviors
+                .addStage<Raindrop::Script::ScriptUpdateStage>(_gameplay); // run script updates
+
+            auto physicsLoop = scheduler.createLoop("Gameplay physics")
+                .setFrequency(30_Hz)
+                .addStage<Raindrop::Physics::PhysicsUpdateStage>(_gameplay);
+
+            auto renderLoop = scheduler.createLoop("Render")
+                .addStage<Raindrop::Render::RenderStage>(_gameplay)
+                .addStage<Raindrop::Render::RenderStage>(_HUD)
+                .addStage<Raindrop::Render::PresentStage>("main"); // present to render output named "gameplay" (could be a window or a buffer set up by an editor layer)
+        }
+
         void createGameplayLayer(){
             auto& layers = _engine->getLayerManager();
             auto sceneModule = _engine->getModuleManager().getModuleAs<Raindrop::Scene::SceneModule>("Scene");
