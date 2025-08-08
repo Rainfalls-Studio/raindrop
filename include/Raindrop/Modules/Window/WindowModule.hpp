@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Raindrop/Core/Modules/IModule.hpp"
-#include "Raindrop/Core/Scheduler/Subscription.hpp"
 #include "WindowConfig.hpp"
 #include "Window.hpp"
 #include <memory>
@@ -29,8 +28,6 @@ namespace Raindrop::Window{
         private:
             Engine* _engine;
             std::unordered_map<SDL_WindowID, std::weak_ptr<Window>> _windows;
-
-            Scheduler::Subscription eventSubscription;
             
     };
 }

@@ -1,33 +1,108 @@
 #include "Raindrop/Core/Scheduler/Scheduler.hpp"
-
+#include "Raindrop/Core/Tasks/TaskManager.hpp"
+#include "Raindrop/Core/Time/Clock.hpp"
+#include "Raindrop/Engine.hpp"
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Scheduler{
-    Scheduler::Scheduler(Engine& engine) : _engine{engine}{}
+    Scheduler::Scheduler(Engine& engine) :
+        _engine{engine},
+        _taskManager{engine.getTaskManager()}
+    {}
 
-    Subscription Scheduler::subscribe(const Callback& callback, Priority priority){
-        SharedSubscriptionData data = std::make_shared<SubscriptionData>(callback, priority);
-        _subscriptions.insert({data, priority});
-        return Subscription(data);
+    Scheduler::~Scheduler(){
+        shutdown();
     }
 
-    bool Scheduler::SubscriptionWrapper::operator<(const SubscriptionWrapper& other) const noexcept{
-        return other.priority > priority;
-    }
+    void Scheduler::shutdown(){
+        spdlog::info("Shuting down loop scheduler...");
+        for (auto [it, loop] : _loops){
+            auto runtime = loop->runtime;
 
-    void Scheduler::trigger(){
-        auto it = _subscriptions.begin();
-
-        while (it != _subscriptions.end()){
-            auto ref = it->sub.lock();
-            
-            if (!ref){
-                it = _subscriptions.erase(it);
-                continue;
+            if (runtime){
+                spdlog::trace("Stopping loop {}", loop->name);
+                runtime->running.store(false);
             }
-
-            ref->getCallback()();
-            ++it;
         }
+    }
+
+
+    Loop Scheduler::createLoop(const std::string& name) {
+        auto [it, inserted] = _loops.emplace(name, std::make_shared<LoopData>());
+        it->second->name = name;
+        return Loop(it->second);
+    }
+
+    void Scheduler::run(const Loop& loop){
+        assert(loop);
+        
+        auto data = loop.data();
+        auto& runtime = data->runtime;
+
+        spdlog::trace("Running loop {}", data->name);
+
+        runtime = std::make_shared<LoopData::Runtime>();
+        runtime->loop = data.get();
+        runtime->lastRunTime = Time::now();
+
+        runtime->controller = _taskManager.createTask(
+            [this, data]() -> Tasks::TaskStatus {
+                auto& loopRuntime = data->runtime;
+
+                if (!loopRuntime->running.load()) return Tasks::TaskStatus::Completed();
+
+                Time::TimePoint now = Time::now();
+                if (loopRuntime->loop->period != Time::Duration::zero()) {
+
+                    Time::Duration& period = loopRuntime->loop->period;
+                    Time::Duration elapsed = now - loopRuntime->lastRunTime;
+
+                    if (elapsed < period) {
+                        return Tasks::TaskStatus::Retry(period - elapsed); // will be rescheduled with retry delay
+                    }
+                }
+                
+                loopRuntime->lastRunTime = now;
+                submitLoopIteration(*data);
+                return Tasks::TaskStatus::Completed();
+            },
+            data->executionPriority,
+            loop.name() + " - controller"
+        );
+
+        _taskManager.submit(runtime->controller);
+    }
+
+    Loop Scheduler::getLoop(const std::string& name){
+        auto it = _loops.find(name);
+        if (it != _loops.end()){
+            return Loop(it->second);
+        }
+        return Loop();
+    }
+
+    void Scheduler::submitLoopIteration(LoopData& loop) {
+        // Ensure hooks are sorted by phase
+        std::sort(loop.hooks.begin(), loop.hooks.end(),
+                [](const Hook& a, const Hook& b) {
+                    return static_cast<int>(a.phase) < static_cast<int>(b.phase);
+                });
+
+        Tasks::TaskHandle prev;
+        spdlog::info("running {}", loop.name);
+
+        for (auto& hook : loop.hooks) {
+            auto h = _taskManager.createTask(hook.fn, loop.executionPriority, loop.name + " - hook: " + hook.name);
+            if (prev.definition()) prev.then(h);
+            prev = h;
+        }
+        
+        if (prev.definition()){
+            prev = prev.then(loop.runtime->controller);
+        } else {
+            prev = loop.runtime->controller;            
+        }
+
+        _taskManager.submit(prev);
     }
 }

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Types.hpp"
-#include <vector>
-#include <stdexcept>
 #include <filesystem>
 
 namespace Raindrop::Filesystem{

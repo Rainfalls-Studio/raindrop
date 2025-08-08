@@ -12,7 +12,6 @@ namespace Raindrop::Behaviors{
         
         private:
             Scene::Scene* _scene;
-            Scheduler::Subscription _preUpdateSubscription;
 
     };
 }

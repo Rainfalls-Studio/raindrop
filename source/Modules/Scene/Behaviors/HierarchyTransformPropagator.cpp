@@ -7,7 +7,7 @@
 namespace Raindrop::Behaviors{
     void HierarchyTransformPropagator::initialize(Engine& engine, Scene::Scene& scene){
         _scene = &scene;
-        _preUpdateSubscription = engine.getScheduler().subscribe([this]{preUpdate();}, Scheduler::Priority::PRE_UPDATE);
+        // _preUpdateSubscription = engine.getScheduler().subscribe([this]{preUpdate();}, Scheduler::Priority::PRE_UPDATE);
     }
 
     void HierarchyTransformPropagator::preUpdate(){

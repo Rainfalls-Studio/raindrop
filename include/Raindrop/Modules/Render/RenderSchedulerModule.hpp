@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Raindrop/Core/Modules/IModule.hpp"
-#include "Raindrop/Core/Scheduler/Subscription.hpp"
 #include "RenderCoreModule.hpp"
 #include <functional>
 #include <vulkan/vulkan.hpp>
@@ -47,6 +46,10 @@ namespace Raindrop::Render{
             inline void setRenderCallback(const RenderCallback& callback){_render = callback;}
             inline void setPostRender(const PostRenderCallback& callback){_postRender = callback;}
 
+            void preRender();
+            void render();
+            void postRender();
+
         private:
             Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;
@@ -59,12 +62,5 @@ namespace Raindrop::Render{
             RenderCallback _render;
             PostRenderCallback _postRender;
 
-            Scheduler::Subscription _preRenderSubscription;
-            Scheduler::Subscription _renderSubscription;
-            Scheduler::Subscription _postRenderSubscription;
-
-            void preRender();
-            void render();
-            void postRender();
     };
 }

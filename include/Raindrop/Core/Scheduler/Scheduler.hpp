@@ -1,33 +1,30 @@
 #pragma once
 
-#include <set>
-#include "SubscriptionData.hpp"
-#include "Subscription.hpp"
-#include "Priority.hpp"
+#include "LoopData.hpp"
+#include "Loop.hpp"
+#include "Raindrop/Core/Tasks/TaskManager.hpp"
 
 namespace Raindrop{
     class Engine;
 }
 
 namespace Raindrop::Scheduler{
-    class Scheduler{
+    class Scheduler {
         public:
             Scheduler(Engine& engine);
+            ~Scheduler();
 
-            Subscription subscribe(const Callback& callback, Priority priority);
+            Loop createLoop(const std::string& name);
+            Loop getLoop(const std::string& name);
+            void run(const Loop& loop);
 
-            void trigger();
+            void shutdown();
 
         private:
             Engine& _engine;
-
-            struct SubscriptionWrapper{
-                WeakSubscriptionData sub;
-                const Priority priority;
-
-                bool operator<(const SubscriptionWrapper& other) const noexcept;
-            };
-
-            std::multiset<SubscriptionWrapper> _subscriptions;
+            Tasks::TaskManager& _taskManager;
+            
+            std::unordered_map<std::string, std::shared_ptr<LoopData>> _loops;
+            void submitLoopIteration(LoopData& loop);
     };
 }

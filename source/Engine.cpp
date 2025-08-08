@@ -6,7 +6,9 @@ namespace Raindrop{
     Engine::Engine() : 
         _modules(*this),
         _layers(*this),
-        _scheduler(*this)
+        _scheduler(*this),
+        _store(*this),
+        _tasks(*this)
     {
         spdlog::info("===================== Startup =====================");
     }
@@ -15,11 +17,17 @@ namespace Raindrop{
         spdlog::info("===================== Starting mainloop =====================");
 
         _running = true;
-        while (_running){
-            _scheduler.trigger();
-        }
+        // while (_running){
+            // _scheduler.trigger();
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        // }
 
+        
         spdlog::info("===================== Shutdown =====================");
+        _scheduler.shutdown();
+        _tasks.shutdown();
+        _store.shutdown();
+        _layers.shutdown();
         _modules.shutdown();
     }
 
@@ -37,5 +45,13 @@ namespace Raindrop{
 
     Scheduler::Scheduler& Engine::getScheduler() noexcept{
         return _scheduler;
+    }
+
+    Store::Store& Engine::getStore() noexcept{
+        return _store;
+    }
+
+    Tasks::TaskManager& Engine::getTaskManager() noexcept{
+        return _tasks;
     }
 }

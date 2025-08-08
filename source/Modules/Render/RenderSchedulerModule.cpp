@@ -8,20 +8,10 @@ namespace Raindrop::Render{
         _engine = &helper.engine();
         _core = helper.getDependencyAs<RenderCoreModule>("RenderCore");
 
-        auto& scheduler = helper.scheduler();
-
-        _preRenderSubscription = scheduler.subscribe([this]{preRender();}, Scheduler::Priority::PRE_RENDER);
-        _renderSubscription = scheduler.subscribe([this]{render();}, Scheduler::Priority::PRE_RENDER);
-        _postRenderSubscription = scheduler.subscribe([this]{postRender();}, Scheduler::Priority::PRE_RENDER);
-
         return Modules::Result::Success();
     }
 
-    void RenderSchedulerModule::shutdown(){
-        _preRenderSubscription.unsubscribe();
-        _renderSubscription.unsubscribe();
-        _postRenderSubscription.unsubscribe();
-    }
+    void RenderSchedulerModule::shutdown(){}
 
     RenderSchedulerModule::Name RenderSchedulerModule::name() const noexcept{
         return "RenderScheduler";
@@ -41,7 +31,10 @@ namespace Raindrop::Render{
     }
 
     Modules::Result RenderSchedulerModule::dependencyShutdown(const Name& name){
-        return Modules::Result::Error();
+        if (name == "RenderCore"){
+            return Modules::Result::Error();
+        }
+        return Modules::Result::Success();
     }
 
     void RenderSchedulerModule::preRender(){

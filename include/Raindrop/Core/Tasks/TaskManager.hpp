@@ -1,74 +1,52 @@
+#pragma once
+
 #include <atomic>
 #include <condition_variable>
-#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <queue>
 #include <thread>
-#include <unordered_map>
 #include <vector>
 
-#include "Task.hpp"
-#include "TaskProfile.hpp"
+#include "TaskHandle.hpp"
+
+namespace Raindrop{
+    class Engine;
+}
 
 namespace Raindrop::Tasks{
-    class TaskManager : public std::enable_shared_from_this<TaskManager> {
+    class TaskManager {
         public:
-            TaskManager(uint32_t workerCount = static_cast<uint32_t>(std::thread::hardware_concurrency()));
+            TaskManager(Engine& engine, unsigned workers = std::thread::hardware_concurrency());
             ~TaskManager();
 
-            // Create a task; returns its id
-            uint64_t createTask(Task::Func function,
-                                int priority = 0,
-                                const std::vector<uint64_t>& dependencies = {},
-                                std::string name = "");
+            TaskHandle createTask(std::function<TaskStatus()> fn, int priority = 0, std::string name = "");
 
-            // Query profiling data for a task by id
-            std::shared_ptr<TaskProfile> getProfile(uint64_t id);
-
-            // Wait until all tasks that currently exist are finished
-            void waitForAll();
-
-            // Graceful shutdown: stop accepting tasks and join workers.
+            void submit(const TaskHandle& task);
             void shutdown();
 
         private:
-            struct TaskEntry {
-                std::shared_ptr<Task> task; // may be null for placeholders
+            struct TaskInstance {
+                std::shared_ptr<TaskHandle::TaskDef> def;
                 std::atomic<int> unmetDeps{0};
-                std::vector<uint64_t> dependents; // task ids that depend on this one
-                std::atomic<bool> completed{false};
-                std::shared_ptr<TaskProfile> profile = std::make_shared<TaskProfile>();
-            };
-            
-            struct ReadyItem {
-                std::shared_ptr<TaskEntry> entry;
-                TimePoint availableAt;
             };
 
-            struct ReadyComparator {
-                // higher priority runs first; tie-breaker older insertion (by id)
-                bool operator()(const ReadyItem& a, const ReadyItem& b) const {
-                    if (a.entry->task->priority != b.entry->task->priority)
-                        return a.entry->task->priority < b.entry->task->priority;
-                    return a.entry->task->id > b.entry->task->id;
+            struct Compare {
+                bool operator()(const std::shared_ptr<TaskInstance>& a,
+                                const std::shared_ptr<TaskInstance>& b) const {
+                    if (a->def->priority != b->def->priority)
+                        return a->def->priority < b->def->priority;
+                    return a < b; // arbitrary tie-break
                 }
             };
             
-            // internal storage
-            std::mutex mutex;
+            Engine& _engine;
+            std::mutex mtx;
             std::condition_variable cv;
-            std::condition_variable finishedCv;
-            std::unordered_map<uint64_t, std::shared_ptr<TaskEntry>> tasks;
-            std::priority_queue<ReadyItem, std::vector<ReadyItem>, ReadyComparator> readyPQ;
-            std::vector<std::thread> workers;
+            std::priority_queue<std::shared_ptr<TaskInstance>, std::vector<std::shared_ptr<TaskInstance>>, Compare> ready;
+            std::vector<std::thread> threads;
             std::atomic<bool> running{false};
-            std::atomic<uint64_t> nextId{1};
 
-            // push ready task (available now)
-            void pushReady(const std::shared_ptr<TaskEntry>& entry, TimePoint when = Clock::now());
-
-            // worker loop
             void workerLoop();
-    };
+        };
 }  // namespace Raindrop::Tasks

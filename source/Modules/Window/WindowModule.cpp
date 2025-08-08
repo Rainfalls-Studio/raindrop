@@ -14,8 +14,6 @@ namespace Raindrop::Window{
         }
 
         spdlog::info("Initialized SDL3");
-
-        eventSubscription = _engine->getScheduler().subscribe([this]{event();}, Scheduler::Priority::EVENT);
         
         return Modules::Result::Success();
     }

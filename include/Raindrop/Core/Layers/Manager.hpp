@@ -18,6 +18,8 @@ namespace Raindrop::Layers{
             Manager(Engine& engine);
             ~Manager();
 
+            void shutdown();
+
             Layer createLayer();
             Layer getLayer(LayerHandle handle);
 

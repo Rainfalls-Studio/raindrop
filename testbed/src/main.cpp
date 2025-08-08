@@ -1,5 +1,7 @@
 #include <Raindrop/Raindrop.hpp>
 
+using namespace Raindrop::Time::literals;
+
 class Testbed : public Raindrop::Modules::IModule{
     public:
 
@@ -30,13 +32,14 @@ class Testbed : public Raindrop::Modules::IModule{
                 ));
             }
 
-            createWindow();
+            // createWindow();
             createGameplayLayer();
             createDebugLayer();
+            setupGameplayLoop();
 
-            auto& scheduler = _engine->getScheduler();
+            // auto& scheduler = _engine->getScheduler();
 
-            updateSubscription = scheduler.subscribe([this]{update();}, Raindrop::Scheduler::Priority::UPDATE);
+            // updateSubscription = scheduler.subscribe([this]{update();}, Raindrop::Scheduler::Priority::UPDATE);
 
             return Raindrop::Modules::Result::Success();
         }
@@ -103,19 +106,22 @@ class Testbed : public Raindrop::Modules::IModule{
         void setupGameplayLoop(){
             auto& scheduler = _engine->getScheduler();
 
-            auto updateLoop = scheduler.createLoop("Gameplay update")
-                .setFrequency(30_Hz)
-                .addStage<Raindrop::Scene::SceneUpdateStage>(_gameplay) // runs scene behaviors
-                .addStage<Raindrop::Script::ScriptUpdateStage>(_gameplay); // run script updates
+            Raindrop::Scheduler::Loop updateLoop = scheduler.createLoop("Gameplay update")
+                .setPeriod(30_Hz);
+                // .addStage<Raindrop::Scene::SceneUpdateStage>(_gameplay) // runs scene behaviors
+                // .addStage<Raindrop::Script::ScriptUpdateStage>(_gameplay); // run script updates
 
-            auto physicsLoop = scheduler.createLoop("Gameplay physics")
-                .setFrequency(30_Hz)
-                .addStage<Raindrop::Physics::PhysicsUpdateStage>(_gameplay);
+            Raindrop::Scheduler::Loop physicsLoop = scheduler.createLoop("Gameplay physics")
+                .setPeriod(30_Hz);
+                // .addStage<Raindrop::Physics::PhysicsUpdateStage>(_gameplay);
+            
+            Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
+                .setPeriod(4_Hz);
+                // .addStage<Raindrop::Render::RenderStage>(_gameplay)
+                // .addStage<Raindrop::Render::RenderStage>(_HUD)
+                // .addStage<Raindrop::Render::PresentStage>("main"); // present to render output named "gameplay" (could be a window or a buffer set up by an editor layer)
 
-            auto renderLoop = scheduler.createLoop("Render")
-                .addStage<Raindrop::Render::RenderStage>(_gameplay)
-                .addStage<Raindrop::Render::RenderStage>(_HUD)
-                .addStage<Raindrop::Render::PresentStage>("main"); // present to render output named "gameplay" (could be a window or a buffer set up by an editor layer)
+            scheduler.run(renderLoop);
         }
 
         void createGameplayLayer(){
@@ -168,7 +174,7 @@ class Testbed : public Raindrop::Modules::IModule{
         Raindrop::Engine* _engine;
         std::shared_ptr<Raindrop::Window::Window> _window;
         
-        Raindrop::Scheduler::Subscription updateSubscription;
+        // Raindrop::Scheduler::Subscription updateSubscription;
 };
 
 int main(){

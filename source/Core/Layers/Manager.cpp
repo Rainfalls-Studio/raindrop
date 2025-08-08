@@ -1,9 +1,16 @@
 #include "Raindrop/Core/Layers/Manager.hpp"
 #include "Raindrop/Core/Layers/Layer.hpp"
+#include <spdlog/spdlog.h>
 
 namespace Raindrop::Layers{
     Manager::Manager(Engine &engine) : _engine{engine}{}
     Manager::~Manager(){}
+
+    void Manager::shutdown(){
+        spdlog::info("Shuting down layers...");
+        _layers.clear();
+    }
+
 
     Layer Manager::createLayer(){
         return Layer{this, _layers.create()};
