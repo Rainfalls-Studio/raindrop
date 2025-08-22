@@ -26,21 +26,22 @@ namespace Raindrop::Modules{
                 registerModule(std::make_shared<T>(std::forward<Args>(args)...));
             }
 
-            SharedModule getModule(const IModule::Name& name) noexcept;
+            [[nodiscard]] SharedModule getModule(const IModule::Name& name) noexcept;
 
             template<typename... Modules>
-            auto getModules(const Modules&... modules){
+            [[nodiscard]] auto getModules(const Modules&... modules){
                 static_assert((std::is_same_v<Modules, const IModule::Name&> && ...), "The Modules names must be strings");
                 return std::make_tuple((getModule(modules))...);
             }
-
+            
+            
             template<typename T>
-            std::shared_ptr<T> getModuleAs(const IModule::Name& name){
+            [[nodiscard]] std::shared_ptr<T> getModuleAs(const IModule::Name& name){
                 return std::dynamic_pointer_cast<T>(getModule(name));
             }
 
             template<typename... Ts, typename... Modules>
-            auto getModulesAs(Modules&&... modules){
+            [[nodiscard]] auto getModulesAs(Modules&&... modules){
                 static_assert(sizeof...(Ts) == sizeof...(Modules), "Types and names must match in count");
                 static_assert((std::is_constructible<IModule::Name, Modules>::value && ...), "The Modules names must be strings");
                 return std::make_tuple(getModuleAs<Ts>(IModule::Name(modules))...);

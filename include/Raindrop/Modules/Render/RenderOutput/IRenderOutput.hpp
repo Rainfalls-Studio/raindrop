@@ -3,7 +3,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "RenderCoreModule.hpp"
+#include "../Core/RenderCoreModule.hpp"
+// #include "Stages/PreRenderResult.hpp"
+// #include "Stages/RenderResult.hpp"
 
 namespace Raindrop::Render{
     class IRenderOutput{
@@ -12,23 +14,13 @@ namespace Raindrop::Render{
 
             virtual ~IRenderOutput() = default;
 
-            struct PreRenderResult{
-                vk::Semaphore wait;
-                vk::PipelineStageFlags waitStageFlags;
-                uint32_t currentFrame;
-            };
 
-            struct RenderResult{
-                vk::Semaphore signal;
-                vk::Fence fence;
-            };
-
-            virtual void initialize(RenderCoreModule& engine) = 0;
+            virtual void initialize(Engine& engine) = 0;
             virtual void shutdown() = 0;
 
             virtual std::expected<bool, Error> acquire(uint64_t timeout = UINT64_MAX) = 0;
-            virtual std::expected<PreRenderResult, Error> preRender(uint64_t timeout = UINT64_MAX) = 0;
-            virtual std::expected<void, Error> postRender(const RenderResult& result) = 0;
+            virtual std::expected<void, Error> preRender(uint64_t timeout = UINT64_MAX) = 0;
+            virtual std::expected<void, Error> postRender() = 0;
 
             virtual uint32_t getCurrentBufferIndex() const = 0;
             virtual uint32_t getBufferCount() const = 0;

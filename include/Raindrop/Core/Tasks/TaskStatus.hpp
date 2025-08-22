@@ -10,7 +10,7 @@ namespace Raindrop::Tasks{
     };
 
     struct FailedStatus{
-        
+        std::string reason;
     };
 
     struct TaskStatus{
@@ -51,13 +51,13 @@ namespace Raindrop::Tasks{
                 RetryStatus{waitDuration}
             };
         }
-    
-        static inline constexpr TaskStatus Failed(){
+
+        
+        static inline constexpr TaskStatus Failed(const std::string& reason = {}){
             return TaskStatus{
                 TaskStatus::FAILED,
-                FailedStatus{}
+                FailedStatus{reason}
             };
         }
     };
-
 }

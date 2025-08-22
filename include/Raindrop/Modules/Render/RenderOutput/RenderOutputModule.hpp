@@ -2,8 +2,7 @@
 
 #include "Raindrop/Core/Modules/IModule.hpp"
 #include "IRenderOutput.hpp"
-#include "RenderCoreModule.hpp"
-#include "RenderSchedulerModule.hpp"
+#include "../Core/RenderCoreModule.hpp"
 #include "Raindrop/Engine.hpp"
 
 namespace Raindrop::Render{
@@ -87,17 +86,10 @@ namespace Raindrop::Render{
             void shutdownAllOutputs();
             void rebuildAllOutputs();
 
-            void prepareRender();
-            RenderSchedulerModule::PreRenderResult preRender();
-            void postRender(const RenderSchedulerModule::RenderResult& results);
-
             enum class RenderOutputResult{
                 SUCCESS,
                 SKIP,
                 ERROR
             };
-
-            RenderOutputResult acquireRenderOutput(std::shared_ptr<RenderOutputInfo> info, uint64_t timeout = UINT64_MAX);
-            RenderOutputResult presentRenderOutput(std::shared_ptr<RenderOutputInfo> info, const RenderSchedulerModule::RenderResult& results);
     };
 }

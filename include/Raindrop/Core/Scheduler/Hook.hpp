@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Raindrop/Core/Tasks/TaskStatus.hpp"
+#include "HookResult.hpp"
 #include <functional>
 
 namespace Raindrop::Scheduler{
@@ -19,6 +19,6 @@ namespace Raindrop::Scheduler{
     struct Hook {
         Phase phase;
         std::string name;
-        std::function<Tasks::TaskStatus()> fn;
+        std::function<HookResult()> fn;
     };
 }

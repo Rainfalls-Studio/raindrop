@@ -26,7 +26,5 @@ namespace Raindrop{
             Scheduler::Scheduler _scheduler;
             Store::Store _store;
             Tasks::TaskManager _tasks;
-
-            bool _running;
     };
 }

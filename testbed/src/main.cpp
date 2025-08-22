@@ -16,23 +16,23 @@ class Testbed : public Raindrop::Modules::IModule{
 
             filesystem->mount<Raindrop::Filesystem::FolderProvider>("{root}", 10, parent);
 
-            {
-                auto renderGraph = init.getDependencyAs<Raindrop::Render::RenderGraphModule>("RenderGraph");
+            // {
+            //     auto renderGraph = init.getDependencyAs<Raindrop::Render::RenderGraphModule>("RenderGraph");
                 
-                renderGraph->getFrameGraph()->createPass("WindowClear", crg::RunnablePassCreator(
-                    [this](const crg::FramePass& pass, crg::GraphContext& ctx, crg::RunnableGraph& graph) -> crg::RunnablePassPtr {
-                        return std::make_unique<Raindrop::Render::BlitToRenderOutputPass>(
-                            *_engine,
-                            pass,
-                            ctx,
-                            graph,
-                            "main"
-                        );
-                    }
-                ));
-            }
+            //     renderGraph->getFrameGraph()->createPass("WindowClear", crg::RunnablePassCreator(
+            //         [this](const crg::FramePass& pass, crg::GraphContext& ctx, crg::RunnableGraph& graph) -> crg::RunnablePassPtr {
+            //             return std::make_unique<Raindrop::Render::BlitToRenderOutputPass>(
+            //                 *_engine,
+            //                 pass,
+            //                 ctx,
+            //                 graph,
+            //                 "main"
+            //             );
+            //         }
+            //     ));
+            // }
 
-            // createWindow();
+            createWindow();
             createGameplayLayer();
             createDebugLayer();
             setupGameplayLoop();
@@ -107,7 +107,8 @@ class Testbed : public Raindrop::Modules::IModule{
             auto& scheduler = _engine->getScheduler();
 
             Raindrop::Scheduler::Loop updateLoop = scheduler.createLoop("Gameplay update")
-                .setPeriod(30_Hz);
+                .setPeriod(30_Hz)
+                .addStage<Raindrop::Window::EventStage>();
                 // .addStage<Raindrop::Scene::SceneUpdateStage>(_gameplay) // runs scene behaviors
                 // .addStage<Raindrop::Script::ScriptUpdateStage>(_gameplay); // run script updates
 
@@ -116,12 +117,16 @@ class Testbed : public Raindrop::Modules::IModule{
                 // .addStage<Raindrop::Physics::PhysicsUpdateStage>(_gameplay);
             
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
-                .setPeriod(4_Hz);
-                // .addStage<Raindrop::Render::RenderStage>(_gameplay)
-                // .addStage<Raindrop::Render::RenderStage>(_HUD)
-                // .addStage<Raindrop::Render::PresentStage>("main"); // present to render output named "gameplay" (could be a window or a buffer set up by an editor layer)
+                .setPeriod(4_Hz)
+                // .addStage<Raindrop::Render::RenderGraphRecordStage>(_gameplay)
+                // .addStage<Raindrop::Render::RenderGraphRecordStage>(_hud)
+                // .addStage<Raindrop::Render::RenderGraphRenderStage>()
+                .addStage<Raindrop::Render::PresentRenderOutputStage>("main");
 
+            scheduler.run(updateLoop);
             scheduler.run(renderLoop);
+            // scheduler.run(updateLoop);
+            // scheduler.run(physicsLoop);
         }
 
         void createGameplayLayer(){
@@ -188,7 +193,6 @@ int main(){
     modules.registerModule<Raindrop::Render::RenderCoreModule>();
     modules.registerModule<Raindrop::Render::RenderOutputModule>();
     modules.registerModule<Raindrop::Render::RenderGraphModule>();
-    modules.registerModule<Raindrop::Render::RenderSchedulerModule>();
     modules.registerModule<Raindrop::Scene::SceneModule>();
     modules.registerModule<Raindrop::Filesystem::FilesystemModule>();
     modules.registerModule<Raindrop::Asset::AssetModule>();

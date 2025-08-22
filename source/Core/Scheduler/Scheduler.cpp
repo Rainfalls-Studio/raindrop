@@ -5,6 +5,15 @@
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Scheduler{
+    Tasks::TaskStatus HookResultToTaskStatus(HookResult&& r){
+        switch (r.type){
+            case HookResult::SKIP: [[fallthrough]];
+            case HookResult::CONTINUE: return Tasks::TaskStatus::Completed();
+            case HookResult::RETRY_HOOK: return Tasks::TaskStatus::Retry(r.getRetryHook().waitDuration);
+        }
+        return Tasks::TaskStatus::Failed("Unknown hook result !");
+    }
+
     Scheduler::Scheduler(Engine& engine) :
         _engine{engine},
         _taskManager{engine.getTaskManager()}
@@ -24,12 +33,17 @@ namespace Raindrop::Scheduler{
                 runtime->running.store(false);
             }
         }
+        _loops.clear();
     }
 
 
     Loop Scheduler::createLoop(const std::string& name) {
         auto [it, inserted] = _loops.emplace(name, std::make_shared<LoopData>());
-        it->second->name = name;
+
+        LoopData& loop = *it->second;
+        loop.name = name;
+        loop.engine = &_engine;
+
         return Loop(it->second);
     }
 
@@ -39,7 +53,7 @@ namespace Raindrop::Scheduler{
         auto data = loop.data();
         auto& runtime = data->runtime;
 
-        spdlog::trace("Running loop {}", data->name);
+        // spdlog::trace("Running loop {}", data->name);
 
         runtime = std::make_shared<LoopData::Runtime>();
         runtime->loop = data.get();
@@ -54,7 +68,7 @@ namespace Raindrop::Scheduler{
                 Time::TimePoint now = Time::now();
                 if (loopRuntime->loop->period != Time::Duration::zero()) {
 
-                    Time::Duration& period = loopRuntime->loop->period;
+                    const Time::Duration& period = loopRuntime->loop->period;
                     Time::Duration elapsed = now - loopRuntime->lastRunTime;
 
                     if (elapsed < period) {
@@ -88,21 +102,24 @@ namespace Raindrop::Scheduler{
                     return static_cast<int>(a.phase) < static_cast<int>(b.phase);
                 });
 
+        auto controller = loop.runtime->controller;
+
         Tasks::TaskHandle prev;
-        spdlog::info("running {}", loop.name);
+        // spdlog::info("running {}", loop.name);
 
         for (auto& hook : loop.hooks) {
-            auto h = _taskManager.createTask(hook.fn, loop.executionPriority, loop.name + " - hook: " + hook.name);
-            if (prev.definition()) prev.then(h);
+            auto h = _taskManager.createTask(
+                [hook] -> Tasks::TaskStatus {return HookResultToTaskStatus(hook.fn());},
+                loop.executionPriority,
+                loop.name + " - hook: " + hook.name);
+            if (prev.definition()) h.then(prev);
             prev = h;
         }
         
         if (prev.definition()){
-            prev = prev.then(loop.runtime->controller);
-        } else {
-            prev = loop.runtime->controller;            
+            controller.then(prev);
         }
-
-        _taskManager.submit(prev);
+        
+        _taskManager.submit(controller);
     }
 }

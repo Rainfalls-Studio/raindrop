@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Raindrop/Engine.hpp"
 
 #include <spdlog/spdlog.h>
@@ -16,12 +17,7 @@ namespace Raindrop{
     void Engine::start(){
         spdlog::info("===================== Starting mainloop =====================");
 
-        _running = true;
-        // while (_running){
-            // _scheduler.trigger();
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-        // }
-
+        _tasks.workerLoop();
         
         spdlog::info("===================== Shutdown =====================");
         _scheduler.shutdown();
@@ -32,7 +28,7 @@ namespace Raindrop{
     }
 
     void Engine::stop(){
-        _running = false;
+        _tasks.stop();
     }
 
     Modules::Manager& Engine::getModuleManager() noexcept{

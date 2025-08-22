@@ -13,7 +13,12 @@ namespace Raindrop::Tasks{
     TaskManager::~TaskManager() { shutdown(); }
 
     TaskHandle TaskManager::createTask(std::function<TaskStatus()> fn, int priority, std::string name) {
-        return TaskHandle(std::make_shared<TaskHandle::TaskDef>(std::move(fn), priority, std::vector<std::weak_ptr<TaskHandle::TaskDef>>{}, std::move(name), TaskProfile{}));
+        return TaskHandle(std::make_shared<TaskHandle::TaskDef>(std::move(fn), priority, std::move(name), TaskProfile{}));
+    }
+
+    void TaskManager::stop(){
+        running.store(false);
+        cv.notify_all();
     }
 
     void TaskManager::submit(const TaskHandle& h) {
@@ -29,9 +34,7 @@ namespace Raindrop::Tasks{
     }
 
     void TaskManager::shutdown() {
-        bool expected = true;
-        if (!running.compare_exchange_strong(expected, false)) return;
-        cv.notify_all();
+        stop();
         for (auto& t : threads) if (t.joinable()) t.join();
     }
 
@@ -48,7 +51,7 @@ namespace Raindrop::Tasks{
                 ready.pop();
             }
 
-            spdlog::trace("TaskManager::workerLoop: Running task {}", inst->def->name);
+            // spdlog::trace("TaskManager::workerLoop: Running task {}", inst->def->name);
 
             auto start = Time::now();
             TaskStatus res = TaskStatus::Failed();
@@ -65,8 +68,8 @@ namespace Raindrop::Tasks{
 
             if (res.type == TaskStatus::COMPLETED) {
                 // Auto-submit chained tasks
-                for (auto& weak : inst->def->chained) {
-                    if (auto nxt = weak.lock()) submit(TaskHandle(nxt));
+                if (auto next = inst->def->chained){
+                    submit(TaskHandle(next));
                 }
             }
         }

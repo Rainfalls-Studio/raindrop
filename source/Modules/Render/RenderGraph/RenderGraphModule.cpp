@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Render/RenderGraphModule.hpp"
+#include "Raindrop/Modules/Render/RenderGraph/RenderGraphModule.hpp"
 #include "Raindrop/Core/Modules/InitHelper.hpp"
 
 #include <RenderGraph/ResourceHandler.hpp>
@@ -15,21 +15,18 @@ namespace Raindrop::Render{
     Modules::Result RenderGraphModule::initialize(Modules::InitHelper& helper){
         _engine = &helper.engine();
         _core = helper.getDependencyAs<RenderCoreModule>("RenderCore");
-        _scheduler = helper.getDependencyAs<RenderSchedulerModule>("RenderScheduler");
 
         buildContext();
         buildResourceHandler();
-        buildFrameGraph();
-        scheduleFrameGraph();
-
-        setBufferCount(2);
 
         return Modules::Result::Success();
     }
 
-    void RenderGraphModule::scheduleFrameGraph(){
-        spdlog::trace("Scheduling frame graph...");
-        _scheduler->setRenderCallback([this](const RenderSchedulerModule::PreRenderResult& preRender){return render(preRender);});
+    std::shared_ptr<crg::FrameGraph> RenderGraphModule::createGraph(const std::string& name){
+        spdlog::trace("Creating frame graph \"{}\"...", name);
+
+        std::shared_ptr<crg::FrameGraph> graph = std::make_shared<crg::FrameGraph>(*_resourceHandler, name);
+        return graph;
     }
 
     Modules::Result RenderGraphModule::buildContext(){
@@ -56,16 +53,6 @@ namespace Raindrop::Render{
         _resourceHandler = std::make_unique<crg::ResourceHandler>();
     }
 
-    void RenderGraphModule::buildFrameGraph(){
-        spdlog::trace("Building frame graph...");
-        _frameGraph = std::make_unique<crg::FrameGraph>(*_resourceHandler, "RenderGraph");
-    }
-
-    void RenderGraphModule::destroyFrameGraph(){
-        _runnableGraphs.clear();
-        _frameGraph.reset();
-    }
-
     void RenderGraphModule::destroyContext(){
         _context.reset();
     }
@@ -77,7 +64,6 @@ namespace Raindrop::Render{
     void RenderGraphModule::shutdown(){
         _core->device().waitIdle();
         
-        destroyFrameGraph();
         destroyResourceHandler();
         destroyContext();
     }
@@ -88,52 +74,40 @@ namespace Raindrop::Render{
 
     Modules::DependencyList RenderGraphModule::dependencies() const noexcept{
         return {
-            Modules::Dependency("RenderCore"),
-            Modules::Dependency("RenderScheduler")
+            Modules::Dependency("RenderCore")
         };
     }
 
-    void RenderGraphModule::setBufferCount(uint32_t count){
-        _runnableGraphs.resize(count);
-    }
+    // void RenderGraphModule::setBufferCount(uint32_t count){
+    //     _runnableGraphs.resize(count);
+    // }
 
-    RenderSchedulerModule::RenderResult RenderGraphModule::render(const RenderSchedulerModule::PreRenderResult& preRender){
-        if (_pendingRecompile){
-            compileRenderGraph();
-        }
+    // RenderSchedulerModule::RenderResult RenderGraphModule::render(const RenderSchedulerModule::PreRenderResult& preRender){
+    //     if (_pendingRecompile){
+    //         compileRenderGraph();
+    //     }
 
-        auto graph = _runnableGraphs[preRender.currentFrame].get();
-        if (graph){
-            crg::SemaphoreWait wait = {preRender.wait, static_cast<VkPipelineStageFlags>(preRender.waitStageFlags)};
-            auto waitSemaphores = graph->run(wait, *_core->graphicsQueue());
+    //     auto graph = _runnableGraphs[preRender.currentFrame].get();
+    //     if (graph){
+    //         crg::SemaphoreWait wait = {preRender.wait, static_cast<VkPipelineStageFlags>(preRender.waitStageFlags)};
+    //         auto waitSemaphores = graph->run(wait, *_core->graphicsQueue());
 
-            RenderSchedulerModule::RenderResult result;
-            result.signal = waitSemaphores[0].semaphore;
-            result.fence = graph->getFence();
+    //         RenderSchedulerModule::RenderResult result;
+    //         result.signal = waitSemaphores[0].semaphore;
+    //         result.fence = graph->getFence();
 
-            return result;
-        }
+    //         return result;
+    //     }
 
-        return {};
-    }
+    //     return {};
+    // }
 
-    void RenderGraphModule::compileRenderGraph(){
-        for (auto& graph : _runnableGraphs){
-            graph = _frameGraph->compile(*_context);
-        }
-        
-        _pendingRecompile = false;
-    }
 
     Modules::Result RenderGraphModule::dependencyReload(const Name& dep){
         if (dep == "RenderCore"){
             spdlog::info("Rebuilding frame graph context...");
             _core = _engine->getModuleManager().getModuleAs<RenderCoreModule>("RenderCore");
             return buildContext();
-        }
-
-        if (dep == "RenderScheduler"){
-            scheduleFrameGraph();
         }
 
         return Modules::Result::Success();
@@ -145,9 +119,5 @@ namespace Raindrop::Render{
             return Modules::Result::Error("RenderCore is a critical dependency of RenderGraph");
         }
         return Modules::Result::Success();
-    }
-
-    crg::FrameGraph* RenderGraphModule::getFrameGraph(){
-        return _frameGraph.get();
     }
 }

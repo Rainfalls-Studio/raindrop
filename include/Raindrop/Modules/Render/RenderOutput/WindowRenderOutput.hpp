@@ -1,9 +1,12 @@
 #pragma once
 
-#include "../IRenderOutput.hpp"
-#include "Raindrop/Modules/Window/Window.hpp"
 #include <VkBootstrap.h>
 #include <vulkan/vulkan.hpp>
+
+#include "IRenderOutput.hpp"
+#include "Raindrop/Core/Store/WriteLease.hpp"
+#include "Raindrop/Modules/Window/Window.hpp"
+#include "RenderOutputResource.hpp"
 
 namespace Raindrop::Render{
     class WindowRenderOutput : public IRenderOutput{
@@ -11,12 +14,12 @@ namespace Raindrop::Render{
             WindowRenderOutput(Window::SharedWindow window);
             virtual ~WindowRenderOutput() = default;
 
-            virtual void initialize(RenderCoreModule& core) override;
+            virtual void initialize(Engine& engine) override;
             virtual void shutdown() override;
 
             virtual std::expected<bool, Error> acquire(uint64_t timeout = UINT64_MAX) override;
-            virtual std::expected<PreRenderResult, Error> preRender(uint64_t timeout = UINT64_MAX) override;
-            virtual std::expected<void, Error> postRender(const RenderResult& result) override;
+            virtual std::expected<void, Error> preRender(uint64_t timeout = UINT64_MAX) override;
+            virtual std::expected<void, Error> postRender() override;
 
             virtual uint32_t getCurrentBufferIndex() const override;
             virtual uint32_t getBufferCount() const override;
@@ -28,6 +31,8 @@ namespace Raindrop::Render{
             virtual vk::Extent2D extent() const override;
 
             void invalidate();
+            
+            Store::ResourcePtr<RenderOutputResource> resources();
         
         private:
             RenderCoreModule* _core;
@@ -44,6 +49,8 @@ namespace Raindrop::Render{
                 RenderCoreModule& core;
                 vk::SwapchainKHR swapchain;
                 std::vector<Frame> frames;
+
+                Store::ResourcePtr<RenderOutputResource> resources;
                 
                 Swapchain(RenderCoreModule& core, vk::SwapchainKHR swapchain);
                 ~Swapchain();
@@ -59,8 +66,11 @@ namespace Raindrop::Render{
                     return !formats.empty() && !presentModes.empty();
                 }
             };
+
             
             std::unique_ptr<Swapchain> _swapchain;
+            // Store::WriteLease<RenderOutputResource> _resourceWrite;
+
             vk::SurfaceKHR _surface;
             vk::SurfaceFormatKHR _surfaceFormat;
             vk::PresentModeKHR _presentMode;
@@ -88,5 +98,6 @@ namespace Raindrop::Render{
             std::expected<void, Error> getSupport();
             std::expected<void, Error> getSwapchainImages();
             std::expected<void, Error> createSyncObjects();
+            std::expected<void, Error> createSwapchainResources();
     };
 }

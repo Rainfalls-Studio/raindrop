@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Render/RenderOutputModule.hpp"
+#include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include "Raindrop/Core/Modules/InitHelper.hpp"
 
 #include <spdlog/spdlog.h>
@@ -32,12 +32,6 @@ namespace Raindrop::Render{
         _engine = &helper.engine();
         _core = helper.getDependencyAs<RenderCoreModule>("RenderCore");
 
-        auto scheduler = helper.getDependencyAs<RenderSchedulerModule>("RenderScheduler");
-
-        scheduler->setPreparRenderCallback([this]{prepareRender();});
-        scheduler->setPreRenderCallback([this] -> RenderSchedulerModule::PreRenderResult {return preRender();});
-        scheduler->setPostRender([this](const RenderSchedulerModule::RenderResult& renderResult){postRender(renderResult);});
-
         return Modules::Result::Success();
     }
 
@@ -52,8 +46,7 @@ namespace Raindrop::Render{
 
     Modules::DependencyList RenderOutputModule::dependencies() const noexcept{
         return {
-            Modules::Dependency("RenderCore"),
-            Modules::Dependency("RenderScheduler"),
+            Modules::Dependency("RenderCore")
         };
     }
 
@@ -72,7 +65,7 @@ namespace Raindrop::Render{
     void RenderOutputModule::initializeAllOutputs(){
         for (auto [it, info] : _outputs){
             spdlog::info("Initializing render output \"{}\"", it);
-            info->output->initialize(*_core);
+            info->output->initialize(*_engine);
         }
     }
 
@@ -87,7 +80,7 @@ namespace Raindrop::Render{
         for (auto [it, info] : _outputs){
             spdlog::info("Rebuilding render output \"{}\"", it);
             info->output->shutdown();
-            info->output->initialize(*_core);
+            info->output->initialize(*_engine);
         }
     }
 
@@ -105,7 +98,7 @@ namespace Raindrop::Render{
             spdlog::info("Overwriting existing output \"{}\"", name);
         }
         _outputs[name] = std::make_shared<RenderOutputInfo>(output, name);
-        output->initialize(*_core);
+        output->initialize(*_engine);
         findMainOutput();
     }
 
@@ -153,91 +146,5 @@ namespace Raindrop::Render{
         }
         spdlog::error("There are no valid outputs registred !");
         return nullptr;
-    }
-
-
-    RenderOutputModule::RenderOutputResult RenderOutputModule::acquireRenderOutput(std::shared_ptr<RenderOutputInfo> info, uint64_t timeout){
-        auto result = info->output->acquire(timeout);
-
-        if (!result){
-            const auto& error = result.error();
-
-            spdlog::error("Failed to acquire render output \"{}\" : {} : {}", info->name, error.message(), error.message());
-            info->available = false;
-            return RenderOutputResult::ERROR;
-        }
-
-        info->available = *result;
-        return info->available ? RenderOutputResult::SUCCESS : RenderOutputResult::SKIP;
-    }
-
-    void RenderOutputModule::prepareRender(){
-        if (!_mainOutput) return;
-
-        RenderOutputResult result = acquireRenderOutput(_mainOutput);
-        
-        if (result == RenderOutputResult::SKIP){
-            return;
-
-        } else if (result == RenderOutputResult::ERROR){
-            spdlog::error("Error occured while acquiering main render output (\"{}\") ! discarding output", _mainOutputName);
-            _mainOutput->enabled = false;
-            findMainOutput();
-            return;
-        }
-    }
-    
-    RenderOutputModule::RenderOutputResult RenderOutputModule::presentRenderOutput(std::shared_ptr<RenderOutputInfo> info, const RenderSchedulerModule::RenderResult& results){
-        if (info->valid()){
-            
-            IRenderOutput::RenderResult renderResults{
-                results.signal,
-                results.fence
-            };
-
-            auto result = info->output->postRender(renderResults);
-
-            if (!result){
-                const auto& error = result.error();
-                spdlog::error("Failed to present render output \"{}\" : {}, {}", info->name, error.message(), error.reason());
-                return RenderOutputResult::ERROR;
-            }
-            return RenderOutputResult::SUCCESS;
-        }
-        return RenderOutputResult::SKIP;
-    }
-
-    void RenderOutputModule::postRender(const RenderSchedulerModule::RenderResult& results){
-        if (!_mainOutput) return;
-        
-        auto result = presentRenderOutput(_mainOutput, results);
-        
-        if (result == RenderOutputResult::ERROR){
-            spdlog::error("Error occured while presenting main render output (\"{}\") ! discarding output", _mainOutputName);
-            _outputs.erase(_mainOutputName);
-        }
-
-        _mainOutput->available = false;
-    }
-
-    RenderSchedulerModule::PreRenderResult RenderOutputModule::preRender(){
-        if (!_mainOutput) return {};
-
-        auto result = _mainOutput->output->preRender();
-
-        if (!result){
-            const auto& error = result.error();
-            spdlog::error("Failed to get pre render result for render output \"{}\" : {}, {}", _mainOutputName, error.message(), error.reason());
-            return {};
-        }
-
-        auto out = *result;
-        RenderSchedulerModule::PreRenderResult preSubmitResult{
-            out.wait,
-            out.waitStageFlags,
-            out.currentFrame
-        };
-            
-        return preSubmitResult;
     }
 }

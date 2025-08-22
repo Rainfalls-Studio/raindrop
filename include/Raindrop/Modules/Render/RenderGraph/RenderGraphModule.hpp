@@ -2,8 +2,7 @@
 
 #include "Raindrop/Core/Modules/IModule.hpp"
 #include "Raindrop/Engine.hpp"
-#include "RenderCoreModule.hpp"
-#include "RenderSchedulerModule.hpp"
+#include "../Core/RenderCoreModule.hpp"
 
 #include <RenderGraph/FrameGraphPrerequisites.hpp>
 #include <RenderGraph/FrameGraph.hpp>
@@ -16,40 +15,30 @@ namespace Raindrop::Render{
 
             virtual Modules::Result initialize(Modules::InitHelper& helper) override;
             virtual void shutdown() override;
-
+ 
             virtual Name name() const noexcept override;
             virtual Modules::DependencyList dependencies() const noexcept override;
 
             inline virtual Modules::Result dependencyReload(const Name& dep) override;
             inline virtual Modules::Result dependencyShutdown(const Name& dep) override;
 
-            void setBufferCount(uint32_t count);
-            crg::FrameGraph* getFrameGraph();
+            std::shared_ptr<crg::FrameGraph> createGraph(const std::string& name = "Render graph");
+            crg::GraphContext& context();
 
         private:
             Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;
-            std::shared_ptr<RenderSchedulerModule> _scheduler;
 
             bool _pendingRecompile = true;
 
             std::unique_ptr<crg::GraphContext> _context;
             std::unique_ptr<crg::ResourceHandler> _resourceHandler;
-            std::unique_ptr<crg::FrameGraph> _frameGraph;
-
-            std::vector<crg::RunnableGraphPtr> _runnableGraphs;
+            
 
             Modules::Result buildContext();
             void buildResourceHandler();
-            void buildFrameGraph();
 
-            void destroyFrameGraph();
             void destroyResourceHandler();
             void destroyContext();
-
-            void scheduleFrameGraph();
-            RenderSchedulerModule::RenderResult render(const RenderSchedulerModule::PreRenderResult& preRender);
-
-            void compileRenderGraph();
     };
 }

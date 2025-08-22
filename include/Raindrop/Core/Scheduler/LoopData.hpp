@@ -7,18 +7,26 @@
 
 #include "Hook.hpp"
 #include "IStage.hpp"
+#include "StageInitHelper.hpp"
+#include "LoopStorageRegistry.hpp"
 #include "Raindrop/Core/Time/Clock.hpp"
 #include "Raindrop/Core/Tasks/TaskHandle.hpp"
 
+namespace Raindrop{
+    class Engine;
+}
+
 namespace Raindrop::Scheduler{
-    struct LoopData {
+    struct LoopData : std::enable_shared_from_this<LoopData>{
         LoopData() = default;
         
+        Engine* engine;
         std::string name;
         Time::Duration period = Time::Duration::zero(); // 0 means unlimited
         int executionPriority = 0;
         std::vector<std::shared_ptr<IStage>> stages;
         std::vector<Hook> hooks;
+        LoopStorageRegistry storage;
 
         struct Runtime {
             LoopData* loop;
@@ -32,12 +40,24 @@ namespace Raindrop::Scheduler{
         template<typename StageT, typename... Args>
         LoopData& addStage(Args&&... args) {
             auto stage = std::make_unique<StageT>(std::forward<Args>(args)...);
-            stage->registerHooks(hooks);
+
+            std::shared_ptr<LoopData> self = shared_from_this();
+            StageInitHelper helper(*engine, self);
+
+            stage->initialize(helper);
             stages.push_back(std::move(stage));
+
             return *this;
         }
 
-        LoopData& setPeriod(Time::Duration period_) { period = period_; return *this; }
-        LoopData& setExecutionPriority(int prio) { executionPriority = prio; return *this; }
+        inline LoopData& setPeriod(Time::Duration period_) {
+            period = period_;
+            return *this;
+        }
+
+        inline LoopData& setExecutionPriority(int prio) {
+            executionPriority = prio;
+            return *this;
+        }
     };
 }

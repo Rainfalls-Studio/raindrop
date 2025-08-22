@@ -2,6 +2,6 @@
 
 namespace Raindrop::Store{
     template<typename T> class Resource;
-    template<typename T> class ResourceWriter;
-    template<typename T> class ResourceReader;
+    template<typename T> class ReadLease;
+    template<typename T> class WriteLease;
 }

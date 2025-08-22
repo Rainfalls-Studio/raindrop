@@ -35,8 +35,27 @@ namespace Raindrop::Scheduler{
                 return valid();
             }
 
-            const std::shared_ptr<LoopData>& data() const noexcept{
+            inline const std::shared_ptr<LoopData>& data() const noexcept{
                 return _data;
+            }
+
+            inline LoopStorageRegistry& storage() const{
+                return _data->storage;
+            }
+
+            template<typename T, typename... Args>
+            inline T& emplaceStorage(Args&&... args){
+                return _data->storage.emplace<T>(std::forward<Args>(args)...);
+            }
+
+            template<typename T>
+            inline T& getStorage(){
+                return _data->storage.get<T>();
+            }
+
+            template<typename T, typename... Args>
+            inline T& getOrEmplaceStorage(Args&&... args){
+                return _data->storage.getOrEmplace<T>(std::forward<Args>(args)...);
             }
 
         private:

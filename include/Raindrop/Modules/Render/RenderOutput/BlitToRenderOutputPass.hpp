@@ -1,7 +1,7 @@
 #pragma once
 
 #include <RenderGraph/RunnableGraph.hpp>
-#include "../IRenderOutput.hpp"
+#include "IRenderOutput.hpp"
 
 namespace Raindrop::Render{
     class BlitToRenderOutputPass : public crg::RunnablePass{

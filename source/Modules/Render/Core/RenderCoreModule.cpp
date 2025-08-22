@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Render/RenderCoreModule.hpp"
+#include "Raindrop/Modules/Render/Core/RenderCoreModule.hpp"
 #include "Raindrop/Core/Modules/InitHelper.hpp"
 
 #include <spdlog/spdlog.h>

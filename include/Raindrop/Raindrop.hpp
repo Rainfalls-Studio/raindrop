@@ -22,13 +22,17 @@
 
 #include "Modules/Window/WindowModule.hpp"
 #include "Modules/Window/WindowEvents.hpp"
+#include "Modules/Window/WindowEventStage.hpp"
 
-#include "Modules/Render/RenderCoreModule.hpp"
-#include "Modules/Render/RenderOutputModule.hpp"
-#include "Modules/Render/RenderGraphModule.hpp"
-#include "Modules/Render/RenderSchedulerModule.hpp"
-#include "Modules/Render/RenderOutputs/WindowRenderOutput.hpp"
-#include "Modules/Render/Passes/BlitToRenderOutput.hpp"
+#include "Modules/Render/Core/RenderCoreModule.hpp"
+
+#include "Modules/Render/RenderGraph/RenderGraphModule.hpp"
+
+#include "Modules/Render/RenderOutput/RenderOutputModule.hpp"
+#include "Modules/Render/RenderOutput/PresentRenderOutputStage.hpp"
+#include "Modules/Render/RenderOutput/WindowRenderOutput.hpp"
+#include "Modules/Render/RenderOutput/BlitToRenderOutputPass.hpp"
+
 
 #include "Modules/Filesystem/FilesystemModule.hpp"
 #include "Modules/Filesystem/Providers/FolderProvider.hpp"

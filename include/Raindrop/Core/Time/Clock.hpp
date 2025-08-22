@@ -37,7 +37,15 @@ namespace Raindrop::Time{
 
             constexpr inline static Duration zero() noexcept {
                 return Duration();
-            } 
+            }
+
+            constexpr inline static Duration max() noexcept{
+                return Duration(std::numeric_limits<rep>::max());
+            }
+
+            constexpr inline static Duration min() noexcept{
+                return Duration(std::numeric_limits<rep>::min());
+            }
 
             // Operators
             constexpr Duration operator+(Duration other) const { return Duration(ns(value_ + other.value_)); }
@@ -53,6 +61,8 @@ namespace Raindrop::Time{
             constexpr bool operator!=(Duration other) const { return value_ != other.value_; }
 
         private:
+            inline constexpr Duration(rep value) noexcept : value_(value){}
+
             rep value_;
     };
 

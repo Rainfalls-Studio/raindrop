@@ -14,7 +14,7 @@ namespace Raindrop::Tasks{
             struct TaskDef {
                 std::function<TaskStatus()> fn;
                 int priority = 0;
-                std::vector<std::weak_ptr<TaskDef>> chained;
+                std::shared_ptr<TaskDef> chained;
                 std::string name;
                 TaskProfile profile;
                 Time::Duration defaultRetryDelay = Time::milliseconds(1);
@@ -22,14 +22,14 @@ namespace Raindrop::Tasks{
                 TaskDef(
                     const std::function<TaskStatus()>& fn_,
                     int priority_,
-                    std::vector<std::weak_ptr<TaskDef>> chained_,
                     std::string name_,
                     TaskProfile profile_,
+                    std::shared_ptr<TaskDef> next = {},
                     Time::Duration defaultRetryDelay_ = Time::milliseconds(1)
                 ) : 
                     fn(std::move(fn_)),
                     priority(priority_),
-                    chained(std::move(chained_)),
+                    chained(std::move(next)),
                     name(std::move(name_)),
                     profile(profile_),
                     defaultRetryDelay(defaultRetryDelay_)

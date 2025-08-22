@@ -16,6 +16,7 @@ namespace Raindrop{
 
 namespace Raindrop::Tasks{
     class TaskManager {
+        friend class ::Raindrop::Engine;
         public:
             TaskManager(Engine& engine, unsigned workers = std::thread::hardware_concurrency());
             ~TaskManager();
@@ -24,6 +25,7 @@ namespace Raindrop::Tasks{
 
             void submit(const TaskHandle& task);
             void shutdown();
+            void stop();
 
         private:
             struct TaskInstance {

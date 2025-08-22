@@ -1,5 +1,5 @@
-#include "Raindrop/Modules/Render/Passes/BlitToRenderOutput.hpp"
-#include "Raindrop/Modules/Render/RenderOutputModule.hpp"
+#include "Raindrop/Modules/Render/RenderOutput/BlitToRenderOutputPass.hpp"
+#include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include "Raindrop/Engine.hpp"
 
 #include <RenderGraph/GraphContext.hpp>
@@ -38,7 +38,7 @@ namespace Raindrop::Render{
     void BlitToRenderOutputPass::recordInto(
         crg::RecordContext& context,
         VkCommandBuffer commandBuffer,
-        uint32_t index
+        uint32_t index [[maybe_unused]]
     ){
         _renderOutputLock->begin(commandBuffer);
 
@@ -113,7 +113,7 @@ namespace Raindrop::Render{
         _renderOutputLock->end(commandBuffer);
     }
 
-    void BlitToRenderOutputPass::initialize(uint32_t passIndex){
+    void BlitToRenderOutputPass::initialize(uint32_t){
         _renderOutputLock = findRenderOutput();
     }
 

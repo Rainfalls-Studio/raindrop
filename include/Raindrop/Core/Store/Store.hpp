@@ -31,28 +31,43 @@ namespace Raindrop::Store{
         }
 
         template<typename T>
-        ResourceReader<T> read(const std::string& name) {
+        std::shared_ptr<Resource<T>> get(const std::string& name) {
             auto it = resources.find(name);
-            if (it == resources.end()) throw std::runtime_error("resource not found: " + name);
+
+            if (it == resources.end()){
+                throw std::runtime_error("resource not found: " + name);
+            }
+
             IResourceHolder* base = it->second.get();
-            if (base->type() != typeid(T)) throw std::runtime_error("type mismatch for resource: " + name);
+
+            if (base->type() != typeid(T)){
+                throw std::runtime_error("type mismatch for resource: " + name);
+            }
+
             auto* holder = static_cast<ResourceHolder<T>*>(base);
-            return ResourceReader<T>(holder->resource);
+
+            return holder->resource;
         }
 
         template<typename T>
-        ResourceWriter<T> emplace(const std::string& name,
-                                const ResourceBuilder<T>& builder,
-                                size_t bufferCount = 2)
+        std::shared_ptr<Resource<T>> emplace(
+            const std::string& name,
+            size_t bufferCount = 2)
         {
             // If already exists, throw
-            if (resources.count(name)) throw std::runtime_error("resource already exists: " + name);
-            auto resource = Resource<T>::create(builder, bufferCount);
+            if (resources.count(name)){
+                throw std::runtime_error("resource already exists: " + name);
+            }
+
+            auto resource = std::make_shared<Resource<T>>(bufferCount);
             resources.emplace(name, std::make_unique<ResourceHolder<T>>(resource));
 
-            auto maybeWriter = ResourceWriter<T>::make_writer(resource);
-            if (!maybeWriter) throw std::runtime_error("failed to create writer for resource: " + name);
-            return std::move(*maybeWriter);
+            return resource;
+        }
+
+
+        void removeResource(const std::string& name){
+            resources.erase(name);
         }
 
     private:
