@@ -4,8 +4,8 @@
 #include <unordered_map>
 
 #include "../Core/RenderCoreModule.hpp"
-// #include "Stages/PreRenderResult.hpp"
-// #include "Stages/RenderResult.hpp"
+#include "Raindrop/Core/Store/Resource.hpp"
+#include "RenderOutputResource.hpp"
 
 namespace Raindrop::Render{
     class IRenderOutput{
@@ -13,7 +13,6 @@ namespace Raindrop::Render{
             using Name = std::string;
 
             virtual ~IRenderOutput() = default;
-
 
             virtual void initialize(Engine& engine) = 0;
             virtual void shutdown() = 0;
@@ -30,6 +29,8 @@ namespace Raindrop::Render{
 
             virtual vk::Image image() const = 0;
             virtual vk::Extent2D extent() const = 0;
+
+            virtual Store::ResourcePtr<RenderOutputResource> resources() = 0;
     };
 
     using SharedRenderOutput = std::shared_ptr<IRenderOutput>;

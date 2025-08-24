@@ -28,6 +28,7 @@ namespace Raindrop::Render{
         private:
             Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;
+            std::shared_ptr<spdlog::logger> _logger;
 
             bool _pendingRecompile = true;
 
@@ -40,5 +41,6 @@ namespace Raindrop::Render{
 
             void destroyResourceHandler();
             void destroyContext();
+            void setupLogger();
     };
 }

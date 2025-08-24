@@ -20,6 +20,9 @@ namespace Raindrop::Render{
             IRenderOutput::Name _outputName;
 
             void findOutput();
+
+            Scheduler::HookResult preRender();
+            Scheduler::HookResult postRender();
         
     };
 }

@@ -8,11 +8,11 @@
 
 namespace Raindrop::Render{
     struct RenderGraph{
-        std::shared_ptr<crg::FrameGraph> _frameGraph;
+        std::shared_ptr<crg::FrameGraph> frameGraph;
 
         void invalidate();
 
-        bool _pendingRecompile = true;
-        uint32_t _bufferCount = 2;
+        bool pendingRecompile = true;
+        uint32_t bufferCount = 2;
     };
 }

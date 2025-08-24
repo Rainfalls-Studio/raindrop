@@ -27,6 +27,8 @@
 #include "Modules/Render/Core/RenderCoreModule.hpp"
 
 #include "Modules/Render/RenderGraph/RenderGraphModule.hpp"
+#include "Modules/Render/RenderGraph/RenderGraphRecordStage.hpp"
+#include "Modules/Render/RenderGraph/RenderGraphRenderStage.hpp"
 
 #include "Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include "Modules/Render/RenderOutput/PresentRenderOutputStage.hpp"

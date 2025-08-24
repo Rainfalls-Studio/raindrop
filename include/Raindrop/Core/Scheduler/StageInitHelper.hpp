@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "Raindrop/Core/Modules/Manager.hpp"
 
 namespace Raindrop{
     class Engine;
@@ -18,6 +19,8 @@ namespace Raindrop::Scheduler{
             Engine& engine();
             Loop loop();
             void registerHook(const Hook& hook);
+
+            Modules::Manager& modules() const;
 
         private:
             Engine& _engine;

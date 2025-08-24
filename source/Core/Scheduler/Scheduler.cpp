@@ -61,8 +61,8 @@ namespace Raindrop::Scheduler{
 
         runtime->controller = _taskManager.createTask(
             [this, data]() -> Tasks::TaskStatus {
+                
                 auto& loopRuntime = data->runtime;
-
                 if (!loopRuntime->running.load()) return Tasks::TaskStatus::Completed();
 
                 Time::TimePoint now = Time::now();
@@ -74,6 +74,7 @@ namespace Raindrop::Scheduler{
                     if (elapsed < period) {
                         return Tasks::TaskStatus::Retry(period - elapsed); // will be rescheduled with retry delay
                     }
+
                 }
                 
                 loopRuntime->lastRunTime = now;
@@ -99,12 +100,12 @@ namespace Raindrop::Scheduler{
         // Ensure hooks are sorted by phase
         std::sort(loop.hooks.begin(), loop.hooks.end(),
                 [](const Hook& a, const Hook& b) {
-                    return static_cast<int>(a.phase) < static_cast<int>(b.phase);
+                    return static_cast<int>(a.phase) > static_cast<int>(b.phase);
                 });
 
         auto controller = loop.runtime->controller;
 
-        Tasks::TaskHandle prev;
+        Tasks::TaskHandle prev = controller;
         // spdlog::info("running {}", loop.name);
 
         for (auto& hook : loop.hooks) {
@@ -116,10 +117,6 @@ namespace Raindrop::Scheduler{
             prev = h;
         }
         
-        if (prev.definition()){
-            controller.then(prev);
-        }
-        
-        _taskManager.submit(controller);
+        _taskManager.submit(prev);
     }
 }

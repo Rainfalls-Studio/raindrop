@@ -27,6 +27,8 @@ namespace Raindrop::Tasks{
             void shutdown();
             void stop();
 
+            size_t taskCount();
+
         private:
             struct TaskInstance {
                 std::shared_ptr<TaskHandle::TaskDef> def;

@@ -87,6 +87,7 @@ namespace Raindrop::Render{
         );
         #else
 
+        // aa
         vk::Image dstImage = _renderOutputLock->image();
 
         VkClearColorValue clearColor = { .float32 = {1.f, 0., 0., 0. } };

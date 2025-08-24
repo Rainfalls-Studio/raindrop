@@ -3,8 +3,6 @@
 
 namespace Raindrop::Tasks{
     TaskManager::TaskManager(Engine& engine, unsigned workers) : _engine(engine) {
-        if (!workers) workers = 1;
-
         running.store(true);
         for (unsigned i = 0; i < workers; ++i)
             threads.emplace_back(&TaskManager::workerLoop, this);
@@ -51,11 +49,17 @@ namespace Raindrop::Tasks{
                 ready.pop();
             }
 
-            // spdlog::trace("TaskManager::workerLoop: Running task {}", inst->def->name);
+            spdlog::trace("TaskManager::workerLoop: Running task {}", inst->def->name);
 
             auto start = Time::now();
             TaskStatus res = TaskStatus::Failed();
-            try { res = inst->def->fn(); } catch (...) {}
+
+            try {
+                res = inst->def->fn();
+            } catch (const std::exception& e) {
+                res = TaskStatus::Failed(e.what());
+            }
+
             auto end = Time::now();
 
             inst->def->profile.addRun(end - start);
@@ -71,7 +75,18 @@ namespace Raindrop::Tasks{
                 if (auto next = inst->def->chained){
                     submit(TaskHandle(next));
                 }
+                continue;
+            }
+
+            if (res.type == TaskStatus::FAILED){
+                spdlog::error("Task \"{}\" failed ! :: {}", inst->def->name, res.getFailed().reason);
             }
         }
     }
+
+    size_t TaskManager::taskCount(){
+        std::lock_guard<std::mutex> lock(mtx);
+        return ready.size();
+    }
+
 }

@@ -16,22 +16,6 @@ class Testbed : public Raindrop::Modules::IModule{
 
             filesystem->mount<Raindrop::Filesystem::FolderProvider>("{root}", 10, parent);
 
-            // {
-            //     auto renderGraph = init.getDependencyAs<Raindrop::Render::RenderGraphModule>("RenderGraph");
-                
-            //     renderGraph->getFrameGraph()->createPass("WindowClear", crg::RunnablePassCreator(
-            //         [this](const crg::FramePass& pass, crg::GraphContext& ctx, crg::RunnableGraph& graph) -> crg::RunnablePassPtr {
-            //             return std::make_unique<Raindrop::Render::BlitToRenderOutputPass>(
-            //                 *_engine,
-            //                 pass,
-            //                 ctx,
-            //                 graph,
-            //                 "main"
-            //             );
-            //         }
-            //     ));
-            // }
-
             createWindow();
             createGameplayLayer();
             createDebugLayer();
@@ -118,12 +102,13 @@ class Testbed : public Raindrop::Modules::IModule{
             
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
                 .setPeriod(4_Hz)
-                // .addStage<Raindrop::Render::RenderGraphRecordStage>(_gameplay)
+                .addStage<Raindrop::Window::EventStage>()
+                .addStage<Raindrop::Render::RenderGraphRecordStage>(_gameplay)
                 // .addStage<Raindrop::Render::RenderGraphRecordStage>(_hud)
-                // .addStage<Raindrop::Render::RenderGraphRenderStage>()
+                .addStage<Raindrop::Render::RenderGraphRenderStage>()
                 .addStage<Raindrop::Render::PresentRenderOutputStage>("main");
 
-            scheduler.run(updateLoop);
+            // scheduler.run(updateLoop);
             scheduler.run(renderLoop);
             // scheduler.run(updateLoop);
             // scheduler.run(physicsLoop);
@@ -133,8 +118,8 @@ class Testbed : public Raindrop::Modules::IModule{
             auto& layers = _engine->getLayerManager();
             auto sceneModule = _engine->getModuleManager().getModuleAs<Raindrop::Scene::SceneModule>("Scene");
             
-            Raindrop::Layers::Layer gameplay = layers.createLayer();
-            auto& scene = sceneModule->emplaceTrait(gameplay).scene;
+            _gameplay = layers.createLayer();
+            auto& scene = sceneModule->emplaceTrait(_gameplay).scene;
 
             scene.emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
             scene.emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
@@ -146,8 +131,8 @@ class Testbed : public Raindrop::Modules::IModule{
             auto& layers = _engine->getLayerManager();
             auto sceneModule = _engine->getModuleManager().getModuleAs<Raindrop::Scene::SceneModule>("Scene");
             
-            Raindrop::Layers::Layer debug = layers.createLayer();
-            auto& scene = sceneModule->emplaceTrait(debug).scene;
+            _debug = layers.createLayer();
+            auto& scene = sceneModule->emplaceTrait(_debug).scene;
 
             scene.emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
             scene.emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
@@ -178,14 +163,28 @@ class Testbed : public Raindrop::Modules::IModule{
     private:
         Raindrop::Engine* _engine;
         std::shared_ptr<Raindrop::Window::Window> _window;
+
+        Raindrop::Layers::Layer _gameplay;
+        Raindrop::Layers::Layer _debug;
         
         // Raindrop::Scheduler::Subscription updateSubscription;
 };
+
+#include <signal.h>
+
+Raindrop::Engine* enginePtr;
+
+void interupt_handler(int){
+    spdlog::warn("Keyboard interupt !");
+    enginePtr->stop();
+}
+
 
 int main(){
     spdlog::set_level(spdlog::level::trace);
 
     Raindrop::Engine engine;
+    enginePtr = &engine;
     auto& modules = engine.getModuleManager();
 
     modules.registerModule<Raindrop::Window::WindowModule>();
@@ -197,6 +196,14 @@ int main(){
     modules.registerModule<Raindrop::Filesystem::FilesystemModule>();
     modules.registerModule<Raindrop::Asset::AssetModule>();
     modules.registerModule<Testbed>();
+    
+    struct sigaction sigIntHandler;
+
+    sigIntHandler.sa_handler = interupt_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
 
     engine.start();
 

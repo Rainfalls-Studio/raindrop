@@ -5,7 +5,9 @@
 #include <RenderGraph/GraphContext.hpp>
 #include <RenderGraph/FrameGraph.hpp>
 #include <RenderGraph/RunnableGraph.hpp>
+#include <RenderGraph/Log.hpp>
 
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Render{
@@ -18,8 +20,19 @@ namespace Raindrop::Render{
 
         buildContext();
         buildResourceHandler();
+        setupLogger();
 
         return Modules::Result::Success();
+    }
+
+    void RenderGraphModule::setupLogger(){
+        _logger = spdlog::stdout_color_mt("RenderGraph");
+
+        crg::Logger::setDebugCallback([this](const std::string& msg, bool){_logger->debug(msg);});
+        crg::Logger::setTraceCallback([this](const std::string& msg, bool){_logger->trace(msg);});
+        crg::Logger::setInfoCallback([this](const std::string& msg, bool){_logger->info(msg);});
+        crg::Logger::setWarningCallback([this](const std::string& msg, bool){_logger->warn(msg);});
+        crg::Logger::setErrorCallback([this](const std::string& msg, bool){_logger->error(msg);});
     }
 
     std::shared_ptr<crg::FrameGraph> RenderGraphModule::createGraph(const std::string& name){
@@ -78,31 +91,6 @@ namespace Raindrop::Render{
         };
     }
 
-    // void RenderGraphModule::setBufferCount(uint32_t count){
-    //     _runnableGraphs.resize(count);
-    // }
-
-    // RenderSchedulerModule::RenderResult RenderGraphModule::render(const RenderSchedulerModule::PreRenderResult& preRender){
-    //     if (_pendingRecompile){
-    //         compileRenderGraph();
-    //     }
-
-    //     auto graph = _runnableGraphs[preRender.currentFrame].get();
-    //     if (graph){
-    //         crg::SemaphoreWait wait = {preRender.wait, static_cast<VkPipelineStageFlags>(preRender.waitStageFlags)};
-    //         auto waitSemaphores = graph->run(wait, *_core->graphicsQueue());
-
-    //         RenderSchedulerModule::RenderResult result;
-    //         result.signal = waitSemaphores[0].semaphore;
-    //         result.fence = graph->getFence();
-
-    //         return result;
-    //     }
-
-    //     return {};
-    // }
-
-
     Modules::Result RenderGraphModule::dependencyReload(const Name& dep){
         if (dep == "RenderCore"){
             spdlog::info("Rebuilding frame graph context...");
@@ -119,5 +107,9 @@ namespace Raindrop::Render{
             return Modules::Result::Error("RenderCore is a critical dependency of RenderGraph");
         }
         return Modules::Result::Success();
+    }
+
+    crg::GraphContext& RenderGraphModule::context(){
+        return *_context;
     }
 }

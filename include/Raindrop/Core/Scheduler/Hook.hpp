@@ -11,6 +11,7 @@ namespace Raindrop::Scheduler{
         PRE_UPDATE,
         UPDATE,
         POST_UPDATE,
+        PRE_RENDER_SETUP,
         PRE_RENDER,
         RENDER,
         POST_RENDER,

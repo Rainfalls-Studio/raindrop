@@ -16,9 +16,18 @@ namespace Raindrop::Render{
         private:
             Scheduler::Loop _loop;
             Engine* _engine;
+            std::shared_ptr<RenderCoreModule> _core;
             std::weak_ptr<RenderGraphModule> _weakRenderGraphModule = {};
-            std::vector<crg::RunnableGraphPtr> _runnableGraphs;
 
+            struct CompiledGraph{
+                crg::RunnableGraphPtr graph = {};
+                bool invalid = true;
+            };
+
+            std::vector<CompiledGraph> _runnableGraphs;
+
+            Scheduler::HookResult setupFrameGraph();
             Scheduler::HookResult render();
+            void invalidate();
     };
 }

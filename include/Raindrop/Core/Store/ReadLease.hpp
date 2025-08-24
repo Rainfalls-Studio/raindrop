@@ -40,18 +40,18 @@ namespace Raindrop::Store{
             }
 
             T& get() {
-                return resource->buffer[index].data;
+                return resource->buffers[index].data;
             }
 
             const T& get() const {
-                return resource->buffer[index].data;
+                return resource->buffers[index].data;
             }
 
             void release() {
-                if (resource && index != (size_t)-1) {
+                if (resource && index != static_cast<size_t>(-1)) {
                     resource->release_reader(index);
                     resource.reset();
-                    index = -1;
+                    index = static_cast<size_t>(-1);
                 }
             }
 

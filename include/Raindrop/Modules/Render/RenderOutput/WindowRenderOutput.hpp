@@ -32,7 +32,7 @@ namespace Raindrop::Render{
 
             void invalidate();
             
-            Store::ResourcePtr<RenderOutputResource> resources();
+            virtual Store::ResourcePtr<RenderOutputResource> resources() override;
         
         private:
             RenderCoreModule* _core;

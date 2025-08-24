@@ -357,6 +357,7 @@ namespace Raindrop::Render{
                 .setWaitSemaphores(wl->renderFinishedSemaphore);
         }
         
+        _currentFrame = (_currentFrame + 1) % _frameCount;
         auto result = _core->presentQueue()->presentKHR(info);
 
         switch (result){
@@ -442,5 +443,9 @@ namespace Raindrop::Render{
 
     vk::Extent2D WindowRenderOutput::extent() const{
         return _extent;
+    }
+
+    Store::ResourcePtr<RenderOutputResource> WindowRenderOutput::resources(){
+        return _swapchain->resources;
     }
 }

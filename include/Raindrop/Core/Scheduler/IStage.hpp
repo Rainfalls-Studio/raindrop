@@ -1,7 +1,6 @@
 #pragma once
 
 #include "StageInitHelper.hpp"
-#include "Hook.hpp"
 
 namespace Raindrop::Scheduler{
     class IStage {
