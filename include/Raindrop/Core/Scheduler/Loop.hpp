@@ -18,7 +18,7 @@ namespace Raindrop::Scheduler{
                 return *this;
             }
 
-            inline Loop& setExecutionPriority(int priority){
+            inline Loop& setExecutionPriority(Tasks::Priority priority){
                 _data->setExecutionPriority(priority);
                 return *this;
             }

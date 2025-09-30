@@ -8,12 +8,24 @@
 #include "TaskStatus.hpp"
 
 namespace Raindrop::Tasks{
+    enum class Priority{
+        BACKGROUND,
+        VERY_LOW,
+        LOW,
+        MEDIUM,
+        HIGH,
+        VERY_HIGH,
+        CRITICAL,
+
+        __size__
+    };
+
     class TaskHandle {
         friend class TaskManager;
         public:
             struct TaskDef {
                 std::function<TaskStatus()> fn;
-                int priority = 0;
+                Priority priority = Priority::MEDIUM;
                 std::shared_ptr<TaskDef> chained;
                 std::string name;
                 TaskProfile profile;
@@ -21,7 +33,7 @@ namespace Raindrop::Tasks{
 
                 TaskDef(
                     const std::function<TaskStatus()>& fn_,
-                    int priority_,
+                    Priority priority_,
                     std::string name_,
                     TaskProfile profile_,
                     std::shared_ptr<TaskDef> next = {},

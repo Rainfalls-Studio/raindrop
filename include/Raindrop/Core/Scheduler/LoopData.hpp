@@ -23,7 +23,7 @@ namespace Raindrop::Scheduler{
         Engine* engine;
         std::string name;
         Time::Duration period = Time::Duration::zero(); // 0 means unlimited
-        int executionPriority = 0;
+        Tasks::Priority executionPriority = Tasks::Priority::MEDIUM;
         std::vector<std::shared_ptr<IStage>> stages;
         std::vector<Hook> hooks;
         LoopStorageRegistry storage;
@@ -55,7 +55,7 @@ namespace Raindrop::Scheduler{
             return *this;
         }
 
-        inline LoopData& setExecutionPriority(int prio) {
+        inline LoopData& setExecutionPriority(Tasks::Priority prio) {
             executionPriority = prio;
             return *this;
         }

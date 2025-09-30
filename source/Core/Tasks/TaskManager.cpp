@@ -1,6 +1,8 @@
 #include "Raindrop/Core/Tasks/TaskManager.hpp"
 #include <spdlog/spdlog.h>
 
+constexpr static Raindrop::Time::Duration safetyMargin = Raindrop::Time::nanoseconds(500);
+
 namespace Raindrop::Tasks{
     TaskManager::TaskManager(Engine& engine, unsigned workers) : _engine(engine) {
         running.store(true);
@@ -10,7 +12,7 @@ namespace Raindrop::Tasks{
 
     TaskManager::~TaskManager() { shutdown(); }
 
-    TaskHandle TaskManager::createTask(std::function<TaskStatus()> fn, int priority, std::string name) {
+    TaskHandle TaskManager::createTask(std::function<TaskStatus()> fn, Priority priority, std::string name) {
         return TaskHandle(std::make_shared<TaskHandle::TaskDef>(std::move(fn), priority, std::move(name), TaskProfile{}));
     }
 
@@ -21,12 +23,12 @@ namespace Raindrop::Tasks{
 
     void TaskManager::submit(const TaskHandle& h) {
         if (!h.def) return;
-        auto inst = std::make_shared<TaskInstance>();
-        inst->def = h.def;
-        inst->unmetDeps.store(0);
+
+        TaskInstance inst(h.def);
+
         {
             std::lock_guard<std::mutex> lock(mtx);
-            ready.push(inst);
+            _tasks[static_cast<size_t>(h->priority)].push_back(inst);
         }
         cv.notify_one();
     }
@@ -36,57 +38,128 @@ namespace Raindrop::Tasks{
         for (auto& t : threads) if (t.joinable()) t.join();
     }
 
-     void TaskManager::workerLoop() {
-        while (running.load()) {
-            std::shared_ptr<TaskInstance> inst;
+    TaskManager::TaskInstance TaskManager::nextTask(std::unique_lock<std::mutex>& lock){
+
+        while (true){
+            const Time::TimePoint now = Time::now();
+
+            Time::nanoseconds remaningNsUntilNextWaitingTask = Time::nanoseconds::max();
+            auto currentWaitingTask = _waiting.end();
+
+
             {
-                std::unique_lock<std::mutex> lock(mtx);
-                if (ready.empty()) {
-                    cv.wait(lock, [&] { return !running.load() || !ready.empty(); });
-                    if (!running.load()) break;
+                lock.lock();
+
+                for (auto it=_waiting.begin(); it!=_waiting.end(); ++it){
+                    auto remaning = (it->availability - now).as<Time::nanoseconds>();
+
+                    if (remaning < remaningNsUntilNextWaitingTask){
+                        remaningNsUntilNextWaitingTask = remaning;
+                        currentWaitingTask = it;
+                    }
                 }
-                inst = ready.top();
-                ready.pop();
+                
+                // if the task scheduled time, just run now
+                if (safetyMargin >= remaningNsUntilNextWaitingTask){
+                    auto instance = currentWaitingTask->instance;
+                    _waiting.erase(currentWaitingTask);
+
+                    lock.unlock();
+                    return instance;
+                }
+
+                // lock.unlock();
             }
 
-            spdlog::trace("TaskManager::workerLoop: Running task {}", inst->def->name);
+            // wait either for a waiting task or one in the pool
+            cv.wait_for(
+                lock,
+                remaningNsUntilNextWaitingTask
+            );
+
+
+            if (!running.load()){
+                lock.unlock();
+                return TaskInstance{nullptr};
+            }
+
+            {
+                // lock.lock();
+
+                // reverse to account for higher to lower priority
+                for (TaskPool::reverse_iterator it = _tasks.rbegin(); it != _tasks.rend(); ++it){
+                    if (it->empty()) continue;
+                    
+                    auto taskIt = it->begin();
+                    auto task = *taskIt;
+                    it->erase(taskIt);
+
+                    lock.unlock();
+                    return task;
+                }
+
+                lock.unlock();
+            }
+        }
+    }
+
+    void TaskManager::workerLoop() {
+        while (running.load()) {
+            TaskInstance inst;
+            std::unique_lock<std::mutex> lock(mtx, std::defer_lock);
+            {
+                inst = nextTask(lock);
+
+                if (inst.ref == nullptr){
+                    continue;;
+                }
+            }
+
+            spdlog::trace("TaskManager::workerLoop: Running task {}", inst.ref->name);
 
             auto start = Time::now();
             TaskStatus res = TaskStatus::Failed();
 
             try {
-                res = inst->def->fn();
+                res = inst.ref->fn();
             } catch (const std::exception& e) {
                 res = TaskStatus::Failed(e.what());
             }
 
             auto end = Time::now();
 
-            inst->def->profile.addRun(end - start);
+            inst.ref->profile.addRun(end - start);
             
             if (res.type == TaskStatus::RETRY) {
-                std::this_thread::sleep_for(res.getRetry().waitDuration.as<Time::nanoseconds>());
-                submit(TaskHandle(inst->def));
+                lock.lock();
+                _waiting.push_back({inst, Time::TimePoint(end + res.getRetry().waitDuration.as<Time::nanoseconds>())});
+                lock.unlock();
                 continue;
             }
 
             if (res.type == TaskStatus::COMPLETED) {
                 // Auto-submit chained tasks
-                if (auto next = inst->def->chained){
+                if (auto next = inst.ref->chained){
                     submit(TaskHandle(next));
                 }
                 continue;
             }
 
             if (res.type == TaskStatus::FAILED){
-                spdlog::error("Task \"{}\" failed ! :: {}", inst->def->name, res.getFailed().reason);
+                spdlog::error("Task \"{}\" failed ! :: {}", inst.ref->name, res.getFailed().reason);
             }
         }
     }
 
     size_t TaskManager::taskCount(){
         std::lock_guard<std::mutex> lock(mtx);
-        return ready.size();
+        size_t sum=0;
+
+        // cummulative sum of all the queues
+        for (const auto& q : _tasks){
+            sum+=q.size();
+        }
+        return sum;
     }
 
 }

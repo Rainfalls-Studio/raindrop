@@ -7,6 +7,7 @@
 #include <queue>
 #include <thread>
 #include <vector>
+#include <list>
 
 #include "TaskHandle.hpp"
 
@@ -21,7 +22,7 @@ namespace Raindrop::Tasks{
             TaskManager(Engine& engine, unsigned workers = std::thread::hardware_concurrency());
             ~TaskManager();
 
-            TaskHandle createTask(std::function<TaskStatus()> fn, int priority = 0, std::string name = "");
+            TaskHandle createTask(std::function<TaskStatus()> fn, Priority priority = Priority::MEDIUM, std::string name = "");
 
             void submit(const TaskHandle& task);
             void shutdown();
@@ -30,27 +31,29 @@ namespace Raindrop::Tasks{
             size_t taskCount();
 
         private:
+            // A simple task that has been registred and is waiting to run
             struct TaskInstance {
-                std::shared_ptr<TaskHandle::TaskDef> def;
-                std::atomic<int> unmetDeps{0};
+                std::shared_ptr<TaskHandle::TaskDef> ref;
+            };
+            
+            // A task that has been ask to be delayed and will run from a specific time
+            struct WaitingTask{
+                TaskInstance instance;
+                Time::TimePoint availability;
             };
 
-            struct Compare {
-                bool operator()(const std::shared_ptr<TaskInstance>& a,
-                                const std::shared_ptr<TaskInstance>& b) const {
-                    if (a->def->priority != b->def->priority)
-                        return a->def->priority < b->def->priority;
-                    return a < b; // arbitrary tie-break
-                }
-            };
+            using TaskPool = std::array<std::list<TaskInstance>, static_cast<size_t>(Priority::__size__)>;
             
             Engine& _engine;
             std::mutex mtx;
             std::condition_variable cv;
-            std::priority_queue<std::shared_ptr<TaskInstance>, std::vector<std::shared_ptr<TaskInstance>>, Compare> ready;
+            TaskPool _tasks;
+            std::list<WaitingTask> _waiting;
             std::vector<std::thread> threads;
             std::atomic<bool> running{false};
 
             void workerLoop();
+            TaskInstance nextTask(std::unique_lock<std::mutex>& lock);
+
         };
 }  // namespace Raindrop::Tasks

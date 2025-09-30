@@ -77,9 +77,14 @@ namespace Raindrop::Time{
             inline Duration operator-(const TimePoint& other) const {
                 return Duration(ns(_value - other._value));
             }
+
+            constexpr TimePoint operator+(const Duration& duration) const {
+                return TimePoint(_value + duration.as<ns>().count());
+            }
             
 
         private:
+            TimePoint(rep value) : _value{value}{}
             rep _value;
 
     };
