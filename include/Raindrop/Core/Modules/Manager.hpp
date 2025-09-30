@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <atomic>
 #include "IModule.hpp"
 #include "Status.hpp"
 
@@ -54,8 +55,7 @@ namespace Raindrop::Modules{
                 SharedModule module = {};
                 DependencyList dependencies = {};
                 DependencyList dependents = {};
-                Status status = Status::UNREGISTRED;
-                uint32_t version = 0;
+                std::atomic<Status> status = Status::UNREGISTRED;
 
                 inline IModule::Name name() const noexcept{
                     return module ? module->name() : "";
@@ -66,7 +66,7 @@ namespace Raindrop::Modules{
 
             Engine& _engine;
             Map _nodes;
-            uint32_t _version = 0;
+            mutable std::mutex _mtx;
 
             void initializeModule(Node& node);
             bool areModuleDependenciesMet(Node& node);

@@ -13,13 +13,18 @@ namespace Raindrop::Modules{
     }
 
     void Manager::registerModule(const SharedModule& module){
+        std::unique_lock<std::mutex> lock(_mtx);
+
+        // lock.lock();
+
+        // TODO: module override
+
         auto& node = _nodes[module->name()];
 
         node.module = module;
-        node.status = Status::PENDING;
+        node.status = Status::NEW;
 
         std::string nodeName = node.name();
-        _version++;
 
         // unregister previous dependencies
         for (const auto& dependency : node.dependencies){
@@ -85,7 +90,7 @@ namespace Raindrop::Modules{
             //     continue;
             // }
 
-            current.version = source.version;
+            // current.version = source.version;
 
             // if initialized, propagate initialization. Else propagate failure
             if (parent.status == Status::INITIALIZED){
@@ -98,7 +103,7 @@ namespace Raindrop::Modules{
                 // if not initialized, initialize
                 } else {
                     initializeModule(current);
-                    current.version = parent.version;
+                    // current.version = parent.version;
                 }
             } else {
                 // if initialized, signal shutdown
@@ -151,7 +156,7 @@ namespace Raindrop::Modules{
 
         spdlog::trace("initializing node \"{}\"...", nodeName);
 
-        node.version = _version;
+        // node.version = _version;
         result = module->initialize(helper);
         node.status = catchResultError(nodeName, result);
     }

@@ -79,10 +79,10 @@ namespace Raindrop::Render{
             SwapchainSupport _support;
             uint32_t _frameCount;
 
-            uint32_t _currentFrame;
-            uint32_t _currentImage;
+            uint32_t _currentFrame = 0;
+            uint32_t _currentImage = 0;
 
-            bool _rebuildPending;
+            bool _rebuildPending = false;
 
             vk::SurfaceFormatKHR _wantedSurfaceFormat;
             vk::PresentModeKHR _wantedPresentMode;

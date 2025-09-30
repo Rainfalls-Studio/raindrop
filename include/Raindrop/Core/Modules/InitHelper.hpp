@@ -28,7 +28,6 @@ namespace Raindrop::Modules{
                 return _dependencies;
             }
 
-            
             SharedModule getDependency(const IModule::Name& name) const{
                 return _dependencies.at(name);
             }
