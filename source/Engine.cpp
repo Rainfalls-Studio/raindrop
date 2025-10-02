@@ -9,7 +9,7 @@ namespace Raindrop{
         _layers(*this),
         _scheduler(*this),
         _store(*this),
-        _tasks(*this, 0)
+        _tasks(*this)
     {
         spdlog::info("===================== Startup =====================");
     }
