@@ -28,14 +28,15 @@ namespace Raindrop::Scheduler{
         for (auto [it, loop] : _loops){
             auto runtime = loop->runtime;
 
-            if (runtime){
-                spdlog::trace("Stopping loop {}", loop->name);
-                runtime->running.store(false);
+            for (auto& stage : loop->stages){
+                stage->shutdown();
             }
+            
+            loop->stages.clear();
         }
+
         _loops.clear();
     }
-
 
     Loop Scheduler::createLoop(const std::string& name) {
         auto [it, inserted] = _loops.emplace(name, std::make_shared<LoopData>());

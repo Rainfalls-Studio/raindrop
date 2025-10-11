@@ -30,6 +30,11 @@ namespace Raindrop::Render{
         );
     }
 
+    void RenderGraphRenderStage::shutdown(){
+        _core->device().waitIdle();
+        _runnableGraphs.clear();
+    }
+
     void RenderGraphRenderStage::invalidate(){
         for (auto& graph : _runnableGraphs){
             graph.invalid = true;
@@ -88,6 +93,7 @@ namespace Raindrop::Render{
         
         // if not available, just skip a frame
         if (!info.available){
+            spdlog::info("skip");
             return HookResult::Skip("pre render is not available");
         }
 
@@ -98,7 +104,6 @@ namespace Raindrop::Render{
         }
 
         auto& graph = _runnableGraphs[info.currentFrame];
-        spdlog::info("current : {}", info.currentFrame);
 
         if (graph.invalid){
             try{

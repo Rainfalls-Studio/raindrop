@@ -12,6 +12,7 @@ namespace Raindrop::Render{
             virtual ~PresentRenderOutputStage() override = default;
 
             virtual void initialize(Scheduler::StageInitHelper& helper) override;
+            virtual void shutdown() override;
         
         private:
             Engine* _engine;

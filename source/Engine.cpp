@@ -4,25 +4,30 @@
 #include <spdlog/spdlog.h>
 
 namespace Raindrop{
+    void printTitle(const char* title){
+        spdlog::info("----------------------------------------------------------");
+        spdlog::info("                         {}                           ", title);
+        spdlog::info("----------------------------------------------------------");
+    }
+
     Engine::Engine() : 
         _modules(*this),
         _layers(*this),
         _scheduler(*this),
-        _store(*this),
         _tasks(*this)
     {
-        spdlog::info("===================== Startup =====================");
+        printTitle("Startup");
     }
 
     void Engine::start(){
-        spdlog::info("===================== Runtime =====================");
+        printTitle("Runtime");
 
         _tasks.workerLoop();
         
-        spdlog::info("===================== Shutdown =====================");
-        _scheduler.shutdown();
+        printTitle("Shutdown");
+
         _tasks.shutdown();
-        _store.shutdown();
+        _scheduler.shutdown();
         _layers.shutdown();
         _modules.shutdown();
     }
@@ -41,10 +46,6 @@ namespace Raindrop{
 
     Scheduler::Scheduler& Engine::getScheduler() noexcept{
         return _scheduler;
-    }
-
-    Store::Store& Engine::getStore() noexcept{
-        return _store;
     }
 
     Tasks::TaskManager& Engine::getTaskManager() noexcept{

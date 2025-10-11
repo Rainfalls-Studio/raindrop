@@ -34,8 +34,16 @@ namespace Raindrop::Tasks{
     }
 
     void TaskManager::shutdown() {
+        spdlog::info("Shutting down task manager...");
         stop();
         for (auto& t : threads) if (t.joinable()) t.join();
+
+        for (auto& q : _tasks){
+            q.clear();
+        }
+
+        _waiting.clear();
+        threads.clear();
     }
 
     TaskManager::TaskInstance TaskManager::nextTask(std::unique_lock<std::mutex>& lock){
@@ -115,7 +123,7 @@ namespace Raindrop::Tasks{
                 }
             }
 
-            spdlog::trace("TaskManager::workerLoop: Running task {}", inst.ref->name);
+            // spdlog::trace("TaskManager::workerLoop: Running task {}", inst.ref->name);
 
             auto start = Time::now();
             TaskStatus res = TaskStatus::Failed();

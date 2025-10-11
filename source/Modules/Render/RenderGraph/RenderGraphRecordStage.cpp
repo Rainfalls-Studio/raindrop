@@ -5,6 +5,8 @@
 namespace Raindrop::Render{
     RenderGraphRecordStage::RenderGraphRecordStage(Layers::Layer layer) : _layer{layer}{}
 
+    void RenderGraphRecordStage::shutdown(){}
+
     void RenderGraphRecordStage::initialize(Scheduler::StageInitHelper& helper){
         _loop = helper.loop();
         _engine = &helper.engine();

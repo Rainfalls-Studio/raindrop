@@ -1,7 +1,7 @@
 #include "Raindrop/Modules/Render/RenderOutput/PresentRenderOutputStage.hpp"
+#include <spdlog/spdlog.h>
 #include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include "Raindrop/Modules/Render/Stages/RenderInfo.hpp"
-#include "Raindrop/Core/Store/ReadLease.hpp"
 #include "Raindrop/Engine.hpp"
 
 namespace Raindrop::Render{
@@ -42,6 +42,7 @@ namespace Raindrop::Render{
         });
     }
 
+    void PresentRenderOutputStage::shutdown(){}
 
     Scheduler::HookResult PresentRenderOutputStage::preRender(){
         using namespace Scheduler;
@@ -58,7 +59,7 @@ namespace Raindrop::Render{
 
         // Acquire
         {
-            auto result = output->acquire();
+            auto result = output->acquire(renderInfo.renderFinishedFence);
 
             if (!result){
                 const auto& error = result.error();
@@ -66,7 +67,8 @@ namespace Raindrop::Render{
                 return HookResult::Skip("Failed to acquire render output");
             }
 
-            bool acquired = *result;
+            renderInfo.imageAvailable = result.value();
+            const bool acquired = renderInfo.imageAvailable != VK_NULL_HANDLE;
             renderInfo.available = acquired;
 
             if (!acquired){
@@ -86,13 +88,13 @@ namespace Raindrop::Render{
         }
 
 
-        auto rl = output->resources()->blocking_acquire_read_latest();
+        // auto rl = output->resources()->blocking_acquire_read_latest();
         
         renderInfo.currentFrame = output->getCurrentBufferIndex();
         renderInfo.frameCount = output->getBufferCount();
 
-        renderInfo.imageAvailable = rl->imageAvailableSemaphore;
-        renderInfo.imageAvailableWaitStageFlags = vk::PipelineStageFlagBits::eBottomOfPipe;
+        // renderInfo.imageAvailable = rl->imageAvailableSemaphore;
+        // renderInfo.imageAvailableWaitStageFlags = vk::PipelineStageFlagBits::eBottomOfPipe;
 
         return HookResult::Continue();
     }
@@ -110,15 +112,7 @@ namespace Raindrop::Render{
         auto& renderInfo = _loop.getOrEmplaceStorage<RenderInfo>();
 
         if (renderInfo.available){
-
-            {
-                auto rl = output->resources()->blocking_acquire_read_latest();
-
-                rl->renderFinishedFence = renderInfo.renderFinishedFence;
-                rl->renderFinishedSemaphore = renderInfo.renderFinishedSemaphore;
-            }
-
-            auto result = output->postRender();
+            auto result = output->postRender(renderInfo.renderFinishedSemaphore);
             renderInfo.available = false;
 
             if (!result){

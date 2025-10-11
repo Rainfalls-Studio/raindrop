@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <atomic>
+#include <spdlog/spdlog.h>
 
 #include "Hook.hpp"
 #include "IStage.hpp"

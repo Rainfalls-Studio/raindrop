@@ -12,6 +12,7 @@ namespace Raindrop::Render{
             RenderGraphRecordStage(Layers::Layer layer);
 
             virtual void initialize(Scheduler::StageInitHelper& helper) override;
+            virtual void shutdown() override;
         
         private:
             Engine* _engine;

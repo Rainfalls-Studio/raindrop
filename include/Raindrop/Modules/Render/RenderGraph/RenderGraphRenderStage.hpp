@@ -12,6 +12,7 @@ namespace Raindrop::Render{
             virtual ~RenderGraphRenderStage() = default;
 
             virtual void initialize(Scheduler::StageInitHelper& helper) override;
+            virtual void shutdown() override;
         
         private:
             Scheduler::Loop _loop;

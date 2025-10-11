@@ -236,13 +236,10 @@ namespace Raindrop::Render{
         auto device = _core->device();
 
 		vk::SemaphoreCreateInfo semaphoreInfo;
-		vk::FenceCreateInfo fenceInfo = {};
-        fenceInfo.setFlags(vk::FenceCreateFlagBits::eSignaled);
 
 		for (auto &f : _swapchain->frames) {
             try{
                 f.imageAvailable = device.createSemaphore(semaphoreInfo);
-                // f.inFlightFence = device.createFence(fenceInfo);
             } catch (const vk::Error& e){
                 spdlog::error("Failed to create vulkan swapchain sync object : {}", e.what());
                 return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "failed to create vulkan swapchain sync object : {}", e.what()));
@@ -259,18 +256,18 @@ namespace Raindrop::Render{
             return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The swapchain as not been created"));
         }
 
-        auto& res = _swapchain->resources;
-        res = std::make_shared<Store::Resource<RenderOutputResource>>(_frameCount);
+        // auto& res = _swapchain->resources;
+        // res = std::make_shared<Store::Resource<RenderOutputResource>>(_frameCount);
 
-        for (size_t i=0; i<_frameCount; i++){
-            auto wl = res->acquire_write(i);
-            auto& b = _swapchain->frames[i];
+        // for (size_t i=0; i<_frameCount; i++){
+        //     auto wl = res->acquire_write(i);
+        //     auto& b = _swapchain->frames[i];
 
-            wl->image = _swapchain->images[i];
-            wl->imageAvailableFence = b.fence;
-            wl->imageAvailableSemaphore = b.imageAvailable;
-            wl->available = false;
-        }
+        //     wl->image = _swapchain->images[i];
+        //     wl->imageAvailableFence = b.fence;
+        //     wl->imageAvailableSemaphore = b.imageAvailable;
+        //     wl->available = false;
+        // }
 
         return {};
     }
@@ -279,7 +276,7 @@ namespace Raindrop::Render{
         _rebuildPending = true;
     }
 
-    std::expected<bool, Error> WindowRenderOutput::acquire(uint64_t timeout){
+    std::expected<vk::Semaphore, Error> WindowRenderOutput::acquire(vk::Fence fence, uint64_t timeout){
         if (_window.expired()){
             spdlog::error("Window is not valid");
             return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
@@ -296,8 +293,8 @@ namespace Raindrop::Render{
         auto device = _core->device();
         auto& frame = _swapchain->frames[_currentFrame];
 
-        if (frame.fence != nullptr){
-            auto result = device.waitForFences(frame.fence, vk::True, timeout);
+        if (fence != nullptr){
+            auto result = device.waitForFences(fence, vk::True, timeout);
 
             if (result != vk::Result::eSuccess && result != vk::Result::eTimeout){
                 spdlog::error("Failed to wait for in-flight fence : {}", vk::to_string(result));
@@ -309,12 +306,7 @@ namespace Raindrop::Render{
         }
 
         auto result = device.acquireNextImageKHR(_swapchain->swapchain, timeout, frame.imageAvailable, VK_NULL_HANDLE, &_currentImage);
-
-        // no possible reader at the time
-        auto wl = _swapchain->resources->acquire_write(_currentFrame);
-
-        wl->available = false;
-        wl->image = _swapchain->images[_currentImage];
+        // spdlog::info("acquire semaphore : {}, {}", static_cast<void*>(frame.imageAvailable), vk::to_string(result));
 
         switch (result){
             case vk::Result::eSuboptimalKHR: invalidate(); [[fallthrough]];
@@ -322,7 +314,7 @@ namespace Raindrop::Render{
 
             case vk::Result::eErrorOutOfDateKHR: invalidate(); [[fallthrough]];
             case vk::Result::eTimeout: [[fallthrough]];
-            case vk::Result::eNotReady: return false;
+            case vk::Result::eNotReady: return nullptr;
 
             default:{
                 spdlog::error("Failed to acquire swapchain image : {}", vk::to_string(result));
@@ -330,35 +322,29 @@ namespace Raindrop::Render{
             }
         }
 
-        return true;
+        return frame.imageAvailable;
     }
 
     std::expected<void, Error> WindowRenderOutput::preRender(uint64_t timeout [[maybe_unused]]){
-        auto& frame = _swapchain->frames[_currentFrame];
-        
-        auto wl = _swapchain->resources->blocking_acquire_write(_currentFrame);
-        wl->imageAvailableFence = frame.fence;
-        wl->imageAvailableSemaphore = frame.imageAvailable;
-        wl->available = true;
 
         return {};
     }
 
-    std::expected<void, Error> WindowRenderOutput::postRender(){
-        auto wl = _swapchain->resources->blocking_acquire_write(_currentFrame);
+    std::expected<void, Error> WindowRenderOutput::postRender(vk::Semaphore finishedSemaphore){
+        // auto wl = _swapchain->resources->blocking_acquire_write(_currentFrame);
 
         vk::PresentInfoKHR info;
         info.setSwapchains(_swapchain->swapchain)
             .setSwapchainCount(1)
             .setImageIndices(_currentFrame);
 
-        if (wl->renderFinishedSemaphore != nullptr){
-            info.setWaitSemaphoreCount(1)
-                .setWaitSemaphores(wl->renderFinishedSemaphore);
+        
+        if (finishedSemaphore){
+            info.setWaitSemaphores({finishedSemaphore});
         }
         
-        _currentFrame = (_currentFrame + 1) % _frameCount;
         auto result = _core->presentQueue()->presentKHR(info);
+        _currentFrame = (_currentFrame + 1) % _frameCount;
 
         switch (result){
             case vk::Result::eErrorOutOfDateKHR: [[fallthrough]];
@@ -445,7 +431,7 @@ namespace Raindrop::Render{
         return _extent;
     }
 
-    Store::ResourcePtr<RenderOutputResource> WindowRenderOutput::resources(){
-        return _swapchain->resources;
-    }
+    // Store::ResourcePtr<RenderOutputResource> WindowRenderOutput::resources(){
+    //     return _swapchain->resources;
+    // }
 }

@@ -16,6 +16,6 @@ namespace Raindrop::Window{
                     return Scheduler::HookResult::Continue();
                 }
             });
-    }
+        }
     }
 }

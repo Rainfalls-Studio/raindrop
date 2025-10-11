@@ -4,7 +4,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include "IRenderOutput.hpp"
-#include "Raindrop/Core/Store/WriteLease.hpp"
 #include "Raindrop/Modules/Window/Window.hpp"
 #include "RenderOutputResource.hpp"
 
@@ -17,9 +16,9 @@ namespace Raindrop::Render{
             virtual void initialize(Engine& engine) override;
             virtual void shutdown() override;
 
-            virtual std::expected<bool, Error> acquire(uint64_t timeout = UINT64_MAX) override;
+            virtual std::expected<vk::Semaphore, Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) override;
             virtual std::expected<void, Error> preRender(uint64_t timeout = UINT64_MAX) override;
-            virtual std::expected<void, Error> postRender() override;
+            virtual std::expected<void, Error> postRender(vk::Semaphore finishedSemaphore = {}) override;
 
             virtual uint32_t getCurrentBufferIndex() const override;
             virtual uint32_t getBufferCount() const override;
@@ -32,7 +31,7 @@ namespace Raindrop::Render{
 
             void invalidate();
             
-            virtual Store::ResourcePtr<RenderOutputResource> resources() override;
+            // virtual Store::ResourcePtr<RenderOutputResource> resources() override;
         
         private:
             RenderCoreModule* _core;
@@ -50,7 +49,7 @@ namespace Raindrop::Render{
                 vk::SwapchainKHR swapchain;
                 std::vector<Frame> frames;
 
-                Store::ResourcePtr<RenderOutputResource> resources;
+                // Store::ResourcePtr<RenderOutputResource> resources;
                 
                 Swapchain(RenderCoreModule& core, vk::SwapchainKHR swapchain);
                 ~Swapchain();

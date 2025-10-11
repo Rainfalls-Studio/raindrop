@@ -7,5 +7,6 @@ namespace Raindrop::Scheduler{
         public:
             virtual ~IStage() = default;
             virtual void initialize(StageInitHelper& helper) = 0;
+            virtual void shutdown() {}
     };
 }

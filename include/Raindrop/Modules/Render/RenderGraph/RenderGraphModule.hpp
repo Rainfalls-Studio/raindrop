@@ -6,6 +6,7 @@
 
 #include <RenderGraph/FrameGraphPrerequisites.hpp>
 #include <RenderGraph/FrameGraph.hpp>
+#include <spdlog/spdlog.h>
 
 namespace Raindrop::Render{
     class RenderGraphModule : public Modules::IModule{
@@ -29,8 +30,6 @@ namespace Raindrop::Render{
             Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;
             std::shared_ptr<spdlog::logger> _logger;
-
-            bool _pendingRecompile = true;
 
             std::unique_ptr<crg::GraphContext> _context;
             std::unique_ptr<crg::ResourceHandler> _resourceHandler;

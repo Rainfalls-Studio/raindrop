@@ -4,7 +4,6 @@
 #include <unordered_map>
 
 #include "../Core/RenderCoreModule.hpp"
-#include "Raindrop/Core/Store/Resource.hpp"
 #include "RenderOutputResource.hpp"
 
 namespace Raindrop::Render{
@@ -17,9 +16,9 @@ namespace Raindrop::Render{
             virtual void initialize(Engine& engine) = 0;
             virtual void shutdown() = 0;
 
-            virtual std::expected<bool, Error> acquire(uint64_t timeout = UINT64_MAX) = 0;
+            virtual std::expected<vk::Semaphore, Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) = 0;
             virtual std::expected<void, Error> preRender(uint64_t timeout = UINT64_MAX) = 0;
-            virtual std::expected<void, Error> postRender() = 0;
+            virtual std::expected<void, Error> postRender(vk::Semaphore finishedSemaphore = {}) = 0;
 
             virtual uint32_t getCurrentBufferIndex() const = 0;
             virtual uint32_t getBufferCount() const = 0;
@@ -29,8 +28,6 @@ namespace Raindrop::Render{
 
             virtual vk::Image image() const = 0;
             virtual vk::Extent2D extent() const = 0;
-
-            virtual Store::ResourcePtr<RenderOutputResource> resources() = 0;
     };
 
     using SharedRenderOutput = std::shared_ptr<IRenderOutput>;
