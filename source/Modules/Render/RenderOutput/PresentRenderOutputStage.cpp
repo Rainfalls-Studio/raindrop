@@ -62,14 +62,17 @@ namespace Raindrop::Render{
             auto result = output->acquire(renderInfo.renderFinishedFence);
 
             if (!result){
+                renderInfo.available = false;
                 const auto& error = result.error();
-                spdlog::error("Failed to aqcuire render output \"{}\" : {} :: {}", _outputName, error.message(), error.reason());
+                spdlog::error("Failed to acquire render output \"{}\" : {} :: {}", _outputName, error.message(), error.reason());
                 return HookResult::Skip("Failed to acquire render output");
             }
 
             renderInfo.imageAvailable = result.value();
             const bool acquired = renderInfo.imageAvailable != VK_NULL_HANDLE;
             renderInfo.available = acquired;
+
+            spdlog::info(renderInfo.available);
 
             if (!acquired){
                 return HookResult::Skip("Failed to acquire render output");

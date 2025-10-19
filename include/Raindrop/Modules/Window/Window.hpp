@@ -25,9 +25,20 @@ namespace Raindrop::Window{
 			std::vector<std::string_view> getInstanceExtensions();
 			std::expected<vk::SurfaceKHR, Error> createSurface(vk::Instance instance);
 
+            inline bool resized() const {
+                return _resized;
+            }
+
+            inline void markResized(){
+                _resized = true;
+            }
+
+            void resetFlags();
+
         private:
             SDL_Window* _window;
             SDL_WindowID _id;
+            bool _resized;
     };
 
     using SharedWindow = std::shared_ptr<Window>;

@@ -30,6 +30,8 @@ namespace Raindrop{
         _scheduler.shutdown();
         _layers.shutdown();
         _modules.shutdown();
+
+        printTitle("Stopped");
     }
 
     void Engine::stop(){

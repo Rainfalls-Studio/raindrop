@@ -28,8 +28,11 @@ namespace Raindrop::Render{
 
             virtual vk::Image image() const override;
             virtual vk::Extent2D extent() const override;
+            virtual vk::RenderPass renderPass() const override;
 
             void invalidate();
+
+            Window::WeakWindow window() const;
             
             // virtual Store::ResourcePtr<RenderOutputResource> resources() override;
         
@@ -41,6 +44,8 @@ namespace Raindrop::Render{
                 struct Frame{
                     vk::Semaphore imageAvailable = VK_NULL_HANDLE;
                     vk::Fence fence = VK_NULL_HANDLE;
+                    vk::ImageView imageView = VK_NULL_HANDLE;
+                    vk::Framebuffer framebuffer = VK_NULL_HANDLE;
                 };
 
                 std::vector<vk::Image> images; 
@@ -75,6 +80,7 @@ namespace Raindrop::Render{
             vk::PresentModeKHR _presentMode;
 			vk::ClearColorValue _clearColor;
             vk::Extent2D _extent;
+            vk::RenderPass _renderPass;
             SwapchainSupport _support;
             uint32_t _frameCount;
 
@@ -96,7 +102,9 @@ namespace Raindrop::Render{
             std::expected<void, Error> rebuildSwapchain();
             std::expected<void, Error> getSupport();
             std::expected<void, Error> getSwapchainImages();
+            std::expected<void, Error> createImageViews();
+            std::expected<void, Error> createFramebuffers();
             std::expected<void, Error> createSyncObjects();
-            std::expected<void, Error> createSwapchainResources();
+            std::expected<void, Error> createRenderPass();
     };
 }

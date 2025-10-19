@@ -14,6 +14,9 @@ namespace Raindrop::Scheduler{
         PRE_RENDER_SETUP,
         PRE_RENDER,
         RENDER,
+        PRE_GUI,
+        GUI,
+        POST_GUI,
         POST_RENDER,
     };
 

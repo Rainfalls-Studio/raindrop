@@ -2,6 +2,10 @@
 #include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include <spdlog/spdlog.h>
 
+// this will make the window use render pass
+// The absence of this define will make the window use only copy mechanism to render
+#define RENDERPASS
+
 namespace Raindrop::Render{
     WindowRenderOutput::Swapchain::Swapchain(RenderCoreModule& core_, vk::SwapchainKHR swapchain_) :
         core{core_},
@@ -14,11 +18,23 @@ namespace Raindrop::Render{
         Queue& presentQueue = core.presentQueue();
         Queue& graphicsQueue = core.graphicsQueue();
 
-        presentQueue->waitIdle();
-        graphicsQueue->waitIdle();
+        {
+            auto result = vk::Result::eErrorUnknown;
+
+            if ((result = presentQueue->waitIdle()) != vk::Result::eSuccess){
+                spdlog::warn("Failed to wait present queue idle : {}", vk::to_string(result));
+            }
+
+            if ((result = graphicsQueue->waitIdle()) != vk::Result::eSuccess){
+                spdlog::warn("Failed to wait graphics queue idle : {}", vk::to_string(result));
+
+            }
+        }
 
         for (auto& frame : frames){
             device.destroySemaphore(frame.imageAvailable);
+            device.destroyImageView(frame.imageView);
+            device.destroyFramebuffer(frame.framebuffer);
 
             // the image is owned by the swapchain
 
@@ -46,6 +62,7 @@ namespace Raindrop::Render{
             createSurface()
             .and_then([this]{return getSupport();})
             .transform([this]{findSurfaceFormat();})
+            .and_then([this]{return createRenderPass();})
             .and_then([this]{return rebuildSwapchain();});
     }
 
@@ -108,6 +125,12 @@ namespace Raindrop::Render{
         spdlog::trace("Destroying swapchain...");
         _swapchain.reset();
 
+        auto device = _core->device();
+
+        if (_renderPass){
+            device.destroyRenderPass(_renderPass);
+        }
+
         if (_surface){
             _core->instance().destroySurfaceKHR(_surface);
         }
@@ -136,6 +159,10 @@ namespace Raindrop::Render{
     std::expected<void, Error> WindowRenderOutput::rebuildSwapchain(){
         auto window = _window.lock();
         auto device = _core->device();
+
+        if (auto result = device.waitIdle(); result != vk::Result::eSuccess){
+            spdlog::warn("Failed to wait vulkan device idle : {} ", vk::to_string(result));
+        }
 
         if (!window){
             spdlog::error("Window is not valid");
@@ -166,14 +193,24 @@ namespace Raindrop::Render{
             .setMinImageCount(_frameCount)
             .setImageExtent({resolution.x, resolution.y})
             .setImageArrayLayers(1)
-            .setImageUsage(vk::ImageUsageFlagBits::eTransferDst)
             .setPreTransform(_support.capabilities.currentTransform);
         
+        #ifdef RENDERPASS
+            info.setImageUsage(vk::ImageUsageFlagBits::eColorAttachment);
+        #else
+            info.setImageUsage(vk::ImageUsageFlagBits::eTransferDst);
+        #endif
+
         Queue& presentQueue = _core->presentQueue();
         Queue& graphicsQueue = _core->graphicsQueue();
 
-        presentQueue->waitIdle();
-        graphicsQueue->waitIdle();
+        if (auto result = presentQueue->waitIdle(); result != vk::Result::eSuccess){
+            spdlog::warn("Failed to wait present queue idle : {}", vk::to_string(result));
+        }
+
+        if (auto result = graphicsQueue->waitIdle(); result != vk::Result::eSuccess){
+            spdlog::warn("Failed to wait graphics queue idle : {}", vk::to_string(result));
+        }
 
         uint32_t families[] = {presentQueue.familyIndex(), graphicsQueue.familyIndex()};
 
@@ -187,27 +224,34 @@ namespace Raindrop::Render{
 
 
         vk::SwapchainKHR newSwapchain;
-        try{
-            newSwapchain = device.createSwapchainKHR(info);
-        } catch (vk::Error& e){
-            spdlog::error("Failed to create swapchain : {}", e.what());
-            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create swapchain : {}", e.what()));
+
+        {
+            auto result = device.createSwapchainKHR(info);
+
+            if (result.result != vk::Result::eSuccess){
+                spdlog::error("Failed to create swapchain : {}", vk::to_string(result.result));
+                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create swapchain"));
+
+            }
+
+            newSwapchain = result.value;
         }
 
         _swapchain = std::make_unique<Swapchain>(*_core, newSwapchain);
         _rebuildPending = false;
 
         return getSwapchainImages()
-            .and_then([this]{return createSyncObjects();})
-            .and_then([this]{return createSwapchainResources();});
+            .and_then([this]{return createImageViews();})
+            .and_then([this]{return createFramebuffers();})
+            .and_then([this]{return createSyncObjects();});
     }
 
     std::expected<void, Error> WindowRenderOutput::getSupport(){
         auto core = *_core;
 
-        _support.presentModes = core.physicalDevice().getSurfacePresentModesKHR(_surface);
-        _support.formats = core.physicalDevice().getSurfaceFormatsKHR(_surface);
-        _support.capabilities = core.physicalDevice().getSurfaceCapabilitiesKHR(_surface);
+        _support.presentModes = core.physicalDevice().getSurfacePresentModesKHR(_surface).value;
+        _support.formats = core.physicalDevice().getSurfaceFormatsKHR(_surface).value;
+        _support.capabilities = core.physicalDevice().getSurfaceCapabilitiesKHR(_surface).value;
 
         if (_support.supported()){
             return {};
@@ -219,12 +263,16 @@ namespace Raindrop::Render{
     std::expected<void, Error> WindowRenderOutput::getSwapchainImages(){
         std::vector<vk::Image> images;
 
-        try{
-            images = _core->device().getSwapchainImagesKHR(_swapchain->swapchain);
-        } catch (vk::Error& e){
-            spdlog::error("Failed to get swapchain images : {}", e.what());
-            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to get swapchain images : {}", e.what()));
-        }
+        {
+            auto result = _core->device().getSwapchainImagesKHR(_swapchain->swapchain);
+            
+            if (result.result != vk::Result::eSuccess){
+                spdlog::error("Failed to get swapchain images : {}", vk::to_string(result.result));
+                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to get swapchain images"));
+            }
+
+            images = result.value;
+        }   
         
         _swapchain->frames.resize(images.size());
         _swapchain->images = images;
@@ -232,47 +280,140 @@ namespace Raindrop::Render{
         return {};
     }
 
+    std::expected<void, Error> WindowRenderOutput::createImageViews(){
+        auto device = _core->device();
+
+        for (size_t i=0; i<_frameCount; i++){
+            auto& frame = _swapchain->frames[i];
+            auto& image = _swapchain->images[i];
+
+            vk::ImageViewCreateInfo info{
+                vk::ImageViewCreateFlags(0),
+                image,
+                vk::ImageViewType::e2D,
+                _surfaceFormat.format,
+                vk::ComponentMapping(),
+                vk::ImageSubresourceRange{
+                    vk::ImageAspectFlagBits::eColor,
+                    0, 1,
+                    0, 1
+                }
+            };
+
+            auto result = device.createImageView(info);
+
+            if (result.result != vk::Result::eSuccess){
+                spdlog::error("Failed to create frame image view : {}", vk::to_string(result.result));
+                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create image view"));
+            }
+
+            frame.imageView = result.value;
+        }
+
+        return {};
+    }
+
+
+    std::expected<void, Error> WindowRenderOutput::createFramebuffers(){
+        auto device = _core->device();
+
+        for (size_t i=0; i<_frameCount; i++){
+            auto& frame = _swapchain->frames[i];
+
+            vk::FramebufferCreateInfo info{
+                vk::FramebufferCreateFlagBits(0),
+                _renderPass,
+                1, &frame.imageView,
+                _extent.width, _extent.height, 1
+            };
+
+            auto result = device.createFramebuffer(info);
+
+            if (result.result != vk::Result::eSuccess){
+                spdlog::error("Failed to create framebuffer : {}", vk::to_string(result.result));
+                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create framebuffer"));
+            }
+
+            frame.framebuffer = result.value;
+        }
+
+        return {};
+    }
+
+
     std::expected<void, Error> WindowRenderOutput::createSyncObjects(){
         auto device = _core->device();
 
 		vk::SemaphoreCreateInfo semaphoreInfo;
 
 		for (auto &f : _swapchain->frames) {
-            try{
-                f.imageAvailable = device.createSemaphore(semaphoreInfo);
-            } catch (const vk::Error& e){
-                spdlog::error("Failed to create vulkan swapchain sync object : {}", e.what());
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "failed to create vulkan swapchain sync object : {}", e.what()));
+            auto result = device.createSemaphore(semaphoreInfo);
+
+            if (result.result != vk::Result::eSuccess){
+                spdlog::error("Failed to create vulkan swapchain sync object : {}", vk::to_string(result.result));
+                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "failed to create vulkan swapchain sync object"));
+
             }
+            
+            f.imageAvailable = result.value;
 		}
 
         return {};
     }
 
-    std::expected<void, Error> WindowRenderOutput::createSwapchainResources(){
-        spdlog::info("Creating window render output resources...");
-        if (!_swapchain){
-            spdlog::error("Cannot create swapchain resources as there is no swapchain");
-            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The swapchain as not been created"));
+    std::expected<void, Error> WindowRenderOutput::createRenderPass(){
+
+        vk::RenderPassCreateInfo info;
+
+        auto device = _core->device();
+
+        vk::AttachmentDescription colorAttachment(
+            vk::AttachmentDescriptionFlags(),
+            _surfaceFormat.format,
+            vk::SampleCountFlagBits::e1,
+            vk::AttachmentLoadOp::eClear,
+            vk::AttachmentStoreOp::eStore,
+            vk::AttachmentLoadOp::eDontCare,
+            vk::AttachmentStoreOp::eDontCare,
+            vk::ImageLayout::eUndefined,
+            vk::ImageLayout::ePresentSrcKHR
+        );
+
+        vk::AttachmentReference colorAttachmentRef(0, vk::ImageLayout::eColorAttachmentOptimal);
+
+        vk::SubpassDescription subpass(
+            vk::SubpassDescriptionFlags(),
+            vk::PipelineBindPoint::eGraphics,
+            0, nullptr,
+            1, &colorAttachmentRef
+        );
+
+        vk::SubpassDependency dependency(
+            VK_SUBPASS_EXTERNAL,
+            0,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            vk::PipelineStageFlagBits::eColorAttachmentOutput,
+            {},
+            vk::AccessFlagBits::eColorAttachmentWrite
+        );
+
+        info.setAttachments({colorAttachment})
+            .setSubpasses({subpass})
+            .setDependencies({dependency});
+
+        auto result = device.createRenderPass(info);
+
+        if (result.result != vk::Result::eSuccess){
+            spdlog::error("Failed to create render pass : {}", vk::to_string(result.result));
+            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create render pass"));
         }
 
-        // auto& res = _swapchain->resources;
-        // res = std::make_shared<Store::Resource<RenderOutputResource>>(_frameCount);
-
-        // for (size_t i=0; i<_frameCount; i++){
-        //     auto wl = res->acquire_write(i);
-        //     auto& b = _swapchain->frames[i];
-
-        //     wl->image = _swapchain->images[i];
-        //     wl->imageAvailableFence = b.fence;
-        //     wl->imageAvailableSemaphore = b.imageAvailable;
-        //     wl->available = false;
-        // }
-
+        _renderPass = result.value;
         return {};
     }
 
     void WindowRenderOutput::invalidate(){
+        spdlog::info("swapchain invalidated");
         _rebuildPending = true;
     }
 
@@ -288,6 +429,7 @@ namespace Raindrop::Render{
             if (!rebuildResult){
                 return std::unexpected(rebuildResult.error());
             }
+            return nullptr;
         }
 
         auto device = _core->device();
@@ -306,7 +448,6 @@ namespace Raindrop::Render{
         }
 
         auto result = device.acquireNextImageKHR(_swapchain->swapchain, timeout, frame.imageAvailable, VK_NULL_HANDLE, &_currentImage);
-        // spdlog::info("acquire semaphore : {}, {}", static_cast<void*>(frame.imageAvailable), vk::to_string(result));
 
         switch (result){
             case vk::Result::eSuboptimalKHR: invalidate(); [[fallthrough]];
@@ -331,7 +472,17 @@ namespace Raindrop::Render{
     }
 
     std::expected<void, Error> WindowRenderOutput::postRender(vk::Semaphore finishedSemaphore){
-        // auto wl = _swapchain->resources->blocking_acquire_write(_currentFrame);
+
+        auto lock = _window.lock();
+        if (!lock){
+            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
+        }
+
+        // Check for window resize before presenting
+        if (lock->resized()){
+            invalidate();
+            return {};
+        }
 
         vk::PresentInfoKHR info;
         info.setSwapchains(_swapchain->swapchain)
@@ -343,13 +494,16 @@ namespace Raindrop::Render{
             info.setWaitSemaphores({finishedSemaphore});
         }
         
-        auto result = _core->presentQueue()->presentKHR(info);
+        vk::Result result;
+        
+        result = _core->presentQueue()->presentKHR(info);
         _currentFrame = (_currentFrame + 1) % _frameCount;
 
         switch (result){
             case vk::Result::eErrorOutOfDateKHR: [[fallthrough]];
             case vk::Result::eSuboptimalKHR: invalidate(); [[fallthrough]];
             case vk::Result::eSuccess: break;
+
             default: {
                 spdlog::error("Failed to present swapchain image : {}", vk::to_string(result));
                 return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to present swapchain image : {}", vk::to_string(result)));
@@ -367,60 +521,87 @@ namespace Raindrop::Render{
         return _frameCount;
     }
 
-    void WindowRenderOutput::begin(vk::CommandBuffer cmd, vk::SubpassContents){
-        vk::ImageMemoryBarrier barrier(
-            {},  // Presentation engine doesn't write in a way we can sync on
-            vk::AccessFlagBits::eTransferWrite,
-            vk::ImageLayout::eUndefined,
-            vk::ImageLayout::eTransferDstOptimal,
-            vk::QueueFamilyIgnored,
-            vk::QueueFamilyIgnored,
-            image(),
-            {
-                vk::ImageAspectFlagBits::eColor,
-                0,
-                1,
-                0,
-                1
-            }
-        );
+    void WindowRenderOutput::begin(vk::CommandBuffer cmd, vk::SubpassContents contents){
+        #ifdef RENDERPASS
+            auto& frame = _swapchain->frames[_currentFrame];
 
-        cmd.pipelineBarrier(
-            vk::PipelineStageFlagBits::eBottomOfPipe,
-            vk::PipelineStageFlagBits::eTransfer,
-            {},
-            {},
-            {},
-            barrier
-        );
+            vk::ClearValue clear{
+                vk::ClearColorValue(
+                    0.5f, 0.1f, 0.1f, 1.f
+                )
+            };
+
+            vk::RenderPassBeginInfo info{
+                _renderPass,
+                frame.framebuffer,
+                {
+                    {0, 0},
+                    _extent
+                },
+                1, &clear
+            };
+
+            cmd.beginRenderPass(info, contents);
+
+        #else
+            vk::ImageMemoryBarrier barrier(
+                {},  // Presentation engine doesn't write in a way we can sync on
+                vk::AccessFlagBits::eTransferWrite,
+                vk::ImageLayout::eUndefined,
+                vk::ImageLayout::eTransferDstOptimal,
+                vk::QueueFamilyIgnored,
+                vk::QueueFamilyIgnored,
+                image(),
+                {
+                    vk::ImageAspectFlagBits::eColor,
+                    0,
+                    1,
+                    0,
+                    1
+                }
+            );
+
+            cmd.pipelineBarrier(
+                vk::PipelineStageFlagBits::eBottomOfPipe,
+                vk::PipelineStageFlagBits::eTransfer,
+                {},
+                {},
+                {},
+                barrier
+            );
+        #endif
     }
 
     void WindowRenderOutput::end(vk::CommandBuffer cmd){
-        vk::ImageMemoryBarrier barrier(
-            vk::AccessFlagBits::eTransferWrite,
-            {},
-            vk::ImageLayout::eTransferDstOptimal,
-            vk::ImageLayout::ePresentSrcKHR,
-            vk::QueueFamilyIgnored,
-            vk::QueueFamilyIgnored,
-            image(),
-            {
-                vk::ImageAspectFlagBits::eColor,
-                0,
-                1,
-                0,
-                1
-            }
-        );
+        #ifdef RENDERPASS
+            cmd.endRenderPass();
+        #else
+            vk::ImageMemoryBarrier barrier(
+                vk::AccessFlagBits::eTransferWrite,
+                {},
+                vk::ImageLayout::eTransferDstOptimal,
+                vk::ImageLayout::ePresentSrcKHR,
+                vk::QueueFamilyIgnored,
+                vk::QueueFamilyIgnored,
+                image(),
+                {
+                    vk::ImageAspectFlagBits::eColor,
+                    0,
+                    1,
+                    0,
+                    1
+                }
+            );
 
-        cmd.pipelineBarrier(
-            vk::PipelineStageFlagBits::eTransfer,
-            vk::PipelineStageFlagBits::eBottomOfPipe,
-            {},
-            {},
-            {},
-            barrier
-        );
+            cmd.pipelineBarrier(
+                vk::PipelineStageFlagBits::eTransfer,
+                vk::PipelineStageFlagBits::eBottomOfPipe,
+                {},
+                {},
+                {},
+                barrier
+            );
+        #endif
     }
 
     vk::Image WindowRenderOutput::image() const{
@@ -431,7 +612,11 @@ namespace Raindrop::Render{
         return _extent;
     }
 
-    // Store::ResourcePtr<RenderOutputResource> WindowRenderOutput::resources(){
-    //     return _swapchain->resources;
-    // }
+    Window::WeakWindow WindowRenderOutput::window() const{
+        return _window;
+    }
+
+    vk::RenderPass WindowRenderOutput::renderPass() const{
+        return _renderPass;
+    }
 }

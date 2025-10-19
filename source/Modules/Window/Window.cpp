@@ -18,6 +18,11 @@ namespace Raindrop::Window{
         return out;
     }
 
+    void Window::resetFlags(){
+        _resized = false;
+    }
+
+
     Window::Window(const WindowConfig& config){
         _window = SDL_CreateWindow(
             config.title.c_str(),

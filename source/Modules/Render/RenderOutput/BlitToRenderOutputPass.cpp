@@ -100,14 +100,14 @@ namespace Raindrop::Render{
             .layerCount = 1
         };
 
-        context->vkCmdClearColorImage(
-            commandBuffer,
-            dstImage,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            &clearColor,
-            1,
-            &range
-        );
+        // context->vkCmdClearColorImage(
+        //     commandBuffer,
+        //     dstImage,
+        //     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        //     &clearColor,
+        //     1,
+        //     &range
+        // );
 
         #endif
 

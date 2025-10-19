@@ -21,10 +21,6 @@ class Testbed : public Raindrop::Modules::IModule{
             createDebugLayer();
             setupGameplayLoop();
 
-            // auto& scheduler = _engine->getScheduler();
-
-            // updateSubscription = scheduler.subscribe([this]{update();}, Raindrop::Scheduler::Priority::UPDATE);
-
             return Raindrop::Modules::Result::Success();
         }
 
@@ -37,6 +33,7 @@ class Testbed : public Raindrop::Modules::IModule{
                 Dependency("RenderGraph"),
                 Dependency("Window"),
                 Dependency("Scene"),
+                Dependency("ImGui"),
                 Dependency("Filesystem")
             };
         }
@@ -51,9 +48,9 @@ class Testbed : public Raindrop::Modules::IModule{
 
         void createWindow(){
             // Get Modules
-            auto& Modules = _engine->getModuleManager();
+            auto& modules = _engine->getModuleManager();
 
-            auto [windowMod, eventMod, renderOutputMod] = Modules.getModulesAs<
+            auto [windowMod, eventMod, renderOutputMod] = modules.getModulesAs<
                 Raindrop::Window::WindowModule,
                 Raindrop::Event::EventModule,
                 Raindrop::Render::RenderOutputModule>(
@@ -75,8 +72,10 @@ class Testbed : public Raindrop::Modules::IModule{
             };
             _window = windowMod->createWindow(config);
 
+            // register the window as output "main"
             renderOutputMod->registerOutput<Raindrop::Render::WindowRenderOutput>("main", _window);
-
+            
+            // subscribe to event 'WindowCloseRequest'. In which case, stop the engine
             eventMod->getManager().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
                 [this](const Raindrop::Window::Events::WindowCloseRequest& event) -> bool {
                     if (event.getWindow() == _window){
@@ -102,13 +101,14 @@ class Testbed : public Raindrop::Modules::IModule{
             
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
                 .setPeriod(4_Hz)
-                .addStage<Raindrop::Window::EventStage>()
+                // .addStage<Raindrop::Window::EventStage>()
                 .addStage<Raindrop::Render::RenderGraphRecordStage>(_gameplay)
                 // .addStage<Raindrop::Render::RenderGraphRecordStage>(_hud)
                 .addStage<Raindrop::Render::RenderGraphRenderStage>()
+                .addStage<Raindrop::Render::ImGuiStage>("main")
                 .addStage<Raindrop::Render::PresentRenderOutputStage>("main");
 
-            // scheduler.run(updateLoop);
+            scheduler.run(updateLoop);
             scheduler.run(renderLoop);
             // scheduler.run(updateLoop);
             // scheduler.run(physicsLoop);
@@ -166,8 +166,6 @@ class Testbed : public Raindrop::Modules::IModule{
 
         Raindrop::Layers::Layer _gameplay;
         Raindrop::Layers::Layer _debug;
-        
-        // Raindrop::Scheduler::Subscription updateSubscription;
 };
 
 #include <signal.h>
@@ -177,6 +175,16 @@ Raindrop::Engine* enginePtr;
 void interupt_handler(int){
     spdlog::warn("Keyboard interupt !");
     enginePtr->stop();
+}
+
+void setup_interuption_handler(){
+    struct sigaction sigIntHandler;
+
+    sigIntHandler.sa_handler = interupt_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
 }
 
 
@@ -195,15 +203,10 @@ int main(){
     modules.registerModule<Raindrop::Scene::SceneModule>();
     modules.registerModule<Raindrop::Filesystem::FilesystemModule>();
     modules.registerModule<Raindrop::Asset::AssetModule>();
+    modules.registerModule<Raindrop::Render::ImGuiModule>();
     modules.registerModule<Testbed>();
     
-    struct sigaction sigIntHandler;
-
-    sigIntHandler.sa_handler = interupt_handler;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-
-    sigaction(SIGINT, &sigIntHandler, NULL);
+    setup_interuption_handler();
 
     engine.start();
 

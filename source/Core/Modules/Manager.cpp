@@ -162,25 +162,28 @@ namespace Raindrop::Modules{
     }
 
     Status Manager::catchResultError(const IModule::Name& name, const Result& result){
+
+        const std::string result_msg = result.message().empty() ? "no message" : result.message();
+
         // catch result
         switch (result.level()){
             case Result::Level::SUCCESS:{
-                spdlog::info("Successfully initialized module \"{}\" !", name);
+                spdlog::info("Successfully initialized module \"{}\" : {} !", name, result_msg);
                 return Status::INITIALIZED;
             }
 
             case Result::Level::ERROR:{
-                spdlog::warn("Failed to initialize module \"{}\" : {}", name, result.message());
+                spdlog::warn("Failed to initialize module \"{}\" : {}", name, result_msg);
                 return Status::FAILED;
             }
 
             case Result::Level::FATAL:{
-                spdlog::critical("Failed to initialize critical module \"{}\" : {}", name, result.message());
+                spdlog::critical("Failed to initialize critical module \"{}\" : {}", name, result_msg);
                 throw std::runtime_error(result.message());
             }
         }
 
-        spdlog::warn("Unknown result level : {}", static_cast<int>(result.level()));
+        spdlog::warn("Unknown result level : {} : {}", static_cast<int>(result.level()), result_msg);
         return Status::FAILED;
     }
 

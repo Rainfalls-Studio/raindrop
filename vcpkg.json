@@ -7,7 +7,11 @@
     "spdlog",
     "vk-bootstrap",
     "vulkan-memory-allocator",
-    "rendergraph"
+    "rendergraph",
+    {
+      "name": "imgui",
+      "features": [ "vulkan-binding" ]
+    }
   ],
   "features": {
     "test": {

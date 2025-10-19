@@ -35,6 +35,8 @@
 #include "Modules/Render/RenderOutput/WindowRenderOutput.hpp"
 #include "Modules/Render/RenderOutput/BlitToRenderOutputPass.hpp"
 
+#include "Modules/Render/ImGui/ImGuiModule.hpp"
+#include "Modules/Render/ImGui/ImGuiStage.hpp"
 
 #include "Modules/Filesystem/FilesystemModule.hpp"
 #include "Modules/Filesystem/Providers/FolderProvider.hpp"

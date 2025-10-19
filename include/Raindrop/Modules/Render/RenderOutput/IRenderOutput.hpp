@@ -28,6 +28,7 @@ namespace Raindrop::Render{
 
             virtual vk::Image image() const = 0;
             virtual vk::Extent2D extent() const = 0;
+            virtual vk::RenderPass renderPass() const = 0;
     };
 
     using SharedRenderOutput = std::shared_ptr<IRenderOutput>;

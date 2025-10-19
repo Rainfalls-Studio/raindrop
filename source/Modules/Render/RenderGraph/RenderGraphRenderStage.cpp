@@ -31,7 +31,10 @@ namespace Raindrop::Render{
     }
 
     void RenderGraphRenderStage::shutdown(){
-        _core->device().waitIdle();
+        if (_core->device().waitIdle() != vk::Result::eSuccess){
+            spdlog::error("Failed to wait device idle");
+        }
+        
         _runnableGraphs.clear();
     }
 
@@ -93,8 +96,7 @@ namespace Raindrop::Render{
         
         // if not available, just skip a frame
         if (!info.available){
-            spdlog::info("skip");
-            return HookResult::Skip("pre render is not available");
+            return HookResult::Skip("image is not available");
         }
 
         // ! The if frameCount is less than runnableGraphs.size(). There may be resources in use destroyed

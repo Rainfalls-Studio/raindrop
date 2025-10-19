@@ -91,6 +91,8 @@ namespace Raindrop::Window{
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
 
+        window->markResized();
+
         glm::uvec2 size{
             static_cast<unsigned int>(info.e.window.data1),
             static_cast<unsigned int>(info.e.window.data2)
@@ -241,6 +243,20 @@ namespace Raindrop::Window{
 
     void WindowModule::event(){
         std::shared_ptr<Event::EventModule> events;
+
+        auto it = _windows.begin();
+        while (it != _windows.end()){
+            auto window = it->second.lock();
+
+            if (!window){
+                it = _windows.erase(it);
+                continue;
+            }
+
+            window->resetFlags();
+            ++it;
+        }
+
         events = _engine->getModuleManager().getModuleAs<Event::EventModule>("Event");
 
         SDL_Event e;
