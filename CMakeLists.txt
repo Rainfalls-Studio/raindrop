@@ -60,6 +60,7 @@ target_link_libraries(Raindrop
 target_compile_definitions(Raindrop
     PUBLIC
     VULKAN_HPP_NO_EXCEPTIONS
+    VULKAN_HPP_ASSERT_ON_RESULT="(expression)((void)0)"
 )
 
 # ---- Install rules ----

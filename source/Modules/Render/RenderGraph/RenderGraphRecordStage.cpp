@@ -7,18 +7,17 @@ namespace Raindrop::Render{
 
     void RenderGraphRecordStage::shutdown(){}
 
+    const char* RenderGraphRecordStage::name() const{
+        return "RenderGraphRecord";
+    }
+
+
     void RenderGraphRecordStage::initialize(Scheduler::StageInitHelper& helper){
         _loop = helper.loop();
         _engine = &helper.engine();
-
-        helper.registerHook(Scheduler::Hook{
-            Scheduler::Phase::PRE_RENDER,
-            "Render graph record",
-            [this]{ return render();}
-        });
     }
 
-    Scheduler::HookResult RenderGraphRecordStage::render(){
+    Scheduler::StageResult RenderGraphRecordStage::execute(){
         using namespace Scheduler;
         
         RenderGraph& renderGraph = _loop.getOrEmplaceStorage<RenderGraph>();
@@ -27,7 +26,7 @@ namespace Raindrop::Render{
             auto& frameGraph = renderGraph.frameGraph;
 
             if (!frameGraph){
-                return HookResult::Skip("No framegraph");
+                return StageResult::Skip("No framegraph");
             }
             
             frameGraph->createPass("WindowClear", crg::RunnablePassCreator(
@@ -44,6 +43,6 @@ namespace Raindrop::Render{
             _submited = true;
         }
 
-        return HookResult::Continue();
+        return StageResult::Continue();
     }
 }

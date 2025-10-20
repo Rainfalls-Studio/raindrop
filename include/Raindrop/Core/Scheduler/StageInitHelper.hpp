@@ -18,7 +18,6 @@ namespace Raindrop::Scheduler{
 
             Engine& engine();
             Loop loop();
-            void registerHook(const Hook& hook);
 
             Modules::Manager& modules() const;
 

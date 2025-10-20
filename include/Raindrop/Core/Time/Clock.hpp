@@ -102,17 +102,17 @@ namespace Raindrop::Time{
 
     namespace literals{
         // Literals
-        constexpr Duration operator""_ns(unsigned long long v) { return Duration(nanoseconds(v)); }
+        constexpr Duration operator""_ns(unsigned long long v)  { return Duration(nanoseconds(v)); }
         constexpr Duration operator""_ns(long double v)         { return Duration(std::chrono::duration<long double, std::nano>(v)); }
 
-        constexpr Duration operator""_us(unsigned long long v) { return Duration(microseconds(v)); }
+        constexpr Duration operator""_us(unsigned long long v)  { return Duration(microseconds(v)); }
         constexpr Duration operator""_us(long double v)         { return Duration(std::chrono::duration<long double, std::micro>(v)); }
 
-        constexpr Duration operator""_ms(unsigned long long v) { return Duration(milliseconds(v)); }
+        constexpr Duration operator""_ms(unsigned long long v)  { return Duration(milliseconds(v)); }
         constexpr Duration operator""_ms(long double v)         { return Duration(std::chrono::duration<long double, std::milli>(v)); }
 
-        constexpr Duration operator""_s(unsigned long long v)  { return Duration(seconds(v)); }
-        constexpr Duration operator""_s(long double v)         { return Duration(std::chrono::duration<long double>(v)); }
+        constexpr Duration operator""_s(unsigned long long v)   { return Duration(seconds(v)); }
+        constexpr Duration operator""_s(long double v)          { return Duration(std::chrono::duration<long double>(v)); }
         
         // Frequency literal: 60_Hz -> period of 1/60s
         constexpr Duration operator""_Hz(unsigned long long hz) {

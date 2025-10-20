@@ -5,11 +5,11 @@
 #include "IRenderOutput.hpp"
 
 namespace Raindrop::Render{
-    class PresentRenderOutputStage : public Scheduler::IStage{
+    class AcquireRenderOutputStage : public Scheduler::IStage{
         public:
-            PresentRenderOutputStage(const std::string& outputName);
+            AcquireRenderOutputStage(const std::string& outputName);
 
-            virtual ~PresentRenderOutputStage() override = default;
+            virtual ~AcquireRenderOutputStage() override = default;
 
             virtual const char* name() const override;
 
@@ -24,6 +24,5 @@ namespace Raindrop::Render{
             IRenderOutput::Name _outputName;
 
             void findOutput();
-        
     };
 }

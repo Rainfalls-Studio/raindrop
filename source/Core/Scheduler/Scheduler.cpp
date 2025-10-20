@@ -5,11 +5,11 @@
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Scheduler{
-    Tasks::TaskStatus HookResultToTaskStatus(HookResult&& r){
+    Tasks::TaskStatus StageResultToTaskStatus(StageResult&& r){
         switch (r.type){
-            case HookResult::SKIP: [[fallthrough]];
-            case HookResult::CONTINUE: return Tasks::TaskStatus::Completed();
-            case HookResult::RETRY_HOOK: return Tasks::TaskStatus::Retry(r.getRetryHook().waitDuration);
+            case StageResult::SKIP: spdlog::warn("task skipped : {}", r.getSkip().reason); [[fallthrough]];
+            case StageResult::CONTINUE: return Tasks::TaskStatus::Completed();
+            case StageResult::RETRY_HOOK: return Tasks::TaskStatus::Retry(r.getRetry().waitDuration);
         }
         return Tasks::TaskStatus::Failed("Unknown hook result !");
     }
@@ -98,22 +98,17 @@ namespace Raindrop::Scheduler{
     }
 
     void Scheduler::submitLoopIteration(LoopData& loop) {
-        // Ensure hooks are sorted by phase
-        std::sort(loop.hooks.begin(), loop.hooks.end(),
-                [](const Hook& a, const Hook& b) {
-                    return static_cast<int>(a.phase) > static_cast<int>(b.phase);
-                });
-
         auto controller = loop.runtime->controller;
 
         Tasks::TaskHandle prev = controller;
-        // spdlog::info("running {}", loop.name);
+        auto& stages = loop.stages;
 
-        for (auto& hook : loop.hooks) {
+        for (size_t i=stages.size(); i>0; i--) {
+            auto& stage = stages[i-1];
             auto h = _taskManager.createTask(
-                [hook] -> Tasks::TaskStatus {return HookResultToTaskStatus(hook.fn());},
+                [stage] -> Tasks::TaskStatus {return StageResultToTaskStatus(stage->execute());},
                 loop.executionPriority,
-                loop.name + " - hook: " + hook.name);
+                loop.name + " - stage: " + stage->name());
             if (prev.definition()) h.then(prev);
             prev = h;
         }

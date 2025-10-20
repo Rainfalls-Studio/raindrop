@@ -14,20 +14,7 @@ namespace Raindrop::Render{
         _engine = &helper.engine();
 
         _core = helper.modules().getModuleAs<RenderCoreModule>("RenderCore");
-        
-        helper.registerHook(Scheduler::Hook{
-            Scheduler::Phase::RENDER,
-            "Render graph render",
-            [this]{return render();}
-        });
-
-        helper.registerHook(
-            Scheduler::Hook{
-                Scheduler::Phase::PRE_RENDER_SETUP,
-                "Render graph setup",
-                [this]{return setupFrameGraph();}
-            }
-        );
+        _weakRenderGraphModule = helper.modules().getModuleAs<RenderGraphModule>("RenderGraph");
     }
 
     void RenderGraphRenderStage::shutdown(){
@@ -38,50 +25,17 @@ namespace Raindrop::Render{
         _runnableGraphs.clear();
     }
 
+    const char* RenderGraphRenderStage::name() const{
+        return "RenderGraphRender";
+    }
+
     void RenderGraphRenderStage::invalidate(){
         for (auto& graph : _runnableGraphs){
             graph.invalid = true;
         }
     }
 
-    Scheduler::HookResult RenderGraphRenderStage::setupFrameGraph(){
-        using namespace Scheduler;
-
-        auto& renderGraph = _loop.getOrEmplaceStorage<RenderGraph>();
-
-        // get render graph
-        auto renderGraphModule = _weakRenderGraphModule.lock();
-
-        // if the reference is not valid, try to get it again from the module manager
-        if (!renderGraphModule){
-            auto& modules = _engine->getModuleManager();
-
-            renderGraphModule = modules.getModuleAs<RenderGraphModule>("RenderGraph");
-            _weakRenderGraphModule = renderGraphModule;
-
-            // rebuild all graphs.
-            // We don't use _runnnableGraphs.clear() as some resources may still be on the fly
-            invalidate();
-            
-            // If there are no render graph modules registred
-            if (!renderGraphModule){
-                spdlog::error("Cannot get render graph module");
-                return HookResult::Skip("Cannot get render graph module");
-            }
-
-            renderGraph.frameGraph = renderGraphModule->createGraph();
-        }
-
-        // if pending recompile is true, compile the graph
-        if (renderGraph.pendingRecompile){
-            invalidate();
-            renderGraph.pendingRecompile = false;
-        }
-
-        return HookResult::Continue();
-    }
-
-    Scheduler::HookResult RenderGraphRenderStage::render(){
+    Scheduler::StageResult RenderGraphRenderStage::execute(){
         using namespace Scheduler;
 
         auto& info = _loop.getOrEmplaceStorage<RenderInfo>();
@@ -91,12 +45,12 @@ namespace Raindrop::Render{
         auto renderGraphModule = _weakRenderGraphModule.lock();
 
         if (!renderGraphModule){
-            return HookResult::Skip("No render graph module");
+            return StageResult::Skip("No render graph module");
         }
         
         // if not available, just skip a frame
         if (!info.available){
-            return HookResult::Skip("image is not available");
+            return StageResult::Skip("image is not available");
         }
 
         // ! The if frameCount is less than runnableGraphs.size(). There may be resources in use destroyed
@@ -129,6 +83,6 @@ namespace Raindrop::Render{
         info.renderFinishedFence = graph.graph->getFence();
         info.renderFinishedSemaphore = renderFinished[0].semaphore;
 
-        return HookResult::Continue();
+        return StageResult::Continue();
     }
 }

@@ -1,6 +1,7 @@
 #include "Raindrop/Modules/Render/RenderOutput/WindowRenderOutput.hpp"
 #include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include <spdlog/spdlog.h>
+#include <array>
 
 // this will make the window use render pass
 // The absence of this define will make the window use only copy mechanism to render
@@ -484,7 +485,13 @@ namespace Raindrop::Render{
             return {};
         }
 
-        vk::PresentInfoKHR info;
+        static std::array<vk::Result, 3> validResults = {
+            vk::Result::eSuccess,
+            vk::Result::eSuboptimalKHR,
+            vk::Result::eErrorOutOfDateKHR
+        };
+
+        vk::PresentInfoKHR info{};
         info.setSwapchains(_swapchain->swapchain)
             .setSwapchainCount(1)
             .setImageIndices(_currentFrame);

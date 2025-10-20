@@ -1,11 +1,12 @@
-#include "Raindrop/Modules/Render/ImGui/ImGuiStage.hpp"
+#include "Raindrop/Modules/Render/ImGui/ImGuiBeginStage.hpp"
 #include "Raindrop/Modules/Render/ImGui/ImGuiModule.hpp"
+#include "Raindrop/Modules/Render/ImGui/LoopStorage.hpp"
 #include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
 
 namespace Raindrop::Render{
-    ImGuiStage::ImGuiStage(const std::string& outputName) : _outputName(outputName){}
+    ImGuiBeginStage::ImGuiBeginStage(const std::string& outputName) : _outputName(outputName){}
 
-    void ImGuiStage::initialize(Scheduler::StageInitHelper& helper){
+    void ImGuiBeginStage::initialize(Scheduler::StageInitHelper& helper){
         using namespace Scheduler;
 
         _loop = helper.loop();
@@ -20,25 +21,13 @@ namespace Raindrop::Render{
         _imgui = imgui;
 
         findOutput();
-
-        helper.registerHook(Hook{
-            Phase::PRE_GUI,
-            "Prepare GUI onto : " + _outputName,
-            [this]{ return preGUI();}
-        });
-
-        helper.registerHook(Hook{
-            Phase::POST_GUI,
-            "Render GUI onto : " + _outputName,
-            [this]{ return postGUI(); }
-        });
     }
 
-    void ImGuiStage::shutdown(){
+    void ImGuiBeginStage::shutdown(){
         
     }
     
-    void ImGuiStage::findOutput(){
+    void ImGuiBeginStage::findOutput(){
         auto outputs = _engine->getModuleManager().getModuleAs<RenderOutputModule>("RenderOutput");
         if (!outputs){
             spdlog::error("Cannot get output \"{}\", There is no \"RenderOutput\" module registred", _outputName);
@@ -52,13 +41,17 @@ namespace Raindrop::Render{
         }
     }
 
-    Scheduler::HookResult ImGuiStage::preGUI(){
+    const char* ImGuiBeginStage::name() const{
+        return "ImGuiBegin";
+    }
+
+    Scheduler::StageResult ImGuiBeginStage::execute(){
         using namespace Scheduler;
         auto imgui = _imgui.lock();
 
         if (!imgui){
             spdlog::error("The ImGui module is not valid");
-            return HookResult::Skip("The ImGui module is not valid");
+            return StageResult::Skip("The ImGui module is not valid");
         }
 
         auto output = _output.lock();
@@ -69,7 +62,7 @@ namespace Raindrop::Render{
             output = _output.lock();
 
             if (!output){
-                return HookResult::Skip("No render output");
+                return StageResult::Skip("No render output");
             }
         }
 
@@ -78,21 +71,6 @@ namespace Raindrop::Render{
 
         storage.context = &context;
 
-        return HookResult::Continue();
-    }
-
-    Scheduler::HookResult ImGuiStage::postGUI(){
-        using namespace Scheduler;
-        auto imgui = _imgui.lock();
-
-        if (!imgui){
-            spdlog::error("The ImGui module is not valid");
-            return HookResult::Skip("The ImGui module is not valid");
-        }
-        auto& storage = _loop.getOrEmplaceStorage<ImGuiStorage>();
-
-        imgui->end(*storage.context);
-
-        return HookResult::Continue();
+        return StageResult::Continue();
     }
 }

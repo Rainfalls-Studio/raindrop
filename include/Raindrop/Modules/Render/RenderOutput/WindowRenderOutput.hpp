@@ -5,7 +5,6 @@
 
 #include "IRenderOutput.hpp"
 #include "Raindrop/Modules/Window/Window.hpp"
-#include "RenderOutputResource.hpp"
 
 namespace Raindrop::Render{
     class WindowRenderOutput : public IRenderOutput{

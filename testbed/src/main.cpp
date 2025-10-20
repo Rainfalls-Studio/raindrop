@@ -19,7 +19,7 @@ class Testbed : public Raindrop::Modules::IModule{
             createWindow();
             createGameplayLayer();
             createDebugLayer();
-            setupGameplayLoop();
+            setupLoops();
 
             return Raindrop::Modules::Result::Success();
         }
@@ -86,7 +86,7 @@ class Testbed : public Raindrop::Modules::IModule{
             );
         }
 
-        void setupGameplayLoop(){
+        void setupLoops(){
             auto& scheduler = _engine->getScheduler();
 
             Raindrop::Scheduler::Loop updateLoop = scheduler.createLoop("Gameplay update")
@@ -101,11 +101,13 @@ class Testbed : public Raindrop::Modules::IModule{
             
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
                 .setPeriod(4_Hz)
-                // .addStage<Raindrop::Window::EventStage>()
+                .addStage<Raindrop::Render::AcquireRenderOutputStage>("main")
+                .addStage<Raindrop::Render::RenderGraphSetupStage>()
                 .addStage<Raindrop::Render::RenderGraphRecordStage>(_gameplay)
                 // .addStage<Raindrop::Render::RenderGraphRecordStage>(_hud)
                 .addStage<Raindrop::Render::RenderGraphRenderStage>()
-                .addStage<Raindrop::Render::ImGuiStage>("main")
+                .addStage<Raindrop::Render::ImGuiBeginStage>("main")
+                .addStage<Raindrop::Render::ImGuiEndStage>("main")
                 .addStage<Raindrop::Render::PresentRenderOutputStage>("main");
 
             scheduler.run(updateLoop);

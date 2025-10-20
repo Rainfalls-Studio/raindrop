@@ -2,24 +2,27 @@
 
 #include "Raindrop/Core/Scheduler/IStage.hpp"
 #include "Raindrop/Core/Scheduler/Loop.hpp"
-#include "IRenderOutput.hpp"
+#include "Raindrop/Modules/Render/RenderOutput/IRenderOutput.hpp"
+#include "ImGuiModule.hpp"
 
 namespace Raindrop::Render{
-    class PresentRenderOutputStage : public Scheduler::IStage{
+    class ImGuiEndStage : public Scheduler::IStage{
         public:
-            PresentRenderOutputStage(const std::string& outputName);
+            ImGuiEndStage(const std::string& outputName);
 
-            virtual ~PresentRenderOutputStage() override = default;
+            virtual ~ImGuiEndStage() override = default;
 
-            virtual const char* name() const override;
+            const char* name() const override;
 
             virtual void initialize(Scheduler::StageInitHelper& helper) override;
             virtual void shutdown() override;
             virtual Scheduler::StageResult execute() override;
+
         
         private:
             Engine* _engine;
             std::weak_ptr<IRenderOutput> _output;
+            std::weak_ptr<ImGuiModule> _imgui;
             Scheduler::Loop _loop;
             IRenderOutput::Name _outputName;
 

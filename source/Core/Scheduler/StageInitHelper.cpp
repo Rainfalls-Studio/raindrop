@@ -16,10 +16,6 @@ namespace Raindrop::Scheduler{
         return Loop(_loopData);
     }
 
-    void StageInitHelper::registerHook(const Hook& hook){
-        _loopData->hooks.push_back(hook);
-    }
-
     Modules::Manager& StageInitHelper::modules() const{
         return _engine.getModuleManager();
     }

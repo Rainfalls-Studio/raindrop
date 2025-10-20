@@ -6,10 +6,10 @@
 #include <RenderGraph/FrameGraph.hpp>
 
 namespace Raindrop::Render{
-    class RenderGraphRenderStage : public Scheduler::IStage{
+    class RenderGraphSetupStage : public Scheduler::IStage{
         public:
-            RenderGraphRenderStage() = default;
-            virtual ~RenderGraphRenderStage() = default;
+            RenderGraphSetupStage() = default;
+            virtual ~RenderGraphSetupStage() = default;
 
             virtual const char* name() const override;
 
@@ -29,7 +29,7 @@ namespace Raindrop::Render{
             };
 
             std::vector<CompiledGraph> _runnableGraphs;
-            
+
             void invalidate();
     };
 }

@@ -5,7 +5,7 @@
 namespace Raindrop::Scheduler{
     struct ContinueStatus{};
 
-    struct HookRetryStatus{
+    struct StageRetryStatus{
         Time::Duration waitDuration;
     };
 
@@ -13,7 +13,7 @@ namespace Raindrop::Scheduler{
         std::string reason;
     };
 
-    struct HookResult{
+    struct StageResult{
         enum Type {
             CONTINUE,
             RETRY_HOOK,
@@ -22,7 +22,7 @@ namespace Raindrop::Scheduler{
 
         std::variant<
             ContinueStatus,
-            HookRetryStatus,
+            StageRetryStatus,
             SkipStatus
         > status;
 
@@ -30,31 +30,31 @@ namespace Raindrop::Scheduler{
             return std::get<ContinueStatus>(status);
         }
 
-        inline HookRetryStatus& getRetryHook(){
-            return std::get<HookRetryStatus>(status);
+        inline StageRetryStatus& getRetry(){
+            return std::get<StageRetryStatus>(status);
         }
 
         inline SkipStatus& getSkip(){
             return std::get<SkipStatus>(status);
         }
 
-        static inline constexpr HookResult Continue(){
-            return HookResult{
+        static inline constexpr StageResult Continue(){
+            return StageResult{
                 CONTINUE,
                 ContinueStatus{}
             };
         } 
     
-        static inline constexpr HookResult Retry(Time::Duration waitDuration){
-            return HookResult{
+        static inline constexpr StageResult Retry(Time::Duration waitDuration){
+            return StageResult{
                 RETRY_HOOK,
-                HookRetryStatus{waitDuration}
+                StageRetryStatus{waitDuration}
             };
         }
 
         
-        static inline constexpr HookResult Skip(const std::string& reason = {}){
-            return HookResult{
+        static inline constexpr StageResult Skip(const std::string& reason = {}){
+            return StageResult{
                 SKIP,
                 SkipStatus{reason}
             };

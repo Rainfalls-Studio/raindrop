@@ -6,18 +6,18 @@
 #include "ImGuiModule.hpp"
 
 namespace Raindrop::Render{
-    struct ImGuiStorage{
-        ImGuiService::Context* context;
-    };
 
-    class ImGuiStage : public Scheduler::IStage{
+    class ImGuiBeginStage : public Scheduler::IStage{
         public:
-            ImGuiStage(const std::string& outputName);
+            ImGuiBeginStage(const std::string& outputName);
 
-            virtual ~ImGuiStage() override = default;
+            virtual ~ImGuiBeginStage() override = default;
+
+            const char* name() const override;
 
             virtual void initialize(Scheduler::StageInitHelper& helper) override;
             virtual void shutdown() override;
+            virtual Scheduler::StageResult execute() override;
 
         
         private:
@@ -28,9 +28,6 @@ namespace Raindrop::Render{
             IRenderOutput::Name _outputName;
 
             void findOutput();
-
-            Scheduler::HookResult preGUI();
-            Scheduler::HookResult postGUI();
         
     };
 }

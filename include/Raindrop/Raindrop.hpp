@@ -29,14 +29,17 @@
 #include "Modules/Render/RenderGraph/RenderGraphModule.hpp"
 #include "Modules/Render/RenderGraph/RenderGraphRecordStage.hpp"
 #include "Modules/Render/RenderGraph/RenderGraphRenderStage.hpp"
+#include "Modules/Render/RenderGraph/RenderGraphSetupStage.hpp"
 
 #include "Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include "Modules/Render/RenderOutput/PresentRenderOutputStage.hpp"
+#include "Modules/Render/RenderOutput/AcquireRenderOutputStage.hpp"
 #include "Modules/Render/RenderOutput/WindowRenderOutput.hpp"
 #include "Modules/Render/RenderOutput/BlitToRenderOutputPass.hpp"
 
 #include "Modules/Render/ImGui/ImGuiModule.hpp"
-#include "Modules/Render/ImGui/ImGuiStage.hpp"
+#include "Modules/Render/ImGui/ImGuiBeginStage.hpp"
+#include "Modules/Render/ImGui/ImGuiEndStage.hpp"
 
 #include "Modules/Filesystem/FilesystemModule.hpp"
 #include "Modules/Filesystem/Providers/FolderProvider.hpp"

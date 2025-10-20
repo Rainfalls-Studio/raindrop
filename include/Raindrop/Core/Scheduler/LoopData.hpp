@@ -6,7 +6,6 @@
 #include <atomic>
 #include <spdlog/spdlog.h>
 
-#include "Hook.hpp"
 #include "IStage.hpp"
 #include "StageInitHelper.hpp"
 #include "LoopStorageRegistry.hpp"
@@ -26,7 +25,6 @@ namespace Raindrop::Scheduler{
         Time::Duration period = Time::Duration::zero(); // 0 means unlimited
         Tasks::Priority executionPriority = Tasks::Priority::MEDIUM;
         std::vector<std::shared_ptr<IStage>> stages;
-        std::vector<Hook> hooks;
         LoopStorageRegistry storage;
 
         struct Runtime {

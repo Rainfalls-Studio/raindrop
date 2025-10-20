@@ -75,7 +75,9 @@ namespace Raindrop::Render{
     }
     
     void RenderGraphModule::shutdown(){
-        _core->device().waitIdle();
+        if (auto result = _core->device().waitIdle(); result != vk::Result::eSuccess){
+            spdlog::error("Failed to wait for vk device to be idle : \"{}\"", vk::to_string(result));
+        }
         
         destroyResourceHandler();
         destroyContext();

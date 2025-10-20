@@ -196,7 +196,6 @@ namespace Raindrop::Render{
         }
     }
 
-
     void ImGuiService::begin(Context& context){
         ImGui::SetCurrentContext(context.ctx);
 
@@ -212,5 +211,4 @@ namespace Raindrop::Render{
         ImGui::Render();
         
     }
-
 }

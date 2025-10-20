@@ -21,6 +21,10 @@ namespace Raindrop::Render{
         }
     }
 
+    const char* PresentRenderOutputStage::name() const{
+        return "PresentRenderOutput";
+    }
+
     void PresentRenderOutputStage::initialize(Scheduler::StageInitHelper& helper){
         using namespace Scheduler;
 
@@ -28,88 +32,18 @@ namespace Raindrop::Render{
         _engine = &helper.engine();
 
         findOutput();
-
-        helper.registerHook(Hook{
-            Phase::PRE_RENDER,
-            "Acquire render output : " + _outputName,
-            [this]{ return preRender();}
-        });
-
-        helper.registerHook(Hook{
-            Phase::POST_RENDER,
-            "Present render output : " + _outputName,
-            [this]{ return postRender(); }
-        });
     }
 
     void PresentRenderOutputStage::shutdown(){}
 
-    Scheduler::HookResult PresentRenderOutputStage::preRender(){
-        using namespace Scheduler;
-
-        auto output = _output.lock();
-        if (!output){
-            spdlog::error("No render output !");
-            return HookResult::Skip("No render output");
-        }
-
-        auto& renderInfo = _loop.getOrEmplaceStorage<RenderInfo>();
-        renderInfo.available = false;
-
-
-        // Acquire
-        {
-            auto result = output->acquire(renderInfo.renderFinishedFence);
-
-            if (!result){
-                renderInfo.available = false;
-                const auto& error = result.error();
-                spdlog::error("Failed to acquire render output \"{}\" : {} :: {}", _outputName, error.message(), error.reason());
-                return HookResult::Skip("Failed to acquire render output");
-            }
-
-            renderInfo.imageAvailable = result.value();
-            const bool acquired = renderInfo.imageAvailable != VK_NULL_HANDLE;
-            renderInfo.available = acquired;
-
-            spdlog::info(renderInfo.available);
-
-            if (!acquired){
-                return HookResult::Skip("Failed to acquire render output");
-            }
-        }
-        
-        // Pre render
-        {
-            auto result = output->preRender();
-
-            if (!result){
-                const auto& error = result.error();
-                spdlog::error("Failed to pre render render output \"{}\" : {} :: {}", _outputName, error.message(), error.reason());
-                return HookResult::Skip("Failed to pre render render output");
-            }
-        }
-
-
-        // auto rl = output->resources()->blocking_acquire_read_latest();
-        
-        renderInfo.currentFrame = output->getCurrentBufferIndex();
-        renderInfo.frameCount = output->getBufferCount();
-
-        // renderInfo.imageAvailable = rl->imageAvailableSemaphore;
-        // renderInfo.imageAvailableWaitStageFlags = vk::PipelineStageFlagBits::eBottomOfPipe;
-
-        return HookResult::Continue();
-    }
-
-    Scheduler::HookResult PresentRenderOutputStage::postRender(){
+    Scheduler::StageResult PresentRenderOutputStage::execute(){
         using namespace Scheduler;
 
         auto output = _output.lock();
 
         if (!output){
             spdlog::error("No render output !");
-            return HookResult::Skip("No render output");
+            return StageResult::Skip("No render output");
         }
         
         auto& renderInfo = _loop.getOrEmplaceStorage<RenderInfo>();
@@ -121,12 +55,12 @@ namespace Raindrop::Render{
             if (!result){
                 const auto& error = result.error();
                 spdlog::error("Failed to present render output \"{}\" : {} :: {}", _outputName, error.message(), error.reason());
-                return HookResult::Skip("Failed to present render output");
+                return StageResult::Skip("Failed to present render output");
             }
         } else {
-            return HookResult::Skip("The render output is not available");
+            return StageResult::Skip("The render output is not available");
         }
 
-        return HookResult::Continue();
+        return StageResult::Continue();
     }
 }
