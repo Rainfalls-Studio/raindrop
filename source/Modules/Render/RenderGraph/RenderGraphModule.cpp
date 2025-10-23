@@ -11,7 +11,7 @@
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Render{
-    RenderGraphModule::RenderGraphModule(){}
+    RenderGraphModule::RenderGraphModule() : std::enable_shared_from_this<RenderGraphModule>(){}
     RenderGraphModule::~RenderGraphModule(){}
 
     Modules::Result RenderGraphModule::initialize(Modules::InitHelper& helper){
@@ -35,13 +35,6 @@ namespace Raindrop::Render{
         crg::Logger::setErrorCallback([this](const std::string& msg, bool){_logger->error(msg);});
     }
 
-    std::shared_ptr<crg::FrameGraph> RenderGraphModule::createGraph(const std::string& name){
-        spdlog::trace("Creating frame graph \"{}\"...", name);
-
-        std::shared_ptr<crg::FrameGraph> graph = std::make_shared<crg::FrameGraph>(*_resourceHandler, name);
-        return graph;
-    }
-
     Modules::Result RenderGraphModule::buildContext(){
         spdlog::trace("Building frame graph context...");
         try{
@@ -59,6 +52,10 @@ namespace Raindrop::Render{
         }
 
         return Modules::Result::Success();
+    }
+
+    std::shared_ptr<RenderGraph> RenderGraphModule::createGraph(const std::string& name){
+        return std::make_shared<RenderGraph>(shared_from_this(), name);
     }
 
     void RenderGraphModule::buildResourceHandler(){
@@ -113,5 +110,13 @@ namespace Raindrop::Render{
 
     crg::GraphContext& RenderGraphModule::context(){
         return *_context;
+    }
+
+    crg::ResourceHandler& RenderGraphModule::resourceHandler(){
+        return *_resourceHandler;
+    }
+
+    std::shared_ptr<RenderCoreModule> RenderGraphModule::core(){
+        return _core;
     }
 }

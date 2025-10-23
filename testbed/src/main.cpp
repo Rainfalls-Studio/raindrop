@@ -17,6 +17,7 @@ class Testbed : public Raindrop::Modules::IModule{
             filesystem->mount<Raindrop::Filesystem::FolderProvider>("{root}", 10, parent);
 
             createWindow();
+            createRenderGraph();
             createGameplayLayer();
             createDebugLayer();
             setupLoops();
@@ -46,6 +47,30 @@ class Testbed : public Raindrop::Modules::IModule{
             return true;
         }
 
+        void createRenderGraph(){
+            auto& modules = _engine->getModuleManager();
+            auto renderGraphMod = modules.getModuleAs<Raindrop::Render::RenderGraphModule>("RenderGraph");
+
+            _graph = renderGraphMod->createGraph("MainGraph");
+            auto& frameGraph = _graph->get();
+
+            auto& beginRenderPass = frameGraph.createPass("Main render target render", 
+                [&]( const crg::FramePass& pass, crg::GraphContext& ctx, crg::RunnableGraph& runGraph ) -> crg::RunnablePassPtr {
+                    using Raindrop::Render::MakeStep;
+                    using Raindrop::Render::MakeSteps;
+                    auto imguiMod = _engine->getModuleManager().getModuleAs<Raindrop::Render::ImGuiModule>("ImGui");
+                    
+                    return std::make_unique<Raindrop::Render::RenderSequencePass>(pass, ctx, runGraph,
+                        MakeSteps(
+                            MakeStep<Raindrop::Render::RenderOutputBeginRenderPass>(_windowOutput),
+                            MakeStep<Raindrop::Render::ImGuiRenderStep>(imguiMod, _windowOutput, "main"),
+                            MakeStep<Raindrop::Render::RenderOutputEndRenderPass>(_windowOutput)
+                        )
+                    );
+                }
+            );
+        }
+
         void createWindow(){
             // Get Modules
             auto& modules = _engine->getModuleManager();
@@ -73,7 +98,7 @@ class Testbed : public Raindrop::Modules::IModule{
             _window = windowMod->createWindow(config);
 
             // register the window as output "main"
-            renderOutputMod->registerOutput<Raindrop::Render::WindowRenderOutput>("main", _window);
+            _windowOutput = renderOutputMod->createOutput<Raindrop::Render::WindowRenderOutput>("main", _window);
             
             // subscribe to event 'WindowCloseRequest'. In which case, stop the engine
             eventMod->getManager().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
@@ -102,17 +127,14 @@ class Testbed : public Raindrop::Modules::IModule{
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
                 .setPeriod(4_Hz)
                 .addStage<Raindrop::Render::AcquireRenderOutputStage>("main")
-                .addStage<Raindrop::Render::RenderGraphSetupStage>()
-                .addStage<Raindrop::Render::RenderGraphRecordStage>(_gameplay)
                 // .addStage<Raindrop::Render::RenderGraphRecordStage>(_hud)
-                .addStage<Raindrop::Render::RenderGraphRenderStage>()
                 .addStage<Raindrop::Render::ImGuiBeginStage>("main")
                 .addStage<Raindrop::Render::ImGuiEndStage>("main")
+                .addStage<Raindrop::Render::RenderGraphRenderStage>(_graph)
                 .addStage<Raindrop::Render::PresentRenderOutputStage>("main");
 
             scheduler.run(updateLoop);
             scheduler.run(renderLoop);
-            // scheduler.run(updateLoop);
             // scheduler.run(physicsLoop);
         }
 
@@ -151,7 +173,6 @@ class Testbed : public Raindrop::Modules::IModule{
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
 
-
         virtual Raindrop::Modules::Result dependencyReload(const Name& dependency) override {
             spdlog::info(dependency);
             
@@ -165,9 +186,11 @@ class Testbed : public Raindrop::Modules::IModule{
     private:
         Raindrop::Engine* _engine;
         std::shared_ptr<Raindrop::Window::Window> _window;
+        std::shared_ptr<Raindrop::Render::IRenderOutput> _windowOutput;
 
         Raindrop::Layers::Layer _gameplay;
         Raindrop::Layers::Layer _debug;
+        std::shared_ptr<Raindrop::Render::RenderGraph> _graph;
 };
 
 #include <signal.h>

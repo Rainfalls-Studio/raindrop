@@ -8,7 +8,7 @@
 namespace Raindrop::Render{
     class RenderGraphRenderStage : public Scheduler::IStage{
         public:
-            RenderGraphRenderStage() = default;
+            RenderGraphRenderStage(std::weak_ptr<RenderGraph> graph);
             virtual ~RenderGraphRenderStage() = default;
 
             virtual const char* name() const override;
@@ -21,14 +21,8 @@ namespace Raindrop::Render{
             Scheduler::Loop _loop;
             Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;
-            std::weak_ptr<RenderGraphModule> _weakRenderGraphModule = {};
+            std::weak_ptr<RenderGraph> _graph;
 
-            struct CompiledGraph{
-                crg::RunnableGraphPtr graph = {};
-                bool invalid = true;
-            };
-
-            std::vector<CompiledGraph> _runnableGraphs;
             
             void invalidate();
     };

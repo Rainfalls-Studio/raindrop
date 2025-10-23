@@ -44,19 +44,23 @@ namespace Raindrop::Render{
                 return std::dynamic_pointer_cast<T>(getOutput(name));
             }
 
-            void registerOutput(const IRenderOutput::Name& name, SharedRenderOutput output);
+            void createOutput(const IRenderOutput::Name& name, SharedRenderOutput output);
             void unregisterOutput(const IRenderOutput::Name& name);
 
             template<typename T>
-            void registerOutput(const IRenderOutput::Name& name){
+            std::shared_ptr<T> createOutput(const IRenderOutput::Name& name){
                 static_assert(std::is_base_of<IRenderOutput, T>::value, "The type T must be derived from IRenderOutput");
-                registerOutput(name, std::static_pointer_cast<IRenderOutput>(std::make_shared<T>()));
+                std::shared_ptr<T> output = std::make_shared<T>();
+                createOutput(name, std::static_pointer_cast<IRenderOutput>(output));
+                return output;
             }
 
             template<typename T, typename... Args>
-            void registerOutput(const IRenderOutput::Name& name, Args&&... args){
+            std::shared_ptr<T> createOutput(const IRenderOutput::Name& name, Args&&... args){
                 static_assert(std::is_base_of<IRenderOutput, T>::value, "The type T must be derived from IRenderOutput");
-                registerOutput(name, std::static_pointer_cast<IRenderOutput>(std::make_shared<T>(std::forward<Args>(args)...)));
+                auto output = std::make_shared<T>(std::forward<Args>(args)...);
+                createOutput(name, std::static_pointer_cast<IRenderOutput>(output));
+                return output;
             }
         
         private:

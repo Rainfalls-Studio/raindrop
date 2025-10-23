@@ -88,4 +88,9 @@ namespace Raindrop::Render{
     void ImGuiModule::end(ImGuiService::Context& context){
         _service->end(context);
     }
+
+    ImGuiService& ImGuiModule::service(){
+        return *_service;
+    }
+
 }

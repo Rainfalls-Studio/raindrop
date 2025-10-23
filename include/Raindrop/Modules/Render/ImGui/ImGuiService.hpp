@@ -31,6 +31,7 @@ namespace Raindrop::Render{
 
             void begin(Context& context);
             void end(Context& context);
+            void render(Context& context);
 
         private:
             std::shared_ptr<RenderCoreModule> _core;

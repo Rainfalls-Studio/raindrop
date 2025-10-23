@@ -67,6 +67,9 @@ namespace Raindrop::Render{
         }
 
         auto& context = imgui->begin(_outputName, output);
+
+        ImGui::ShowDemoWindow();
+
         auto& storage = _loop.getOrEmplaceStorage<ImGuiStorage>();
 
         storage.context = &context;

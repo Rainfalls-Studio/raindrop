@@ -485,12 +485,6 @@ namespace Raindrop::Render{
             return {};
         }
 
-        static std::array<vk::Result, 3> validResults = {
-            vk::Result::eSuccess,
-            vk::Result::eSuboptimalKHR,
-            vk::Result::eErrorOutOfDateKHR
-        };
-
         vk::PresentInfoKHR info{};
         info.setSwapchains(_swapchain->swapchain)
             .setSwapchainCount(1)

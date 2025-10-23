@@ -3,13 +3,14 @@
 #include "Raindrop/Core/Modules/IModule.hpp"
 #include "Raindrop/Engine.hpp"
 #include "../Core/RenderCoreModule.hpp"
+#include "RenderGraph.hpp"
 
 #include <RenderGraph/FrameGraphPrerequisites.hpp>
 #include <RenderGraph/FrameGraph.hpp>
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Render{
-    class RenderGraphModule : public Modules::IModule{
+    class RenderGraphModule : public Modules::IModule, public std::enable_shared_from_this<RenderGraphModule>{
         public:
             RenderGraphModule();
             virtual ~RenderGraphModule() override;
@@ -23,8 +24,11 @@ namespace Raindrop::Render{
             inline virtual Modules::Result dependencyReload(const Name& dep) override;
             inline virtual Modules::Result dependencyShutdown(const Name& dep) override;
 
-            std::shared_ptr<crg::FrameGraph> createGraph(const std::string& name = "Render graph");
+            std::shared_ptr<RenderGraph> createGraph(const std::string& name = "Render graph");
             crg::GraphContext& context();
+            crg::ResourceHandler& resourceHandler();
+            std::shared_ptr<RenderCoreModule> core();
+
 
         private:
             Engine* _engine;
@@ -33,7 +37,6 @@ namespace Raindrop::Render{
 
             std::unique_ptr<crg::GraphContext> _context;
             std::unique_ptr<crg::ResourceHandler> _resourceHandler;
-            
 
             Modules::Result buildContext();
             void buildResourceHandler();

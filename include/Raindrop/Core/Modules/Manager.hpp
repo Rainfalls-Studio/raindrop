@@ -19,12 +19,12 @@ namespace Raindrop::Modules{
 
             template<typename T>
             void registerModule(){
-                registerModule(std::make_shared<T>());
+                registerModule(std::static_pointer_cast<IModule>(std::make_shared<T>()));
             }
 
             template<typename T, typename... Args>
             void registerModule(Args&&... args){
-                registerModule(std::make_shared<T>(std::forward<Args>(args)...));
+                registerModule(std::static_pointer_cast<IModule>(std::make_shared<T>(std::forward<Args>(args)...)));
             }
 
             [[nodiscard]] SharedModule getModule(const IModule::Name& name) noexcept;

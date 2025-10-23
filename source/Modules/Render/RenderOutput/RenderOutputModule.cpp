@@ -91,7 +91,7 @@ namespace Raindrop::Render{
         return it->second->output;
     }
 
-    void RenderOutputModule::registerOutput(const IRenderOutput::Name& name, SharedRenderOutput output){
+    void RenderOutputModule::createOutput(const IRenderOutput::Name& name, SharedRenderOutput output){
         spdlog::info("Registering and initializing render output \"{}\"", name);
         
         if (_outputs.count(name) > 0){

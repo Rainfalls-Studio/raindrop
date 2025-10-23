@@ -23,6 +23,8 @@ namespace Raindrop::Render{
             ImGuiService::Context& begin(const IRenderOutput::Name& target, SharedRenderOutput output);
             void end(ImGuiService::Context& context);
 
+            ImGuiService& service();
+
         private:
             Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;

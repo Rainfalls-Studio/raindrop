@@ -75,8 +75,13 @@ namespace Raindrop::Scheduler{
                     if (elapsed < period) {
                         return Tasks::TaskStatus::Retry(period - elapsed); // will be rescheduled with retry delay
                     }
-
                 }
+                
+                auto delta = (now - loopRuntime->lastRunTime).as<Time::milliseconds>().count();
+                
+                double d = static_cast<double>(delta);
+                double hz = 1000.0 / d;
+                spdlog::info("loop {} :: elta : {:.1f} ms or ~{:.1f} Hz", data->name, d, hz);
                 
                 loopRuntime->lastRunTime = now;
                 submitLoopIteration(*data);

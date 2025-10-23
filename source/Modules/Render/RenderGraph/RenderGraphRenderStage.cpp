@@ -9,79 +9,58 @@
 #include <RenderGraph/RunnableGraph.hpp>
 
 namespace Raindrop::Render{
+    RenderGraphRenderStage::RenderGraphRenderStage(std::weak_ptr<RenderGraph> graph) : 
+        _graph{graph}
+    {}
+
+
     void RenderGraphRenderStage::initialize(Scheduler::StageInitHelper& helper) {
         _loop = helper.loop();
         _engine = &helper.engine();
 
         _core = helper.modules().getModuleAs<RenderCoreModule>("RenderCore");
-        _weakRenderGraphModule = helper.modules().getModuleAs<RenderGraphModule>("RenderGraph");
     }
 
     void RenderGraphRenderStage::shutdown(){
         if (_core->device().waitIdle() != vk::Result::eSuccess){
             spdlog::error("Failed to wait device idle");
         }
-        
-        _runnableGraphs.clear();
     }
 
     const char* RenderGraphRenderStage::name() const{
         return "RenderGraphRender";
     }
 
-    void RenderGraphRenderStage::invalidate(){
-        for (auto& graph : _runnableGraphs){
-            graph.invalid = true;
-        }
-    }
-
     Scheduler::StageResult RenderGraphRenderStage::execute(){
         using namespace Scheduler;
 
-        auto& info = _loop.getOrEmplaceStorage<RenderInfo>();
-        auto& renderGraph = _loop.getOrEmplaceStorage<RenderGraph>();
+        auto graph = _graph.lock();
 
-
-        auto renderGraphModule = _weakRenderGraphModule.lock();
-
-        if (!renderGraphModule){
-            return StageResult::Skip("No render graph module");
+        if (!graph){
+            spdlog::warn("The render graph is not valid !");
+            return StageResult::Skip("The provided render graph is valid");
         }
+
+        auto& info = _loop.getOrEmplaceStorage<RenderInfo>();
         
         // if not available, just skip a frame
         if (!info.available){
             return StageResult::Skip("image is not available");
         }
 
-        // ! The if frameCount is less than runnableGraphs.size(). There may be resources in use destroyed
-        // TODO: fix
-        if (info.frameCount != _runnableGraphs.size()){
-            _runnableGraphs.resize(info.frameCount);
-        }
-
-        auto& graph = _runnableGraphs[info.currentFrame];
-
-        if (graph.invalid){
-            try{
-                graph.graph = renderGraph.frameGraph->compile(renderGraphModule->context());
-                graph.invalid = false;
-            } catch (...){} 
-        }
-
-        crg::SemaphoreWait submitWait{
-            info.imageAvailable,
-            VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT
-        };
-
+    
+        
         auto& queue = _core->graphicsQueue();
 
-        auto renderFinished = graph.graph->run(
-            {submitWait},
-            *queue
-        );
+        auto renderFinished = graph->run(*queue, info.imageAvailable);
 
-        info.renderFinishedFence = graph.graph->getFence();
-        info.renderFinishedSemaphore = renderFinished[0].semaphore;
+        if (renderFinished.success){
+            info.renderFinishedFence = renderFinished.fence;
+            info.renderFinishedSemaphore = renderFinished.semaphore;
+        } else {
+            info.renderFinishedFence = VK_NULL_HANDLE;
+            info.renderFinishedSemaphore = VK_NULL_HANDLE;
+        }
 
         return StageResult::Continue();
     }
