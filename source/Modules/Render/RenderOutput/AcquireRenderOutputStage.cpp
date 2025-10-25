@@ -52,7 +52,7 @@ namespace Raindrop::Render{
         // Acquire
         {
             auto result = output->acquire(renderInfo.renderFinishedFence);
-
+            
             if (!result){
                 renderInfo.available = false;
                 const auto& error = result.error();

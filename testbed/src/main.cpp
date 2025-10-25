@@ -4,7 +4,6 @@ using namespace Raindrop::Time::literals;
 
 class Testbed : public Raindrop::Modules::IModule{
     public:
-
         Testbed(){}
         virtual ~Testbed() override = default;
 
@@ -62,7 +61,7 @@ class Testbed : public Raindrop::Modules::IModule{
                     
                     return std::make_unique<Raindrop::Render::RenderSequencePass>(pass, ctx, runGraph,
                         MakeSteps(
-                            MakeStep<Raindrop::Render::RenderOutputBeginRenderPass>(_windowOutput),
+                            MakeStep<Raindrop::Render::RenderOutputBeginRenderPass>(_windowOutput, _graph),
                             MakeStep<Raindrop::Render::ImGuiRenderStep>(imguiMod, _windowOutput, "main"),
                             MakeStep<Raindrop::Render::RenderOutputEndRenderPass>(_windowOutput)
                         )
@@ -88,7 +87,7 @@ class Testbed : public Raindrop::Modules::IModule{
 
             // Create a window
             Raindrop::Window::WindowConfig config {
-                .resolution = {800, 600},
+                .resolution = {2560, 1400},
                 .position = {0, 0},
                 .title = "testbed",
                 .flags = {
@@ -125,7 +124,7 @@ class Testbed : public Raindrop::Modules::IModule{
                 // .addStage<Raindrop::Physics::PhysicsUpdateStage>(_gameplay);
             
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
-                .setPeriod(4_Hz)
+                // .setPeriod(4_Hz)
                 .addStage<Raindrop::Render::AcquireRenderOutputStage>("main")
                 // .addStage<Raindrop::Render::RenderGraphRecordStage>(_hud)
                 .addStage<Raindrop::Render::ImGuiBeginStage>("main")

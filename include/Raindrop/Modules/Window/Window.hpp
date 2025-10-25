@@ -21,6 +21,7 @@ namespace Raindrop::Window{
             glm::u32vec2 getResolution() const;
             std::string_view getTitle() const;
             Display getDisplay() const;
+            float scale() const;
 
 			std::vector<std::string_view> getInstanceExtensions();
 			std::expected<vk::SurfaceKHR, Error> createSurface(vk::Instance instance);

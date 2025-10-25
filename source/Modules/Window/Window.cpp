@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.hpp>
+#include <spdlog/spdlog.h>
 
 namespace Raindrop::Window{
     SDL_WindowFlags raindropToSDLFlags(WindowFlags flags){
@@ -82,5 +83,9 @@ namespace Raindrop::Window{
     Display Window::getDisplay() const{
         SDL_DisplayID id = SDL_GetDisplayForWindow(_window);
         return Display(id);
+    }
+
+    float Window::scale() const{
+        return SDL_GetWindowDisplayScale(_window);
     }
 }

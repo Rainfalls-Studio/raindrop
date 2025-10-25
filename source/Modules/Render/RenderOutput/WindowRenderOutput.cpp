@@ -118,8 +118,14 @@ namespace Raindrop::Render{
     }
 
     void WindowRenderOutput::findExtent(const vk::Extent2D& wanted){
-		_extent.width = std::clamp(wanted.width, _support.capabilities.minImageExtent.width, _support.capabilities.maxImageExtent.width);
-		_extent.height = std::clamp(wanted.height, _support.capabilities.minImageExtent.height, _support.capabilities.maxImageExtent.height);
+        const auto& caps = _support.capabilities;
+
+        if (caps.currentExtent.width != UINT32_MAX){
+            _extent = caps.currentExtent;
+        } else {
+		    _extent.width = std::clamp(wanted.width, _support.capabilities.minImageExtent.width, _support.capabilities.maxImageExtent.width);
+		    _extent.height = std::clamp(wanted.height, _support.capabilities.minImageExtent.height, _support.capabilities.maxImageExtent.height);
+        }
     }
 
     void WindowRenderOutput::shutdown(){
@@ -170,8 +176,7 @@ namespace Raindrop::Render{
         }
 
         {
-            auto result = getSupport();
-            if (!result){
+            if (auto result = getSupport(); !result.has_value()){
                 return std::unexpected(result.error());
             }
         }
@@ -183,7 +188,6 @@ namespace Raindrop::Render{
         findFrameCount();
         findExtent({resolution.x, resolution.y});
 
-
         vk::SwapchainCreateInfoKHR info;
         info.setSurface(_surface)
             .setOldSwapchain(_swapchain ? _swapchain->swapchain : nullptr)
@@ -192,7 +196,7 @@ namespace Raindrop::Render{
             .setClipped(vk::True)
             .setImageFormat(_surfaceFormat.format)
             .setMinImageCount(_frameCount)
-            .setImageExtent({resolution.x, resolution.y})
+            .setImageExtent(_extent)
             .setImageArrayLayers(1)
             .setPreTransform(_support.capabilities.currentTransform);
         
@@ -240,6 +244,9 @@ namespace Raindrop::Render{
 
         _swapchain = std::make_unique<Swapchain>(*_core, newSwapchain);
         _rebuildPending = false;
+
+        _currentFrame = 0;
+        _currentImage = 0;
 
         return getSwapchainImages()
             .and_then([this]{return createImageViews();})
@@ -488,7 +495,7 @@ namespace Raindrop::Render{
         vk::PresentInfoKHR info{};
         info.setSwapchains(_swapchain->swapchain)
             .setSwapchainCount(1)
-            .setImageIndices(_currentFrame);
+            .setImageIndices(_currentImage);
 
         
         if (finishedSemaphore){
@@ -499,6 +506,7 @@ namespace Raindrop::Render{
         
         result = _core->presentQueue()->presentKHR(info);
         _currentFrame = (_currentFrame + 1) % _frameCount;
+        
 
         switch (result){
             case vk::Result::eErrorOutOfDateKHR: [[fallthrough]];
@@ -619,5 +627,12 @@ namespace Raindrop::Render{
 
     vk::RenderPass WindowRenderOutput::renderPass() const{
         return _renderPass;
+    }
+
+    float WindowRenderOutput::scale() const{
+        if (auto lock = _window.lock()){
+            return lock->scale();
+        }
+        return 1.f;
     }
 }

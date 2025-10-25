@@ -67,6 +67,27 @@ namespace Raindrop::Render{
         }
 
         auto& context = imgui->begin(_outputName, output);
+        float scale = output->scale();
+
+        ImGuiStyle& style = ImGui::GetStyle();
+        ImGuiStyle styleold = style; // Backup colors
+        style = ImGuiStyle(); // IMPORTANT: ScaleAllSizes will change the original size, so we should reset all style config
+        style.WindowBorderSize = 1.0f;
+        style.ChildBorderSize  = 1.0f;
+        style.PopupBorderSize  = 1.0f;
+        style.FrameBorderSize  = 1.0f;
+        style.TabBorderSize    = 1.0f;
+        style.WindowRounding    = 0.0f;
+        style.ChildRounding     = 0.0f;
+        style.PopupRounding     = 0.0f;
+        style.FrameRounding     = 0.0f;
+        style.ScrollbarRounding = 0.0f;
+        style.GrabRounding      = 0.0f;
+        style.TabRounding       = 0.0f;
+        style.ScaleAllSizes(scale);
+        std::memcpy(style.Colors, styleold.Colors, sizeof(style.Colors));
+
+        ImGui::GetIO().FontGlobalScale = scale;
 
         ImGui::ShowDemoWindow();
 

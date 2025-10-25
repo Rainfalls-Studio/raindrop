@@ -54,7 +54,6 @@ namespace Raindrop::Render{
             uint32_t _currentBuffer = 0;
 
             uint32_t _wantedBufferCount = 1;
-            bool _pendingRecompile = true;
 
             void compileGraph(uint32_t index);
     };

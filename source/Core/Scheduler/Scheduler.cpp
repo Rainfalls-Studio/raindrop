@@ -77,11 +77,11 @@ namespace Raindrop::Scheduler{
                     }
                 }
                 
-                auto delta = (now - loopRuntime->lastRunTime).as<Time::milliseconds>().count();
+                // auto delta = (now - loopRuntime->lastRunTime).as<Time::milliseconds>().count();
                 
-                double d = static_cast<double>(delta);
-                double hz = 1000.0 / d;
-                spdlog::info("loop {} :: elta : {:.1f} ms or ~{:.1f} Hz", data->name, d, hz);
+                // double d = static_cast<double>(delta);
+                // double hz = 1000.0 / d;
+                // spdlog::info("loop {} :: delta : {:.1f} ms or ~{:.1f} Hz", data->name, d, hz);
                 
                 loopRuntime->lastRunTime = now;
                 submitLoopIteration(*data);

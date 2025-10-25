@@ -28,6 +28,8 @@ namespace Raindrop::Render{
             virtual vk::Image image() const override;
             virtual vk::Extent2D extent() const override;
             virtual vk::RenderPass renderPass() const override;
+            virtual float scale() const override;
+
 
             void invalidate();
 

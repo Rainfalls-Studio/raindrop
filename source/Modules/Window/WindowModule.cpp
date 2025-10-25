@@ -4,6 +4,7 @@
 #include "Raindrop/Core/Modules/InitHelper.hpp"
 #include "Raindrop/Engine.hpp"
 #include <SDL3/SDL.h>
+#include "Raindrop/Modules/Render/ImGui/backend/imgui_impl_sdl3.h"
 
 namespace Raindrop::Window{
     Modules::Result WindowModule::initialize(Modules::InitHelper& init){
@@ -268,8 +269,13 @@ namespace Raindrop::Window{
             .windows = _windows
         };
 
+        
         while (SDL_PollEvent(&e)){
-			switch (e.type){
+
+            if (ImGui::GetCurrentContext() != nullptr)
+                ImGui_ImplSDL3_ProcessEvent(&e);
+
+            switch (e.type){
 
 			case SDL_EVENT_TERMINATING: terminatingEvent(info); break;
 			case SDL_EVENT_LOW_MEMORY: lowMemoryEvent(info); break;

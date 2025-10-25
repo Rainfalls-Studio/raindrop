@@ -45,6 +45,11 @@ namespace Raindrop::Render{
         
         // if not available, just skip a frame
         if (!info.available){
+
+            // if a fram is skipped. The sync objects needs to be rebuilt (signaled semaphore has not been waited on)
+            // TODO: invalidate sync objects instead of whole graph
+            graph->invalidate();
+            
             return StageResult::Skip("image is not available");
         }
 

@@ -20,7 +20,9 @@ namespace Raindrop::Render{
     }
 
     void RenderGraph::invalidate(){
-        _pendingRecompile = true;
+        for (auto& g : _compiledGraphs){
+            g.pendingRecompile = true;
+        }
     }
 
     void RenderGraph::wantBufferCount(uint32_t count){
@@ -58,6 +60,8 @@ namespace Raindrop::Render{
             {crg::SemaphoreWait{toWait, VkPipelineStageFlags(semaphoreWaitStage)}},
             queue
         );
+
+        _currentBuffer = (_currentBuffer + 1) % _bufferCount;
 
         return SyncResult{
             .fence = vk::Fence(runnableGraph->getFence()),

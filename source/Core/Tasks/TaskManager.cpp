@@ -123,7 +123,7 @@ namespace Raindrop::Tasks{
                 }
             }
 
-            spdlog::trace("TaskManager::workerLoop: Running task {}", inst.ref->name);
+            // spdlog::trace("TaskManager::workerLoop: Running task {}", inst.ref->name);
 
             auto start = Time::now();
             TaskStatus res = TaskStatus::Failed();
