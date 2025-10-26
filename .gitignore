@@ -11,3 +11,4 @@ compile_commands.json
 vcpkg_installed/
 .qodo/
 trash/
+imgui.ini

@@ -53,7 +53,7 @@ class Testbed : public Raindrop::Modules::IModule{
             _graph = renderGraphMod->createGraph("MainGraph");
             auto& frameGraph = _graph->get();
 
-            auto& beginRenderPass = frameGraph.createPass("Main render target render", 
+            auto& swapchainPass = frameGraph.createPass("Main render target render", 
                 [&]( const crg::FramePass& pass, crg::GraphContext& ctx, crg::RunnableGraph& runGraph ) -> crg::RunnablePassPtr {
                     using Raindrop::Render::MakeStep;
                     using Raindrop::Render::MakeSteps;

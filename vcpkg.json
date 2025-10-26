@@ -10,7 +10,7 @@
     "rendergraph",
     {
       "name": "imgui",
-      "features": [ "vulkan-binding" ]
+      "features": [ "vulkan-binding", "docking-experimental" ]
     }
   ],
   "features": {

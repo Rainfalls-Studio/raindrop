@@ -194,6 +194,9 @@ namespace Raindrop::Render{
 
             throw std::runtime_error("Failed to create Vulkan fonts textures");
         }
+
+
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     }
 
     void ImGuiService::begin(Context& context){
