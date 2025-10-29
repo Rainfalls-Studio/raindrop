@@ -7,7 +7,9 @@ using namespace Raindrop::Time::literals;
 class Sim : public Raindrop::Modules::IModule{
     public:
         Sim(){}
-        virtual ~Sim() override = default;
+        virtual ~Sim() override{
+            _bufferCtx.reset();
+        }
 
         virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
             _engine = &init.engine();
@@ -21,7 +23,6 @@ class Sim : public Raindrop::Modules::IModule{
             _imGuiModule = init.getDependencyAs<Raindrop::ImGui::ImGuiModule>("ImGui");
 
             createWindow();
-            createRenderGraph();
             createGameplayLayer();
             createBufferContext();
             createImGuiContext();
@@ -64,40 +65,6 @@ class Sim : public Raindrop::Modules::IModule{
 
         void createImGuiContext(){
             _imGuiCtx = _imGuiModule->createContext(_windowOutput);
-        }
-        
-
-        void createRenderGraph(){
-            // auto& modules = _engine->getModuleManager();
-            // auto renderGraphMod = modules.getModuleAs<Raindrop::Render::RenderGraphModule>("RenderGraph");
-
-            // // the name does not serve as id but as debug and user identification
-            // _graph = renderGraphMod->createGraph("graph");
-            // auto& frameGraph = _graph->get();
-
-            // // auto& content = frameGraph.createPass("Content",
-            // //     [&]( const crg::FramePass& pass, crg::GraphContext& ctx, crg::RunnableGraph& runGraph ) -> crg::RunnablePassPtr {
-            // //         return std::make_unique<ContentPass>(pass, ctx, runGraph, contentImage);
-            // //     }
-            // // );
-
-            // auto& swapchainPass = frameGraph.createPass("Main render target render", 
-            //     [&]( const crg::FramePass& pass, crg::GraphContext& ctx, crg::RunnableGraph& runGraph ) -> crg::RunnablePassPtr {
-            //         using Raindrop::Render::MakeStep;
-            //         using Raindrop::Render::MakeSteps;
-            //         auto imguiMod = _engine->getModuleManager().getModuleAs<Raindrop::Render::ImGuiModule>("ImGui");
-                    
-            //         return std::make_unique<Raindrop::Render::RenderSequencePass>(pass, ctx, runGraph,
-            //             MakeSteps(
-            //                 MakeStep<Raindrop::Render::RenderOutputBeginRenderPass>(_windowOutput, _graph),
-            //                 MakeStep<Raindrop::Render::ImGuiRenderStep>(imguiMod, _windowOutput, "main"),
-            //                 MakeStep<Raindrop::Render::RenderOutputEndRenderPass>(_windowOutput)
-            //             )
-            //         );
-            //     }
-            // );
-
-            // // swapchainPass.dependsOn(content);
         }
 
         void createWindow(){
@@ -143,7 +110,7 @@ class Sim : public Raindrop::Modules::IModule{
             auto& scheduler = _engine->getScheduler();
 
             Raindrop::Scheduler::Loop updateLoop = scheduler.createLoop("Gameplay update")
-                .setPeriod(30_Hz)
+                .setPeriod(100_Hz)
                 .addStage<Raindrop::Window::EventStage>();
                 // .addStage<Raindrop::Scene::SceneUpdateStage>(_gameplay) // runs scene behaviors
                 // .addStage<Raindrop::Script::ScriptUpdateStage>(_gameplay); // run script updates
@@ -197,17 +164,16 @@ class Sim : public Raindrop::Modules::IModule{
 
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _renderCore;
         std::shared_ptr<Raindrop::ImGui::ImGuiModule> _imGuiModule;
+        std::shared_ptr<Raindrop::ImGui::ImGuiContext> _imGuiCtx;
 
 
         std::shared_ptr<Raindrop::Render::RenderCommandContext> _bufferCtx;
-        std::shared_ptr<Raindrop::ImGui::ImGuiContext> _imGuiCtx;
 
         std::shared_ptr<Raindrop::Window::Window> _window;
         std::shared_ptr<Raindrop::Render::IRenderOutput> _windowOutput;
 
         Raindrop::Layers::Layer _gameplay;
         Raindrop::Layers::Layer _debug;
-        std::shared_ptr<Raindrop::Render::RenderGraph> _graph;
 };
 
 

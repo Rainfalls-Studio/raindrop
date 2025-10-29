@@ -51,6 +51,7 @@ namespace Raindrop::Render{
     }
 
     RenderCommandContext::~RenderCommandContext(){
+        _skipFrame = true;
         waitForFences();
 
         destroyPool();
@@ -145,7 +146,7 @@ namespace Raindrop::Render{
         #endif
 
         auto& buffer = _buffers[_currentIndex];
-        buffer.inUse = false;
+        // buffer.inUse = false;
 
         auto cmdBuffer = buffer.cmdBuffer;
 
@@ -329,6 +330,7 @@ namespace Raindrop::Render{
         for (auto& buffer : _buffers){
             if (buffer.inUse){
                 fences.push_back(buffer.fence);
+                spdlog::info("waiting fence");
             }
         }
 
