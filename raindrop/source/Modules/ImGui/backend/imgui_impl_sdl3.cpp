@@ -63,7 +63,7 @@
 
 #include "imgui.h"
 #ifndef IMGUI_DISABLE
-#include "Raindrop/Modules/Render/ImGui/backend/imgui_impl_sdl3.h"
+#include "Raindrop/Modules/ImGui/backend/imgui_impl_sdl3.h"
 
 // Clang warnings with -Weverything
 #if defined(__clang__)

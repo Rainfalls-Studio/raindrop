@@ -10,7 +10,7 @@ namespace Raindrop::Scheduler{
             
             virtual const char* name() const = 0;
 
-            virtual void initialize(StageInitHelper& helper) = 0;
+            inline virtual void initialize(StageInitHelper& helper [[maybe_unused]]) {}
             virtual void shutdown() {}
             virtual StageResult execute() = 0;
         };

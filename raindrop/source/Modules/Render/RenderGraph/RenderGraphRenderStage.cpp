@@ -38,7 +38,7 @@ namespace Raindrop::Render{
 
         if (!graph){
             spdlog::warn("The render graph is not valid !");
-            return StageResult::Skip("The provided render graph is valid");
+            return StageResult::Skip("The provided render graph is not valid");
         }
 
         auto& info = _loop.getOrEmplaceStorage<RenderInfo>();

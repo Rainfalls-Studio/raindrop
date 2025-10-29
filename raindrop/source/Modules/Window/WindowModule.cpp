@@ -4,7 +4,7 @@
 #include "Raindrop/Core/Modules/InitHelper.hpp"
 #include "Raindrop/Engine.hpp"
 #include <SDL3/SDL.h>
-#include "Raindrop/Modules/Render/ImGui/backend/imgui_impl_sdl3.h"
+#include "Raindrop/Modules/ImGui/backend/imgui_impl_sdl3.h"
 
 namespace Raindrop::Window{
     Modules::Result WindowModule::initialize(Modules::InitHelper& init){
@@ -272,6 +272,7 @@ namespace Raindrop::Window{
         
         while (SDL_PollEvent(&e)){
 
+            // TODO: move this
             if (ImGui::GetCurrentContext() != nullptr)
                 ImGui_ImplSDL3_ProcessEvent(&e);
 

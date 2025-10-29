@@ -12,6 +12,13 @@ namespace Raindrop::Render{
     class Queue{
         friend class RenderCoreModule;
         public:
+
+            enum class Type{
+                GRAPHICS,
+                COMPUTE,
+                TRANSFER
+            };
+
             Queue() = default;
 
             inline const vk::Queue* operator->() const noexcept{
@@ -84,6 +91,8 @@ namespace Raindrop::Render{
 
             virtual Modules::Result dependencyReload(const Name& name) override;
             virtual Modules::Result dependencyShutdown(const Name& name) override;
+
+            
 
             inline vk::Instance instance() const noexcept{
                 return _vkInstance;

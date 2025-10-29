@@ -2,13 +2,73 @@
 
 #include <memory>
 #include <unordered_map>
-
-#include "../Core/RenderCoreModule.hpp"
+#include "Raindrop/Core/Scheduler/IStage.hpp"
+#include "Raindrop/Modules/Render/Core/RenderCommandContext.hpp"
 
 namespace Raindrop::Render{
     class IRenderOutput{
         public:
             using Name = std::string;
+
+            class BeginStage : public Scheduler::IStage{
+                public:
+                    BeginStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<RenderCommandContext> cmdCtx);
+
+                    virtual const char* name() const override;
+                    virtual Scheduler::StageResult execute() override;
+
+                private:
+                    std::weak_ptr<IRenderOutput> _output;
+                    std::weak_ptr<RenderCommandContext> _cmdCtx;
+            };
+
+            class EndStage : public Scheduler::IStage{
+                public:
+                    EndStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<RenderCommandContext> cmdCtx);
+
+                    virtual const char* name() const override;
+                    virtual Scheduler::StageResult execute() override;
+
+                private:
+                    std::weak_ptr<IRenderOutput> _output;
+                    std::weak_ptr<RenderCommandContext> _cmdCtx;
+            };
+
+            class PresentStage : public Scheduler::IStage{
+                public:
+                    PresentStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<RenderCommandContext> cmdCtx);
+
+                    virtual ~PresentStage() override = default;
+
+                    virtual const char* name() const override;
+
+                    virtual void initialize(Scheduler::StageInitHelper& helper) override;
+                    virtual void shutdown() override;
+                    virtual Scheduler::StageResult execute() override;
+                
+                private:
+                    Engine* _engine;
+                    std::weak_ptr<IRenderOutput> _output;
+                    std::weak_ptr<RenderCommandContext> _cmdCtx;
+            };
+
+            class AcquireStage : public Scheduler::IStage{
+                public:
+                    AcquireStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<RenderCommandContext> cmdCtx);
+
+                    virtual ~AcquireStage() override = default;
+
+                    virtual const char* name() const override;
+
+                    virtual void initialize(Scheduler::StageInitHelper& helper) override;
+                    virtual void shutdown() override;
+                    virtual Scheduler::StageResult execute() override;
+                
+                private:
+                    Engine* _engine;
+                    std::weak_ptr<IRenderOutput> _output;
+                    std::weak_ptr<RenderCommandContext> _cmdCtx;
+            };
 
             virtual ~IRenderOutput() = default;
 
@@ -16,14 +76,19 @@ namespace Raindrop::Render{
             virtual void shutdown() = 0;
 
             virtual std::expected<vk::Semaphore, Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) = 0;
-            virtual std::expected<void, Error> preRender(uint64_t timeout = UINT64_MAX) = 0;
-            virtual std::expected<void, Error> postRender(vk::Semaphore finishedSemaphore = {}) = 0;
+            virtual std::expected<void, Error> present(vk::Semaphore finishedSemaphore = {}) = 0;
 
             virtual uint32_t getCurrentBufferIndex() const = 0;
             virtual uint32_t getBufferCount() const = 0;
 
             virtual void begin(vk::CommandBuffer cmd, vk::SubpassContents subpassContents = vk::SubpassContents::eInline) = 0;
             virtual void end(vk::CommandBuffer cmd) = 0;
+
+            /**
+             * @brief Get if the previous 'acquire' call successfuly acquired the output
+             */
+            virtual bool wasAcquired() const = 0;
+
 
             virtual vk::Image image() const = 0;
             virtual vk::Extent2D extent() const = 0;

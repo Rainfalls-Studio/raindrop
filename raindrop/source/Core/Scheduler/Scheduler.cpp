@@ -5,9 +5,9 @@
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Scheduler{
-    Tasks::TaskStatus StageResultToTaskStatus(StageResult&& r){
+    Tasks::TaskStatus StageResultToTaskStatus(const char* name, StageResult&& r){
         switch (r.type){
-            case StageResult::SKIP: spdlog::warn("task skipped : {}", r.getSkip().reason); [[fallthrough]];
+            case StageResult::SKIP: spdlog::warn("task \"{}\" skipped : {}", name,  r.getSkip().reason); [[fallthrough]];
             case StageResult::CONTINUE: return Tasks::TaskStatus::Completed();
             case StageResult::RETRY_HOOK: return Tasks::TaskStatus::Retry(r.getRetry().waitDuration);
         }
@@ -111,7 +111,7 @@ namespace Raindrop::Scheduler{
         for (size_t i=stages.size(); i>0; i--) {
             auto& stage = stages[i-1];
             auto h = _taskManager.createTask(
-                [stage] -> Tasks::TaskStatus {return StageResultToTaskStatus(stage->execute());},
+                [stage] -> Tasks::TaskStatus {return StageResultToTaskStatus(stage->name(),  stage->execute());},
                 loop.executionPriority,
                 loop.name + " - stage: " + stage->name());
             if (prev.definition()) h.then(prev);

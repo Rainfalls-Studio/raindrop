@@ -2,10 +2,10 @@
 
 #include "Raindrop/Core/Modules/IModule.hpp"
 #include "Raindrop/Engine.hpp"
-#include "../Core/RenderCoreModule.hpp"
-#include "ImGuiService.hpp"
+#include "Raindrop/Modules/Render/Core/RenderCoreModule.hpp"
+#include "ImGuiContext.hpp"
 
-namespace Raindrop::Render{
+namespace Raindrop::ImGui{
     class ImGuiModule : public Modules::IModule{
         public:
             ImGuiModule();
@@ -20,23 +20,14 @@ namespace Raindrop::Render{
             inline virtual Modules::Result dependencyReload(const Name& dep) override;
             inline virtual Modules::Result dependencyShutdown(const Name& dep) override;
 
-            ImGuiService::Context& begin(const IRenderOutput::Name& target, SharedRenderOutput output);
-            void end(ImGuiService::Context& context);
-
-            ImGuiService& service();
+            std::shared_ptr<ImGuiContext> createContext(std::shared_ptr<Render::IRenderOutput> output);
 
         private:
             Engine* _engine;
-            std::shared_ptr<RenderCoreModule> _core;
+            std::shared_ptr<Render::RenderCoreModule> _core;
             std::shared_ptr<spdlog::logger> _logger;
 
-            std::unique_ptr<ImGuiService> _service;
-
             void createLogger();
-            Modules::Result createService();
-            void shutdownService();
-
-            void createDescriptor();
             void initializeImGui();
     };
 }

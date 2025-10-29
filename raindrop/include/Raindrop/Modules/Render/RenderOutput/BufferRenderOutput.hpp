@@ -24,7 +24,6 @@ namespace Raindrop::Render{
             virtual void begin(vk::CommandBuffer cmd, vk::SubpassContents subpassContents = vk::SubpassContents::eInline) override;
             virtual void end(vk::CommandBuffer cmd) override;
 
-            virtual bool wasAcquired() const override;
             virtual vk::Image image() const override;
             virtual vk::Extent2D extent() const override;
             virtual vk::RenderPass renderPass() const override;
@@ -40,6 +39,10 @@ namespace Raindrop::Render{
         private:
             RenderCoreModule* _core;
             Window::WeakWindow _window;
+
+            struct Buffer{
+                
+            };
 
             struct Swapchain{
                 struct Frame{
@@ -89,7 +92,6 @@ namespace Raindrop::Render{
             uint32_t _currentImage = 0;
 
             bool _rebuildPending = false;
-            bool _acquired = false;
 
             vk::SurfaceFormatKHR _wantedSurfaceFormat;
             vk::PresentModeKHR _wantedPresentMode;

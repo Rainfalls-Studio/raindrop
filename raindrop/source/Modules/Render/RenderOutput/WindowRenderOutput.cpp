@@ -1,7 +1,6 @@
 #include "Raindrop/Modules/Render/RenderOutput/WindowRenderOutput.hpp"
 #include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include <spdlog/spdlog.h>
-#include <array>
 
 // this will make the window use render pass
 // The absence of this define will make the window use only copy mechanism to render
@@ -431,6 +430,8 @@ namespace Raindrop::Render{
             return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
         }
 
+        _acquired = false;
+
         if (_rebuildPending){
             auto rebuildResult = rebuildSwapchain();
 
@@ -452,7 +453,7 @@ namespace Raindrop::Render{
             }
 
             // The framegraph already resets the fence
-            // device.resetFences(frame.fence);
+            // device.resetFences(fence);
         }
 
         auto result = device.acquireNextImageKHR(_swapchain->swapchain, timeout, frame.imageAvailable, VK_NULL_HANDLE, &_currentImage);
@@ -471,15 +472,11 @@ namespace Raindrop::Render{
             }
         }
 
+        _acquired = true;
         return frame.imageAvailable;
     }
 
-    std::expected<void, Error> WindowRenderOutput::preRender(uint64_t timeout [[maybe_unused]]){
-
-        return {};
-    }
-
-    std::expected<void, Error> WindowRenderOutput::postRender(vk::Semaphore finishedSemaphore){
+    std::expected<void, Error> WindowRenderOutput::present(vk::Semaphore finishedSemaphore){
 
         auto lock = _window.lock();
         if (!lock){
@@ -491,6 +488,8 @@ namespace Raindrop::Render{
             invalidate();
             return {};
         }
+
+        _acquired = false;
 
         vk::PresentInfoKHR info{};
         info.setSwapchains(_swapchain->swapchain)
@@ -534,9 +533,14 @@ namespace Raindrop::Render{
         #ifdef RENDERPASS
             auto& frame = _swapchain->frames[_currentFrame];
 
+            static Time::TimePoint start = Time::now();
+            Time::Duration a(Time::now() - start);
+
+            float s = static_cast<float>(a.as<Time::milliseconds>().count()) / 1000.f;
+
             vk::ClearValue clear{
                 vk::ClearColorValue(
-                    0.f, 0.f, 0.f, 0.f
+                    sin(s) * 0.5 + 0.5, cos(s) * 0.5 + 0.5, 0.f, 0.f
                 )
             };
 
@@ -635,4 +639,9 @@ namespace Raindrop::Render{
         }
         return 1.f;
     }
+
+    bool WindowRenderOutput::wasAcquired() const{
+        return _acquired;
+    }
+
 }
