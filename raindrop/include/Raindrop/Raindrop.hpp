@@ -34,7 +34,7 @@
 
 #include "Modules/Render/RenderOutput/RenderOutputModule.hpp"
 #include "Modules/Render/RenderOutput/WindowRenderOutput.hpp"
-#include "Modules/Render/RenderOutput/BlitToRenderOutputPass.hpp"
+#include "Modules/Render/RenderOutput/BufferRenderOutput.hpp"
 #include "Modules/Render/RenderOutput/RenderOutputBeginRenderPass.hpp"
 #include "Modules/Render/RenderOutput/RenderOutputEndRenderPass.hpp"
 

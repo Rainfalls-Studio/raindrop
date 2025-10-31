@@ -72,7 +72,7 @@ namespace Raindrop::Render{
 
             virtual ~IRenderOutput() = default;
 
-            virtual void initialize(Engine& engine) = 0;
+            virtual std::expected<void, Error> initialize(Engine& engine) = 0;
             virtual void shutdown() = 0;
 
             virtual std::expected<vk::Semaphore, Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) = 0;
@@ -90,7 +90,16 @@ namespace Raindrop::Render{
             virtual bool wasAcquired() const = 0;
 
 
-            virtual vk::Image image() const = 0;
+            virtual vk::Image currentColorImage(uint32_t attachment) const = 0;
+            virtual vk::ImageView currentColorImageView(uint32_t attachment) const = 0;
+            virtual vk::Image currentDepthStencilImage() const = 0;
+            virtual vk::ImageView currentDepthStencilImageView() const = 0;
+
+            virtual uint32_t colorAttachmentCount() const = 0;
+            virtual bool hasDepthAttachment() const = 0;
+
+            virtual uint64_t epoch() const = 0;
+            
             virtual vk::Extent2D extent() const = 0;
             virtual vk::RenderPass renderPass() const = 0;
             inline virtual float scale() const {return 1.f;}

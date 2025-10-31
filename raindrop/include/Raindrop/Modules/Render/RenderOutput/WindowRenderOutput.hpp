@@ -12,7 +12,7 @@ namespace Raindrop::Render{
             WindowRenderOutput(Window::SharedWindow window);
             virtual ~WindowRenderOutput() = default;
 
-            virtual void initialize(Engine& engine) override;
+            virtual std::expected<void, Error> initialize(Engine& engine) override;
             virtual void shutdown() override;
 
             virtual std::expected<vk::Semaphore, Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) override;
@@ -25,10 +25,20 @@ namespace Raindrop::Render{
             virtual void end(vk::CommandBuffer cmd) override;
 
             virtual bool wasAcquired() const override;
-            virtual vk::Image image() const override;
+
+            virtual vk::Image currentColorImage(uint32_t attachment) const override;
+            virtual vk::ImageView currentColorImageView(uint32_t attachment) const override;
+            virtual vk::Image currentDepthStencilImage() const override;
+            virtual vk::ImageView currentDepthStencilImageView() const override;
+
             virtual vk::Extent2D extent() const override;
             virtual vk::RenderPass renderPass() const override;
             virtual float scale() const override;
+
+            virtual uint32_t colorAttachmentCount() const override;
+            virtual bool hasDepthAttachment() const override;
+
+            virtual uint64_t epoch() const override;
 
 
             void invalidate();
@@ -84,6 +94,7 @@ namespace Raindrop::Render{
             vk::RenderPass _renderPass;
             SwapchainSupport _support;
             uint32_t _frameCount;
+            uint64_t _epoch;
 
             uint32_t _currentFrame = 0;
             uint32_t _currentImage = 0;

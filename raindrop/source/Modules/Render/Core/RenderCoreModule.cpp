@@ -1,3 +1,11 @@
+#include <vulkan/vulkan.h>
+
+// #define VMA_STATIC_VULKAN_FUNCTIONS 1
+// #define VMA_DYNAMIC_VULKAN_FUNCTIONS 0
+// #define VMA_VULKAN_VERSION 1003000
+
+#define VMA_IMPLEMENTATION 1
+
 #include "Raindrop/Modules/Render/Core/RenderCoreModule.hpp"
 #include "Raindrop/Core/Modules/InitHelper.hpp"
 
@@ -38,6 +46,7 @@ namespace Raindrop::Render{
                     case ErrorCode::NO_SUITABLE_PHYSICAL_DEVICE: return "No suitable physical device";
                     case ErrorCode::NO_COMPATIBLE_QUEUE_FAMILY: return "No compatible queue family";
                     case ErrorCode::FAILED_LOGICAL_DEVICE_CREATION: return "Failed logical device creation";
+                    case ErrorCode::FAILED_ALLOCATOR_CREATION: return "Failed allocator creation";
                     default: return "Unknown system error";
                 }
             }
@@ -63,6 +72,10 @@ namespace Raindrop::Render{
 
     void RenderCoreModule::destroyVulkan(){
         spdlog::info("Destroying vulkan...");
+
+        if (_allocator){
+            vmaDestroyAllocator(_allocator);
+        }
 
         if (_device){
             spdlog::trace("Destroying vulkan device...");
@@ -95,7 +108,8 @@ namespace Raindrop::Render{
             createInstance(init)
             .and_then([this, &init]{return findPhysicalDevice(init);})
             .and_then([this, &init]{return createDevice(init);})
-            .and_then([this] {return findQueues();});
+            .and_then([this] {return findQueues();})
+            .and_then([this]{return createVmaAllocator();});
         
         if (!result){
             auto& error = result.error();
@@ -123,7 +137,10 @@ namespace Raindrop::Render{
 
         auto result = builder
             .set_engine_name("Raindrop")
-            .set_minimum_instance_version(VK_VERSION_1_2)
+            .set_minimum_instance_version(VK_API_VERSION_1_4)
+            .set_engine_version(VK_API_VERSION_1_4)
+            .set_app_version(VK_API_VERSION_1_4)
+            .require_api_version(1, 4, 0)
             #ifndef NDEBUG
                 .set_debug_callback(&debugCallback)
                 .enable_validation_layers()
@@ -162,6 +179,7 @@ namespace Raindrop::Render{
         auto result = selector
             .prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
             .allow_any_gpu_device_type(false)
+            .set_minimum_version(1, 3)
             .select();
         
         if (!result){
@@ -266,6 +284,33 @@ namespace Raindrop::Render{
         if (!result){
             return std::unexpected(result.error());
         }
+        return {};
+    }
+
+    std::expected<void, Error> RenderCoreModule::createVmaAllocator(){
+
+        VmaVulkanFunctions vulkanFuncs{};
+        vulkanFuncs.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+        vulkanFuncs.vkGetDeviceProcAddr   = vkGetDeviceProcAddr;
+
+        VmaAllocatorCreateInfo info{
+            {},
+            static_cast<VkPhysicalDevice>(_vkPhysicalDevice),
+            static_cast<VkDevice>(_vkDevice),
+            0, // default size
+            nullptr,
+            nullptr,
+            nullptr,
+            &vulkanFuncs,
+            static_cast<VkInstance>(_vkInstance),
+            VK_API_VERSION_1_4,
+            nullptr
+        };
+
+        if (auto result = vmaCreateAllocator(&info, &_allocator); result != VK_SUCCESS){
+            return std::unexpected(Error(FailedAllocatorCreationError(), "Failed to create VMA Allocator : ", vk::to_string(vk::Result(result))));
+        }
+
         return {};
     }
 }

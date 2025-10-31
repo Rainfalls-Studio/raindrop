@@ -21,10 +21,12 @@ class Sim : public Raindrop::Modules::IModule{
 
             _renderCore = init.getDependencyAs<Raindrop::Render::RenderCoreModule>("RenderCore");
             _imGuiModule = init.getDependencyAs<Raindrop::ImGui::ImGuiModule>("ImGui");
+            _outputs = init.getDependencyAs<Raindrop::Render::RenderOutputModule>("RenderOutput");
 
             createWindow();
             createGameplayLayer();
             createBufferContext();
+            createOffscreenBuffer();
             createImGuiContext();
             setupLoops();
 
@@ -53,6 +55,42 @@ class Sim : public Raindrop::Modules::IModule{
         virtual bool critical() const noexcept override {
             return true;
         }
+
+        void createOffscreenBuffer(){
+            _offscreenBuffer =  _outputs->createOutput<Raindrop::Render::BufferRenderOutput>(
+                "offscreen",
+                _renderCore,
+                Raindrop::Render::BufferRenderOutput::Info{
+                    vk::Extent2D{
+                        1080,
+                        720
+                    },
+                    {
+                        Raindrop::Render::BufferRenderOutput::AttachmentDescription{
+                            "color attachment",
+                            vk::Format::eR8G8B8A8Unorm,
+                            vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled,
+                            vk::ClearValue{
+                                vk::ClearColorValue{
+                                    1.f, 0.f, 0.f, 1.f
+                                }
+                            }
+                        }
+                    },
+                    Raindrop::Render::BufferRenderOutput::AttachmentDescription{
+                        "depth attachment",
+                        vk::Format::eD16Unorm,
+                        vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eSampled,
+                        vk::ClearValue{
+                            vk::ClearDepthStencilValue{
+                                1.f, 0
+                            }
+                        }
+                    }
+                }
+            );
+        }
+
 
         void createBufferContext(){
             _bufferCtx = std::make_shared<Raindrop::Render::RenderCommandContext>(
@@ -114,21 +152,32 @@ class Sim : public Raindrop::Modules::IModule{
                 .addStage<Raindrop::Window::EventStage>();
                 // .addStage<Raindrop::Scene::SceneUpdateStage>(_gameplay) // runs scene behaviors
                 // .addStage<Raindrop::Script::ScriptUpdateStage>(_gameplay); // run script updates
-
-            Raindrop::Scheduler::Loop physicsLoop = scheduler.createLoop("Gameplay physics")
-                .setPeriod(30_Hz);
-                // .addStage<Raindrop::Physics::PhysicsUpdateStage>(_gameplay);
             
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
                 .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_windowOutput, _bufferCtx)
-                .addStage<Raindrop::ImGui::BeginStage>(_imGuiCtx)
-                .addStage<Raindrop::ImGui::EndStage>(_imGuiCtx)
-                .addStage<Raindrop::Render::RenderCommandContext::BeginStage>(_bufferCtx)
-                .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_windowOutput, _bufferCtx)
-                .addStage<Raindrop::ImGui::RenderStage>(_imGuiCtx, _bufferCtx)
-                .addStage<Raindrop::Render::IRenderOutput::EndStage>(_windowOutput, _bufferCtx)
-                .addStage<Raindrop::Render::RenderCommandContext::EndStage>(_bufferCtx)
-                .addStage<Raindrop::Render::RenderCommandContext::SubmitStage>(_bufferCtx, _renderCore->graphicsQueue())
+                    .addStage<Raindrop::Render::RenderCommandContext::BeginStage>(_bufferCtx)
+
+                        
+                        .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_offscreenBuffer, _bufferCtx)
+                            .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_offscreenBuffer, _bufferCtx)
+                                // .addStage<Raindrop::Scene::RenderStage>(_scene, _gameplayOutput, _bufferCtx)
+                            .addStage<Raindrop::Render::IRenderOutput::EndStage>(_offscreenBuffer, _bufferCtx)
+                        .addStage<Raindrop::Render::IRenderOutput::PresentStage>(_offscreenBuffer, _bufferCtx)
+                        
+
+                        .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_windowOutput, _bufferCtx)
+
+                            .addStage<Raindrop::ImGui::BeginStage>(_imGuiCtx)
+
+                            .addStage<Editor>()
+                            .addStage<ContentStage>(_offscreenBuffer)
+
+                            .addStage<Raindrop::ImGui::EndStage>(_imGuiCtx)
+                            .addStage<Raindrop::ImGui::RenderStage>(_imGuiCtx, _bufferCtx)
+
+                        .addStage<Raindrop::Render::IRenderOutput::EndStage>(_windowOutput, _bufferCtx)
+                    .addStage<Raindrop::Render::RenderCommandContext::EndStage>(_bufferCtx)
+                    .addStage<Raindrop::Render::RenderCommandContext::SubmitStage>(_bufferCtx, _renderCore->graphicsQueue())
                 .addStage<Raindrop::Render::IRenderOutput::PresentStage>(_windowOutput, _bufferCtx);
 
             scheduler.run(updateLoop);
@@ -163,6 +212,7 @@ class Sim : public Raindrop::Modules::IModule{
         Raindrop::Engine* _engine;
 
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _renderCore;
+        std::shared_ptr<Raindrop::Render::RenderOutputModule> _outputs;
         std::shared_ptr<Raindrop::ImGui::ImGuiModule> _imGuiModule;
         std::shared_ptr<Raindrop::ImGui::ImGuiContext> _imGuiCtx;
 
@@ -171,6 +221,8 @@ class Sim : public Raindrop::Modules::IModule{
 
         std::shared_ptr<Raindrop::Window::Window> _window;
         std::shared_ptr<Raindrop::Render::IRenderOutput> _windowOutput;
+
+        std::shared_ptr<Raindrop::Render::BufferRenderOutput> _offscreenBuffer;
 
         Raindrop::Layers::Layer _gameplay;
         Raindrop::Layers::Layer _debug;

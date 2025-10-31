@@ -27,6 +27,7 @@ class Editor : public Raindrop::Scheduler::IStage{
                 ImGuiWindowFlags_NoMove |
                 ImGuiWindowFlags_NoBringToFrontOnFocus |
                 ImGuiWindowFlags_NoNavFocus |
+                ImGuiWindowFlags_NoDecoration |
                 ImGuiWindowFlags_NoBackground;
 
             const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -35,20 +36,18 @@ class Editor : public Raindrop::Scheduler::IStage{
             ImGui::SetNextWindowViewport(viewport->ID);
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, 0 });
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
+            
 
             ImGui::Begin("DockspaceHost", nullptr, window_flags);
 
-            ImGui::PopStyleVar(2);
+            ImGui::PopStyleVar(3);
 
             ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
             ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
-            ImGui::End();
-
-            ImGui::Begin("Scene");
-            ImGui::Text("Scene view content");
             ImGui::End();
 
             return Raindrop::Scheduler::StageResult::Continue();

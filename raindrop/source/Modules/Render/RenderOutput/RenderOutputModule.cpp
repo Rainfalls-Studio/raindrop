@@ -65,7 +65,11 @@ namespace Raindrop::Render{
     void RenderOutputModule::initializeAllOutputs(){
         for (auto [it, info] : _outputs){
             spdlog::info("Initializing render output \"{}\"", it);
-            info->output->initialize(*_engine);
+
+            if (auto result = info->output->initialize(*_engine); !result){
+                auto& error = result.error();
+                spdlog::error("Failed to initialize render output \"{}\" : {}, {}", it, error.message(), error.reason());
+            }
         }
     }
 
@@ -80,7 +84,11 @@ namespace Raindrop::Render{
         for (auto [it, info] : _outputs){
             spdlog::info("Rebuilding render output \"{}\"", it);
             info->output->shutdown();
-            info->output->initialize(*_engine);
+
+            if (auto result = info->output->initialize(*_engine); !result){
+                auto& error = result.error();
+                spdlog::error("Failed to initialize render output \"{}\" : {}, {}", it, error.message(), error.reason());
+            }
         }
     }
 
@@ -98,7 +106,12 @@ namespace Raindrop::Render{
             spdlog::info("Overwriting existing output \"{}\"", name);
         }
         _outputs[name] = std::make_shared<RenderOutputInfo>(output, name);
-        output->initialize(*_engine);
+
+        if (auto result = output->initialize(*_engine); !result){
+            auto& error = result.error();
+            spdlog::error("Failed to initialize render output \"{}\" : {}, {}", name, error.message(), error.reason());
+        }
+
         findMainOutput();
     }
 

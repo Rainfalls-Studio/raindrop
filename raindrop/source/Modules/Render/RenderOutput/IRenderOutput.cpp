@@ -162,7 +162,7 @@ namespace Raindrop::Render{
             
             if (!result){
                 const auto& error = result.error();
-                return StageResult::Skip("Failed to acquire render output");
+                return StageResult::Skip("Failed to acquire render output - " + error.message() + " : " + error.reason());
             }
             
             if (!output->wasAcquired()){
@@ -174,8 +174,8 @@ namespace Raindrop::Render{
 
             if (imageAvailableSemaphore)
                 cmdCtx->waitFor(imageAvailableSemaphore);
-            else
-                cmdCtx->skipFrame();
+            // else
+                // cmdCtx->skipFrame();
         }
 
 

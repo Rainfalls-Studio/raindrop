@@ -53,13 +53,12 @@ namespace Raindrop::Render{
         _wantedFrameCount = 2;
     }
 
-    void WindowRenderOutput::initialize(Engine& engine){
+    std::expected<void, Error> WindowRenderOutput::initialize(Engine& engine){
         _core = engine.getModuleManager().getModuleAs<RenderCoreModule>("RenderCore").get();
 
         spdlog::info("Initializing window render output...");
 
-        auto result = 
-            createSurface()
+        return createSurface()
             .and_then([this]{return getSupport();})
             .transform([this]{findSurfaceFormat();})
             .and_then([this]{return createRenderPass();})
@@ -246,6 +245,7 @@ namespace Raindrop::Render{
 
         _currentFrame = 0;
         _currentImage = 0;
+        _epoch++;
 
         return getSwapchainImages()
             .and_then([this]{return createImageViews();})
@@ -617,8 +617,21 @@ namespace Raindrop::Render{
         #endif
     }
 
-    vk::Image WindowRenderOutput::image() const{
+
+    vk::Image WindowRenderOutput::currentColorImage(uint32_t) const{
         return _swapchain->images[_currentImage];
+    }
+
+    vk::ImageView WindowRenderOutput::currentColorImageView(uint32_t) const{
+        return _swapchain->frames[_currentFrame].imageView;
+    }
+
+    vk::Image WindowRenderOutput::currentDepthStencilImage() const{
+        return {};
+    }
+
+    vk::ImageView WindowRenderOutput::currentDepthStencilImageView() const{
+        return {};
     }
 
     vk::Extent2D WindowRenderOutput::extent() const{
@@ -644,4 +657,15 @@ namespace Raindrop::Render{
         return _acquired;
     }
 
+    uint32_t WindowRenderOutput::colorAttachmentCount() const{
+        return 1;
+    }
+
+    bool WindowRenderOutput::hasDepthAttachment() const{
+        return false;
+    }
+
+    uint64_t WindowRenderOutput::epoch() const{
+        return _epoch;
+    }
 }

@@ -4,6 +4,8 @@
 #include "Raindrop/Modules/Window/WindowModule.hpp"
 #include <VkBootstrap.h>
 
+#include <vk_mem_alloc.h>
+
 namespace Raindrop{
     class Engine;
 }
@@ -61,7 +63,8 @@ namespace Raindrop::Render{
                 NO_PRESENT_SUPPORT,
                 NO_SUITABLE_PHYSICAL_DEVICE,
                 NO_COMPATIBLE_QUEUE_FAMILY,
-                FAILED_LOGICAL_DEVICE_CREATION
+                FAILED_LOGICAL_DEVICE_CREATION,
+                FAILED_ALLOCATOR_CREATION
             };
 
             static std::error_category& error_category();
@@ -78,6 +81,7 @@ namespace Raindrop::Render{
             static inline std::error_code NoSuitablePhysicalDeviceError() {return make_error_code(ErrorCode::NO_SUITABLE_PHYSICAL_DEVICE);}
             static inline std::error_code NoCompatibleQueueFamilyError() {return make_error_code(ErrorCode::NO_COMPATIBLE_QUEUE_FAMILY);}
             static inline std::error_code FailedLogicalDeviceCreationError() {return make_error_code(ErrorCode::FAILED_LOGICAL_DEVICE_CREATION);}
+            static inline std::error_code FailedAllocatorCreationError() {return make_error_code(ErrorCode::FAILED_ALLOCATOR_CREATION);}
 
             RenderCoreModule();
             virtual ~RenderCoreModule() = default;
@@ -134,6 +138,10 @@ namespace Raindrop::Render{
                 return _presentQueue;
             }
 
+            inline VmaAllocator allocator() const noexcept{
+                return _allocator;
+            }
+
         private:
             struct InitData{
                 std::shared_ptr<Window::Window> window;
@@ -151,6 +159,8 @@ namespace Raindrop::Render{
             vk::PhysicalDevice _vkPhysicalDevice;
             vk::Device _vkDevice;
 
+            VmaAllocator _allocator;
+
             Queue _graphicsQueue;
             Queue _computeQueue;
             Queue _transferQueue;
@@ -163,5 +173,6 @@ namespace Raindrop::Render{
             std::expected<void, Error> findPhysicalDevice(InitData& init);
             std::expected<void, Error> createDevice(InitData& init);
             std::expected<void, Error> findQueues();
+            std::expected<void, Error> createVmaAllocator();
     };
 }
