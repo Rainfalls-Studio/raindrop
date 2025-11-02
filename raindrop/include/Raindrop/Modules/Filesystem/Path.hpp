@@ -2,6 +2,8 @@
 
 #include "Types.hpp"
 #include <filesystem>
+#include <format>
+#include <fmt/format.h>
 
 namespace Raindrop::Filesystem{
     class Path{
@@ -12,39 +14,39 @@ namespace Raindrop::Filesystem{
             Path(const String& str) : _storage{str}{}
             Path(const std::filesystem::path& path) : _storage{path}{}
 
-            void clear(){
+            inline void clear(){
                 _storage.clear();
             }
 
-            bool empty() const{
+            inline bool empty() const{
                 return _storage.empty();
             }
 
-            String filename() const{
+            inline String filename() const{
                 return String(_storage.filename());
             }
 
-            String extension() const{
+            inline String extension() const{
                 return String(_storage.extension());
             }
 
-            Path parent() const {
-                return String(_storage.parent_path());
+            inline Path parent() const {
+                return Path(_storage.parent_path());
             }
 
-            bool isAbsolute() const{
+            inline bool isAbsolute() const{
                 return _storage.is_absolute();
             }
 
-            bool isRelative() const{
+            inline bool isRelative() const{
                 return _storage.is_relative();
             }
 
-            Size size() const{
+            inline Size size() const{
                 return _storage.native().size();
             }
 
-            Path relativeTo(const Path& other) const{
+            inline Path relativeTo(const Path& other) const{
                 return Path(_storage.lexically_relative(other._storage));
             }
 
@@ -66,11 +68,46 @@ namespace Raindrop::Filesystem{
             decltype(auto) str() { return _storage.string(); }
             decltype(auto) str() const { return _storage.string(); }
 
-            Path operator/(const Path& other){
+            inline Path operator/(const Path& other){
                 return Path(_storage / other._storage);
             }
+
+            inline bool operator==(const Path& other) const{
+                return _storage == other._storage;
+            }
+
+            // inline std::size_t hash() const noexcept{
+            // }
+
+            friend class std::hash<Path>;
+            friend class std::formatter<Path>; // std::format
+            friend class fmt::formatter<Path>; // spdlog
 
         protected:
             std::filesystem::path _storage;
     };
 }
+
+namespace std{
+    template<>
+    struct hash<Raindrop::Filesystem::Path>{
+        std::size_t operator()(const Raindrop::Filesystem::Path& path) const noexcept{
+            static std::hash<std::filesystem::path> hash;
+            return hash(path._storage);
+        }
+    };
+
+    template <>
+    struct formatter<Raindrop::Filesystem::Path> : formatter<std::string>{
+        auto format(const Raindrop::Filesystem::Path& path, std::format_context& ctx) const {
+            return formatter<std::string>::format(path._storage.string(), ctx);
+        }
+    };
+}
+
+template <>
+struct fmt::formatter<Raindrop::Filesystem::Path> : fmt::formatter<std::string> {
+    auto format(const Raindrop::Filesystem::Path& path, fmt::format_context& ctx) const {
+        return fmt::formatter<std::string>::format(path._storage.string(), ctx);
+    }
+};

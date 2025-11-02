@@ -1,17 +1,19 @@
 #pragma once
 
 #include <cstdint>
+#include <expected>
+#include <Raindrop/Core/Error.hpp>
 
 namespace Raindrop::Asset{
 	class Asset{
 		public:
 			virtual ~Asset() = default;
 
-            virtual void load() = 0;
+            virtual std::expected<void, Error> load() = 0;
+            virtual std::expected<void, Error> reload() = 0;
+            virtual std::expected<void, Error> unload() = 0;
 
-            virtual void reload() = 0;
-
-            virtual void unload() = 0;
+            virtual bool isLoaded() = 0;
 
             virtual std::uint32_t getMemoryUsage() const = 0;
 	};

@@ -1,6 +1,7 @@
 #include <Raindrop/Raindrop.hpp>
 #include "Editor.hpp"
 #include "Content.hpp"
+#include "Planet.hpp"
 
 using namespace Raindrop::Time::literals;
 
@@ -14,23 +15,39 @@ class Sim : public Raindrop::Modules::IModule{
         virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
             _engine = &init.engine();
 
-            auto filesystem = init.getDependencyAs<Raindrop::Filesystem::FilesystemModule>("Filesystem");
-            Raindrop::Filesystem::Path parent = filesystem->getExecutableDirectory().parent();
-
-            filesystem->mount<Raindrop::Filesystem::FolderProvider>("{root}", 10, parent);
-
+            _filesystem= init.getDependencyAs<Raindrop::Filesystem::FilesystemModule>("Filesystem");
+            _assets = init.getDependencyAs<Raindrop::Asset::AssetModule>("Asset");
             _renderCore = init.getDependencyAs<Raindrop::Render::RenderCoreModule>("RenderCore");
             _imGuiModule = init.getDependencyAs<Raindrop::ImGui::ImGuiModule>("ImGui");
             _outputs = init.getDependencyAs<Raindrop::Render::RenderOutputModule>("RenderOutput");
 
+            setupMounts();
+            registerFactories();
             createWindow();
             createGameplayLayer();
             createBufferContext();
             createOffscreenBuffer();
             createImGuiContext();
+
+            _planet = std::make_shared<Planet>(*_engine, _offscreenBuffer);
+
             setupLoops();
 
             return Raindrop::Modules::Result::Success();
+        }
+
+        void setupMounts(){
+            Raindrop::Filesystem::Path parent = _filesystem->getExecutableDirectory().parent();
+
+            _filesystem->mount<Raindrop::Filesystem::FolderProvider>("{root}", 10, parent);
+            _filesystem->mount<Raindrop::Filesystem::FolderProvider>("{resources}", 10, parent/"resources");
+
+            spdlog::info("dir : {}", _filesystem->getExecutableDirectory());
+            spdlog::info("aa : {}", _filesystem->exists("{resources}/shaders"));
+        }
+
+        void registerFactories(){
+            _shaderFactory = _assets->emplaceFactory<Raindrop::Render::Shader, Raindrop::Render::ShaderFactory>(*_engine);
         }
 
         virtual Raindrop::Modules::DependencyList dependencies() const noexcept override{
@@ -44,7 +61,8 @@ class Sim : public Raindrop::Modules::IModule{
                 Dependency("Window"),
                 Dependency("Scene"),
                 Dependency("ImGui"),
-                Dependency("Filesystem")
+                Dependency("Filesystem"),
+                Dependency("Asset"),
             };
         }
 
@@ -74,7 +92,9 @@ class Sim : public Raindrop::Modules::IModule{
                                 vk::ClearColorValue{
                                     1.f, 0.f, 0.f, 1.f
                                 }
-                            }
+                            },
+                            vk::AttachmentLoadOp::eClear,
+                            vk::AttachmentStoreOp::eStore
                         }
                     },
                     Raindrop::Render::BufferRenderOutput::AttachmentDescription{
@@ -85,7 +105,9 @@ class Sim : public Raindrop::Modules::IModule{
                             vk::ClearDepthStencilValue{
                                 1.f, 0
                             }
-                        }
+                        },
+                        vk::AttachmentLoadOp::eClear,
+                        vk::AttachmentStoreOp::eStore
                     }
                 }
             );
@@ -157,22 +179,22 @@ class Sim : public Raindrop::Modules::IModule{
                 .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_windowOutput, _bufferCtx)
                     .addStage<Raindrop::Render::RenderCommandContext::BeginStage>(_bufferCtx)
 
-                        
+                        // offscreen render 
                         .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_offscreenBuffer, _bufferCtx)
                             .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_offscreenBuffer, _bufferCtx)
-                                // .addStage<Raindrop::Scene::RenderStage>(_scene, _gameplayOutput, _bufferCtx)
+                                // .addStage<Raindrop::Scene::RenderStage>(_gameplay, _offscreenBuffer, _bufferCtx)
+                                .addStage<Planet::RenderStage>(_planet, _offscreenBuffer, _bufferCtx)
                             .addStage<Raindrop::Render::IRenderOutput::EndStage>(_offscreenBuffer, _bufferCtx)
                         .addStage<Raindrop::Render::IRenderOutput::PresentStage>(_offscreenBuffer, _bufferCtx)
                         
-
+                        // Swapchain render
                         .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_windowOutput, _bufferCtx)
 
                             .addStage<Raindrop::ImGui::BeginStage>(_imGuiCtx)
-
-                            .addStage<Editor>()
-                            .addStage<ContentStage>(_offscreenBuffer)
-
+                                .addStage<Editor>()
+                                .addStage<ContentStage>(_offscreenBuffer)
                             .addStage<Raindrop::ImGui::EndStage>(_imGuiCtx)
+
                             .addStage<Raindrop::ImGui::RenderStage>(_imGuiCtx, _bufferCtx)
 
                         .addStage<Raindrop::Render::IRenderOutput::EndStage>(_windowOutput, _bufferCtx)
@@ -182,7 +204,6 @@ class Sim : public Raindrop::Modules::IModule{
 
             scheduler.run(updateLoop);
             scheduler.run(renderLoop);
-            // scheduler.run(physicsLoop);
         }
 
         void createGameplayLayer(){
@@ -211,10 +232,12 @@ class Sim : public Raindrop::Modules::IModule{
     private:
         Raindrop::Engine* _engine;
 
+        std::shared_ptr<Raindrop::Filesystem::FilesystemModule> _filesystem;
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _renderCore;
         std::shared_ptr<Raindrop::Render::RenderOutputModule> _outputs;
         std::shared_ptr<Raindrop::ImGui::ImGuiModule> _imGuiModule;
         std::shared_ptr<Raindrop::ImGui::ImGuiContext> _imGuiCtx;
+        std::shared_ptr<Raindrop::Asset::AssetModule> _assets;
 
 
         std::shared_ptr<Raindrop::Render::RenderCommandContext> _bufferCtx;
@@ -223,6 +246,9 @@ class Sim : public Raindrop::Modules::IModule{
         std::shared_ptr<Raindrop::Render::IRenderOutput> _windowOutput;
 
         std::shared_ptr<Raindrop::Render::BufferRenderOutput> _offscreenBuffer;
+        std::shared_ptr<Planet> _planet;
+
+        std::shared_ptr<Raindrop::Render::ShaderFactory> _shaderFactory;
 
         Raindrop::Layers::Layer _gameplay;
         Raindrop::Layers::Layer _debug;

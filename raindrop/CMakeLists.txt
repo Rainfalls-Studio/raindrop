@@ -38,6 +38,7 @@ find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(RenderGraph REQUIRED)
 find_package(ImGui REQUIRED)
+find_package(glslang REQUIRED)
 
 find_package(SDL3 REQUIRED) # Not specified in vcpkg.json as it's not currently supported on all linux distros (such as mine)
 
@@ -52,6 +53,7 @@ target_link_libraries(Raindrop
     GPUOpen::VulkanMemoryAllocator
     crg::RenderGraph
     imgui::imgui
+    glslang::glslang
 
     PUBLIC
     EnTT::EnTT

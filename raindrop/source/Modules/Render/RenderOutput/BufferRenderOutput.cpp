@@ -110,10 +110,10 @@ namespace Raindrop::Render{
                 {},
                 _depthDescription->format,
                 _sampleCount,
-                vk::AttachmentLoadOp::eDontCare,
-                vk::AttachmentStoreOp::eDontCare,
                 _depthDescription->load,
                 _depthDescription->store,
+                vk::AttachmentLoadOp::eDontCare,
+                vk::AttachmentStoreOp::eDontCare,
                 _depthDescription->initialLayout,
                 _depthDescription->finalLayout
             });

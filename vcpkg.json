@@ -9,6 +9,7 @@
     "vulkan-headers",
     "vulkan-memory-allocator",
     "rendergraph",
+    "glslang",
     {
       "name": "imgui",
       "features": [ "vulkan-binding", "docking-experimental" ]

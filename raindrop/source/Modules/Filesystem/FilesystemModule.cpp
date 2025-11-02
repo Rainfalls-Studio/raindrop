@@ -36,15 +36,15 @@ namespace Raindrop::Filesystem{
         
         #ifdef __WIN32
 
-        int bytes = GetModuleFileName(NULL, pBuf, len);
-        return bytes ? bytes : -1;
+            int bytes = GetModuleFileName(NULL, pBuf, len);
+            return bytes ? bytes : -1;
 
         #endif
 
         #ifdef __unix__
-        int bytes = std::min(static_cast<int>(readlink("/proc/self/exe", pBuf, len)), static_cast<int>(len - 1));
-        if(bytes >= 0)
-            pBuf[bytes] = '\0';
+            int bytes = std::min(static_cast<int>(readlink("/proc/self/exe", pBuf, len)), static_cast<int>(len - 1));
+            if(bytes >= 0)
+                pBuf[bytes] = '\0';
         #endif
         
         return Path(pBuf);

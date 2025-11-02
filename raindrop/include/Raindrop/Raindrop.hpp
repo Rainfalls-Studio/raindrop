@@ -10,6 +10,7 @@
 #include "Modules/Scene/SceneModule.hpp"
 #include "Modules/Scene/SceneTrait.hpp"
 #include "Modules/Scene/Entity.hpp"
+#include "Modules/Scene/RenderStage.hpp"
 #include "Modules/Scene/Behaviors/HierarchyAttacherBehavior.hpp"
 #include "Modules/Scene/Behaviors/TagAttacherBehavior.hpp"
 #include "Modules/Scene/Behaviors/TransformAttacherBehavior.hpp"
@@ -26,6 +27,9 @@
 
 #include "Modules/Render/Core/RenderCoreModule.hpp"
 #include "Modules/Render/Core/RenderCommandContext.hpp"
+
+#include "Modules/Render/Shaders/ShaderFactory.hpp"
+#include "Modules/Render/Shaders/Shader.hpp"
 
 #include "Modules/Render/RenderGraph/RenderGraphModule.hpp"
 #include "Modules/Render/RenderGraph/RenderGraphRenderStage.hpp"
