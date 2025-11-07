@@ -1,7 +1,8 @@
 #include <Raindrop/Raindrop.hpp>
 #include "Editor.hpp"
 #include "Content.hpp"
-#include "Planet.hpp"
+// #include "Planet.hpp"
+#include "planet/PlanetServiceBehavior.hpp"
 
 using namespace Raindrop::Time::literals;
 
@@ -28,8 +29,6 @@ class Sim : public Raindrop::Modules::IModule{
             createBufferContext();
             createOffscreenBuffer();
             createImGuiContext();
-
-            _planet = std::make_shared<Planet>(*_engine, _offscreenBuffer);
 
             setupLoops();
 
@@ -90,7 +89,7 @@ class Sim : public Raindrop::Modules::IModule{
                             vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eSampled,
                             vk::ClearValue{
                                 vk::ClearColorValue{
-                                    1.f, 0.f, 0.f, 1.f
+                                    0.f, 0.f, 0.f, 1.f
                                 }
                             },
                             vk::AttachmentLoadOp::eClear,
@@ -179,11 +178,12 @@ class Sim : public Raindrop::Modules::IModule{
                 .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_windowOutput, _bufferCtx)
                     .addStage<Raindrop::Render::RenderCommandContext::BeginStage>(_bufferCtx)
 
+                        // .addStage<Scene::PhaseStage>(_scene, Stage::PRE_RENDER)
+
                         // offscreen render 
                         .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_offscreenBuffer, _bufferCtx)
                             .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_offscreenBuffer, _bufferCtx)
-                                // .addStage<Raindrop::Scene::RenderStage>(_gameplay, _offscreenBuffer, _bufferCtx)
-                                .addStage<Planet::RenderStage>(_planet, _offscreenBuffer, _bufferCtx)
+                                // .addStage<Planet::RenderStage>(_scene, _offscreenBuffer, _bufferCtx)
                             .addStage<Raindrop::Render::IRenderOutput::EndStage>(_offscreenBuffer, _bufferCtx)
                         .addStage<Raindrop::Render::IRenderOutput::PresentStage>(_offscreenBuffer, _bufferCtx)
                         
@@ -213,10 +213,21 @@ class Sim : public Raindrop::Modules::IModule{
             _gameplay = layers.createLayer();
             auto& scene = sceneModule->emplaceTrait(_gameplay).scene;
 
+            // Not ticked behaviors
             scene.emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
             scene.emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
             scene.emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
-            scene.emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>();
+            
+            _preUpdateStage = scene.createStage("Pre Update");
+            _updateStage = scene.createStage("Update");
+            _renderStage = scene.createStage("Render");
+
+            scene.addToStage(_preUpdateStage, scene.emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>());
+
+            scene.addToStage(_updateStage, scene.emplaceBehavior<Planet::ServiceBehavior>());
+            // scene.emplaceBehavior<Planet::PreRenderBehavior>().in(Stage::PreRender); // collects visible chunks and 
+            // scene.emplaceBehavior<Planet::RenderBehavior>().in(Stage::Render);
+
         }
 
         virtual Raindrop::Modules::Result dependencyReload(const Name& dependency) override {
@@ -232,6 +243,10 @@ class Sim : public Raindrop::Modules::IModule{
     private:
         Raindrop::Engine* _engine;
 
+        Raindrop::Scene::StageID _preUpdateStage;
+        Raindrop::Scene::StageID _updateStage;
+        Raindrop::Scene::StageID _renderStage;
+
         std::shared_ptr<Raindrop::Filesystem::FilesystemModule> _filesystem;
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _renderCore;
         std::shared_ptr<Raindrop::Render::RenderOutputModule> _outputs;
@@ -246,7 +261,8 @@ class Sim : public Raindrop::Modules::IModule{
         std::shared_ptr<Raindrop::Render::IRenderOutput> _windowOutput;
 
         std::shared_ptr<Raindrop::Render::BufferRenderOutput> _offscreenBuffer;
-        std::shared_ptr<Planet> _planet;
+
+        std::shared_ptr<Raindrop::Scene::Scene> _scene;
 
         std::shared_ptr<Raindrop::Render::ShaderFactory> _shaderFactory;
 

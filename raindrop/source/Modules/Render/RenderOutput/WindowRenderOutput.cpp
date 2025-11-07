@@ -13,7 +13,7 @@ namespace Raindrop::Render{
     {}
 
     WindowRenderOutput::Swapchain::~Swapchain(){
-        auto device = core.device();
+        auto device = core.deviceManager().device();
 
         Queue& presentQueue = core.presentQueue();
         Queue& graphicsQueue = core.graphicsQueue();
@@ -130,14 +130,14 @@ namespace Raindrop::Render{
         spdlog::trace("Destroying swapchain...");
         _swapchain.reset();
 
-        auto device = _core->device();
+        auto& deviceManager = _core->deviceManager();
 
         if (_renderPass){
-            device.destroyRenderPass(_renderPass);
+            deviceManager.device().destroyRenderPass(_renderPass);
         }
 
         if (_surface){
-            _core->instance().destroySurfaceKHR(_surface);
+            deviceManager.instance().destroySurfaceKHR(_surface);
         }
     }
 
@@ -150,7 +150,7 @@ namespace Raindrop::Render{
         }
 
         spdlog::info("Creating a vulkan surface...");
-        auto result = window->createSurface(_core->instance());
+        auto result = window->createSurface(_core->deviceManager().instance());
         if (!result){
             auto& error = result.error();
             spdlog::error("Failed to create surface : {} : {}", error.message(), error.reason());
@@ -163,7 +163,7 @@ namespace Raindrop::Render{
 
     std::expected<void, Error> WindowRenderOutput::rebuildSwapchain(){
         auto window = _window.lock();
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         if (auto result = device.waitIdle(); result != vk::Result::eSuccess){
             spdlog::warn("Failed to wait vulkan device idle : {} ", vk::to_string(result));
@@ -256,9 +256,11 @@ namespace Raindrop::Render{
     std::expected<void, Error> WindowRenderOutput::getSupport(){
         auto core = *_core;
 
-        _support.presentModes = core.physicalDevice().getSurfacePresentModesKHR(_surface).value;
-        _support.formats = core.physicalDevice().getSurfaceFormatsKHR(_surface).value;
-        _support.capabilities = core.physicalDevice().getSurfaceCapabilitiesKHR(_surface).value;
+        auto physicalDevice = core.deviceManager().physicalDevice();
+
+        _support.presentModes = physicalDevice.getSurfacePresentModesKHR(_surface).value;
+        _support.formats = physicalDevice.getSurfaceFormatsKHR(_surface).value;
+        _support.capabilities = physicalDevice.getSurfaceCapabilitiesKHR(_surface).value;
 
         if (_support.supported()){
             return {};
@@ -270,8 +272,10 @@ namespace Raindrop::Render{
     std::expected<void, Error> WindowRenderOutput::getSwapchainImages(){
         std::vector<vk::Image> images;
 
+        auto device = _core->deviceManager().device();
+
         {
-            auto result = _core->device().getSwapchainImagesKHR(_swapchain->swapchain);
+            auto result = device.getSwapchainImagesKHR(_swapchain->swapchain);
             
             if (result.result != vk::Result::eSuccess){
                 spdlog::error("Failed to get swapchain images : {}", vk::to_string(result.result));
@@ -288,7 +292,7 @@ namespace Raindrop::Render{
     }
 
     std::expected<void, Error> WindowRenderOutput::createImageViews(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         for (size_t i=0; i<_frameCount; i++){
             auto& frame = _swapchain->frames[i];
@@ -322,7 +326,7 @@ namespace Raindrop::Render{
 
 
     std::expected<void, Error> WindowRenderOutput::createFramebuffers(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         for (size_t i=0; i<_frameCount; i++){
             auto& frame = _swapchain->frames[i];
@@ -349,7 +353,7 @@ namespace Raindrop::Render{
 
 
     std::expected<void, Error> WindowRenderOutput::createSyncObjects(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
 		vk::SemaphoreCreateInfo semaphoreInfo;
 
@@ -372,7 +376,7 @@ namespace Raindrop::Render{
 
         vk::RenderPassCreateInfo info;
 
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         vk::AttachmentDescription colorAttachment(
             vk::AttachmentDescriptionFlags(),
@@ -441,7 +445,7 @@ namespace Raindrop::Render{
             return nullptr;
         }
 
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
         auto& frame = _swapchain->frames[_currentFrame];
 
         if (fence != nullptr){

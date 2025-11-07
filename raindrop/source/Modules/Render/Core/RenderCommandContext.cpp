@@ -60,7 +60,7 @@ namespace Raindrop::Render{
     }
 
     void RenderCommandContext::destroyPool(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         if (_pool){
             device.destroyCommandPool(_pool);
@@ -86,7 +86,7 @@ namespace Raindrop::Render{
             familyIndex
         };
         
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         // create pool
         {
@@ -190,7 +190,7 @@ namespace Raindrop::Render{
         );
 
         // std::vector<vk::CommandBuffer>
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
         auto result = device.allocateCommandBuffers(info);
 
         if (result.result != vk::Result::eSuccess){
@@ -228,7 +228,7 @@ namespace Raindrop::Render{
     }
 
     std::expected<void, Error> RenderCommandContext::createFences(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         vk::FenceCreateInfo info{
             vk::FenceCreateFlagBits::eSignaled
@@ -249,7 +249,7 @@ namespace Raindrop::Render{
     }
 
     std::expected<void, Error> RenderCommandContext::createSemaphores(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         vk::SemaphoreCreateInfo info{};
 
@@ -269,7 +269,7 @@ namespace Raindrop::Render{
 
 
     void RenderCommandContext::freeCommandBuffers(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         std::vector<vk::CommandBuffer> cmdBuffers(_bufferCount);
         for (size_t i=0; i<_bufferCount; i++){
@@ -283,7 +283,7 @@ namespace Raindrop::Render{
     }
 
     void RenderCommandContext::destroyFences(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         for (auto& buffer : _buffers){
             device.destroyFence(buffer.fence);    
@@ -291,7 +291,7 @@ namespace Raindrop::Render{
     }
 
     void RenderCommandContext::destroySemaphores(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         for (auto& buffer : _buffers){
             device.destroySemaphore(buffer.semaphore);
@@ -323,7 +323,7 @@ namespace Raindrop::Render{
     }
 
     void RenderCommandContext::waitForFences(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         std::vector<vk::Fence> fences;
 
@@ -437,7 +437,7 @@ namespace Raindrop::Render{
             return Scheduler::StageResult::Continue();
         }
 
-        auto device = ctx->core()->device();
+        auto device = ctx->core()->deviceManager().device();
 
         auto& buffer = ctx->currentBuffer();
 

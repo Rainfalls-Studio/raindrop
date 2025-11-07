@@ -27,11 +27,45 @@ class Planet{
         ~Planet();
 
     private:
+        enum Face{
+            X,
+            Y,
+            Z
+        };
+
+        struct ChunkNode{
+            int8_t face; // X, -X, Y, -Y, Z, -Y
+            uint8_t lod;
+            glm::vec2 uvMin;
+            glm::vec2 uvMax;
+            float angularSize;
+            ChunkNode* children[4];
+            ChunkNode* parent;
+        };
+
+        std::array<ChunkNode, 6> _faces;
+
+        struct PlanetGPU{
+            vk::Buffer _vertexBuffer;
+            VmaAllocation _vertexAllocation;
+
+            vk::Buffer _indexBuffer;
+            VmaAllocation _indexAllocation;
+
+            vk::Buffer _instanceBuffer;
+            VmaAllocation _instanceAllocation;
+
+            uint32_t _vertexCount;
+            uint32_t _indexCount;
+            uint32_t _instanceCount;
+            uint32_t _maxInstanceCount;
+        };
+
+        PlanetGPU _gpu;
+
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _core;
         std::shared_ptr<Raindrop::Asset::AssetModule> _assets;
 
-        vk::Buffer _vertexBuffer;
-        vk::Buffer _indexBuffer;
 
         vk::Pipeline _pipeline;
         vk::PipelineLayout _pipelineLayout;
@@ -41,8 +75,9 @@ class Planet{
         std::shared_ptr<Raindrop::Render::IRenderOutput> _output;
 
         glm::quat _rotation = glm::quat(0.f, {1.f, 0.f, 0.f});
-        float _scale = 1.f;
 
         void createPipelineLayout();
         void createPipeline();
+        void createGridMesh(uint32_t xcells, uint32_t ycells);
+        void createInstanceBuffer();
 };

@@ -1,22 +1,18 @@
 #version 450
 #pragma shader_stage(vertex)
 
-struct Vertex{
-	vec2 position;
-	vec3 color;
+layout(push_constant, std430) uniform pc{
+	mat4 transform;
+	mat4 viewTransform;
 };
 
-Vertex vertices[] = {
-	{{0, -0.5}, {1.0, 0.0, 0.0}},
-	{{0.5, 0.5}, {0.0, 1.0, 0.0}},
-	{{-0.5, 0.5}, {0.0, 0.0, 1.0}}
-};
+layout (location = 0) in vec3 vert_pos;
+layout (location = 1) in vec2 vert_UV;
 
 layout (location = 0) out vec3 frag_color;
 
 void main(){
-	const Vertex vertex = vertices[gl_VertexIndex];
 
-	frag_color = vertex.color;
-	gl_Position = vec4(vertex.position, 0.0, 1.0);
+	frag_color = vec3(1.0);
+	gl_Position = viewTransform * transform * vec4(vert_pos, 1.0);
 }

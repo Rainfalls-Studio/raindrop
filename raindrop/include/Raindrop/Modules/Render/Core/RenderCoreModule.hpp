@@ -4,6 +4,8 @@
 #include "Raindrop/Modules/Window/WindowModule.hpp"
 #include <VkBootstrap.h>
 
+#include "DeviceManager.hpp"
+
 #include <vk_mem_alloc.h>
 
 namespace Raindrop{
@@ -96,31 +98,7 @@ namespace Raindrop::Render{
             virtual Modules::Result dependencyReload(const Name& name) override;
             virtual Modules::Result dependencyShutdown(const Name& name) override;
 
-            
-
-            inline vk::Instance instance() const noexcept{
-                return _vkInstance;
-            }
-
-            inline vk::Device device() const noexcept{
-                return _vkDevice;
-            }
-
-            inline vk::PhysicalDevice physicalDevice() const noexcept{
-                return _vkPhysicalDevice;
-            }
-
-            inline vkb::Instance vkbInstance() const noexcept{
-                return _instance;
-            }
-
-            inline vkb::Device vkbDevice() const noexcept{
-                return _device;
-            }
-
-            inline vkb::PhysicalDevice vkbPhysicalDevice() const noexcept{
-                return _physicalDevice;
-            }
+            DeviceManager& deviceManager() noexcept;
 
             inline Queue& graphicsQueue() noexcept{
                 return _graphicsQueue;
@@ -149,15 +127,9 @@ namespace Raindrop::Render{
             };
 
             Engine* _engine;
-            std::shared_ptr<Window::WindowModule> _window;
+            std::shared_ptr<Window::WindowModule> _windowModule;
 
-            vkb::Instance _instance;
-            vkb::PhysicalDevice _physicalDevice;
-            vkb::Device _device;
-
-            vk::Instance _vkInstance;
-            vk::PhysicalDevice _vkPhysicalDevice;
-            vk::Device _vkDevice;
+            DeviceManager _deviceManager;
 
             VmaAllocator _allocator;
 
@@ -166,12 +138,6 @@ namespace Raindrop::Render{
             Queue _transferQueue;
             Queue _presentQueue;
 
-            void destroyVulkan();
-            Modules::Result initVulkan();
-
-            std::expected<void, Error> createInstance(InitData& init);
-            std::expected<void, Error> findPhysicalDevice(InitData& init);
-            std::expected<void, Error> createDevice(InitData& init);
             std::expected<void, Error> findQueues();
             std::expected<void, Error> createVmaAllocator();
     };

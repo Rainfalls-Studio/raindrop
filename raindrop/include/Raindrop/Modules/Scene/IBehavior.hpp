@@ -12,5 +12,7 @@ namespace Raindrop::Scene{
 
             virtual void initialize(Engine& engine, Scene& scene);
             virtual void shutdown();
+
+            inline virtual void execute(){}
     };
 }

@@ -22,7 +22,7 @@ namespace Raindrop::Render{
     }
 
     void RenderGraphRenderStage::shutdown(){
-        if (_core->device().waitIdle() != vk::Result::eSuccess){
+        if (_core->deviceManager().device().waitIdle() != vk::Result::eSuccess){
             spdlog::error("Failed to wait device idle");
         }
     }

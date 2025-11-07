@@ -46,7 +46,7 @@ namespace Raindrop::Render{
     }
 
     void BufferRenderOutput::destroyBuffer(Buffer& buffer){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         if (buffer.framebuffer){
             device.destroyFramebuffer(buffer.framebuffer);
@@ -62,7 +62,7 @@ namespace Raindrop::Render{
     }
 
     void BufferRenderOutput::destroyAttachment(Attachment& attachment){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
         auto allocator = _core->allocator();
 
         device.destroyImageView(attachment.imageView);
@@ -75,7 +75,8 @@ namespace Raindrop::Render{
     }
 
     void BufferRenderOutput::shutdown(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
+
         destroyBuffers();
         device.destroyRenderPass(_renderPass);
     }
@@ -96,7 +97,7 @@ namespace Raindrop::Render{
     }
 
     std::expected<void, Error> BufferRenderOutput::createRenderPass(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         std::vector<vk::AttachmentDescription> attachments;
 
@@ -268,7 +269,7 @@ namespace Raindrop::Render{
 
     std::expected<vk::Framebuffer, Error> BufferRenderOutput::createFramebuffer(const Buffer& buffer){
         
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         std::vector<vk::ImageView> attachments(buffer.colorAttachments.size() + (buffer.depthAttachment.has_value() ? 1 : 0));
 
@@ -354,7 +355,7 @@ namespace Raindrop::Render{
     }
 
     std::expected<vk::ImageView, Error> BufferRenderOutput::createAttachmentImageView(const AttachmentDescription& description, vk::Image image, bool isDepth){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         vk::ImageViewCreateInfo info{
             {},

@@ -61,158 +61,42 @@ namespace Raindrop::Render{
 
     Modules::Result RenderCoreModule::initialize(Modules::InitHelper& helper){
         _engine = &helper.engine();
-        _window = std::dynamic_pointer_cast<Window::WindowModule>(helper.dependencies().at("Window"));
+        _windowModule = std::dynamic_pointer_cast<Window::WindowModule>(helper.dependencies().at("Window"));
 
-        return initVulkan();
-    }
+        vk::SurfaceKHR surface = VK_NULL_HANDLE;
+        std::shared_ptr<Window::Window> window;
 
-    void RenderCoreModule::shutdown(){
-        destroyVulkan();
-    }
-
-    void RenderCoreModule::destroyVulkan(){
-        spdlog::info("Destroying vulkan...");
-
-        if (_allocator){
-            vmaDestroyAllocator(_allocator);
+        if (_windowModule){
+            window = _windowModule->createWindow(Window::WindowConfig::Empty());
         }
 
-        if (_device){
-            spdlog::trace("Destroying vulkan device...");
-            vkDeviceWaitIdle(_device);
-            vkb::destroy_device(_device);
+        auto result = _deviceManager.initialize(surface, window)
+            .and_then([&]{return findQueues();})
+            .and_then([&]{return createVmaAllocator();});
+
+        if (surface){
+            _deviceManager.instance().destroySurfaceKHR(surface);
         }
 
-        if (_instance){
-            spdlog::trace("Destroying vulkan instance...");
-            vkb::destroy_instance(_instance);
-        }
-    }
-
-    Modules::Result RenderCoreModule::initVulkan(){
-        spdlog::info("Initializing vulkan...");
-
-        std::shared_ptr<Window::Window> empty;
-
-        if (_window){
-            spdlog::trace("Window system available. Creating empty window for surface presentation...");
-            empty = _window->createWindow(Window::WindowConfig::Empty());
-        }
-
-        InitData init{
-            .window = empty,
-            .surface = VK_NULL_HANDLE
-        };
-
-        auto result =
-            createInstance(init)
-            .and_then([this, &init]{return findPhysicalDevice(init);})
-            .and_then([this, &init]{return createDevice(init);})
-            .and_then([this] {return findQueues();})
-            .and_then([this]{return createVmaAllocator();});
-        
         if (!result){
-            auto& error = result.error();
-            spdlog::error("Failed to initialize vulkan : {}", error.message());
-            return Modules::Result::Error("Failed to initialize vulkan");
-        }
-
-        if (_window){
-            vkDestroySurfaceKHR(_instance, init.surface, _instance.allocation_callbacks);
-            init.window.reset();
+            const auto& error = result.error();
+            return Modules::Result::Error(error.message() + " " + error.reason());
         }
 
         return Modules::Result::Success();
     }
 
-    std::expected<void, Error> RenderCoreModule::createInstance(InitData& init){
-        vkb::InstanceBuilder builder;
-
-        if (init.window){
-            auto extensions = init.window->getInstanceExtensions();
-            for (const auto& ext : extensions){
-                builder.enable_extension(ext.data());
-            }
-        }
-
-        auto result = builder
-            .set_engine_name("Raindrop")
-            .set_minimum_instance_version(VK_API_VERSION_1_4)
-            .set_engine_version(VK_API_VERSION_1_4)
-            .set_app_version(VK_API_VERSION_1_4)
-            .require_api_version(1, 4, 0)
-            #ifndef NDEBUG
-                .set_debug_callback(&debugCallback)
-                .enable_validation_layers()
-            #endif
-            .build();
-
-        if (!result){
-            const auto& error = result.error();
-            spdlog::error("Failed to create vulkan instance : {}", error.message());
-            return std::unexpected(Error(FailedInstanceCreationError(), "Failed to create vulkan instance : {}", error.message()));
-        }
-
-        _instance = *result;
-        _vkInstance = _instance;
-
-        return {};
+    DeviceManager& RenderCoreModule::deviceManager() noexcept{
+        return _deviceManager;
     }
 
-    std::expected<void, Error> RenderCoreModule::findPhysicalDevice(InitData& init){
-        vkb::PhysicalDeviceSelector selector(_instance);
+
+    void RenderCoreModule::shutdown(){
+        if (_allocator){
+            vmaDestroyAllocator(_allocator);
+        }
         
-        if (init.window){
-            spdlog::trace("Creating window surface...");
-            auto result = init.window->createSurface(_vkInstance);
-
-            if (!result){
-                auto& error = result.error();
-                spdlog::error("Failed to create window surface {} : {} ", error.message(), error.reason());
-                return std::unexpected(Error(FailedSurfaceCreationError(), "Failed to create window surface : {}, {}", error.message(), error.reason()));
-            }
-
-            init.surface = *result;
-            selector.set_surface(init.surface);
-        }
-
-        auto result = selector
-            .prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
-            .allow_any_gpu_device_type(false)
-            .set_minimum_version(1, 3)
-            .select();
-        
-        if (!result){
-            const auto& error = result.error();
-            spdlog::error("Failed to find physical device : {} ", error.message());
-            return std::unexpected(Error(NoSuitablePhysicalDeviceError(), "Failed to find physical device : {}", error.message()));
-        }
-
-        auto device = result.value();
-
-        spdlog::info("Physical device found: {} ", device.name);
-
-        _physicalDevice = device;
-        _vkPhysicalDevice = _physicalDevice;
-
-        return {};
-    }
-
-    std::expected<void, Error> RenderCoreModule::createDevice(InitData&){
-        vkb::DeviceBuilder builder(_physicalDevice);
-
-        auto result = builder.build();
-
-        if (!result){
-            const auto& error = result.error();
-            spdlog::error("Failed to create logical device : {}", error.message());
-            return std::unexpected(Error(FailedLogicalDeviceCreationError(), "Failed to create logical device : {}", error.message()));
-        }
-
-        _device = *result;
-        _vkDevice = _device;
-
-        return {};
+        _deviceManager.shutdown();
     }
 
     RenderCoreModule::Name RenderCoreModule::name() const noexcept{
@@ -227,9 +111,9 @@ namespace Raindrop::Render{
 
     Modules::Result RenderCoreModule::dependencyReload(const Name& name){
         if (name == "Window"){
-            _window = _engine->getModuleManager().getModuleAs<Window::WindowModule>("Window");
-            destroyVulkan();
-            return initVulkan();
+            _windowModule = _engine->getModuleManager().getModuleAs<Window::WindowModule>("Window");
+            // destroyVulkan();
+            // return initVulkan();
         }
 
         return Modules::Result::Success();
@@ -237,18 +121,20 @@ namespace Raindrop::Render{
 
     Modules::Result RenderCoreModule::dependencyShutdown(const Name& name){
         if (name == "Window"){
-            _window.reset();
-            destroyVulkan();
-            return initVulkan();
+            _windowModule.reset();
+            // destroyVulkan();
+            // return initVulkan();
         }
 
         return Modules::Result::Success();
     }
 
     std::expected<void, Error> RenderCoreModule::findQueues(){
-        auto getQueue = [this] (Queue& queue, vkb::QueueType type) -> std::expected<void, Error> {
-            auto vkbQueue = _device.get_queue(type);
-            auto index = _device.get_queue_index(type);
+        auto device = _deviceManager.vkbDevice();
+
+        auto getQueue = [&] (Queue& queue, vkb::QueueType type) -> std::expected<void, Error> {
+            auto vkbQueue = device.get_queue(type);
+            auto index = device.get_queue_index(type);
 
             if (!vkbQueue || !index){
                 const auto& error = vkbQueue.error();
@@ -272,7 +158,7 @@ namespace Raindrop::Render{
                 default: break; 
             }
 
-            queue = Queue(_vkDevice, vkbQueue.value(), flags, index.value());
+            queue = Queue(device.device, vkbQueue.value(), flags, index.value());
             return {};
         };
 
@@ -295,14 +181,14 @@ namespace Raindrop::Render{
 
         VmaAllocatorCreateInfo info{
             {},
-            static_cast<VkPhysicalDevice>(_vkPhysicalDevice),
-            static_cast<VkDevice>(_vkDevice),
+            static_cast<VkPhysicalDevice>(_deviceManager.physicalDevice()),
+            static_cast<VkDevice>(_deviceManager.device()),
             0, // default size
             nullptr,
             nullptr,
             nullptr,
             &vulkanFuncs,
-            static_cast<VkInstance>(_vkInstance),
+            static_cast<VkInstance>(_deviceManager.instance()),
             VK_API_VERSION_1_4,
             nullptr
         };

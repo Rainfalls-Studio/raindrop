@@ -81,6 +81,11 @@ namespace Raindrop::Time{
             constexpr TimePoint operator+(const Duration& duration) const {
                 return TimePoint(_value + duration.as<ns>().count());
             }
+
+            template<typename DurationT>
+            constexpr DurationT as() const {
+                return std::chrono::duration_cast<DurationT>(ns(_value));
+            }
             
 
         private:

@@ -35,7 +35,7 @@ namespace Raindrop::ImGui{
     }
 
     vk::DescriptorPool ImGuiContext::createDescriptorPool(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         vk::DescriptorPoolSize sizes[] = {
             { vk::DescriptorType::eSampler, 1000 },
@@ -68,7 +68,7 @@ namespace Raindrop::ImGui{
     }
 
     void ImGuiContext::destroyDescriptorPool(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         device.destroyDescriptorPool(_pool);
     }
@@ -108,10 +108,12 @@ namespace Raindrop::ImGui{
         }
 
         ImGui_ImplVulkan_InitInfo info{};
+
+        auto& deviceManager = _core->deviceManager();
         
-        info.Device = _core->device();
-        info.PhysicalDevice = _core->physicalDevice();
-        info.Instance = _core->instance();
+        info.Device = deviceManager.device();
+        info.PhysicalDevice = deviceManager.physicalDevice();
+        info.Instance = deviceManager.instance();
         
         auto graphicsQueue = _core->graphicsQueue();
         info.Queue = *graphicsQueue;

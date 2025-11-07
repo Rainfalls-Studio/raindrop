@@ -19,7 +19,7 @@ class ContentStage : public Raindrop::Scheduler::IStage{
         }
 
         virtual void shutdown() override{
-            auto device = _core->device();
+            auto device = _core->deviceManager().device();
             if (device.waitIdle() != vk::Result::eSuccess){
                 spdlog::warn("Failed to wait for device idle");
             }
@@ -92,7 +92,7 @@ class ContentStage : public Raindrop::Scheduler::IStage{
                 vk::False
             };
 
-            auto device = _core->device();
+            auto device = _core->deviceManager().device();
 
             if (auto result = device.createSampler(info); result.result != vk::Result::eSuccess){
                 throw std::runtime_error("Failed to create sampler");

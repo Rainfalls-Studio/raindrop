@@ -70,7 +70,7 @@ namespace Raindrop::Render{
     }
 
     std::expected<void, Error> Shader::unload(){
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         if (_module){
             device.destroyShaderModule(_module);
@@ -103,7 +103,7 @@ namespace Raindrop::Render{
             _code.data()
         };
 
-        auto device = _core->device();
+        auto device = _core->deviceManager().device();
 
         if (auto result = device.createShaderModule(info); result.result == vk::Result::eSuccess){
             return result.value;

@@ -11,7 +11,7 @@ namespace Raindrop::Behaviors{
     }
 
     void HierarchyTransformPropagator::preUpdate(){
-        auto view = _scene->view<Components::Hierarchy, Components::Transform>();
+        auto view = _scene->registry().view<Components::Hierarchy, Components::Transform>();
 
         std::queue<Scene::EntityHandle> toProcess;
         std::unordered_set<Scene::EntityHandle> processed;

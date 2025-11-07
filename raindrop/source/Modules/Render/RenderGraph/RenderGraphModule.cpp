@@ -37,13 +37,15 @@ namespace Raindrop::Render{
 
     Modules::Result RenderGraphModule::buildContext(){
         spdlog::trace("Building frame graph context...");
+
+        auto& deviceManager = _core->deviceManager();
         try{
             _context = std::make_unique<crg::GraphContext>(
-                _core->device(),
+                deviceManager.device(),
                 VK_NULL_HANDLE,
                 nullptr,
-                _core->physicalDevice().getMemoryProperties(),
-                _core->physicalDevice().getProperties(),
+                deviceManager.physicalDevice().getMemoryProperties(),
+                deviceManager.physicalDevice().getProperties(),
                 false,
                 &vkGetDeviceProcAddr
             );
@@ -72,7 +74,7 @@ namespace Raindrop::Render{
     }
     
     void RenderGraphModule::shutdown(){
-        if (auto result = _core->device().waitIdle(); result != vk::Result::eSuccess){
+        if (auto result = _core->deviceManager().device().waitIdle(); result != vk::Result::eSuccess){
             spdlog::error("Failed to wait for vk device to be idle : \"{}\"", vk::to_string(result));
         }
         
