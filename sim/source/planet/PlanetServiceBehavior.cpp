@@ -27,7 +27,8 @@ namespace Planet{
             id = _freeIDs.front();
             _freeIDs.pop_front();
         }
-
+        
+        _planets[id].valid = true;
         return id;
     }
 
@@ -42,6 +43,9 @@ namespace Planet{
         _freeIDs.push_back(id);
     }
 
+    PlanetRenderData ServiceBehavior::constructPlanetRenderData(){
+        return PlanetRenderData{_renderCore, PlanetRenderData::Config{32, 32}};
+    }
 
 
     // ----------------------------------------------------------------------------------
@@ -51,12 +55,211 @@ namespace Planet{
 
 
     PlanetRenderData::PlanetRenderData(std::shared_ptr<Raindrop::Render::RenderCoreModule> renderCore, const Config& conf) : _renderCore(renderCore){
-
+        createVertexBuffer(conf);
+        createIndexBuffer(conf);
     }
 
     PlanetRenderData::~PlanetRenderData(){
+        if (!_renderCore) return;
+        auto allocator = _renderCore->allocator();
+
+        if (grid.index.buffer){
+            vmaDestroyBuffer(
+                allocator,
+                grid.index.buffer,
+                grid.index.allocation
+            );
+        }
+
+        if (grid.vertex.buffer){
+            vmaDestroyBuffer(
+                allocator,
+                grid.vertex.buffer,
+                grid.vertex.allocation
+            );
+        }
+    }
+
+
+    void PlanetRenderData::createVertexBuffer(const Config& config){
+        std::vector<Vertex> vertices;
+
+        const uint32_t xcells = config.xcells;
+        const uint32_t ycells = config.ycells;
+
+        vertices.reserve((xcells + 1) * (ycells + 1));
+        
+        // generating the geometry
+        for (uint32_t y = 0; y <= ycells; ++y) {
+            for (uint32_t x = 0; x <= xcells; ++x) {
+                Vertex v{
+                    .position = glm::vec3(
+                        static_cast<float>(x) * (1.f / float(xcells)) - 0.5f,
+                        static_cast<float>(y) * (1.f / float(xcells)) - 0.5f,
+                        0.0f
+                    ),
+
+                    .uv = glm::vec2(
+                        static_cast<float>(x) / static_cast<float>(xcells),
+                        static_cast<float>(y) / static_cast<float>(ycells)
+                    )
+                };
+
+                vertices.push_back(v);
+            }
+        }
+
+        // buffer creation
+        auto allocator = _renderCore->allocator();
+        size_t size = vertices.size() * sizeof(Vertex);
+
+        vk::BufferCreateInfo info(
+            {},
+            static_cast<vk::DeviceSize>(size),
+            vk::BufferUsageFlagBits::eVertexBuffer,
+            vk::SharingMode::eExclusive,
+            {}, {}
+        );
+
+        VmaAllocationCreateInfo allocationInfo{
+            {},
+            VMA_MEMORY_USAGE_CPU_TO_GPU, // host visible buffer. I don't want to make staging system right now
+            0,
+            0,
+            0,
+            nullptr,
+            nullptr,
+            0.1f
+        };
+
+        VkBuffer buffer;
+        auto& allocation = grid.vertex.allocation;
+        
+        vmaCreateBuffer(
+            allocator,
+            reinterpret_cast<VkBufferCreateInfo*>(&info),
+            &allocationInfo,
+            &buffer,
+            &allocation,
+            nullptr
+        );
+
+        grid.vertex.buffer = buffer;
+
+        // submit the data
+        void* data;
+
+        vmaMapMemory(
+            allocator,
+            allocation,
+            &data
+        );
+
+        std::memcpy(data, vertices.data(), size);
+
+        vmaUnmapMemory(
+            allocator,
+            allocation
+        );
+
+        vmaFlushAllocation(
+            allocator,
+            allocation,
+            0,
+            size
+        );
 
     }
+
+    void PlanetRenderData::createIndexBuffer(const Config& config){
+        std::vector<uint32_t> indices;
+
+        const uint32_t xcells = config.xcells;
+        const uint32_t ycells = config.ycells;
+
+        indices.reserve(xcells * ycells * 6);
+
+        for (uint32_t y = 0; y < ycells; ++y) {
+            for (uint32_t x = 0; x < xcells; ++x) {
+                uint32_t i0 = y * (xcells + 1) + x;
+                uint32_t i1 = i0 + 1;
+                uint32_t i2 = i0 + (xcells + 1);
+                uint32_t i3 = i2 + 1;
+
+                // triangle 1
+                indices.push_back(i0);
+                indices.push_back(i2);
+                indices.push_back(i1);
+
+                // triangle 2
+                indices.push_back(i1);
+                indices.push_back(i2);
+                indices.push_back(i3);
+            }
+        }
+
+        auto allocator = _renderCore->allocator();
+
+        size_t size = indices.size() * sizeof(uint32_t);
+        grid.index.count = static_cast<uint32_t>(indices.size());
+
+        vk::BufferCreateInfo info(
+            {},
+            static_cast<vk::DeviceSize>(size),
+            vk::BufferUsageFlagBits::eIndexBuffer,
+            vk::SharingMode::eExclusive,
+            {}, {}
+        );
+
+
+        VmaAllocationCreateInfo allocationInfo{
+            {},
+            VMA_MEMORY_USAGE_CPU_TO_GPU, // host visible buffer. I don't want to make staging system right now
+            0,
+            0,
+            0,
+            nullptr,
+            nullptr,
+            0.1f
+        };
+
+        VkBuffer buffer;
+        auto& allocation = grid.index.allocation;
+        
+        vmaCreateBuffer(
+            allocator,
+            reinterpret_cast<VkBufferCreateInfo*>(&info),
+            &allocationInfo,
+            &buffer,
+            &allocation,
+            nullptr
+        );
+
+        grid.index.buffer = buffer;
+
+        void* data;
+
+        vmaMapMemory(
+            allocator,
+            allocation,
+            &data
+        );
+
+        std::memcpy(data, indices.data(), size);
+
+        vmaUnmapMemory(
+            allocator,
+            allocation
+        );
+
+        vmaFlushAllocation(
+            allocator,
+            allocation,
+            0,
+            size
+        );
+    }
+
 
     std::pair<vk::Buffer, VmaAllocation> PlanetRenderData::createStaginBuffer(size_t size){
         auto allocator = _renderCore->allocator();

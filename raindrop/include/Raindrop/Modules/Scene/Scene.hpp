@@ -12,8 +12,8 @@ namespace Raindrop::Scene{
     using BehaviorID = uint32_t;
     static constexpr BehaviorID INVALID_BEHAVIOR_ID = ~static_cast<BehaviorID>(0);
     
-    using StageID = uint32_t;
-    static constexpr StageID INVALID_STAGE_ID = ~static_cast<StageID>(0);
+    using PhaseID = uint32_t;
+    static constexpr PhaseID INVALID_PHASE_ID = ~static_cast<PhaseID>(0);
 
     class Entity;
     class IBehavior;
@@ -29,6 +29,8 @@ namespace Raindrop::Scene{
              * @param engine 
              */
             void initialize(Engine& engine);
+
+            void shutdown();
 
             /**
              * @brief creates a new entity
@@ -107,6 +109,11 @@ namespace Raindrop::Scene{
              */
             BehaviorID getBehaviorIndex(std::type_index type);
 
+            template<typename T>
+            inline BehaviorID getBehaviorIndex(){
+                return getBehaviorIndex(typeid(T));
+            }
+
             /**
              * @brief Emplace a behavior
              * 
@@ -143,17 +150,17 @@ namespace Raindrop::Scene{
             std::shared_ptr<IBehavior> getBehaviorFromType(std::type_index type);
 
             template<typename T>
-            inline T& getBehavior(BehaviorID id);
+            inline std::shared_ptr<T> getBehavior(BehaviorID id);
 
             template<typename T>
-            inline T& getBehaviorFromType();
+            inline std::shared_ptr<T> getBehaviorFromType();
 
             
-            StageID createStage(std::string_view name);
-            void destroyStage(StageID stage);
-            std::string_view stageName(StageID stage);
-            void executeStage(StageID stage);
-            void addToStage(StageID stage, BehaviorID behavior);
+            PhaseID createPhase(std::string_view name);
+            void destroyPhase(PhaseID phase);
+            std::string_view phaseName(PhaseID phase);
+            void executePhase(PhaseID phase);
+            void addToPhase(PhaseID phase, BehaviorID behavior);
 
 
             entt::basic_registry<EntityHandle>& registry();
@@ -167,17 +174,17 @@ namespace Raindrop::Scene{
             std::unordered_map<std::type_index, BehaviorID> _typeToIndex;
             std::deque<BehaviorID> _freeBehaviorIDs;
 
-            struct StageContent{
+            struct PhaseContent{
 
-                // the list of behaviors to execute in the stage, in execution order
+                // the list of behaviors to execute in the phase, in execution order
                 std::vector<BehaviorID> behaviors;
                 
                 // it's name for debug and development
                 std::string name;
             };
 
-            std::vector<StageContent> _stages;
-            std::deque<StageID> _freeStageID;
+            std::vector<PhaseContent> _phases;
+            std::deque<PhaseID> _freePhaseID;
 
 
 

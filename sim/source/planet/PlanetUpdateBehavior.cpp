@@ -26,6 +26,10 @@ namespace Planet{
             glm::vec3 lodAnchorOrigin = glm::vec3(0.f);
             {
                 auto anchor = planet.lodAnchor;
+
+                if (anchor == Raindrop::Scene::INVALID_ENTITY_HANDLE)
+                    continue;
+
                 if (!_scene->hasAllComponents<Transform>(anchor)){
                     continue;
                 }

@@ -5,12 +5,12 @@
 
 namespace Planet{
     struct PlanetComponent{
-        float radius;
-        uint8_t maxLOD;
-        PlanetID id;
-        Raindrop::Scene::EntityHandle lodAnchor;
+        float radius = 1.f;
+        uint8_t maxLOD = 1;
+        PlanetID id = INVALID_PLANET_ID;
+        Raindrop::Scene::EntityHandle lodAnchor = Raindrop::Scene::INVALID_ENTITY_HANDLE;
 
         // component has been updated
-        bool dirty;
+        bool dirty = true;
     };
 }

@@ -10,6 +10,10 @@ namespace Raindrop::Scene{
         _engine = &engine;
     }
 
+    void Scene::shutdown(){
+        foreachBehavior([](IBehavior& behavior){behavior.shutdown();});
+    }
+
     Entity Scene::createEntity(){
         Entity entity = Entity(this, _registry.create());
         foreachBehavior([&entity](IBehavior& behavior){behavior.onCreate(entity);});
@@ -30,6 +34,8 @@ namespace Raindrop::Scene{
     BehaviorID Scene::addBehavior(std::type_index index, std::shared_ptr<IBehavior>&& behavior){
 
         BehaviorID id = INVALID_BEHAVIOR_ID;
+        
+        behavior->initialize(*_engine, *this);
 
         // if there are no free IDs
         if (_freeBehaviorIDs.empty()){
@@ -41,6 +47,7 @@ namespace Raindrop::Scene{
             _freeBehaviorIDs.pop_front();
             _behaviors[id] = std::move(behavior);
         }
+
 
         _typeToIndex[index] = id;
         return id;
@@ -79,31 +86,31 @@ namespace Raindrop::Scene{
     }
 
 
-    StageID Scene::createStage(std::string_view name){
-        StageID id = INVALID_STAGE_ID;
+    PhaseID Scene::createPhase(std::string_view name){
+        PhaseID id = INVALID_PHASE_ID;
 
-        if (_freeStageID.empty()){
-            id = static_cast<StageID>(_stages.size());
-            _stages.emplace_back(StageContent{{}, std::string(name)});
+        if (_freePhaseID.empty()){
+            id = static_cast<PhaseID>(_phases.size());
+            _phases.emplace_back(PhaseContent{{}, std::string(name)});
         } else {
-            id = _freeStageID.front();
-            _freeStageID.pop_front();
-            _stages[id] = StageContent{{}, std::string(name)};
+            id = _freePhaseID.front();
+            _freePhaseID.pop_front();
+            _phases[id] = PhaseContent{{}, std::string(name)};
         }
 
         return id;
     }
     
-    void Scene::destroyStage(StageID id){
-        _freeStageID.push_back(id);
+    void Scene::destroyPhase(PhaseID id){
+        _freePhaseID.push_back(id);
     }
 
-    std::string_view Scene::stageName(StageID id){
-        return _stages[id].name;
+    std::string_view Scene::phaseName(PhaseID id){
+        return _phases[id].name;
     }
 
-    void Scene::executeStage(StageID id){
-        auto& content = _stages[id];
+    void Scene::executePhase(PhaseID id){
+        auto& content = _phases[id];
 
         for (auto behaviorId : content.behaviors){
             auto& behavior = _behaviors[behaviorId];
@@ -114,8 +121,8 @@ namespace Raindrop::Scene{
         }
     }
 
-    void Scene::addToStage(StageID stage, BehaviorID behavior){
-        _stages[stage].behaviors.push_back(behavior);
+    void Scene::addToPhase(PhaseID phase, BehaviorID behavior){
+        _phases[phase].behaviors.push_back(behavior);
     }
 
 }

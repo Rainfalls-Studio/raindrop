@@ -5,7 +5,10 @@
 
 class ContentStage : public Raindrop::Scheduler::IStage{
     public:
-        ContentStage(std::shared_ptr<Raindrop::Render::BufferRenderOutput> output) : _output{output}{}
+        ContentStage(std::shared_ptr<Raindrop::Render::BufferRenderOutput> output, std::shared_ptr<Raindrop::Scene::Scene> scene) :
+            _output{output},
+            _scene{scene}
+        {}
 
         virtual ~ContentStage() override = default;
 
@@ -30,7 +33,10 @@ class ContentStage : public Raindrop::Scheduler::IStage{
         }
 
         virtual Raindrop::Scheduler::StageResult execute() override{
-            ImGui::Begin("Content", nullptr, ImGuiWindowFlags_NoScrollbar);
+            ImGui::Begin("Content", nullptr,
+                ImGuiWindowFlags_NoScrollbar |
+                ImGuiWindowFlags_NoScrollWithMouse
+            );
 
             auto output = _output.lock();
 
@@ -61,6 +67,55 @@ class ContentStage : public Raindrop::Scheduler::IStage{
                 }
             }
 
+            if (auto scene = _scene.lock()){
+
+                auto entity = scene->registry().view<Raindrop::Components::Transform, Raindrop::Components::Camera>().front();
+                if (scene->isValid(entity)){
+
+                    const float sensibility = 1.f / ImGui::GetWindowSize().x;
+
+                    auto [transform, camera] = scene->getComponent<Raindrop::Components::Transform, Raindrop::Components::Camera>(entity);
+                    auto& translation = transform.translation;
+                    auto& rotation = transform.rotation;
+                    
+                    {
+                        auto size = ImGui::GetWindowSize();
+                        camera.setSize(size.x, size.y);
+                    }
+
+                    float now = (Raindrop::Time::now().as<Raindrop::Time::milliseconds>().count() / 1000.f) / 5.f;
+
+                    float d = glm::length(translation);
+                    
+                    if (ImGui::IsWindowHovered()){
+                        float scroll = ImGui::GetIO().MouseWheel;
+                        // ImGui::
+
+                        
+                        if (glm::epsilonNotEqual(scroll, 0.f, 0.001f)){
+                            d = glm::max(d + scroll, 1.f);
+                            spdlog::info("{} : {}", d, scroll);
+                        }
+                    }
+
+                    translation = {
+                        glm::cos(now) * d,
+                        0.f,
+                        glm::sin(now) * d
+                    };
+
+                    rotation = glm::quatLookAt(
+                        -glm::normalize(translation),
+                        glm::vec3(0, 1, 0)
+                    );
+
+                    transform.worldTransform = 
+                        glm::translate(glm::mat4(1.f), translation) *
+                        glm::toMat4(rotation) *
+                        glm::scale(glm::mat4(1.f), transform.scale);
+                }
+            }
+
             ImGui::End();
             return Raindrop::Scheduler::StageResult::Continue();
         }
@@ -71,6 +126,7 @@ class ContentStage : public Raindrop::Scheduler::IStage{
         uint64_t _epoch = 0;
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _core;
         std::weak_ptr<Raindrop::Render::BufferRenderOutput> _output;
+        std::weak_ptr<Raindrop::Scene::Scene> _scene;
 
         void createSampler(){
             vk::SamplerCreateInfo info{

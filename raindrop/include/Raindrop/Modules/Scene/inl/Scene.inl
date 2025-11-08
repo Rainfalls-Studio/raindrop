@@ -23,12 +23,12 @@ namespace Raindrop::Scene{
     }
 
     template<typename T>
-    inline T& Scene::getBehavior(BehaviorID id){
-        return reinterpret_cast<T&>(getBehavior(id));
+    inline std::shared_ptr<T> Scene::getBehavior(BehaviorID id){
+        return std::dynamic_pointer_cast<T>(getBehavior(id));
     }
 
     template<typename T>
-    inline T& Scene::getBehaviorFromType(){
-        return reinterpret_cast<T&>(getBehaviorFromType(typeid(T)));
+    inline std::shared_ptr<T> Scene::getBehaviorFromType(){
+        return std::dynamic_pointer_cast<T>(getBehaviorFromType(typeid(T)));
     }
 }

@@ -60,9 +60,18 @@ namespace Planet{
         PlanetRenderData(std::shared_ptr<Raindrop::Render::RenderCoreModule> renderCore, const Config& conf);
         ~PlanetRenderData();
 
+        PlanetRenderData(const PlanetRenderData&) = delete;
+        PlanetRenderData& operator=(const PlanetRenderData&) = delete;
+
+        PlanetRenderData(PlanetRenderData&&) = default;
+        PlanetRenderData& operator=(PlanetRenderData&&) = default;
+
         std::pair<vk::Buffer, VmaAllocation> createStaginBuffer(size_t size);
         vk::CommandBuffer createSingleUseBuffer();
         void submitSingleUseBuffer(vk::Buffer buffer);
+
+        void createVertexBuffer(const Config& config);
+        void createIndexBuffer(const Config& config);
     };
 
 
@@ -103,6 +112,8 @@ namespace Planet{
             PlanetID createPlanet();
             RuntimePlanet* getRuntimeData(PlanetID id);
             void destroyPlanet(PlanetID id);
+
+            PlanetRenderData constructPlanetRenderData();
 
         private:
             std::shared_ptr<Raindrop::Render::RenderCoreModule> _renderCore;

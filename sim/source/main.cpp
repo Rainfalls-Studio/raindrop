@@ -3,6 +3,8 @@
 #include "Content.hpp"
 // #include "Planet.hpp"
 #include "planet/PlanetServiceBehavior.hpp"
+#include "planet/PlanetRenderBehavior.hpp"
+#include "planet/PlanetComponent.hpp"
 
 using namespace Raindrop::Time::literals;
 
@@ -10,6 +12,7 @@ class Sim : public Raindrop::Modules::IModule{
     public:
         Sim(){}
         virtual ~Sim() override{
+            _scene->shutdown();
             _bufferCtx.reset();
         }
 
@@ -25,11 +28,11 @@ class Sim : public Raindrop::Modules::IModule{
             setupMounts();
             registerFactories();
             createWindow();
-            createGameplayLayer();
             createBufferContext();
             createOffscreenBuffer();
             createImGuiContext();
 
+            createGameplayLayer();
             setupLoops();
 
             return Raindrop::Modules::Result::Success();
@@ -165,34 +168,41 @@ class Sim : public Raindrop::Modules::IModule{
             );
         }
 
+
         void setupLoops(){
             auto& scheduler = _engine->getScheduler();
 
             Raindrop::Scheduler::Loop updateLoop = scheduler.createLoop("Gameplay update")
                 .setPeriod(100_Hz)
-                .addStage<Raindrop::Window::EventStage>();
-                // .addStage<Raindrop::Scene::SceneUpdateStage>(_gameplay) // runs scene behaviors
-                // .addStage<Raindrop::Script::ScriptUpdateStage>(_gameplay); // run script updates
+                .addStage<Raindrop::Window::EventStage>()
+                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _preUpdatePhase)
+                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _updatePhase);
             
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
                 .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_windowOutput, _bufferCtx)
                     .addStage<Raindrop::Render::RenderCommandContext::BeginStage>(_bufferCtx)
 
-                        // .addStage<Scene::PhaseStage>(_scene, Stage::PRE_RENDER)
+                        .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _preRenderPhase)
+                        // .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _renderPhase)
+
 
                         // offscreen render 
                         .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_offscreenBuffer, _bufferCtx)
                             .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_offscreenBuffer, _bufferCtx)
-                                // .addStage<Planet::RenderStage>(_scene, _offscreenBuffer, _bufferCtx)
+
+                                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _renderPhase)
+
                             .addStage<Raindrop::Render::IRenderOutput::EndStage>(_offscreenBuffer, _bufferCtx)
                         .addStage<Raindrop::Render::IRenderOutput::PresentStage>(_offscreenBuffer, _bufferCtx)
                         
                         // Swapchain render
+
                         .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_windowOutput, _bufferCtx)
 
                             .addStage<Raindrop::ImGui::BeginStage>(_imGuiCtx)
                                 .addStage<Editor>()
-                                .addStage<ContentStage>(_offscreenBuffer)
+                                .addStage<ContentStage>(_offscreenBuffer, _scene)
+                                // .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _imGuiPhase)
                             .addStage<Raindrop::ImGui::EndStage>(_imGuiCtx)
 
                             .addStage<Raindrop::ImGui::RenderStage>(_imGuiCtx, _bufferCtx)
@@ -211,22 +221,38 @@ class Sim : public Raindrop::Modules::IModule{
             auto sceneModule = _engine->getModuleManager().getModuleAs<Raindrop::Scene::SceneModule>("Scene");
             
             _gameplay = layers.createLayer();
-            auto& scene = sceneModule->emplaceTrait(_gameplay).scene;
+            // auto& scene = sceneModule->emplaceTrait(_gameplay).scene;
+
+            _scene = std::make_shared<Raindrop::Scene::Scene>();
+            _scene->initialize(*_engine);
 
             // Not ticked behaviors
-            scene.emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
-            scene.emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
-            scene.emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
+            _scene->emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
+            _scene->emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
+            _scene->emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
             
-            _preUpdateStage = scene.createStage("Pre Update");
-            _updateStage = scene.createStage("Update");
-            _renderStage = scene.createStage("Render");
+            _preUpdatePhase = _scene->createPhase("Pre Update");
+            _updatePhase = _scene->createPhase("Update");
 
-            scene.addToStage(_preUpdateStage, scene.emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>());
+            _preRenderPhase = _scene->createPhase("Pre Render");
+            _renderPhase = _scene->createPhase("Render");
 
-            scene.addToStage(_updateStage, scene.emplaceBehavior<Planet::ServiceBehavior>());
+            _scene->addToPhase(_preUpdatePhase, _scene->emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>());
+            _scene->addToPhase(_updatePhase, _scene->emplaceBehavior<Planet::ServiceBehavior>());
+            _scene->addToPhase(_renderPhase, _scene->emplaceBehavior<Planet::RenderBehavior>(_offscreenBuffer, _bufferCtx));
             // scene.emplaceBehavior<Planet::PreRenderBehavior>().in(Stage::PreRender); // collects visible chunks and 
             // scene.emplaceBehavior<Planet::RenderBehavior>().in(Stage::Render);
+
+            {
+                auto planet = _scene->createEntity();
+                planet.emplace<Planet::PlanetComponent>();
+            }
+
+            {
+                auto camera = _scene->createEntity();
+                auto& component = camera.emplace<Raindrop::Components::Camera>();
+                camera.get<Raindrop::Components::Transform>().translation = glm::vec3(0, 1, 0);
+            }
 
         }
 
@@ -243,9 +269,10 @@ class Sim : public Raindrop::Modules::IModule{
     private:
         Raindrop::Engine* _engine;
 
-        Raindrop::Scene::StageID _preUpdateStage;
-        Raindrop::Scene::StageID _updateStage;
-        Raindrop::Scene::StageID _renderStage;
+        Raindrop::Scene::PhaseID _preUpdatePhase;
+        Raindrop::Scene::PhaseID _updatePhase;
+        Raindrop::Scene::PhaseID _preRenderPhase;
+        Raindrop::Scene::PhaseID _renderPhase;
 
         std::shared_ptr<Raindrop::Filesystem::FilesystemModule> _filesystem;
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _renderCore;
