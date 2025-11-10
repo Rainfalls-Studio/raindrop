@@ -11,10 +11,13 @@
 #include "Modules/Scene/SceneTrait.hpp"
 #include "Modules/Scene/Entity.hpp"
 #include "Modules/Scene/PhaseExecutionStage.hpp"
+
 #include "Modules/Scene/Behaviors/HierarchyAttacherBehavior.hpp"
 #include "Modules/Scene/Behaviors/TagAttacherBehavior.hpp"
 #include "Modules/Scene/Behaviors/TransformAttacherBehavior.hpp"
 #include "Modules/Scene/Behaviors/HierarchyTransformPropagator.hpp"
+#include "Modules/Scene/Behaviors/FrameSnapshotServiceBehavior.hpp"
+
 #include "Modules/Scene/Components/Hierarchy.hpp"
 #include "Modules/Scene/Components/Tag.hpp"
 #include "Modules/Scene/Components/Transform.hpp"

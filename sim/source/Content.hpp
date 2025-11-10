@@ -89,12 +89,9 @@ class ContentStage : public Raindrop::Scheduler::IStage{
                     
                     if (ImGui::IsWindowHovered()){
                         float scroll = ImGui::GetIO().MouseWheel;
-                        // ImGui::
-
                         
                         if (glm::epsilonNotEqual(scroll, 0.f, 0.001f)){
                             d = glm::max(d + scroll, 1.f);
-                            spdlog::info("{} : {}", d, scroll);
                         }
                     }
 

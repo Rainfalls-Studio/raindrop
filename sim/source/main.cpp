@@ -175,14 +175,15 @@ class Sim : public Raindrop::Modules::IModule{
             Raindrop::Scheduler::Loop updateLoop = scheduler.createLoop("Gameplay update")
                 .setPeriod(100_Hz)
                 .addStage<Raindrop::Window::EventStage>()
-                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _preUpdatePhase)
-                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _updatePhase);
+                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.preUpdate)
+                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.update)
+                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.postUpdate);
             
             Raindrop::Scheduler::Loop renderLoop = scheduler.createLoop("Render")
+                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.preRender)
                 .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_windowOutput, _bufferCtx)
                     .addStage<Raindrop::Render::RenderCommandContext::BeginStage>(_bufferCtx)
 
-                        .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _preRenderPhase)
                         // .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _renderPhase)
 
 
@@ -190,7 +191,7 @@ class Sim : public Raindrop::Modules::IModule{
                         .addStage<Raindrop::Render::IRenderOutput::AcquireStage>(_offscreenBuffer, _bufferCtx)
                             .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_offscreenBuffer, _bufferCtx)
 
-                                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _renderPhase)
+                                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.render)
 
                             .addStage<Raindrop::Render::IRenderOutput::EndStage>(_offscreenBuffer, _bufferCtx)
                         .addStage<Raindrop::Render::IRenderOutput::PresentStage>(_offscreenBuffer, _bufferCtx)
@@ -210,7 +211,9 @@ class Sim : public Raindrop::Modules::IModule{
                         .addStage<Raindrop::Render::IRenderOutput::EndStage>(_windowOutput, _bufferCtx)
                     .addStage<Raindrop::Render::RenderCommandContext::EndStage>(_bufferCtx)
                     .addStage<Raindrop::Render::RenderCommandContext::SubmitStage>(_bufferCtx, _renderCore->graphicsQueue())
-                .addStage<Raindrop::Render::IRenderOutput::PresentStage>(_windowOutput, _bufferCtx);
+                .addStage<Raindrop::Render::IRenderOutput::PresentStage>(_windowOutput, _bufferCtx)
+                .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.postRender);
+
 
             scheduler.run(updateLoop);
             scheduler.run(renderLoop);
@@ -230,16 +233,25 @@ class Sim : public Raindrop::Modules::IModule{
             _scene->emplaceBehavior<Raindrop::Behaviors::TagAttacherBehavior>();
             _scene->emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
             _scene->emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
+            _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService>();
             
-            _preUpdatePhase = _scene->createPhase("Pre Update");
-            _updatePhase = _scene->createPhase("Update");
+            phase.preUpdate = _scene->createPhase("Pre Update");
+            phase.update = _scene->createPhase("Update");
+            phase.postUpdate = _scene->createPhase("Post Update");
 
-            _preRenderPhase = _scene->createPhase("Pre Render");
-            _renderPhase = _scene->createPhase("Render");
+            phase.preRender = _scene->createPhase("Pre Render");
+            phase.render = _scene->createPhase("Render");
+            phase.postRender = _scene->createPhase("Post Render");
 
-            _scene->addToPhase(_preUpdatePhase, _scene->emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>());
-            _scene->addToPhase(_updatePhase, _scene->emplaceBehavior<Planet::ServiceBehavior>());
-            _scene->addToPhase(_renderPhase, _scene->emplaceBehavior<Planet::RenderBehavior>(_offscreenBuffer, _bufferCtx));
+            _scene->addToPhase(phase.preUpdate, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::LockWrite>());
+            _scene->addToPhase(phase.preUpdate, _scene->emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>());
+            _scene->addToPhase(phase.update, _scene->emplaceBehavior<Planet::ServiceBehavior>());
+            _scene->addToPhase(phase.postUpdate, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::ReleaseWrite>());
+            
+            _scene->addToPhase(phase.preRender, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::LockRead>());
+            _scene->addToPhase(phase.render, _scene->emplaceBehavior<Planet::RenderBehavior>(_offscreenBuffer, _bufferCtx));
+            _scene->addToPhase(phase.preRender, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::ReleaseRead>());
+
             // scene.emplaceBehavior<Planet::PreRenderBehavior>().in(Stage::PreRender); // collects visible chunks and 
             // scene.emplaceBehavior<Planet::RenderBehavior>().in(Stage::Render);
 
@@ -269,10 +281,18 @@ class Sim : public Raindrop::Modules::IModule{
     private:
         Raindrop::Engine* _engine;
 
-        Raindrop::Scene::PhaseID _preUpdatePhase;
-        Raindrop::Scene::PhaseID _updatePhase;
-        Raindrop::Scene::PhaseID _preRenderPhase;
-        Raindrop::Scene::PhaseID _renderPhase;
+        struct{
+            using Phase = Raindrop::Scene::PhaseID;
+
+            Phase preUpdate;
+            Phase update;
+            Phase postUpdate;
+
+            Phase preRender;
+            Phase render;
+            Phase postRender;
+            
+        } phase;
 
         std::shared_ptr<Raindrop::Filesystem::FilesystemModule> _filesystem;
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _renderCore;

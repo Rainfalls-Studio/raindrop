@@ -44,7 +44,7 @@ namespace Planet{
     }
 
     PlanetRenderData ServiceBehavior::constructPlanetRenderData(){
-        return PlanetRenderData{_renderCore, PlanetRenderData::Config{32, 32}};
+        return PlanetRenderData{_renderCore, PlanetRenderData::Config{5, 5}};
     }
 
 

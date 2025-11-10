@@ -14,6 +14,7 @@ namespace Planet{
 
         private:
             Raindrop::Scene::Scene* _scene;
+            Raindrop::Scene::BehaviorID _snapshotService;
         
     };
 }

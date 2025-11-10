@@ -8,7 +8,7 @@ namespace Raindrop::Behaviors{
             virtual ~HierarchyTransformPropagator() override = default;
 
             virtual void initialize(Engine& engine, Scene::Scene& scene) override;
-            void preUpdate();
+            virtual void execute() override;
         
         private:
             Scene::Scene* _scene;

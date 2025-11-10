@@ -14,7 +14,7 @@ namespace Raindrop{
         _modules(*this),
         _layers(*this),
         _scheduler(*this),
-        _tasks(*this)
+        _tasks(*this, 2)
     {
         printTitle("Startup");
     }

@@ -10,7 +10,7 @@ namespace Raindrop::Behaviors{
         // _preUpdateSubscription = engine.getScheduler().subscribe([this]{preUpdate();}, Scheduler::Priority::PRE_UPDATE);
     }
 
-    void HierarchyTransformPropagator::preUpdate(){
+    void HierarchyTransformPropagator::execute(){
         auto view = _scene->registry().view<Components::Hierarchy, Components::Transform>();
 
         std::queue<Scene::EntityHandle> toProcess;
