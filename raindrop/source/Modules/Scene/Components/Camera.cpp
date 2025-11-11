@@ -96,4 +96,10 @@ namespace Raindrop::Components{
     float Camera::getAspectRatio() const{
         return _width / _height;
     }
+
+    Camera::RenderData Camera::makeRenderData(const glm::mat4& transform) const{
+        return RenderData{
+            _projectionMatrix * glm::inverse(transform)
+        };
+    }
 }

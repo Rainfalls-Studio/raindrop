@@ -9,5 +9,17 @@ namespace Raindrop::Components{
 
             Scene::EntityHandle parent = Scene::INVALID_ENTITY_HANDLE;
             std::vector<Scene::EntityHandle> children;
+
+            inline bool isChildOf(Scene::Scene& scene, Scene::EntityHandle entity) const{
+                Scene::EntityHandle current = parent;
+
+                while (current != Scene::INVALID_ENTITY_HANDLE){
+                    if (current == entity) return true;
+
+                    auto hierarchy = scene.getComponent<Hierarchy>(current);
+                    current = hierarchy.parent;
+                }
+                return false;
+            }
     };
 }

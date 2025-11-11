@@ -14,12 +14,15 @@ namespace Planet{
 
         private:
             Raindrop::Scene::Scene* _scene;
+            Raindrop::Scene::BehaviorID _snapshotService;
+            Raindrop::Scene::BehaviorID _planetService;
+            Raindrop::Behaviors::FrameSnapshotService::SlotID _planetSlot;
+            Raindrop::Behaviors::FrameSnapshotService::SlotID _cameraSlot;
 
 
             std::shared_ptr<Raindrop::Render::RenderCoreModule> _core;
             std::shared_ptr<Raindrop::Asset::AssetModule> _assets;
 
-            Raindrop::Scene::BehaviorID _planetService;
 
             vk::Pipeline _pipeline;
             vk::PipelineLayout _pipelineLayout;

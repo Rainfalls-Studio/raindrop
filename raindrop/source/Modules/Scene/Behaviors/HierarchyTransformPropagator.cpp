@@ -31,6 +31,11 @@ namespace Raindrop::Behaviors{
 
             auto [hierachy, transform] = view.get(current);
 
+            transform.localTransform = 
+                glm::translate(glm::mat4(1.f), transform.translation) *
+                glm::toMat4(transform.rotation) *
+                glm::scale(glm::mat4(1.f), transform.scale);
+
             
             bool parentProcessed = true;
             Scene::EntityHandle parent = hierachy.parent;
@@ -60,6 +65,8 @@ namespace Raindrop::Behaviors{
             } else {
                 transform.worldTransform = transform.localTransform;
             }
+
+            transform.dirty = false;
 
             processed.insert(current);
 

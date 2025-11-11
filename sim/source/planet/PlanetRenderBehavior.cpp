@@ -4,6 +4,7 @@
 
 using Raindrop::Components::Transform;
 using Raindrop::Components::Camera;
+using Raindrop::Behaviors::FrameSnapshotService;
 
 using Raindrop::Scene::Scene;
 
@@ -22,6 +23,14 @@ namespace Planet{
         _scene = &scene;
 
         _planetService = scene.getBehaviorIndex<ServiceBehavior>();
+        _snapshotService = scene.getBehaviorIndex<FrameSnapshotService>();
+
+        if (_snapshotService != FrameSnapshotService::INVALID_SLOT_ID){
+            auto snapshotService = scene.getBehavior<FrameSnapshotService>(_snapshotService);
+
+            _planetSlot = snapshotService->registerSlot<RenderDataPayload>();
+            _cameraSlot = snapshotService->registerSlot<Raindrop::Components::Camera::RenderData>();
+        }
 
         auto& modules = engine.getModuleManager();
 
@@ -68,6 +77,14 @@ namespace Planet{
         auto view = _scene->registry().view<PlanetComponent, Transform>();
         if (view.size_hint() == 0) return;
 
+        auto frameSnapshot = _scene->getBehavior<FrameSnapshotService>(_snapshotService);
+        if (!frameSnapshot) return;
+
+        if (_planetSlot == FrameSnapshotService::INVALID_SLOT_ID) return;
+
+
+        // ---- Command setup ----------------------------------------------------------------------
+
 
         vk::CommandBuffer cmd = cmdCtx->currentBuffer().cmdBuffer;
 
@@ -90,58 +107,46 @@ namespace Planet{
 
         cmd.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline);
 
+        
+        const auto& planetOffsets = frameSnapshot->readSlotOffsets(_planetSlot);
+        const auto& cameraOffsets = frameSnapshot->readSlotOffsets(_cameraSlot);
 
-        glm::mat4 viewTransform = glm::mat4(1.f);
-        {
-            auto camera = _scene->registry().view<Camera, Transform>().front();    
-            if (_scene->isValid(camera)){
-                const glm::mat4& transform = _scene->getComponent<Transform>(camera).worldTransform;
-                const glm::mat4& projection = _scene->getComponent<Camera>(camera).getProjectionMatrix();
+        for (const auto cameraOffset : cameraOffsets){
+            const auto& camera = frameSnapshot->read<Raindrop::Components::Camera::RenderData>(cameraOffset);
 
-                viewTransform = projection * glm::inverse(transform);
+            for (const auto planetOffset : planetOffsets){
+                const RenderDataPayload& planet = frameSnapshot->read<RenderDataPayload>(planetOffset);
+
+                if (planet.id == INVALID_PLANET_ID) continue;
+
+                const auto& runtime = service->getRuntimeData(planet.id);
+
+                if (!runtime) continue;
+                if (!runtime->valid) continue;
+                
+
+                if (!runtime->render.has_value()){
+                    runtime->render.emplace(service->constructPlanetRenderData());
+                }
+
+                const auto& renderData = runtime->render.value();
+
+                const vk::Buffer& indexBuffer = renderData.grid.index.buffer;
+                const auto& indexCount = renderData.grid.index.count;
+
+                const vk::Buffer& vertexBuffer = renderData.grid.vertex.buffer;
+
+                PushConstant pc{
+                    planet.transform,
+                    camera.viewProjection
+                };
+
+                cmd.pushConstants<PushConstant>(_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, pc);
+
+                cmd.bindVertexBuffers(0, vertexBuffer, {0});
+                cmd.bindIndexBuffer(indexBuffer, 0, vk::IndexType::eUint32);
+                cmd.drawIndexed(indexCount, 1, 0, 0, 0);
             }
-        }
-
-        for (auto e : view){
-            auto [planet, transform] = view.get(e);
-
-            if (planet.id == INVALID_PLANET_ID){
-                planet.id = service->createPlanet();
-            }
-
-            RuntimePlanet* planetRuntime = service->getRuntimeData(planet.id);
-            if (!planetRuntime){
-                continue;
-            }
-
-            // skip invalid planets and planets that don't have render data
-            if (!planetRuntime->valid){
-                continue;
-            }
-
-            if (!planetRuntime->render.has_value()){
-                planetRuntime->render.emplace(service->constructPlanetRenderData());
-            }
-
-            const auto& renderData = planetRuntime->render.value();
-
-            const vk::Buffer& indexBuffer = renderData.grid.index.buffer;
-            const auto& indexCount = renderData.grid.index.count;
-
-            const vk::Buffer& vertexBuffer = renderData.grid.vertex.buffer;
-            // const auto& vertexCount = renderData.grid.vertex.count;
-
-
-            PushConstant pc{
-                transform.worldTransform,
-                viewTransform
-            };
-
-            cmd.pushConstants<PushConstant>(_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, pc);
-
-            cmd.bindVertexBuffers(0, vertexBuffer, {0});
-            cmd.bindIndexBuffer(indexBuffer, 0, vk::IndexType::eUint32);
-            cmd.drawIndexed(indexCount, 1, 0, 0, 0);
         }
     }
 

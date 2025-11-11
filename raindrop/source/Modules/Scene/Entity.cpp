@@ -50,4 +50,9 @@ namespace Raindrop::Scene{
         if (_handle == INVALID_ENTITY_HANDLE || _scene == nullptr) return false;
         return _scene->isValid(_handle);
     }
+
+    bool Entity::operator==(const Entity& other) const{
+        return _handle == other._handle && _scene == other._scene;
+    }
+
 }

@@ -1,10 +1,16 @@
 #include <Raindrop/Raindrop.hpp>
-#include "Editor.hpp"
 #include "Content.hpp"
 // #include "Planet.hpp"
 #include "planet/PlanetServiceBehavior.hpp"
 #include "planet/PlanetRenderBehavior.hpp"
 #include "planet/PlanetComponent.hpp"
+#include "planet/PlanetUpdateBehavior.hpp"
+#include "CameraUpdateBehavior.hpp"
+#include "Editor/Editor.hpp"
+#include "Editor/RenderStage.hpp"
+
+#include <glm/gtc/type_ptr.hpp>
+#include <imgui_stdlib.h>
 
 using namespace Raindrop::Time::literals;
 
@@ -33,9 +39,107 @@ class Sim : public Raindrop::Modules::IModule{
             createImGuiContext();
 
             createGameplayLayer();
+
+            setupEditor();
             setupLoops();
 
+
             return Raindrop::Modules::Result::Success();
+        }
+
+        void setupEditor(){
+
+            _editor = std::make_shared<Editor::Editor>();
+            _editor->registerScene(_scene);
+
+            _editor->registerComponent(Editor::ComponentInfo{
+                .name = "Tag",
+                .add = [](Editor::Entity& e) -> std::expected<void, Raindrop::Error> {
+                    try{
+                        e.emplace<Raindrop::Components::Tag>();
+                    } catch (const std::exception& e){
+                        return {}; // TODO: setup error codes
+                    }
+                    return {};
+                },
+                .has = [](Editor::Entity& e) -> bool {
+                    return e.hasAny<Raindrop::Components::Tag>();
+                },
+                .drawUI = [](Editor::Entity& e) -> void {
+                    auto& tag = e.get<Raindrop::Components::Tag>();
+
+                    ImGui::InputText("Tag", &tag.tag);
+                }
+            });
+
+            _editor->registerComponent(Editor::ComponentInfo{
+                .name = "Transform",
+                .add = [](Editor::Entity& e) -> std::expected<void, Raindrop::Error> {
+                    try{
+                        e.emplace<Raindrop::Components::Transform>();
+                    } catch (const std::exception& e){
+                        return {}; // TODO: setup error codes
+                    }
+                    return {};
+                },
+                .has = [](Editor::Entity& e) -> bool {
+                    return e.hasAny<Raindrop::Components::Transform>();
+                },
+                .drawUI = [](Editor::Entity& e) -> void {
+                    auto& transform = e.get<Raindrop::Components::Transform>();
+
+                    bool updated = false;
+                    updated |= ImGui::DragFloat3("Translation", glm::value_ptr(transform.translation), 0.1f);
+                    updated |= ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale), 0.1f);
+
+                    glm::vec3 eulerAngles = glm::eulerAngles(transform.rotation);
+
+                    if (ImGui::DragFloat3("Axis", glm::value_ptr(eulerAngles), 0.1f)) {
+                        updated = true;
+
+                        transform.rotation = glm::normalize(glm::quat(eulerAngles));
+                    }
+
+                    if (updated){
+                        transform.dirty = true;
+                    }
+                }
+            });
+
+            _editor->registerComponent(Editor::ComponentInfo{
+                .name = "Hierarchy",
+                .add = [](Editor::Entity& e) -> std::expected<void, Raindrop::Error> {
+                    try{
+                        e.emplace<Raindrop::Components::Hierarchy>();
+                    } catch (const std::exception& e){
+                        return {}; // TODO: setup error codes
+                    }
+                    return {};
+                },
+                .has = [](Editor::Entity& e) -> bool {
+                    return e.hasAny<Raindrop::Components::Hierarchy>();
+                },
+                .drawUI = [](Editor::Entity& e) -> void {
+                    auto& hierarchy = e.get<Raindrop::Components::Hierarchy>();
+
+                    if (hierarchy.parent == Raindrop::Scene::INVALID_ENTITY_HANDLE){
+                        ImGui::Text("parent : No parent");
+                    } else {
+                        ImGui::Text("parent : %d", hierarchy.parent);
+                    }
+
+                    if (ImGui::BeginTable("", 1)){
+                        for (auto child : hierarchy.children){
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%d", child);
+                        }
+                        ImGui::EndTable();
+                    }
+                }
+            });
+
+            
         }
 
         void setupMounts(){
@@ -201,7 +305,7 @@ class Sim : public Raindrop::Modules::IModule{
                         .addStage<Raindrop::Render::IRenderOutput::BeginStage>(_windowOutput, _bufferCtx)
 
                             .addStage<Raindrop::ImGui::BeginStage>(_imGuiCtx)
-                                .addStage<Editor>()
+                                .addStage<Editor::RenderStage>(_editor)
                                 .addStage<ContentStage>(_offscreenBuffer, _scene)
                                 // .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _imGuiPhase)
                             .addStage<Raindrop::ImGui::EndStage>(_imGuiCtx)
@@ -234,6 +338,7 @@ class Sim : public Raindrop::Modules::IModule{
             _scene->emplaceBehavior<Raindrop::Behaviors::TransformAttacherBehavior>();
             _scene->emplaceBehavior<Raindrop::Behaviors::HierarchyAttacherBehavior>();
             _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService>();
+            _scene->emplaceBehavior<Planet::ServiceBehavior>();
             
             phase.preUpdate = _scene->createPhase("Pre Update");
             phase.update = _scene->createPhase("Update");
@@ -245,19 +350,21 @@ class Sim : public Raindrop::Modules::IModule{
 
             _scene->addToPhase(phase.preUpdate, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::LockWrite>());
             _scene->addToPhase(phase.preUpdate, _scene->emplaceBehavior<Raindrop::Behaviors::HierarchyTransformPropagator>());
-            _scene->addToPhase(phase.update, _scene->emplaceBehavior<Planet::ServiceBehavior>());
+            _scene->addToPhase(phase.update, _scene->emplaceBehavior<Planet::UpdateBehavior>());
+            _scene->addToPhase(phase.update, _scene->emplaceBehavior<CameraUpdateBehavior>());
             _scene->addToPhase(phase.postUpdate, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::ReleaseWrite>());
             
             _scene->addToPhase(phase.preRender, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::LockRead>());
             _scene->addToPhase(phase.render, _scene->emplaceBehavior<Planet::RenderBehavior>(_offscreenBuffer, _bufferCtx));
-            _scene->addToPhase(phase.preRender, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::ReleaseRead>());
+            _scene->addToPhase(phase.postRender, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::ReleaseRead>());
 
             // scene.emplaceBehavior<Planet::PreRenderBehavior>().in(Stage::PreRender); // collects visible chunks and 
             // scene.emplaceBehavior<Planet::RenderBehavior>().in(Stage::Render);
 
-            {
+            for (int i=0; i<5; i++){
                 auto planet = _scene->createEntity();
                 planet.emplace<Planet::PlanetComponent>();
+                planet.get<Raindrop::Components::Tag>().tag = "Planet " + std::to_string(i);
             }
 
             {
@@ -301,7 +408,7 @@ class Sim : public Raindrop::Modules::IModule{
         std::shared_ptr<Raindrop::ImGui::ImGuiContext> _imGuiCtx;
         std::shared_ptr<Raindrop::Asset::AssetModule> _assets;
 
-
+        std::shared_ptr<Editor::Editor> _editor;
         std::shared_ptr<Raindrop::Render::RenderCommandContext> _bufferCtx;
 
         std::shared_ptr<Raindrop::Window::Window> _window;

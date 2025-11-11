@@ -34,6 +34,12 @@ namespace Raindrop::Components{
 
             const glm::mat4& getProjectionMatrix() const;
 
+            struct RenderData{
+                glm::mat4 viewProjection;
+            };
+
+            RenderData makeRenderData(const glm::mat4& transform) const;
+
         private:
             ProjectionType _projectionType = ProjectionType::PERSPECTIVE;
             float _near = 0.05f, _far = 4000.f;

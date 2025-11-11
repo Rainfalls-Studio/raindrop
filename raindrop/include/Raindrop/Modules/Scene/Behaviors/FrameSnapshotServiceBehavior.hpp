@@ -120,26 +120,26 @@ namespace Raindrop::Behaviors{
             void writeRelease();
 
             template<typename T>
-            inline void writeSlot(SlotID slot, const T& v){
-                writeSlotRaw(slot, static_cast<const void*>(&v));
+            inline void writeSlot(SlotID slot, T*& v){
+                writeSlotRaw(slot, reinterpret_cast<void**>(&v));
             }
 
             /**
              * @brief Write an instance data to a given slot
              * 
              * @param slot the slot to write the data into
-             * @param instance the payload
+             * @param instance the payload pointer reference
              */
-            void writeSlotRaw(SlotID slot, const void* instance);
+            void writeSlotRaw(SlotID slot, void** instance);
 
             /**
              * @brief Store an undefined type of data in the arena, returning it's offset in the buffer
              * 
-             * @param data the data to store
+             * @param data reference to the allocated data
              * @param size the size of the payload
              * @return Offset 
              */
-            Offset storeRaw(const void* data, size_t size);
+            Offset storeRaw(void** data, size_t size);
 
 
             // --- Reading ------------------------------------------------------------------
@@ -148,7 +148,7 @@ namespace Raindrop::Behaviors{
             void lockRead();
             void readRelease();
 
-            std::vector<Offset> readSlotOffsets(SlotID slot) const;
+            const std::vector<Offset>& readSlotOffsets(SlotID slot) const;
 
             template<typename T>
             inline const T& read(Offset off) const{

@@ -52,7 +52,6 @@ namespace Raindrop::Scheduler{
             };
         }
 
-        
         static inline constexpr StageResult Skip(const std::string& reason = {}){
             return StageResult{
                 SKIP,

@@ -140,7 +140,7 @@ namespace Raindrop::Behaviors{
         _cvCanRead.notify_one();
     }
 
-    void FrameSnapshotService::writeSlotRaw(SlotID slot, const void* instance){
+    void FrameSnapshotService::writeSlotRaw(SlotID slot, void** instance){
         assert(slot < _slots.size());
 
         auto& buf = _buffers[_writeIndex];
@@ -148,10 +148,11 @@ namespace Raindrop::Behaviors{
 
         // store data in arena and reference offset
         Offset off = storeRaw(instance, slotData.size);
+
         slotData.instances.push_back(off);
     }
 
-    Offset FrameSnapshotService::storeRaw(const void* data, size_t size){
+    Offset FrameSnapshotService::storeRaw(void** data, size_t size){
         assert(data != nullptr);
         assert(_writeIndex != INVALID_BUFFER_INDEX);
 
@@ -159,7 +160,7 @@ namespace Raindrop::Behaviors{
         Offset off = static_cast<Offset>(buf.arena.size());
         
         buf.arena.resize(off + size);
-        std::memcpy(buf.arena.data() + off, data, size);
+        *data = buf.arena.data() + off;
 
         return off;
     }
@@ -198,7 +199,7 @@ namespace Raindrop::Behaviors{
         _cvCanWrite.notify_one();
     }
 
-    std::vector<Offset> FrameSnapshotService::readSlotOffsets(SlotID slot) const{
+    const std::vector<Offset>& FrameSnapshotService::readSlotOffsets(SlotID slot) const{
         assert(slot < _slots.size());
         assert(_readIndex != INVALID_BUFFER_INDEX);
 

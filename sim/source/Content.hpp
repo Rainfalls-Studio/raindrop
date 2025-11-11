@@ -106,10 +106,7 @@ class ContentStage : public Raindrop::Scheduler::IStage{
                         glm::vec3(0, 1, 0)
                     );
 
-                    transform.worldTransform = 
-                        glm::translate(glm::mat4(1.f), translation) *
-                        glm::toMat4(rotation) *
-                        glm::scale(glm::mat4(1.f), transform.scale);
+                    transform.dirty = true;
                 }
             }
 

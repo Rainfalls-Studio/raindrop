@@ -74,7 +74,6 @@ namespace Planet{
         void createIndexBuffer(const Config& config);
     };
 
-
     enum class Face{
         PX, NX,
         PY, NY,
@@ -99,6 +98,14 @@ namespace Planet{
         bool valid = false;
         PlanetLODData lod;
         std::optional<PlanetRenderData> render;
+    };
+
+    struct RenderDataPayload{
+        Raindrop::Behaviors::Offset chunks;
+        uint32_t chunkCount;
+        glm::mat4 transform;
+        float radius;
+        PlanetID id;
     };
 
     class ServiceBehavior : public Raindrop::Scene::IBehavior{
