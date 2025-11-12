@@ -7,6 +7,11 @@ namespace Raindrop::Scene{
         return _registry.get<Components...>(handle);
     }
 
+    template<typename... Components>
+    inline decltype(auto) Scene::getComponent(EntityHandle handle) const{
+        return _registry.get<Components...>(handle);
+    }
+
     template<typename Components, typename... Args>
     inline decltype(auto) Scene::emplaceComponent(EntityHandle handle, Args&&... args){
         return _registry.emplace<Components, Args...>(handle, std::forward<Args>(args)...);

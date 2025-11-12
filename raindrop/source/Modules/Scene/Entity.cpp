@@ -46,6 +46,12 @@ namespace Raindrop::Scene{
         return *_scene;
     }
 
+    const Scene& Entity::validateScene() const{
+        assert(_scene != nullptr);
+        return *_scene;
+    }
+
+
     bool Entity::isValid() const{
         if (_handle == INVALID_ENTITY_HANDLE || _scene == nullptr) return false;
         return _scene->isValid(_handle);

@@ -8,6 +8,7 @@
 #include "CameraUpdateBehavior.hpp"
 #include "Editor/Editor.hpp"
 #include "Editor/RenderStage.hpp"
+#include "Editor/ImGuiHelper.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui_stdlib.h>
@@ -122,17 +123,15 @@ class Sim : public Raindrop::Modules::IModule{
                 .drawUI = [](Editor::Entity& e) -> void {
                     auto& hierarchy = e.get<Raindrop::Components::Hierarchy>();
 
-                    if (hierarchy.parent == Raindrop::Scene::INVALID_ENTITY_HANDLE){
-                        ImGui::Text("parent : No parent");
-                    } else {
-                        ImGui::Text("parent : %d", hierarchy.parent);
+                    if (auto newParent = ImGuiHelper::EntitySelector(Editor::Entity(e.scene(), hierarchy.parent), "Parent")){
+                        spdlog::info("new parent : {}", newParent->getHandle());
                     }
 
-                    if (ImGui::BeginTable("", 1)){
+                    if (ImGui::BeginTable("##children", 1, ImGuiTableFlags_RowBg)){
                         for (auto child : hierarchy.children){
                             ImGui::TableNextRow();
                             ImGui::TableNextColumn();
-                            ImGui::Text("%d", child);
+                            ImGuiHelper::EntitySelector(Editor::Entity(e.scene(), child), "##child", true, false);
                         }
                         ImGui::EndTable();
                     }
@@ -361,7 +360,7 @@ class Sim : public Raindrop::Modules::IModule{
             // scene.emplaceBehavior<Planet::PreRenderBehavior>().in(Stage::PreRender); // collects visible chunks and 
             // scene.emplaceBehavior<Planet::RenderBehavior>().in(Stage::Render);
 
-            for (int i=0; i<5; i++){
+            for (int i=0; i<10; i++){
                 auto planet = _scene->createEntity();
                 planet.emplace<Planet::PlanetComponent>();
                 planet.get<Raindrop::Components::Tag>().tag = "Planet " + std::to_string(i);

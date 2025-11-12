@@ -32,12 +32,17 @@ namespace Raindrop::Scene{
             }
 
             template<typename... Components>
-            inline bool hasAll() {
+            inline decltype(auto) get() const{
+                return validateScene().getComponent<Components...>(_handle);
+            }
+
+            template<typename... Components>
+            inline bool hasAll() const {
                 return validateScene().hasAllComponents<Components...>(_handle);
             }
 
             template<typename... Components>
-            inline bool hasAny() {
+            inline bool hasAny() const {
                 return validateScene().hasAnyComponents<Components...>(_handle);
             }
 
@@ -55,5 +60,6 @@ namespace Raindrop::Scene{
             EntityHandle _handle;
 
             Scene& validateScene();
+            const Scene& validateScene() const;
     };
 }

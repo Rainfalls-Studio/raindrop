@@ -68,6 +68,16 @@ namespace Raindrop::Scene{
             inline decltype(auto) getComponent(EntityHandle handle);
 
             /**
+             * @brief Get the entite's components
+             * 
+             * @tparam Components 
+             * @param handle 
+             * @return decltype(auto) 
+             */
+            template<typename... Components>
+            inline decltype(auto) getComponent(EntityHandle handle) const;
+
+            /**
              * @brief Creates a component's in place
              * 
              * @tparam Components The component to add
