@@ -1,14 +1,11 @@
 #pragma once
 
 #include "Engine.hpp"
-
 #include "Core/Modules/InitHelper.hpp"
-#include "Core/Layers/Layer.hpp"
 
 // builtin Modules
 
 #include "Modules/Scene/SceneModule.hpp"
-#include "Modules/Scene/SceneTrait.hpp"
 #include "Modules/Scene/Entity.hpp"
 #include "Modules/Scene/PhaseExecutionStage.hpp"
 

@@ -323,11 +323,7 @@ class Sim : public Raindrop::Modules::IModule{
         }
 
         void createGameplayLayer(){
-            auto& layers = _engine->getLayerManager();
             auto sceneModule = _engine->getModuleManager().getModuleAs<Raindrop::Scene::SceneModule>("Scene");
-            
-            _gameplay = layers.createLayer();
-            // auto& scene = sceneModule->emplaceTrait(_gameplay).scene;
 
             _scene = std::make_shared<Raindrop::Scene::Scene>();
             _scene->initialize(*_engine);
@@ -418,9 +414,6 @@ class Sim : public Raindrop::Modules::IModule{
         std::shared_ptr<Raindrop::Scene::Scene> _scene;
 
         std::shared_ptr<Raindrop::Render::ShaderFactory> _shaderFactory;
-
-        Raindrop::Layers::Layer _gameplay;
-        Raindrop::Layers::Layer _debug;
 };
 
 

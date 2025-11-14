@@ -12,7 +12,6 @@ namespace Raindrop{
 
     Engine::Engine() : 
         _modules(*this),
-        _layers(*this),
         _scheduler(*this),
         _tasks(*this, 2)
     {
@@ -28,7 +27,6 @@ namespace Raindrop{
 
         _tasks.shutdown();
         _scheduler.shutdown();
-        _layers.shutdown();
         _modules.shutdown();
 
         printTitle("Stopped");
@@ -40,10 +38,6 @@ namespace Raindrop{
 
     Modules::Manager& Engine::getModuleManager() noexcept{
         return _modules;
-    }
-
-    Layers::Manager& Engine::getLayerManager() noexcept{
-        return _layers;
     }
 
     Scheduler::Scheduler& Engine::getScheduler() noexcept{

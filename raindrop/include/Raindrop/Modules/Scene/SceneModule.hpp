@@ -13,8 +13,6 @@ namespace Raindrop::Scene{
 
             virtual Modules::Result initialize(Modules::InitHelper& helper) override;
             virtual Name name() const noexcept override;
-
-            SceneTrait& emplaceTrait(Layers::Layer layer);
         
         private:
             Engine* _engine;

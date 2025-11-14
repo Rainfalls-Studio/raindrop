@@ -16,10 +16,6 @@ namespace Raindrop::Modules{
                 return _engine.getScheduler();
             }
 
-            inline Layers::Manager& layers() const noexcept{
-                return _engine.getLayerManager();
-            }
-
             inline Modules::Manager& modules() const noexcept{
                 return _engine.getModuleManager();
             }
