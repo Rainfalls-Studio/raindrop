@@ -117,7 +117,7 @@ namespace Raindrop::Modules{
 
             // if the status is not initialized, reset module
             if (current.status != Status::INITIALIZED){
-                current.module = nullptr;
+                // current.module = nullptr;
             }
 
             // add dependents

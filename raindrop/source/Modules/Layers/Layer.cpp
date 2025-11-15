@@ -81,6 +81,7 @@ namespace Raindrop::Layers{
             }
                 
             sorted.push_back(subscriber);
+            ++it;
         }
 
         std::sort(

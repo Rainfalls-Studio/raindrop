@@ -51,3 +51,5 @@
 
 #include "Modules/Asset/AssetModule.hpp"
 #include "Modules/Asset/Factory.hpp"
+
+#include "Modules/Layers/LayerModule.hpp"

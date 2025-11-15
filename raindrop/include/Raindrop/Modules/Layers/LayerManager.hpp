@@ -9,8 +9,12 @@ namespace Raindrop::Layers{
         public:
             LayerManager();
 
-            Layer* operator->(){
+            inline Layer* operator->(){
                 return _root.get();
+            }
+
+            inline Layer& get(){
+                return *_root;
             }
 
         private:

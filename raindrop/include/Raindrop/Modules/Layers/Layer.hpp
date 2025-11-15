@@ -28,14 +28,14 @@ namespace Raindrop::Layers{
             template<typename T>
             void transmit(const T& transmission){
                 static_assert(std::is_base_of<Transmission<T>, T>::value, "T has to be derived from Transmission<T>");
-                transmit(static_cast<const TransmissionBase&>(transmission));
+                transmit(*static_cast<const TransmissionBase*>(&transmission));
             }
 
             void transmit(const TransmissionBase& transmission);
 
-            template<typename T>
-            std::shared_ptr<Subscriber<T>> subscribe(){
-                std::shared_ptr<Subscriber<T>> subscriber = std::make_shared<Subscriber<T>>();
+            template<typename T, typename... Args>
+            std::shared_ptr<Subscriber<T>> subscribe(Args&&... args){
+                std::shared_ptr<Subscriber<T>> subscriber = std::make_shared<Subscriber<T>>(std::forward<Args>(args)...);
                 pushSubcriber(std::static_pointer_cast<SubscriberBase>(subscriber));
                 return subscriber;   
             }

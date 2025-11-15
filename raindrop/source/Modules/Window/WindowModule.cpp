@@ -37,7 +37,7 @@ namespace Raindrop::Window{
     }
 
     struct EventInfo{
-        Event::Manager& manager;
+        Event::EventModule& module;
         SDL_Event& e;
         std::unordered_map<SDL_WindowID, std::weak_ptr<Window>>& windows;
     };
@@ -60,19 +60,19 @@ namespace Raindrop::Window{
     void windowShownEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowShown(window));
+        info.module.trigger<Events::WindowShown>(window);
     }
 
     void windowHiddenEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowHidden(window));
+        info.module.trigger<Events::WindowHidden>(window);
     }
 
     void windowExposedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowExposed(window));
+        info.module.trigger<Events::WindowExposed>(window);
 
     }
 
@@ -85,7 +85,7 @@ namespace Raindrop::Window{
             static_cast<int>(info.e.window.data2)
         };
 
-        info.manager.trigger(Events::WindowMoved(window, pos));
+        info.module.trigger<Events::WindowMoved>(window, pos);
     }
 
     void windowResizedEvent(EventInfo& info){
@@ -99,7 +99,7 @@ namespace Raindrop::Window{
             static_cast<unsigned int>(info.e.window.data2)
         };
 
-        info.manager.trigger(Events::WindowResized(window, size));
+        info.module.trigger<Events::WindowResized>(window, size);
     }
 
     void windowPixelSizeChangedEvent(EventInfo&){}
@@ -107,55 +107,55 @@ namespace Raindrop::Window{
     void windowMinimizedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowMinimized(window));
+        info.module.trigger<Events::WindowMinimized>(window);
     }
 
     void windowMaximizedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowMaximized(window));
+        info.module.trigger<Events::WindowMaximized>(window);
     }
 
     void windowRestoredEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowRestored(window));
+        info.module.trigger<Events::WindowRestored>(window);
     }
 
     void windowMouseEnterEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowMouseEntered(window));
+        info.module.trigger<Events::WindowMouseEntered>(window);
     }
 
     void windowMouseLeaveEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowMouseLeaved(window));
+        info.module.trigger<Events::WindowMouseLeaved>(window);
     }
 
     void windowFocusGainedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowFocusGained(window));
+        info.module.trigger<Events::WindowFocusGained>(window);
     }
 
     void windowFocusLostEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowFocusLost(window));
+        info.module.trigger<Events::WindowFocusLost>(window);
     }
 
     void windowCloseRequestedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowCloseRequest(window));
+        info.module.trigger<Events::WindowCloseRequest>(window);
     }
 
     void windowTakeFocusEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowFocusTake(window));
+        info.module.trigger<Events::WindowFocusTake>(window);
     }
 
     void windowHitTestEvent(EventInfo&){}
@@ -166,23 +166,23 @@ namespace Raindrop::Window{
     void windowOccludedEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowOccluded(window));
+        info.module.trigger<Events::WindowOccluded>(window);
     }
 
     void windowEnterFullsreenEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowFullscreenEnter(window));
+        info.module.trigger<Events::WindowFullscreenEnter>(window);
     }
 
     void windowLeaveFullscreenEvent(EventInfo& info){
         std::shared_ptr<Window> window = info.windows[info.e.window.windowID].lock();
         if (!window) return;
-        info.manager.trigger(Events::WindowFullscreenLeave(window));
+        info.module.trigger<Events::WindowFullscreenLeave>(window);
     }
 
     void windowDestroyedEvent(EventInfo& info){
-        info.manager.trigger(Events::WindowDestroyed());
+        info.module.trigger<Events::WindowDestroyed>();
     }
 
     void windowPenEnterEvent(EventInfo&){}
@@ -261,10 +261,9 @@ namespace Raindrop::Window{
         events = _engine->getModuleManager().getModuleAs<Event::EventModule>("Event");
 
         SDL_Event e;
-        auto& manager = events->getManager();
 
         EventInfo info{
-            .manager = manager,
+            .module = *events,
             .e = e,
             .windows = _windows
         };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <typeindex>
 #include <functional>
 
 #include "Transmission.hpp"
@@ -23,15 +22,20 @@ namespace Raindrop::Layers{
     };
 
     template<typename T>
-    class Subscriber : SubscriberBase{
+    class Subscriber : public SubscriberBase{
         public:
-            Subscriber(float priority) : SubscriberBase{priority}{}
+            using Callback = std::function<Result(const T&)>;
+            inline Subscriber(const Callback& callback, float priority = 0.f) :
+                _callback(callback),
+                SubscriberBase{priority}{}
 
             virtual ~Subscriber() = default;
 
             virtual Result call(const TransmissionBase& tr) final override{
-                if (tr.type() != typeid(T)) return Result::Continue();
-                return _callback(static_cast<const T&>(tr));
+                if (const T* ptr = dynamic_cast<const T*>(&tr)){
+                    return _callback(*ptr);
+                }
+                return Result::Continue();
             }
         
         private:

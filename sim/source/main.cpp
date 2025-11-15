@@ -168,6 +168,7 @@ class Sim : public Raindrop::Modules::IModule{
                 Dependency("ImGui"),
                 Dependency("Filesystem"),
                 Dependency("Asset"),
+                Dependency("Layer")
             };
         }
 
@@ -235,12 +236,12 @@ class Sim : public Raindrop::Modules::IModule{
         void createWindow(){
             // Get Modules
             auto& modules = _engine->getModuleManager();
-            auto [windowMod, eventMod, renderOutputMod] = modules.getModulesAs<
+            auto [windowMod, layer, renderOutputMod] = modules.getModulesAs<
                 Raindrop::Window::WindowModule,
-                Raindrop::Event::EventModule,
+                Raindrop::Layers::LayerModule,
                 Raindrop::Render::RenderOutputModule>(
                     "Window",
-                    "Event",
+                    "Layer",
                     "RenderOutput"
                 );
 
@@ -259,14 +260,14 @@ class Sim : public Raindrop::Modules::IModule{
 
             // register the window as output "main"
             _windowOutput = renderOutputMod->createOutput<Raindrop::Render::WindowRenderOutput>("main", _window);
-            
-            // subscribe to event 'WindowCloseRequest'. In which case, stop the engine
-            eventMod->getManager().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
-                [this](const Raindrop::Window::Events::WindowCloseRequest& event) -> bool {
+
+            _windowClosedSubscriber = layer->manager()->get().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
+                [this](const Raindrop::Window::Events::WindowCloseRequest& event) -> Raindrop::Layers::Result {
                     if (event.getWindow() == _window){
                         _engine->stop();
+                        return Raindrop::Layers::Result::Consume();
                     }
-                    return false;
+                    return Raindrop::Layers::Result::Continue();
                 }
             );
         }
@@ -278,6 +279,7 @@ class Sim : public Raindrop::Modules::IModule{
             Raindrop::Scheduler::Loop updateLoop = scheduler.createLoop("Gameplay update")
                 .setPeriod(100_Hz)
                 .addStage<Raindrop::Window::EventStage>()
+                .addStage<Raindrop::Event::EventModule::PollStage>()
                 .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.preUpdate)
                 .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.update)
                 .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, phase.postUpdate);
@@ -396,6 +398,8 @@ class Sim : public Raindrop::Modules::IModule{
             
         } phase;
 
+        std::shared_ptr<Raindrop::Layers::Subscriber<Raindrop::Window::Events::WindowCloseRequest>> _windowClosedSubscriber;
+
         std::shared_ptr<Raindrop::Filesystem::FilesystemModule> _filesystem;
         std::shared_ptr<Raindrop::Render::RenderCoreModule> _renderCore;
         std::shared_ptr<Raindrop::Render::RenderOutputModule> _outputs;
@@ -431,6 +435,7 @@ int main(){
     modules.registerModule<Raindrop::Filesystem::FilesystemModule>();
     modules.registerModule<Raindrop::Asset::AssetModule>();
     modules.registerModule<Raindrop::ImGui::ImGuiModule>();
+    modules.registerModule<Raindrop::Layers::LayerModule>();
     modules.registerModule<Sim>();
 
     engine.start();

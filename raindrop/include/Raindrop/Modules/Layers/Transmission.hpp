@@ -9,11 +9,14 @@ namespace Raindrop::Layers{
     };
 
     template<typename T>
-    struct Transmission{
+    struct Transmission : public TransmissionBase{
         virtual ~Transmission() = default;
 
-        constexpr inline virtual std::type_index type() const noexcept final{
-            return typeid(T);
-        }
+        virtual std::type_index type() const noexcept final override;
     };
+
+    template<typename T>
+    std::type_index Transmission<T>::type() const noexcept {
+        return typeid(T);
+    }
 }
