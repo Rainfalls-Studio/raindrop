@@ -99,13 +99,13 @@ namespace Raindrop::Layers{
     }
 
 
-    void Layer::transmit(const TransmissionBase& transmission){
+    void Layer::transmit(const Transmission& transmission){
         // shared lock because transmit doesn't cause modifications
         std::shared_lock lock(_ctx.mtx);
         transmit_unsafe(transmission);
     }
 
-    Result Layer::transmit_unsafe(const TransmissionBase& transmission){
+    Result Layer::transmit_unsafe(const Transmission& transmission){
         auto result = signalSubsribers(transmission);
 
         switch (result.type){
@@ -129,7 +129,7 @@ namespace Raindrop::Layers{
         return Result::Continue();
     }
 
-    void Layer::transmitChildren(const TransmissionBase& transmission){
+    void Layer::transmitChildren(const Transmission& transmission){
         for (auto children : _children){
             auto result = children->transmit_unsafe(transmission);
 
@@ -137,7 +137,7 @@ namespace Raindrop::Layers{
         }
     }
 
-    Result Layer::signalSubsribers(const TransmissionBase& transmission){
+    Result Layer::signalSubsribers(const Transmission& transmission){
         for (const auto& weak : _subscribers){
             auto subscriber = weak.lock();
             if (!subscriber) continue;

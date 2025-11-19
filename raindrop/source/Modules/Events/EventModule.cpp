@@ -38,7 +38,7 @@ namespace Raindrop::Event{
             auto event = std::move(_events.front());
             _events.pop_front();
             
-            layers->manager()->get().transmit(*event);
+            layers->manager()->get()->transmit(*event);
         }
     }
 

@@ -11,7 +11,7 @@ namespace Raindrop::Layers{
             SubscriberBase(float priority) : _priority{priority}{}
             virtual ~SubscriberBase() = default;
             
-            virtual Result call(const TransmissionBase& tr) = 0;
+            virtual Result call(const Transmission& tr) = 0;
 
             inline float priority() const noexcept{
                 return _priority;
@@ -31,7 +31,7 @@ namespace Raindrop::Layers{
 
             virtual ~Subscriber() = default;
 
-            virtual Result call(const TransmissionBase& tr) final override{
+            virtual Result call(const Transmission& tr) final override{
                 if (const T* ptr = dynamic_cast<const T*>(&tr)){
                     return _callback(*ptr);
                 }

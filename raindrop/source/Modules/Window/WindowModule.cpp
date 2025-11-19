@@ -4,6 +4,8 @@
 #include "Raindrop/Core/Modules/InitHelper.hpp"
 #include "Raindrop/Engine.hpp"
 #include <SDL3/SDL.h>
+#include "Raindrop/Modules/Event/MouseEvent.hpp"
+#include "Raindrop/Modules/Event/KeyboardEvent.hpp"
 #include "Raindrop/Modules/ImGui/backend/imgui_impl_sdl3.h"
 
 namespace Raindrop::Window{
@@ -187,16 +189,135 @@ namespace Raindrop::Window{
 
     void windowPenEnterEvent(EventInfo&){}
     void windowPenLeaveEvent(EventInfo&){}
-    void keyDownEvent(EventInfo&){}
-    void keyUpEvent(EventInfo&){}
+
+    void keyDownEvent(EventInfo& info){
+        const auto& keyEvent = info.e.key;
+
+        std::shared_ptr<Window> window = info.windows[keyEvent.windowID].lock();
+        if (!window) return;
+
+        info.module.trigger<Event::KeyEvent>(
+            static_cast<Event::Key>(keyEvent.key),
+            static_cast<Event::PhysicalKey>(keyEvent.scancode),
+            keyEvent.down,
+            keyEvent.repeat
+        );
+    }
+
+    void keyUpEvent(EventInfo& info){
+        const auto& keyEvent = info.e.key;
+
+        std::shared_ptr<Window> window = info.windows[keyEvent.windowID].lock();
+        if (!window) return;
+
+        info.module.trigger<Event::KeyEvent>(
+            static_cast<Event::Key>(keyEvent.key),
+            static_cast<Event::PhysicalKey>(keyEvent.scancode),
+            keyEvent.down,
+            keyEvent.repeat
+        );
+    }
+
     void textEditingEvent(EventInfo&){}
-    void textInputEvent(EventInfo&){}
+
+    void textInputEvent(EventInfo& info){
+        const auto& textEvent = info.e.text;
+
+        std::shared_ptr<Window> window = info.windows[textEvent.windowID].lock();
+        if (!window) return;
+
+        info.module.trigger<Event::TextInputEvent>(
+            textEvent.text
+        );
+    }
+
     void keymapChangedEvent(EventInfo&){}
-    void mouseMotionEvent(EventInfo&){}
-    void mouseButtonDownEvent(EventInfo&){}
-    void mouseButtonUpEvent(EventInfo&){}
-    void mouseWheelEvent(EventInfo&){}
+
+    void mouseMotionEvent(EventInfo& info){
+        const auto& mouseEvent = info.e.motion;
+
+        std::shared_ptr<Window> window = info.windows[mouseEvent.windowID].lock();
+        if (!window) return;
+
+        info.module.trigger<Event::MouseMovedEvent>(
+            glm::vec2{
+                mouseEvent.x,
+                mouseEvent.y
+            },
+            glm::vec2{
+                mouseEvent.xrel,
+                mouseEvent.yrel
+            }
+        );
+    }
+
+
+    Event::MouseButton SDLToRaindropMouseButton(Uint8 button){
+        switch (button){
+            case SDL_BUTTON_LEFT: return Event::MouseButton::LEFT;
+            case SDL_BUTTON_RIGHT: return Event::MouseButton::RIGHT;
+            case SDL_BUTTON_MIDDLE: return Event::MouseButton::MIDDLE;
+            case SDL_BUTTON_X1: return Event::MouseButton::X1;
+            case SDL_BUTTON_X2: return Event::MouseButton::X2;
+        }
+        throw std::runtime_error("Unknown button");
+    }
+
+    void mouseButtonDownEvent(EventInfo& info){
+        const auto& buttonEvent = info.e.button;
+
+        std::shared_ptr<Window> window = info.windows[buttonEvent.windowID].lock();
+        if (!window) return;
+
+        info.module.trigger<Event::MouseButtonEvent>(
+            SDLToRaindropMouseButton(buttonEvent.button),
+            buttonEvent.down,
+            buttonEvent.clicks,
+            glm::vec2{
+                buttonEvent.x,
+                buttonEvent.y
+            }
+        );
+    }
+
+
+    void mouseButtonUpEvent(EventInfo& info){
+        const auto& buttonEvent = info.e.button;
+
+        std::shared_ptr<Window> window = info.windows[buttonEvent.windowID].lock();
+        if (!window) return;
+
+        info.module.trigger<Event::MouseButtonEvent>(
+            SDLToRaindropMouseButton(buttonEvent.button),
+            buttonEvent.down,
+            buttonEvent.clicks,
+            glm::vec2{
+                buttonEvent.x,
+                buttonEvent.y
+            }
+        );
+    }
+
+    void mouseWheelEvent(EventInfo& info){
+        const auto& wheelEvent = info.e.wheel;
+
+        std::shared_ptr<Window> window = info.windows[wheelEvent.windowID].lock();
+        if (!window) return;
+
+        info.module.trigger<Event::MouseWheelEvent>(
+            glm::vec2{
+                wheelEvent.x,
+                wheelEvent.y,
+            },
+            glm::vec2{
+                wheelEvent.mouse_x,
+                wheelEvent.mouse_y,
+            }
+        );
+    }
+
     void quitEvent(EventInfo&){}
+
     void joystickAxisMotionEvent(EventInfo&){}
     void joystickHatMotionEvent(EventInfo&){}
     void joystickButtonDownEvent(EventInfo&){}
@@ -205,6 +326,7 @@ namespace Raindrop::Window{
     void joystickRemovedEvent(EventInfo&){}
     void joystickBatteryUpdatedEvent(EventInfo&){}
     void joystickUpdateCompletedEvent(EventInfo&){}
+
     void gamepadAxisMotionEvent(EventInfo&){}
     void gamepadButtonDownEvent(EventInfo&){}
     void gamepadButtonUpEvent(EventInfo&){}
@@ -217,15 +339,18 @@ namespace Raindrop::Window{
     void gamepadSensorUpdateEvent(EventInfo&){}
     void gamepadUpdateCompleteEvent(EventInfo&){}
     void gamepadSteamHandleUpdatedEvent(EventInfo&){}
+    
     void fingerDownEvent(EventInfo&){}
     void fingerUpEvent(EventInfo&){}
     void fingerMotionEvent(EventInfo&){}
     void clipboardUpdateEvent(EventInfo&){}
+    
     void dropFileEvent(EventInfo&){}
     void dropTextEvent(EventInfo&){}
     void dropBeginEvent(EventInfo&){}
     void dropCompleteEvent(EventInfo&){}
     void dropPositionEvent(EventInfo&){}
+
     void audioDeviceAddedEvent(EventInfo&){}
     void audioDeviceRemovedEvent(EventInfo&){}
     void audioDeviceFormatChangedEvent(EventInfo&){}
@@ -267,13 +392,13 @@ namespace Raindrop::Window{
             .e = e,
             .windows = _windows
         };
-
         
+        // SDL_PumpEvents();
         while (SDL_PollEvent(&e)){
 
             // TODO: move this
-            if (ImGui::GetCurrentContext() != nullptr)
-                ImGui_ImplSDL3_ProcessEvent(&e);
+            // if (ImGui::GetCurrentContext() != nullptr)
+                // ImGui_ImplSDL3_ProcessEvent(&e);
 
             switch (e.type){
 

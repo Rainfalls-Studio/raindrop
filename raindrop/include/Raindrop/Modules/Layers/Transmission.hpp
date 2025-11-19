@@ -3,20 +3,11 @@
 #include <typeindex>
 
 namespace Raindrop::Layers{
-    struct TransmissionBase{
-        virtual ~TransmissionBase() = default;
-        virtual std::type_index type() const noexcept = 0;
-    };
-
-    template<typename T>
-    struct Transmission : public TransmissionBase{
+    struct Transmission{
         virtual ~Transmission() = default;
-
-        virtual std::type_index type() const noexcept final override;
+        
+        std::type_index type() const noexcept{
+            return typeid(*this);
+        }
     };
-
-    template<typename T>
-    std::type_index Transmission<T>::type() const noexcept {
-        return typeid(T);
-    }
 }

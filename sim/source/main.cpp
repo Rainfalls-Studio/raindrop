@@ -31,8 +31,10 @@ class Sim : public Raindrop::Modules::IModule{
             _renderCore = init.getDependencyAs<Raindrop::Render::RenderCoreModule>("RenderCore");
             _imGuiModule = init.getDependencyAs<Raindrop::ImGui::ImGuiModule>("ImGui");
             _outputs = init.getDependencyAs<Raindrop::Render::RenderOutputModule>("RenderOutput");
+            _layers = init.getDependencyAs<Raindrop::Layers::LayerModule>("Layer");
 
             setupMounts();
+            setupLayers();
             registerFactories();
             createWindow();
             createBufferContext();
@@ -141,6 +143,10 @@ class Sim : public Raindrop::Modules::IModule{
             
         }
 
+        void setupLayers(){
+            // _layer = _layers->manager()->get();
+        }
+
         void setupMounts(){
             Raindrop::Filesystem::Path parent = _filesystem->getExecutableDirectory().parent();
 
@@ -231,6 +237,7 @@ class Sim : public Raindrop::Modules::IModule{
 
         void createImGuiContext(){
             _imGuiCtx = _imGuiModule->createContext(_windowOutput);
+            _imGuiCtx->setLayer(_layers->manager()->get());
         }
 
         void createWindow(){
@@ -261,7 +268,7 @@ class Sim : public Raindrop::Modules::IModule{
             // register the window as output "main"
             _windowOutput = renderOutputMod->createOutput<Raindrop::Render::WindowRenderOutput>("main", _window);
 
-            _windowClosedSubscriber = layer->manager()->get().subscribe<Raindrop::Window::Events::WindowCloseRequest>(
+            _windowClosedSubscriber = layer->manager()->get()->subscribe<Raindrop::Window::Events::WindowCloseRequest>(
                 [this](const Raindrop::Window::Events::WindowCloseRequest& event) -> Raindrop::Layers::Result {
                     if (event.getWindow() == _window){
                         _engine->stop();
@@ -406,6 +413,7 @@ class Sim : public Raindrop::Modules::IModule{
         std::shared_ptr<Raindrop::ImGui::ImGuiModule> _imGuiModule;
         std::shared_ptr<Raindrop::ImGui::ImGuiContext> _imGuiCtx;
         std::shared_ptr<Raindrop::Asset::AssetModule> _assets;
+        std::shared_ptr<Raindrop::Layers::LayerModule> _layers;
 
         std::shared_ptr<Editor::Editor> _editor;
         std::shared_ptr<Raindrop::Render::RenderCommandContext> _bufferCtx;

@@ -100,40 +100,13 @@
 #endif
 
 // SDL Data
-struct ImGui_ImplSDL3_Data
-{
-    SDL_Window*             Window;
-    SDL_WindowID            WindowID;
-    SDL_Renderer*           Renderer;
-    Uint64                  Time;
-    char*                   ClipboardTextData;
-    char                    BackendPlatformName[48];
 
-    // IME handling
-    SDL_Window*             ImeWindow;
-
-    // Mouse handling
-    Uint32                  MouseWindowID;
-    int                     MouseButtonsDown;
-    SDL_Cursor*             MouseCursors[ImGuiMouseCursor_COUNT];
-    SDL_Cursor*             MouseLastCursor;
-    int                     MousePendingLeaveFrame;
-    bool                    MouseCanUseGlobalState;
-    bool                    MouseCanUseCapture;
-
-    // Gamepad handling
-    ImVector<SDL_Gamepad*>      Gamepads;
-    ImGui_ImplSDL3_GamepadMode  GamepadMode;
-    bool                        WantUpdateGamepadsList;
-
-    ImGui_ImplSDL3_Data()   { memset((void*)this, 0, sizeof(*this)); }
-};
 
 // Backend data stored in io.BackendPlatformUserData to allow support for multiple Dear ImGui contexts
 // It is STRONGLY preferred that you use docking branch with multi-viewports (== single Dear ImGui context + multiple windows) instead of multiple Dear ImGui contexts.
 // FIXME: multi-context support is not well tested and probably dysfunctional in this backend.
 // FIXME: some shared resources (mouse cursor shape, gamepad) are mishandled when using multi-context.
-static ImGui_ImplSDL3_Data* ImGui_ImplSDL3_GetBackendData()
+ImGui_ImplSDL3_Data* ImGui_ImplSDL3_GetBackendData()
 {
     return ImGui::GetCurrentContext() ? (ImGui_ImplSDL3_Data*)ImGui::GetIO().BackendPlatformUserData : nullptr;
 }

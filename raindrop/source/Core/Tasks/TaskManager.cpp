@@ -135,8 +135,9 @@ namespace Raindrop::Tasks{
             }
 
             auto end = Time::now();
+            auto duration = end - start;
 
-            inst.ref->profile.addRun(end - start);
+            inst.ref->profile.addRun(duration);
             
             if (res.type == TaskStatus::RETRY) {
                 lock.lock();

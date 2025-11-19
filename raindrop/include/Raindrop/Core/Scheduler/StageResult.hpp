@@ -1,5 +1,6 @@
 #pragma once
 
+#include <variant>
 #include "Raindrop/Core/Time/Clock.hpp"
 
 namespace Raindrop::Scheduler{

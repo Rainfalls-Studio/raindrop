@@ -1,7 +1,12 @@
 #pragma once
 
+#include <Raindrop/Modules/Event/Event.hpp>
+#include <Raindrop/Modules/Event/MouseEvent.hpp>
+#include <Raindrop/Modules/Event/KeyboardEvent.hpp>
+#include <Raindrop/Modules/Window/WindowEvents.hpp>
 #include <imgui.h>
 
+#include <Raindrop/Modules/Layers/Layer.hpp>
 #include <Raindrop/Modules/Render/RenderOutput/IRenderOutput.hpp>
 #include <Raindrop/Modules/Render/Core/RenderCoreModule.hpp>
 
@@ -17,9 +22,29 @@ namespace Raindrop::ImGui{
             void end();
             void render(vk::CommandBuffer cmdBuffer);
 
+            void setLayer(const std::shared_ptr<Layers::Layer>& layer);
+            std::shared_ptr<Layers::Layer> layer();
+
         private:
             std::shared_ptr<Render::RenderCoreModule> _core;
             std::shared_ptr<Render::IRenderOutput> _output;
+            std::shared_ptr<Layers::Layer> _layer;
+
+            std::shared_ptr<Layers::Subscriber<Event::Event>> _eventSubscriber;
+
+            std::mutex _mtx;
+
+            struct EventBuffer{
+                using Fnc = std::function<void(::ImGuiIO&)>;
+                std::vector<Fnc> events;
+
+                bool wantCaptureMouse;
+                bool wantCaptureKeyboard;
+            };
+
+            EventBuffer _frontEventCaptures;
+            EventBuffer _backEventCaptures;
+
             NativeContext* _ctx;
 
             vk::DescriptorPool _pool;
@@ -28,8 +53,26 @@ namespace Raindrop::ImGui{
             vk::DescriptorPool createDescriptorPool();
             void destroyDescriptorPool();
 
+            bool handleEvent(const Event::Event& e);
+            bool handleMouseEvent(const Event::MouseEvent& e);
+            bool handleKeyboardEvent(const Event::KeyboardEvent& e);
+            bool handleWindowEvent(const Window::Events::WindowEvent& e);
+
     };
 
+    class EventStage : public Scheduler::IStage{
+        public:
+            EventStage(std::shared_ptr<ImGuiContext> context);
+            virtual ~EventStage() = default;
+
+            virtual const char* name() const override;
+
+            virtual void shutdown() override;
+            virtual Scheduler::StageResult execute() override;
+            
+        private:
+            std::weak_ptr<ImGuiContext> _ctx;
+    };
 
     class BeginStage : public Scheduler::IStage{
         public:
@@ -38,7 +81,6 @@ namespace Raindrop::ImGui{
 
             virtual const char* name() const override;
 
-            // inline virtual void initialize(StageInitHelper& helper [[maybe_unused]]) {}
             virtual void shutdown() override;
             virtual Scheduler::StageResult execute() override;
 
@@ -54,7 +96,6 @@ namespace Raindrop::ImGui{
 
             virtual const char* name() const override;
 
-            // inline virtual void initialize(StageInitHelper& helper [[maybe_unused]]) {}
             virtual void shutdown() override;
             virtual Scheduler::StageResult execute() override;
 

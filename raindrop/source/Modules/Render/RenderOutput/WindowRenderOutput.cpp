@@ -48,7 +48,7 @@ namespace Raindrop::Render{
     }
 
     WindowRenderOutput::WindowRenderOutput(Window::SharedWindow window) : _window{window}{
-        _wantedPresentMode = vk::PresentModeKHR::eFifo;
+        _wantedPresentMode = vk::PresentModeKHR::eFifoRelaxed; // instead of Fifo because wayland doesn't support well external displays
         _wantedSurfaceFormat = {vk::Format::eR8G8B8A8Srgb, vk::ColorSpaceKHR::eSrgbNonlinear};
         _wantedFrameCount = 2;
     }
@@ -429,7 +429,8 @@ namespace Raindrop::Render{
     }
 
     std::expected<vk::Semaphore, Error> WindowRenderOutput::acquire(vk::Fence fence, uint64_t timeout){
-        if (_window.expired()){
+        auto window = _window.lock();
+        if (!window){
             spdlog::error("Window is not valid");
             return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
         }
@@ -540,11 +541,9 @@ namespace Raindrop::Render{
             static Time::TimePoint start = Time::now();
             Time::Duration a(Time::now() - start);
 
-            float s = static_cast<float>(a.as<Time::milliseconds>().count()) / 1000.f;
-
             vk::ClearValue clear{
                 vk::ClearColorValue(
-                    sin(s) * 0.5 + 0.5, cos(s) * 0.5 + 0.5, 0.f, 0.f
+                    .1f, .1f, .1f, 0.f
                 )
             };
 

@@ -13,8 +13,8 @@ namespace Raindrop::Layers{
                 return _root.get();
             }
 
-            inline Layer& get(){
-                return *_root;
+            inline std::shared_ptr<Layer> get(){
+                return _root;
             }
 
         private:

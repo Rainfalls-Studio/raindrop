@@ -27,11 +27,11 @@ namespace Raindrop::Layers{
 
             template<typename T>
             void transmit(const T& transmission){
-                static_assert(std::is_base_of<Transmission<T>, T>::value, "T has to be derived from Transmission<T>");
-                transmit(*static_cast<const TransmissionBase*>(&transmission));
+                static_assert(std::is_base_of<Transmission, T>::value, "T has to be derived from Transmission<T>");
+                transmit(*static_cast<const Transmission*>(&transmission));
             }
 
-            void transmit(const TransmissionBase& transmission);
+            void transmit(const Transmission& transmission);
 
             template<typename T, typename... Args>
             std::shared_ptr<Subscriber<T>> subscribe(Args&&... args){
@@ -64,8 +64,8 @@ namespace Raindrop::Layers{
             void sortSubscribers_unsafe();
             std::vector<std::weak_ptr<SubscriberBase>> _subscribers;
 
-            Result transmit_unsafe(const TransmissionBase& transmission);
-            Result signalSubsribers(const TransmissionBase& transmission);
-            void transmitChildren(const TransmissionBase& transmission);
+            Result transmit_unsafe(const Transmission& transmission);
+            Result signalSubsribers(const Transmission& transmission);
+            void transmitChildren(const Transmission& transmission);
     };
 }
