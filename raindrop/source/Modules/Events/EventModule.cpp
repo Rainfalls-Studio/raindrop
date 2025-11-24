@@ -40,6 +40,7 @@ namespace Raindrop::Event{
             
             layers->manager()->get()->transmit(*event);
         }
+        _events.clear();
     }
 
     inline Modules::DependencyList EventModule::dependencies() const noexcept{

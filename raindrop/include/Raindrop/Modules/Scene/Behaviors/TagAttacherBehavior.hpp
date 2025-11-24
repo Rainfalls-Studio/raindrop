@@ -8,5 +8,6 @@ namespace Raindrop::Behaviors{
             virtual ~TagAttacherBehavior() override = default;
 
             virtual void onCreate(Scene::Entity& entity) override;
+            virtual const char* name() const override;
     };
 }

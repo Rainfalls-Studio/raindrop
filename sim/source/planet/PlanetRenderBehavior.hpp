@@ -3,12 +3,34 @@
 #include <Raindrop/Raindrop.hpp>
 
 namespace Planet{
+    class PreRenderBehavior : public Raindrop::Scene::IBehavior{
+        public:
+            PreRenderBehavior(std::weak_ptr<Raindrop::Render::RenderCommandContext> cmdCtx);
+
+            virtual void initialize(Raindrop::Engine& engine, Raindrop::Scene::Scene& scene) override;
+            virtual void shutdown() override;
+            virtual const char* name() const override;
+
+            virtual void execute() override;
+
+        private:
+            Raindrop::Scene::Scene* _scene;
+            Raindrop::Scene::BehaviorID _snapshotService;
+            Raindrop::Scene::BehaviorID _planetService;
+            Raindrop::Behaviors::FrameSnapshotService::SlotID _planetSlot;
+
+            std::shared_ptr<Raindrop::Render::RenderCoreModule> _core;
+            std::weak_ptr<Raindrop::Render::RenderCommandContext> _cmdCtx;
+
+    };
+
     class RenderBehavior : public Raindrop::Scene::IBehavior{
         public:
             RenderBehavior(std::weak_ptr<Raindrop::Render::IRenderOutput> output, std::weak_ptr<Raindrop::Render::RenderCommandContext> cmdCtx);
 
             virtual void initialize(Raindrop::Engine& engine, Raindrop::Scene::Scene& scene) override;
             virtual void shutdown() override;
+            virtual const char* name() const override;
 
             virtual void execute() override;
 

@@ -59,6 +59,8 @@ target_link_libraries(Raindrop
     EnTT::EnTT
 )
 
+add_library(Raindrop::Raindrop ALIAS Raindrop)
+
 target_compile_definitions(Raindrop
     PUBLIC
     VULKAN_HPP_NO_EXCEPTIONS

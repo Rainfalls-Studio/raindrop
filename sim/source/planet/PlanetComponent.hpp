@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include "PlanetServiceBehavior.hpp"
+#include "../Editor/Editor.hpp"
 
 namespace Planet{
     struct PlanetComponent{
@@ -12,5 +13,7 @@ namespace Planet{
 
         // component has been updated
         bool dirty = true;
+
+        static void RegisterComponent(Editor::Editor& editor);
     };
 }

@@ -31,10 +31,13 @@ class CameraUpdateBehavior : public Raindrop::Scene::IBehavior{
             for (auto entity : cameras){
                 const auto& [camera, transform] = cameras.get(entity);
                 
-                Camera::RenderData* renderData;
-                service->writeSlot(_cameraSlot, renderData);
+                auto renderData = service->writeSlot<Camera::RenderData>(_cameraSlot);
                 renderData->viewProjection = camera.getProjectionMatrix() * glm::inverse(transform.worldTransform);
             }
+        }
+
+        virtual const char* name() const override{
+            return "Camera - Update";
         }
     
     private:

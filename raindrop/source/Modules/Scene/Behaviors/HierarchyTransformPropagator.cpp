@@ -79,4 +79,8 @@ namespace Raindrop::Behaviors{
             }
         }
     }
+
+    const char* HierarchyTransformPropagator::name() const{
+        return "Hierarchy Transform Propagator";
+    }
 }

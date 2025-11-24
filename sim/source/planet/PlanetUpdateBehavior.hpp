@@ -9,6 +9,7 @@ namespace Planet{
 
             virtual void initialize(Raindrop::Engine& engine, Raindrop::Scene::Scene& scene) override;
             virtual void shutdown() override;
+            virtual const char* name() const override;
 
             virtual void execute() override;
 

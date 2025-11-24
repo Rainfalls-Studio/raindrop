@@ -14,6 +14,8 @@ namespace Raindrop::Behaviors{
 
                     virtual void initialize(Engine& engine, Scene::Scene& scene) override;
                     virtual void execute() override;
+
+                    virtual const char* name() const override;
                 
                 private:
                     Scene::Scene* _scene;
@@ -27,6 +29,8 @@ namespace Raindrop::Behaviors{
 
                     virtual void initialize(Engine& engine, Scene::Scene& scene) override;
                     virtual void execute() override;
+
+                    virtual const char* name() const override;
                 
                 private:
                     Scene::Scene* _scene;
@@ -40,6 +44,8 @@ namespace Raindrop::Behaviors{
 
                     virtual void initialize(Engine& engine, Scene::Scene& scene) override;
                     virtual void execute() override;
+
+                    virtual const char* name() const override;
                 
                 private:
                     Scene::Scene* _scene;
@@ -53,16 +59,45 @@ namespace Raindrop::Behaviors{
 
                     virtual void initialize(Engine& engine, Scene::Scene& scene) override;
                     virtual void execute() override;
+
+                    virtual const char* name() const override;
                 
                 private:
                     Scene::Scene* _scene;
                     Scene::BehaviorID _serviceID;
             };
 
-
-
             using SlotID = uint32_t;
             static constexpr SlotID INVALID_SLOT_ID = ~static_cast<SlotID>(0);
+
+            template<typename T>
+            struct Handle{
+                Handle(Offset offset, FrameSnapshotService& service) : offset{offset}, service{service}{}
+                Handle(Handle<T>&& ) = default;
+                Handle(const Handle<T>&) = default;
+
+                template<typename U> requires std::is_convertible_v<U*, T*> || std::is_void_v<U>
+                Handle(const Handle<U>& other) : offset(other.offset), service(other.service) {}
+
+                Offset offset;
+                FrameSnapshotService& service;
+                
+                inline T* get(){
+                    return static_cast<T*>(service.resolveWrite(offset));
+                }
+
+                inline T* operator->(){
+                    return get();
+                }
+
+                inline Handle<T> operator[](size_t i){
+                    return Handle<T>(offset + sizeof(T) * i, service);
+                }
+
+                inline operator Offset() const{
+                    return offset;
+                }
+            };
 
             /**
              * @brief Construct a new Frame Snapshot Service object
@@ -73,6 +108,8 @@ namespace Raindrop::Behaviors{
             virtual ~FrameSnapshotService() override = default;
 
             virtual void initialize(Engine& engine, Scene::Scene& scene) override;
+
+            virtual const char* name() const override;
 
 
         
@@ -119,27 +156,62 @@ namespace Raindrop::Behaviors{
             void lockWrite();
             void writeRelease();
 
+            /**
+             * @brief Allocate a buffer of size 'size' in the current buffer arena
+             * @warning doing this may invalidate all pointers to the arena (as it may reallocate). This is why we use handles
+             * 
+             * @param size the size of the buffer
+             * @return Offset 
+             */
+            Offset allocate(size_t size);
+
+            /**
+             * @brief Used to write an instance data to a given slot
+             * 
+             * @tparam T the type of the data
+             * @param slot the slot to write to
+             * @return Handle<T> a handle to the allocated slot
+             */
             template<typename T>
-            inline void writeSlot(SlotID slot, T*& v){
-                writeSlotRaw(slot, reinterpret_cast<void**>(&v));
+            inline Handle<T> writeSlot(SlotID slot){
+                return Handle<T>(writeSlotRaw(slot));
             }
 
             /**
-             * @brief Write an instance data to a given slot
+             * @brief Used to write an instance data to a given slot
              * 
-             * @param slot the slot to write the data into
-             * @param instance the payload pointer reference
+             * @param slot the slot to write to
+             * @return Handle<void*> a handle to the allocated slot
              */
-            void writeSlotRaw(SlotID slot, void** instance);
+            Handle<void> writeSlotRaw(SlotID slot);
+
 
             /**
-             * @brief Store an undefined type of data in the arena, returning it's offset in the buffer
+             * @brief Used to write an undefined ammount of data to the current write buffer
              * 
-             * @param data reference to the allocated data
-             * @param size the size of the payload
-             * @return Offset 
+             * @return Handle<void*> a handle to the allocated buffer
              */
-            Offset storeRaw(void** data, size_t size);
+            Handle<void> writeRaw(size_t size);
+
+            /**
+             * @brief Used to write data to the current write buffer's arena
+             * 
+             * @tparam T the type of the data
+             * @param n The number of instances, usually 1 but can be greater in case of arrays
+             * @return Handle<T> a handle to the allocated buffer
+             */
+            template<typename T>
+            inline Handle<T> write(size_t n=1){
+                return Handle<T>(writeRaw(sizeof(T) * n));
+            }
+
+            /**
+             * @brief Return the pointer of the given offset in the current write buffer arena. This pointer is valid until an allocation operation is made
+             * 
+             * @param offset the offset in the arena
+             * @return void* 
+             */
+            void* resolveWrite(Offset offset);
 
 
             // --- Reading ------------------------------------------------------------------
@@ -155,8 +227,12 @@ namespace Raindrop::Behaviors{
                 return *reinterpret_cast<const T*>(readRaw(off));
             }
 
-            const void* readRaw(Offset off) const;
+            template<typename T>
+            inline const T* readPtr(Offset off) const{
+                return reinterpret_cast<const T*>(readRaw(off));
+            }
 
+            const void* readRaw(Offset off) const;
         
         private:
             bool hasReadyUnsafe() const;

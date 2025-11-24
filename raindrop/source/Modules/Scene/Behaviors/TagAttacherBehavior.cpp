@@ -7,4 +7,8 @@ namespace Raindrop::Behaviors{
         auto& comp = entity.emplace<Components::Tag>();
         comp.tag = "Entity : " + std::to_string(entity.getHandle());
     }
+
+    const char* TagAttacherBehavior::name() const{
+        return "Tag Attacher";
+    }
 }

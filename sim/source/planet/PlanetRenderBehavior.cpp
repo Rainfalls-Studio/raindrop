@@ -14,6 +14,100 @@ namespace Planet{
         glm::mat4 viewTransform;
     };
 
+
+
+    PreRenderBehavior::PreRenderBehavior(std::weak_ptr<Raindrop::Render::RenderCommandContext> cmdCtx) : _cmdCtx(cmdCtx){
+
+    }
+
+    void PreRenderBehavior::initialize(Raindrop::Engine& engine, Raindrop::Scene::Scene& scene){
+        _scene = &scene;
+
+        _planetService = scene.getBehaviorIndex<ServiceBehavior>();
+        _snapshotService = scene.getBehaviorIndex<FrameSnapshotService>();
+
+
+        if (_snapshotService != FrameSnapshotService::INVALID_SLOT_ID){
+            auto snapshotService = scene.getBehavior<FrameSnapshotService>(_snapshotService);
+            _planetSlot = snapshotService->registerSlot<RenderDataPayload>();
+        }
+
+        auto& modules = engine.getModuleManager();
+
+        _core = modules.getModuleAs<Raindrop::Render::RenderCoreModule>("RenderCore");
+    }
+
+    void PreRenderBehavior::shutdown(){}
+
+    void PreRenderBehavior::execute(){
+        if (_planetService == Raindrop::Scene::INVALID_BEHAVIOR_ID) return;
+
+        auto cmdCtx = _cmdCtx.lock();
+        if (!cmdCtx) return;
+        
+        auto service = _scene->getBehavior<ServiceBehavior>(_planetService);
+        if (!service) return;
+
+        auto view = _scene->registry().view<PlanetComponent, Transform>();
+        if (view.size_hint() == 0) return;
+
+        auto frameSnapshot = _scene->getBehavior<FrameSnapshotService>(_snapshotService);
+        if (!frameSnapshot) return;
+
+        if (_planetSlot == FrameSnapshotService::INVALID_SLOT_ID) return;
+
+
+        const auto& planetOffsets = frameSnapshot->readSlotOffsets(_planetSlot);
+
+        for (auto planetOffset : planetOffsets){
+            const auto& planet = frameSnapshot->read<RenderDataPayload>(planetOffset);
+
+            if (planet.id == INVALID_PLANET_ID) continue;
+
+            // we want to write the chunk instance ids
+            const auto& chunks = frameSnapshot->readPtr<ChunkDataPayload>(planet.chunks);
+
+            const auto& runtime = service->getRuntimeData(planet.id);
+
+            if (!runtime) continue;
+            if (!runtime->valid) continue;
+            
+
+            if (!runtime->render.has_value()){
+                runtime->render.emplace(service->constructPlanetRenderData());
+            }
+
+            const auto& renderData = runtime->render.value();
+
+            PlanetRenderData::Instance* mapped = static_cast<PlanetRenderData::Instance*>(renderData.instances.mapped);
+            // uint32_t offset = 0;
+
+            for (uint32_t i=0; i<planet.chunkCount; i++){
+                auto& chunk = chunks[i];
+                uint32_t index = chunk.instanceIndex;
+
+                auto& map = mapped[index];
+
+                map.face = static_cast<uint32_t>(chunk.face);
+                map.offsetUV = chunk.uvMin;
+                map.sizeUV = chunk.uvScale;
+                
+                map.packedNeighbors = 
+                    (static_cast<uint32_t>(chunk.neighorLOD[0]) << 0)  |
+                    (static_cast<uint32_t>(chunk.neighorLOD[1]) << 8)  |
+                    (static_cast<uint32_t>(chunk.neighorLOD[2]) << 16) |
+                    (static_cast<uint32_t>(chunk.neighorLOD[3]) << 24);
+
+                // memcpy(void *__restrict dest, const void *__restrict src, size_t n)
+            }
+        }
+    }
+
+    const char* PreRenderBehavior::name() const{
+        return "Planet - Pre-render";
+    }
+
+
     RenderBehavior::RenderBehavior(std::weak_ptr<Raindrop::Render::IRenderOutput> output, std::weak_ptr<Raindrop::Render::RenderCommandContext> cmdCtx) :
         _output{output},
         _cmdCtx(cmdCtx)
@@ -62,7 +156,7 @@ namespace Planet{
 
     void RenderBehavior::execute(){
 
-        if (_planetService == INVALID_PLANET_ID) return;
+        if (_planetService == Raindrop::Scene::INVALID_BEHAVIOR_ID) return;
 
         auto output = _output.lock();
         if (!output) return;
@@ -135,6 +229,7 @@ namespace Planet{
                 const auto& indexCount = renderData.grid.index.count;
 
                 const vk::Buffer& vertexBuffer = renderData.grid.vertex.buffer;
+                const vk::Buffer& instanceBuffer = renderData.instances.buffer;
 
                 PushConstant pc{
                     planet.transform,
@@ -142,10 +237,19 @@ namespace Planet{
                 };
 
                 cmd.pushConstants<PushConstant>(_pipelineLayout, vk::ShaderStageFlagBits::eVertex, 0, pc);
-
-                cmd.bindVertexBuffers(0, vertexBuffer, {0});
+                cmd.bindVertexBuffers(0, {vertexBuffer, instanceBuffer}, {0, 0});
                 cmd.bindIndexBuffer(indexBuffer, 0, vk::IndexType::eUint32);
-                cmd.drawIndexed(indexCount, 1, 0, 0, 0);
+
+                auto chunkCount = planet.chunkCount;
+                const auto& chunks = frameSnapshot->readPtr<ChunkDataPayload>(planet.chunks);
+
+
+                for (uint32_t i=0; i<chunkCount; i++){
+                    const auto& chunk = chunks[i];
+
+                    uint32_t instanceIndex = chunk.instanceIndex;
+                    cmd.drawIndexed(indexCount, 1, 0, 0, instanceIndex);
+                }
             }
         }
     }
@@ -179,12 +283,25 @@ namespace Planet{
             _fragmentShader->stageInfo()
         };
 
-        vk::VertexInputBindingDescription inputBinding = PlanetRenderData::Vertex::description();
-        auto inputAttributes = PlanetRenderData::Vertex::attributes();
+        vk::VertexInputBindingDescription inputBindings[] = {
+            PlanetRenderData::Vertex::description(),
+            PlanetRenderData::Instance::description(1),
+        };
+
+        std::vector<vk::VertexInputAttributeDescription> inputAttributes = PlanetRenderData::Vertex::attributes();
+        {
+            auto instanceDescription = PlanetRenderData::Instance::attributes(2, 1);
+
+            inputAttributes.insert(
+                inputAttributes.end(),
+                instanceDescription.begin(),
+                instanceDescription.end()
+            );
+        }
 
         vk::PipelineVertexInputStateCreateInfo inputStage(
             {},
-            inputBinding,
+            inputBindings,
             inputAttributes
         );
 
@@ -304,5 +421,9 @@ namespace Planet{
         } else {
             _pipeline = result.value;
         }
+    }
+
+    const char* RenderBehavior::name() const{
+        return "Planet Render";
     }
 }

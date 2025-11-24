@@ -11,7 +11,7 @@ namespace Planet{
             glm::vec2 position;
             glm::vec2 uv;
 
-            static std::array<vk::VertexInputAttributeDescription, 2> attributes(uint32_t binding=0);
+            static std::vector<vk::VertexInputAttributeDescription> attributes(uint32_t binding=0);
             static vk::VertexInputBindingDescription description(uint32_t binding=0);
         };
 
@@ -22,8 +22,9 @@ namespace Planet{
             uint32_t face;
             glm::vec2 offsetUV;
             float sizeUV;
+            uint32_t packedNeighbors;
 
-            static std::array<vk::VertexInputAttributeDescription, 3> attributes(uint32_t binding=0);
+            static std::vector<vk::VertexInputAttributeDescription> attributes(uint32_t startLocation=0, uint32_t binding=0);
             static vk::VertexInputBindingDescription description(uint32_t binding=0);
         };
 
@@ -48,6 +49,7 @@ namespace Planet{
             VmaAllocation allocation;
             uint32_t maxCount;
             uint32_t count;
+            void* mapped;
         } instances;
 
         vk::DescriptorSet set;
@@ -55,6 +57,7 @@ namespace Planet{
         struct Config{
             uint32_t xcells;
             uint32_t ycells;
+            uint8_t maxLod;
         };
 
         PlanetRenderData(std::shared_ptr<Raindrop::Render::RenderCoreModule> renderCore, const Config& conf);
@@ -72,12 +75,21 @@ namespace Planet{
 
         void createVertexBuffer(const Config& config);
         void createIndexBuffer(const Config& config);
+        void createInstanceBuffer(const Config& config);
+
     };
 
     enum class Face{
         PX, NX,
         PY, NY,
         PZ, NZ
+    };
+
+    enum class Neighbor{
+        NORTH,
+        SOUTH,
+        EAST,
+        WEST
     };
 
     struct PlanetLODData{
@@ -91,11 +103,15 @@ namespace Planet{
             ChunkNode* children[4];
         };
 
-        ChunkNode faces[6];
+        std::vector<ChunkNode> nodes;
+        ChunkNode* faces[6];
+
+        uint32_t maxLod;
     };
 
     struct RuntimePlanet{
         bool valid = false;
+
         PlanetLODData lod;
         std::optional<PlanetRenderData> render;
     };
@@ -108,13 +124,27 @@ namespace Planet{
         PlanetID id;
     };
 
+    struct ChunkDataPayload{
+        glm::vec3 center;
+        
+        glm::vec2 uvMin;
+        float uvScale;
+
+        Face face;
+        uint8_t lod;
+        uint8_t neighorLOD[4];
+
+        uint32_t instanceIndex;
+    };
+
     class ServiceBehavior : public Raindrop::Scene::IBehavior{
         public:
             ServiceBehavior();
             ~ServiceBehavior();
 
-            virtual void initialize(Raindrop::Engine& engine, Raindrop::Scene::Scene& scene);
-            virtual void shutdown();
+            virtual void initialize(Raindrop::Engine& engine, Raindrop::Scene::Scene& scene) override;
+            virtual void shutdown() override;
+            virtual const char* name() const override;
 
             PlanetID createPlanet();
             RuntimePlanet* getRuntimeData(PlanetID id);

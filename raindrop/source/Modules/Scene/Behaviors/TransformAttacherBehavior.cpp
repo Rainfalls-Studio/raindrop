@@ -6,4 +6,8 @@ namespace Raindrop::Behaviors{
     void TransformAttacherBehavior::onCreate(Scene::Entity& entity){
         entity.emplace<Components::Transform>();
     }
+
+    const char* TransformAttacherBehavior::name() const{
+        return "Transform Attacher";
+    }
 }

@@ -31,7 +31,7 @@ namespace ImGuiHelper{
 
         if (dropSource && entityValid && ImGui::BeginDragDropSource()){
             ImGui::SetDragDropPayload("ENTITY", &entity, sizeof(Entity));
-            ImGui::Text("Entity %s", name.c_str());
+            ImGui::Text("Entity \"%s\"", name.c_str());
             ImGui::EndDragDropSource();
         }
 

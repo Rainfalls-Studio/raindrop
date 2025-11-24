@@ -327,7 +327,7 @@ namespace Raindrop::ImGui{
         ImGui_ImplSDL3_NewFrame();
         ::ImGui::NewFrame();
 
-        float scale = _output->scale();
+        float scale = 1.f;// _output->scale();
 
         ImGuiStyle& style = ::ImGui::GetStyle();
         ImGuiStyle styleold = style; // Backup colors
@@ -396,7 +396,8 @@ namespace Raindrop::ImGui{
         using namespace Window::Events;
 
         if (const WindowMouseEntered* mouseEnteredEvent = dynamic_cast<const WindowMouseEntered*>(&e)){
-            _backEventCaptures.events.push_back([event=*mouseEnteredEvent](::ImGuiIO&){
+            const auto event = *mouseEnteredEvent;
+            _backEventCaptures.events.push_back([event](::ImGuiIO&){
 
                 ImGui_ImplSDL3_Data* bd = ImGui_ImplSDL3_GetBackendData();
 
@@ -405,21 +406,23 @@ namespace Raindrop::ImGui{
             });
         }
         else if (const WindowMouseLeaved* mouseLeavedEvent = dynamic_cast<const WindowMouseLeaved*>(&e)){
-            _backEventCaptures.events.push_back([event=*mouseLeavedEvent](::ImGuiIO&){
+            const auto event = *mouseLeavedEvent;
+            _backEventCaptures.events.push_back([event](::ImGuiIO&){
 
                 ImGui_ImplSDL3_Data* bd = ImGui_ImplSDL3_GetBackendData();
-
                 bd->MousePendingLeaveFrame = ::ImGui::GetFrameCount() + 1;
                 // bd->MouseWindowID = event->window.windowID;
             });
         }
         else if (const WindowFocusGained* focusGainedEvent = dynamic_cast<const WindowFocusGained*>(&e)){
-            _backEventCaptures.events.push_back([event=*focusGainedEvent](::ImGuiIO& io){
+            const auto event = *focusGainedEvent;
+            _backEventCaptures.events.push_back([event](::ImGuiIO& io){
                 io.AddFocusEvent(true);
             });
         }
         else if (const WindowFocusLost* focusLostEvent = dynamic_cast<const WindowFocusLost*>(&e)){
-            _backEventCaptures.events.push_back([event=*focusLostEvent](::ImGuiIO& io){
+            const auto event = *focusLostEvent;
+            _backEventCaptures.events.push_back([event](::ImGuiIO& io){
                 io.AddFocusEvent(false);
             });
         }
@@ -455,12 +458,14 @@ namespace Raindrop::ImGui{
             });
         }
         else if (const Event::MouseMovedEvent* movedEvent = dynamic_cast<const Event::MouseMovedEvent*>(&e)){
-            _backEventCaptures.events.push_back([event=*movedEvent](::ImGuiIO& io){
+            const auto event = *movedEvent;
+            _backEventCaptures.events.push_back([event](::ImGuiIO& io){
                 io.AddMousePosEvent(event.position().x, event.position().y);
             });
         }
         else if (const Event::MouseWheelEvent* wheelEvent = dynamic_cast<const Event::MouseWheelEvent*>(&e)){
-            _backEventCaptures.events.push_back([event=*wheelEvent](::ImGuiIO& io){
+            const auto event = *wheelEvent;
+            _backEventCaptures.events.push_back([event](::ImGuiIO& io){
                 io.AddMouseWheelEvent(event.wheel().x, event.wheel().y);
             });
         }
@@ -470,12 +475,14 @@ namespace Raindrop::ImGui{
 
     bool ImGuiContext::handleKeyboardEvent(const Event::KeyboardEvent& e){
         if (const Event::TextInputEvent* textEvent = dynamic_cast<const Event::TextInputEvent*>(&e)){
-            _backEventCaptures.events.push_back([event=*textEvent](::ImGuiIO& io){
+            const auto event = *textEvent;
+            _backEventCaptures.events.push_back([event](::ImGuiIO& io){
                 io.AddInputCharactersUTF8(event.text().c_str());
             });
         }
         else if (const Event::KeyEvent* keyEvent = dynamic_cast<const Event::KeyEvent*>(&e)){
-            _backEventCaptures.events.push_back([event=*keyEvent](::ImGuiIO& io){
+            const auto event = *keyEvent;
+            _backEventCaptures.events.push_back([event](::ImGuiIO& io){
                 io.AddKeyEvent(ImGui_Raindrop_KeyEventToImGuiKey(event.key(), event.physicalKey()), event.down());
             });
         }

@@ -140,7 +140,7 @@ class Sim : public Raindrop::Modules::IModule{
                 }
             });
 
-            
+            Planet::PlanetComponent::RegisterComponent(*_editor);
         }
 
         void setupLayers(){
@@ -297,6 +297,7 @@ class Sim : public Raindrop::Modules::IModule{
                     .addStage<Raindrop::Render::RenderCommandContext::BeginStage>(_bufferCtx)
 
                         // .addStage<Raindrop::Scene::PhaseExecutionStage>(_scene, _renderPhase)
+                        // .addStage<Planet::PreRenderBehavior>(_scene)
 
 
                         // offscreen render 
@@ -359,13 +360,14 @@ class Sim : public Raindrop::Modules::IModule{
             _scene->addToPhase(phase.postUpdate, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::ReleaseWrite>());
             
             _scene->addToPhase(phase.preRender, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::LockRead>());
+            _scene->addToPhase(phase.preRender, _scene->emplaceBehavior<Planet::PreRenderBehavior>(_bufferCtx));
             _scene->addToPhase(phase.render, _scene->emplaceBehavior<Planet::RenderBehavior>(_offscreenBuffer, _bufferCtx));
             _scene->addToPhase(phase.postRender, _scene->emplaceBehavior<Raindrop::Behaviors::FrameSnapshotService::ReleaseRead>());
 
             // scene.emplaceBehavior<Planet::PreRenderBehavior>().in(Stage::PreRender); // collects visible chunks and 
             // scene.emplaceBehavior<Planet::RenderBehavior>().in(Stage::Render);
 
-            for (int i=0; i<10; i++){
+            for (int i=0; i<1; i++){
                 auto planet = _scene->createEntity();
                 planet.emplace<Planet::PlanetComponent>();
                 planet.get<Raindrop::Components::Tag>().tag = "Planet " + std::to_string(i);

@@ -125,7 +125,7 @@ namespace Editor{
 
         bool open = ImGui::TreeNodeEx("", tree_flags, "%s", name.c_str());
 
-        if (ImGui::IsItemFocused()){
+        if (ImGui::IsItemClicked() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)){
             editor.select(entity);
         }
 
@@ -186,73 +186,97 @@ namespace Editor{
         if (!open) return;
 
         if (ImGui::Begin("Scene - {}", &open)){
-            auto& registry = scene.registry();
-            auto entities = registry.view<Raindrop::Scene::EntityHandle>();
+            if (ImGui::BeginTabBar("tab")){
+                if (ImGui::BeginTabItem("Content")){
+                    auto& registry = scene.registry();
+                    auto entities = registry.view<Raindrop::Scene::EntityHandle>();
 
-            if (auto size = entities->size(); size == 0){
-                ImGui::Text("No entities in the scene");
-            } else if (size == 1){
-                ImGui::Text("1 entity");
-            } else {
-                ImGui::Text("%ld entities", size);
-            }
+                    if (auto size = entities->size(); size == 0){
+                        ImGui::Text("No entities in the scene");
+                    } else if (size == 1){
+                        ImGui::Text("1 entity");
+                    } else {
+                        ImGui::Text("%ld entities", size);
+                    }
 
-            ImGui::SeparatorText("Content");
+                    ImGui::SeparatorText("Content");
 
-            if (ImGui::InputTextWithHint(
-                    "##Filter",
-                    "incl,-excl",
-                    _sceneGraphFilter.InputBuf,
-                    IM_ARRAYSIZE(_sceneGraphFilter.InputBuf),
-                    ImGuiInputTextFlags_EscapeClearsAll))
-            {
-                _sceneGraphFilter.Build();
-            }
+                    if (ImGui::InputTextWithHint(
+                            "##Filter",
+                            "incl,-excl",
+                            _sceneGraphFilter.InputBuf,
+                            IM_ARRAYSIZE(_sceneGraphFilter.InputBuf),
+                            ImGuiInputTextFlags_EscapeClearsAll))
+                    {
+                        _sceneGraphFilter.Build();
+                    }
 
-            ImVec2 size = ImGui::GetWindowSize();
-            size.y -= ImGui::GetCursorPosY();
+                    ImVec2 size = ImGui::GetWindowSize();
+                    size.y -= ImGui::GetCursorPosY();
 
-            if (ImGui::BeginTable("##bg", 1, ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp, size)){
+                    if (ImGui::BeginTable("##bg", 1, ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp, size)){
 
-                for (auto entity_id : entities){
-                    auto entity = Raindrop::Scene::Entity(&scene, entity_id);
-                    
-                    auto name = getEntityName(entity);
+                        for (auto entity_id : entities){
+                            auto entity = Raindrop::Scene::Entity(&scene, entity_id);
+                            
+                            auto name = getEntityName(entity);
 
-                    if (entity.get<Hierarchy>().parent == Raindrop::Scene::INVALID_ENTITY_HANDLE){
+                            if (entity.get<Hierarchy>().parent == Raindrop::Scene::INVALID_ENTITY_HANDLE){
 
-                        if (_sceneGraphFilter.PassFilter(name.c_str())){
-                            renderEntity(entity, editor);
+                                if (_sceneGraphFilter.PassFilter(name.c_str())){
+                                    renderEntity(entity, editor);
+                                }
+                            }
+                        }
+
+                        ImGui::EndTable();
+
+
+                        if (ImGui::BeginDragDropTarget()){
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY")){
+                                Entity dropped = *static_cast<Entity*>(payload->Data);
+                                
+                                if (dropped.hasAny<Hierarchy>()){
+                                    auto& hierarchy = dropped.get<Hierarchy>();
+                                    const bool hasParent = hierarchy.parent != Raindrop::Scene::INVALID_ENTITY_HANDLE;
+
+                                    if (hasParent){
+                                        auto& parentHierarchy = scene.getComponent<Hierarchy>(hierarchy.parent);
+                                        parentHierarchy.children.erase(dropped.getHandle());
+                                    }
+
+                                    if (dropped.hasAny<Raindrop::Components::Transform>()){
+                                        dropped.get<Raindrop::Components::Transform>().dirty = true;
+                                    }
+
+                                    hierarchy.parent = Raindrop::Scene::INVALID_ENTITY_HANDLE;
+                                }
+                            }
+                            ImGui::EndDragDropTarget();
                         }
                     }
+                    ImGui::EndTabItem();
                 }
 
-                ImGui::EndTable();
+                if (ImGui::BeginTabItem("Behaviors")){
+                    // copy
+                    auto behaviors = scene.behaviors();
 
+                    if (ImGui::BeginTable("Behaviors", 1)){
+                        for (auto behavior : behaviors){
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
 
-                if (ImGui::BeginDragDropTarget()){
-                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY")){
-                        Entity dropped = *static_cast<Entity*>(payload->Data);
-                        
-                        if (dropped.hasAny<Hierarchy>()){
-                            auto& hierarchy = dropped.get<Hierarchy>();
-                            const bool hasParent = hierarchy.parent != Raindrop::Scene::INVALID_ENTITY_HANDLE;
-
-                            if (hasParent){
-                                auto& parentHierarchy = scene.getComponent<Hierarchy>(hierarchy.parent);
-                                parentHierarchy.children.erase(dropped.getHandle());
-                            }
-
-                            if (dropped.hasAny<Raindrop::Components::Transform>()){
-                                dropped.get<Raindrop::Components::Transform>().dirty = true;
-                            }
-
-                            hierarchy.parent = Raindrop::Scene::INVALID_ENTITY_HANDLE;
+                            ImGui::Text("%s", behavior->name());
+                            
                         }
+                        ImGui::EndTable();
                     }
-                    ImGui::EndDragDropTarget();
+                    ImGui::EndTabItem();
                 }
+
             }
+            ImGui::EndTabBar();
         }
         
         ImGui::End();
@@ -296,9 +320,13 @@ namespace Editor{
 
                 for (auto& component : editor.components()){
                     if (component.has(selected)){
-                        ImGui::SeparatorText(component.name.c_str());
-                        // spdlog::info("{}", component.name);
-                        component.drawUI(selected);
+                        if (ImGui::CollapsingHeader(component.name.c_str())){
+                            ImGui::PushID(component.name.c_str());
+
+                            component.drawUI(selected);
+                            
+                            ImGui::PopID();
+                        }
                     }
                 }
             }

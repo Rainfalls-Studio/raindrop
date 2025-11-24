@@ -44,7 +44,11 @@ namespace Planet{
     }
 
     PlanetRenderData ServiceBehavior::constructPlanetRenderData(){
-        return PlanetRenderData{_renderCore, PlanetRenderData::Config{5, 5}};
+        return PlanetRenderData{_renderCore, PlanetRenderData::Config{5, 5, 16}};
+    }
+
+    const char* ServiceBehavior::name() const{
+        return "Planet - Service";
     }
 
 
@@ -57,6 +61,7 @@ namespace Planet{
     PlanetRenderData::PlanetRenderData(std::shared_ptr<Raindrop::Render::RenderCoreModule> renderCore, const Config& conf) : _renderCore(renderCore){
         createVertexBuffer(conf);
         createIndexBuffer(conf);
+        createInstanceBuffer(conf);
     }
 
     PlanetRenderData::~PlanetRenderData(){
@@ -76,6 +81,19 @@ namespace Planet{
                 allocator,
                 grid.vertex.buffer,
                 grid.vertex.allocation
+            );
+        }
+
+        if (instances.buffer){
+            vmaUnmapMemory(
+                allocator,
+                instances.allocation
+            );
+            
+            vmaDestroyBuffer(
+                allocator,
+                instances.buffer,
+                instances.allocation
             );
         }
     }
@@ -260,6 +278,52 @@ namespace Planet{
         );
     }
 
+    void PlanetRenderData::createInstanceBuffer(const Config& config){
+        
+        auto allocator = _renderCore->allocator();
+
+        instances.maxCount = 6 * (1 << (2*config.maxLod));
+
+        vk::BufferCreateInfo info(
+            {},
+            static_cast<vk::DeviceSize>(sizeof(Instance) * instances.maxCount),
+            vk::BufferUsageFlagBits::eVertexBuffer,
+            vk::SharingMode::eExclusive,
+            {}, {}
+        );
+
+
+        VmaAllocationCreateInfo allocationInfo{
+            {},
+            VMA_MEMORY_USAGE_CPU_TO_GPU, // host visible buffer
+            0,
+            0,
+            0,
+            nullptr,
+            nullptr,
+            0.1f
+        };
+
+        VkBuffer buffer;
+        auto& allocation = instances.allocation;
+        
+        vmaCreateBuffer(
+            allocator,
+            reinterpret_cast<VkBufferCreateInfo*>(&info),
+            &allocationInfo,
+            &buffer,
+            &allocation,
+            nullptr
+        );
+
+        instances.buffer = buffer;
+
+        vmaMapMemory(
+            allocator,
+            allocation,
+            &instances.mapped
+        );
+    }
 
     std::pair<vk::Buffer, VmaAllocation> PlanetRenderData::createStaginBuffer(size_t size){
         auto allocator = _renderCore->allocator();
@@ -307,7 +371,7 @@ namespace Planet{
 
     }
 
-    std::array<vk::VertexInputAttributeDescription, 2> PlanetRenderData::Vertex::attributes(uint32_t binding){
+    std::vector<vk::VertexInputAttributeDescription> PlanetRenderData::Vertex::attributes(uint32_t binding){
         return {
             vk::VertexInputAttributeDescription{
                 0,
@@ -333,25 +397,30 @@ namespace Planet{
     }
 
 
-    std::array<vk::VertexInputAttributeDescription, 3> PlanetRenderData::Instance::attributes(uint32_t binding){
+    std::vector<vk::VertexInputAttributeDescription> PlanetRenderData::Instance::attributes(uint32_t startLocation, uint32_t binding){
         return {
             vk::VertexInputAttributeDescription{
-                0,
+                startLocation + 0,
                 binding,
                 vk::Format::eR32Uint,
                 offsetof(Instance, face)
             },
             vk::VertexInputAttributeDescription{
-                1,
+                startLocation + 1,
                 binding,
                 vk::Format::eR32G32Sfloat,
                 offsetof(Instance, offsetUV)
             },
             vk::VertexInputAttributeDescription{
-                2,
+                startLocation + 2,
                 binding,
                 vk::Format::eR32Sfloat,
                 offsetof(Instance, sizeUV)
+            },vk::VertexInputAttributeDescription{
+                startLocation + 3,
+                binding,
+                vk::Format::eR32Uint,
+                offsetof(Instance, packedNeighbors)
             }
         };
     }

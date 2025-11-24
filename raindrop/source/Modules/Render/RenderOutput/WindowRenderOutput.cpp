@@ -48,7 +48,7 @@ namespace Raindrop::Render{
     }
 
     WindowRenderOutput::WindowRenderOutput(Window::SharedWindow window) : _window{window}{
-        _wantedPresentMode = vk::PresentModeKHR::eFifoRelaxed; // instead of Fifo because wayland doesn't support well external displays
+        _wantedPresentMode = vk::PresentModeKHR::eMailbox; // instead of Fifo because wayland doesn't support well external displays
         _wantedSurfaceFormat = {vk::Format::eR8G8B8A8Srgb, vk::ColorSpaceKHR::eSrgbNonlinear};
         _wantedFrameCount = 2;
     }
@@ -543,7 +543,7 @@ namespace Raindrop::Render{
 
             vk::ClearValue clear{
                 vk::ClearColorValue(
-                    .1f, .1f, .1f, 0.f
+                    0.f, 0.f, 0.f, 0.f
                 )
             };
 

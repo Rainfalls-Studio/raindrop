@@ -1,6 +1,10 @@
 #include "Raindrop/Modules/Scene/Behaviors/FrameSnapshotServiceBehavior.hpp"
 
 namespace Raindrop::Behaviors{
+    const char* FrameSnapshotService::name() const{
+        return "Frame Snapshot Service";
+    }
+
     void FrameSnapshotService::LockWrite::initialize(Engine&, Scene::Scene& scene){
         _scene = &scene;
         _serviceID = scene.getBehaviorIndex<FrameSnapshotService>();
@@ -13,6 +17,11 @@ namespace Raindrop::Behaviors{
         service->lockWrite();
     }
 
+    const char* FrameSnapshotService::LockWrite::name() const{
+        return "Frame Snapshot Service - Lock Write";
+    }
+
+
 
     void FrameSnapshotService::ReleaseWrite::initialize(Engine&, Scene::Scene& scene){
         _scene = &scene;
@@ -24,6 +33,10 @@ namespace Raindrop::Behaviors{
         auto service = _scene->getBehavior<FrameSnapshotService>(_serviceID);
 
         service->writeRelease();
+    }
+
+    const char* FrameSnapshotService::ReleaseWrite::name() const{
+        return "Frame Snapshot Service - Release Write";
     }
 
 
@@ -39,6 +52,10 @@ namespace Raindrop::Behaviors{
         service->lockRead();
     }
 
+    const char* FrameSnapshotService::LockRead::name() const{
+        return "Frame Snapshot Service - Lock Read";
+    }
+
 
     void FrameSnapshotService::ReleaseRead::initialize(Engine&, Scene::Scene& scene){
         _scene = &scene;
@@ -52,6 +69,9 @@ namespace Raindrop::Behaviors{
         service->readRelease();
     }
 
+    const char* FrameSnapshotService::ReleaseRead::name() const{
+        return "Frame Snapshot Service - Release Read";
+    }
     
 
     FrameSnapshotService::FrameSnapshotService(uint32_t bufferCount) : 
@@ -140,30 +160,45 @@ namespace Raindrop::Behaviors{
         _cvCanRead.notify_one();
     }
 
-    void FrameSnapshotService::writeSlotRaw(SlotID slot, void** instance){
+    FrameSnapshotService::Handle<void> FrameSnapshotService::writeSlotRaw(SlotID slot){
         assert(slot < _slots.size());
 
         auto& buf = _buffers[_writeIndex];
         auto& slotData = buf.slots[slot];
 
-        // store data in arena and reference offset
-        Offset off = storeRaw(instance, slotData.size);
+        Offset off = allocate(slotData.size);
 
         slotData.instances.push_back(off);
+
+        return Handle<void>(off, *this);
     }
 
-    Offset FrameSnapshotService::storeRaw(void** data, size_t size){
-        assert(data != nullptr);
+    Offset FrameSnapshotService::allocate(size_t size){
         assert(_writeIndex != INVALID_BUFFER_INDEX);
 
         auto& buf = _buffers[_writeIndex];
         Offset off = static_cast<Offset>(buf.arena.size());
         
         buf.arena.resize(off + size);
-        *data = buf.arena.data() + off;
 
         return off;
     }
+
+    void* FrameSnapshotService::resolveWrite(Offset offset){
+        assert(_writeIndex != INVALID_BUFFER_INDEX);
+        assert(offset < _buffers[_writeIndex].arena.size());
+
+        return _buffers[_writeIndex].arena.data() + offset;
+    }
+
+    FrameSnapshotService::Handle<void> FrameSnapshotService::writeRaw(size_t size){
+        assert(size != 0);
+        assert(_writeIndex != INVALID_BUFFER_INDEX);
+
+        Offset offset = allocate(size);
+        return Handle<void>(offset, *this);
+    }
+
 
     // --- Reading ------------------------------------------------------------------
 

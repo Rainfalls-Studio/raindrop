@@ -43,15 +43,63 @@ namespace Planet{
             }
 
 
-            RenderDataPayload* instance;
-            frameSnapshot->writeSlot(_planetSlot, instance);
+            auto instance = frameSnapshot->writeSlot<RenderDataPayload>(_planetSlot);
 
             instance->transform = transform.worldTransform;
             instance->radius = planet.radius;
             instance->id = planet.id;
             
-            instance->chunkCount = 0;
-            
+
+            auto chunks = frameSnapshot->write<ChunkDataPayload>(6);
+
+            instance->chunks = chunks;
+            instance->chunkCount = 6;
+
+            for (uint32_t i=0; i<6; i++){
+                auto chunk = chunks[i];
+
+                switch (i){
+                    case 0:{
+                        chunk->face = Face::NX;
+                        chunk->center = {-planet.radius, 0.f, 0.f};
+                        break;
+                    }
+                    case 1:{
+                        chunk->face = Face::PX;
+                        chunk->center = {planet.radius, 0.f, 0.f};
+                        break;
+                    }
+                    case 2:{
+                        chunk->face = Face::NY;
+                        chunk->center = {0.f, -planet.radius, 0.f};
+                        break;
+                    }
+                    case 3:{
+                        chunk->face = Face::PY;
+                        chunk->center = {0.f, planet.radius, 0.f};
+                        break;
+                    }
+                    case 4:{
+                        chunk->face = Face::NZ;
+                        chunk->center = {0.f, 0.f, -planet.radius};
+                        break;
+                    }
+                    case 5:{
+                        chunk->face = Face::PZ;
+                        chunk->center = {0.f, 0.f, planet.radius};
+                        break;
+                    }
+                }
+
+                chunk->instanceIndex = i;
+                chunk->uvMin = glm::vec2(0.f);
+                chunk->uvScale = 1.f;
+
+                chunk->neighorLOD[0] = 0;
+                chunk->neighorLOD[1] = 0;
+                chunk->neighorLOD[2] = 0;
+                chunk->neighorLOD[3] = 0;
+            }
 
             glm::vec3 lodAnchorOrigin = glm::vec3(0.f);
             {
@@ -72,6 +120,11 @@ namespace Planet{
                 planet.dirty = false;
             }
 
+            
         }
+    }
+
+    const char* UpdateBehavior::name() const{
+        return "Planet - Update";
     }
 }

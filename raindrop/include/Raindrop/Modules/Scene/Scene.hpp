@@ -21,6 +21,18 @@ namespace Raindrop::Scene{
 
     class Scene{
         public:
+            
+            struct PhaseContent{
+
+                // the list of behaviors to execute in the phase, in execution order
+                std::vector<BehaviorID> behaviors;
+                
+                // it's name for debug and development
+                std::string name;
+                
+                uint64_t executionCount;
+            };
+
             Scene();
             ~Scene();
 
@@ -165,6 +177,8 @@ namespace Raindrop::Scene{
             template<typename T>
             inline std::shared_ptr<T> getBehaviorFromType();
 
+            const std::vector<std::shared_ptr<IBehavior>>& behaviors();
+            const std::vector<PhaseContent>& phases();
             
             PhaseID createPhase(std::string_view name);
             void destroyPhase(PhaseID phase);
@@ -184,14 +198,6 @@ namespace Raindrop::Scene{
             std::unordered_map<std::type_index, BehaviorID> _typeToIndex;
             std::deque<BehaviorID> _freeBehaviorIDs;
 
-            struct PhaseContent{
-
-                // the list of behaviors to execute in the phase, in execution order
-                std::vector<BehaviorID> behaviors;
-                
-                // it's name for debug and development
-                std::string name;
-            };
 
             std::vector<PhaseContent> _phases;
             std::deque<PhaseID> _freePhaseID;

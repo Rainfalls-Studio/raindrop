@@ -10,6 +10,8 @@ namespace Raindrop::Scene{
             virtual void onCreate(Entity& entity);
             virtual void onDestroy(Entity& entity);
 
+            virtual const char* name() const = 0;
+
             virtual void initialize(Engine& engine, Scene& scene);
             virtual void shutdown();
 

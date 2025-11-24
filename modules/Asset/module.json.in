@@ -1,0 +1,6 @@
+{
+    "name": "@MODULE_NAME@",
+    "version": "@MODULE_VERSION@",
+    "type": "@MODULE_TYPE@",
+    "dependencies": @MODULE_DEPS@
+}

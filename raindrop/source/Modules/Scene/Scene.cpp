@@ -111,6 +111,7 @@ namespace Raindrop::Scene{
 
     void Scene::executePhase(PhaseID id){
         auto& content = _phases[id];
+        content.executionCount++;
 
         for (auto behaviorId : content.behaviors){
             auto& behavior = _behaviors[behaviorId];
@@ -125,4 +126,11 @@ namespace Raindrop::Scene{
         _phases[phase].behaviors.push_back(behavior);
     }
 
+    const std::vector<std::shared_ptr<IBehavior>>& Scene::behaviors(){
+        return _behaviors;
+    }
+
+    const std::vector<Scene::PhaseContent>& Scene::phases(){
+        return _phases;
+    }
 }
