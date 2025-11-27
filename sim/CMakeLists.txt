@@ -1,19 +1,31 @@
 cmake_minimum_required(VERSION 3.14)
-
-
 project(
     Sim
     VERSION 0.1.0
     LANGUAGES CXX
 )
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+include(RaindropProject)
+
+
+
 file(GLOB_RECURSE SOURCES "source/*.cpp")
 
 add_executable(Sim ${SOURCES})
 
-target_link_libraries(Sim PRIVATE
-    Raindrop
+
+raindrop_add_module_dir(Sim "${CMAKE_SOURCE_DIR}/modules")
+
+raindrop_dependencies(Sim
+    HARD
+        Asset
 )
+
+
+add_raindrop_project(Sim)
+
 
 add_custom_target(
     sim
