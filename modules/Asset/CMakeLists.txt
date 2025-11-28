@@ -1,8 +1,8 @@
-project(Asset LANGUAGES CXX)
+project(Asset
+    LANGUAGES CXX
+    VERSION 0.1.0
+    DESCRIPTION "Simple asset manager with factories and async friendly loading" 
+)
 
 # create library
-
-module_name("Asset")
-module_version("1.0.0")
-
 add_raindrop_module()

@@ -1,0 +1,13 @@
+{
+    "name": "@MODULE_NAME@",
+    "version": "@MODULE_VERSION@",
+    "description": "@MODULE_DESCRIPTION@",
+    "dependencies": {
+        "hard": {
+            @MODULE_HARD_DEPENDENCIES@
+        },
+        "soft": {
+            @MODULE_SOFT_DEPENDENCIES@
+        }
+    }
+}

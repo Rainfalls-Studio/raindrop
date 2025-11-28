@@ -35,7 +35,7 @@ function(raindrop_add_module_dir TARGET PATH)
         set(new_dirs ${PATH})
     endif()
 
-    set_property(TARGET ${TARGET} PROPERTY RAINDROP_MODULE_DIRS ${new_dirs} PARENT_SCOPE)
+    set_property(TARGET ${TARGET} PROPERTY RAINDROP_MODULE_DIRS ${new_dirs})
 endfunction()
 
 
@@ -83,6 +83,7 @@ function(add_raindrop_project TARGET)
     # Phase 0 - discover modules
     message(STATUS "Discovering module...")
     foreach(dir IN LISTS MODULE_DIRS)
+        message(STATUS "\tChecking \"${dir}/\" ...")
         discover_modules(mods ${dir})
         LIST(APPEND MODULES ${mods})
     endforeach()
@@ -95,9 +96,9 @@ function(add_raindrop_project TARGET)
     list(LENGTH MODULE_REGISTRY length)
 
     if (length EQUAL 0)
-        message(STATUS "Discovered 0 module")
+        message(STATUS "Found 0 module")
     else()
-        message(STATUS "Discovered ${length} module(s) : ")
+        message(STATUS "Found ${length} module(s) : ")
         foreach (mod IN LISTS MODULE_REGISTRY)
             message("\t- ${mod}")
         endforeach()
@@ -141,13 +142,83 @@ function(add_raindrop_project TARGET)
         endforeach()
     endif()
 
+    # Create modules
     message(STATUS "Creating modules...")
 
     foreach(mod IN LISTS DEPENDENCIES)
         create_module_library(${mod})
     endforeach()
     
+    # Link the modules together
+    message(STATUS "Linking modules...")
 
+    foreach(mod IN LISTS DEPENDENCIES)
+        link_module_library(${mod})
+    endforeach()
+
+    # List the project direct dependencies
+
+    set(DIRECT_DEPENDENCIES "")
+
+    foreach(dep IN LISTS HARD)
+        module_exists(EXISTS ${dep})
+
+        if (${EXISTS})
+            list(APPEND DIRECT_DEPENDENCIES ${dep})
+        else()
+            message(FATAL_ERROR "The project ${TARGET} is missing hard dependency ${dep}")
+        endif()
+
+    endforeach()
+
+    foreach(dep IN LISTS SOFT)
+        module_exists(EXISTS ${dep})
+
+        if (${EXISTS})
+            list(APPEND DIRECT_DEPENDENCIES ${dep})
+        endif()
+
+    endforeach()
+
+    # Link the project to the dependencies
+
+    if (DIRECT_DEPENDENCIES)
+        set(MODULES_LIBRARIES "")
+
+        foreach(mod IN LISTS DIRECT_DEPENDENCIES)
+            get_property(MOD_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${mod}_LIBRARY)
+            list(APPEND MODULES_LIBRARIES ${MOD_LIBRARY})
+        endforeach()
+
+        target_link_libraries(
+            ${TARGET}
+            PRIVATE
+            ${MODULES_LIBRARIES}
+        )
+    endif()
+
+    set(TARGET_FILE $<TARGET_FILE:${TARGET}>)
+
+    # Directory where the executable is located
+    get_target_property(TARGET_DIR ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
+
+    if (NOT TARGET_DIR)
+        set(TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    endif()
+
+    message("out : ${TARGET_DIR}")
+
+    # Copy the modules
+    message(STATUS "Copying modules to the project's modules folder...")
+
+
+
+    foreach(mod IN LISTS DEPENDENCIES)
+        copy_module_clean(${TARGET} ${mod} "${TARGET_DIR}/modules")
+    endforeach()
+    
+
+    
 
     # Link project to Raindrop
     target_link_libraries(${TARGET} PRIVATE Raindrop::Raindrop)

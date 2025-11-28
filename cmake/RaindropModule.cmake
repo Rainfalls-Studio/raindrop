@@ -3,8 +3,9 @@
 #  Module global context
 # =============================
 
-set(_MODULE_NAME ${CMAKE_PROJECT_NAME})
-set(_MODULE_VERSION ${CMAKE_PROJECT_VERSION})
+set(_MODULE_NAME "")
+set(_MODULE_VERSION "")
+set(_MODULE_DESCRIPTION "")
 
 set(_MODULE_HARD_DEPS "")
 set(_MODULE_SOFT_DEPS "")
@@ -28,8 +29,18 @@ endmacro()
 function(module_name NAME)
     _check_module_not_built()
 
-    set(_MODULE_NAME "${NAME}" PARENT_SCOPE)
+    set(_MODULE_NAME ${NAME} PARENT_SCOPE)
 endfunction()
+
+
+# =============================
+#   module_description(NAME)
+# =============================
+function(module_description DESCRIPTION)
+    _check_module_not_built()
+    set(_MODULE_DESCRIPTION ${DESCRIPTION} PARENT_SCOPE)
+endfunction()
+
 
 
 # =============================
@@ -38,7 +49,7 @@ endfunction()
 function(module_version VERSION)
     _check_module_not_built()
 
-    set(_MODULE_VERSION "${VERSION}" PARENT_SCOPE)
+    set(_MODULE_VERSION ${VERSION} PARENT_SCOPE)
 endfunction()
 
 
@@ -105,16 +116,31 @@ endfunction()
 function(add_raindrop_module)
     _check_module_not_built()
 
-    # check if name is setup
+    # check if module meta data
     if(NOT _MODULE_NAME)
-        message(FATAL_ERROR "module_name() must be called before add_raindrop_module()")
+        set(_MODULE_NAME ${PROJECT_NAME})
     endif()
+
+    if (NOT _MODULE_VERSION)
+        if (NOT PROJECT_VERSION)
+            message("if module_version() is not called, the module MUST set the version with the cmake project VERSION variable")
+        endif()
+        set(_MODULE_VERSION ${PROJECT_VERSION})
+    endif()
+
+    if (NOT _MODULE_DESCRIPTION)
+        set(_MODULE_DESCRIPTION ${PROJECT_DESCRIPTION})
+    endif()
+
+    
+    # Set module global properties
 
     set_property(GLOBAL PROPERTY RAINDROP_CURRENT_MODULE_NAME ${_MODULE_NAME})
 
     set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_BUILT TRUE)
     set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_VERSION ${_MODULE_VERSION})
+    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_DESCRIPTION ${_MODULE_DESCRIPTION})
     set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_HARD_DEPS ${_MODULE_HARD_DEPS})
     set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_SOFT_DEPS ${_MODULE_SOFT_DEPS})
     set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_LINK_PUBLIC_LIBS ${_MODULE_LINK_PUBLIC_LIBS})
