@@ -159,12 +159,17 @@ function(add_raindrop_project TARGET)
     # List the project direct dependencies
 
     set(DIRECT_DEPENDENCIES "")
+    set(DEFINES "")
 
     foreach(dep IN LISTS HARD)
         module_exists(EXISTS ${dep})
 
         if (${EXISTS})
             list(APPEND DIRECT_DEPENDENCIES ${dep})
+            list(APPEND DEFINES
+                "RAINDROP_MODULE_${dep}_AVAILABLE=1"
+                "RAINDROP_MODULE_${dep}_VERSION=1"
+            )
         else()
             message(FATAL_ERROR "The project ${TARGET} is missing hard dependency ${dep}")
         endif()
@@ -176,8 +181,15 @@ function(add_raindrop_project TARGET)
 
         if (${EXISTS})
             list(APPEND DIRECT_DEPENDENCIES ${dep})
+            list(APPEND DEFINES
+                "RAINDROP_MODULE_${dep}_AVAILABLE=1"
+                "RAINDROP_MODULE_${dep}_VERSION=1"
+            )
+        else()
+            list(APPEND DEFINES
+                "RAINDROP_MODULE_${dep}_AVAILABLE=0"
+            )
         endif()
-
     endforeach()
 
     # Link the project to the dependencies
@@ -197,6 +209,14 @@ function(add_raindrop_project TARGET)
         )
     endif()
 
+    if (DEFINES)
+        target_compile_definitions(
+            ${TARGET}
+            PRIVATE
+            ${DEFINES}
+        )
+    endif()
+
     set(TARGET_FILE $<TARGET_FILE:${TARGET}>)
 
     # Directory where the executable is located
@@ -205,8 +225,6 @@ function(add_raindrop_project TARGET)
     if (NOT TARGET_DIR)
         set(TARGET_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     endif()
-
-    message("out : ${TARGET_DIR}")
 
     # Copy the modules
     message(STATUS "Copying modules to the project's modules folder...")

@@ -4,5 +4,10 @@ project(Asset
     DESCRIPTION "Simple asset manager with factories and async friendly loading" 
 )
 
+module_dependencies(
+    SOFT
+        Event
+)
+
 # create library
 add_raindrop_module()

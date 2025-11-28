@@ -280,6 +280,7 @@ function(link_module_library NAME)
     endif()
 
     set(DEPENDENCIES "")
+    set(DEFINES "")
 
     get_property(HARD GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_HARD_DEPS)
     foreach(dep IN LISTS HARD)
@@ -287,6 +288,10 @@ function(link_module_library NAME)
 
         if (DEP_LIBRARY)
             list(APPEND DEPENDENCIES ${DEP_LIBRARY})
+            list(APPEND DEFINES 
+                "RAINDROP_MODULE_${dep}_AVAILABLE=1"
+                "RAINDROP_MODULE_${dep}_VERSION=1" # TODO: support versioning
+            )
         else()
             message(FATAL_ERROR "Module ${NAME} is missing hard dependency ${dep}")
         endif()
@@ -294,11 +299,21 @@ function(link_module_library NAME)
 
 
     get_property(SOFT GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_SOFT_DEPS)
+
     foreach(dep IN LISTS SOFT)
         get_property(DEP_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${dep}_LIBRARY)
-
+        
         if (DEP_LIBRARY)
             list(APPEND DEPENDENCIES ${DEP_LIBRARY})
+
+            list(APPEND DEFINES 
+                "RAINDROP_MODULE_${dep}_AVAILABLE=1"
+                "RAINDROP_MODULE_${dep}_VERSION=1" # TODO: support versioning
+            )
+        else()
+            list(APPEND DEFINES 
+                "RAINDROP_MODULE_${dep}_AVAILABLE=0"
+            )
         endif()
     endforeach()
 
@@ -307,6 +322,14 @@ function(link_module_library NAME)
             ${LIBRARY}
             PRIVATE
             ${DEPENDENCIES}
+        )
+    endif()
+
+    if (DEFINES)
+        target_compile_definitions(
+            ${LIBRARY}
+            PUBLIC
+            ${DEFINES}
         )
     endif()
 
