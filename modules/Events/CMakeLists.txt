@@ -1,12 +1,12 @@
-project(Asset
+project(Events
     LANGUAGES CXX
     VERSION 0.1.0
     DESCRIPTION "Simple asset manager with factories and async friendly loading" 
 )
 
-
-module_link_libraries(
-    PUBLIC spdlog::spdlog
+module_dependencies(
+    HARD
+        Layers
 )
 
 # create library

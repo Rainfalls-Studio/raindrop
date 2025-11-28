@@ -1,9 +1,10 @@
-project(Asset
+project(Layers
     LANGUAGES CXX
     VERSION 0.1.0
-    DESCRIPTION "Simple asset manager with factories and async friendly loading" 
+    DESCRIPTION "Layer managment module for handling data transmission" 
 )
 
+find_package(spdlog REQUIRED)
 
 module_link_libraries(
     PUBLIC spdlog::spdlog

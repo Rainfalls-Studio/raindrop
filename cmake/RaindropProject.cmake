@@ -88,10 +88,8 @@ function(add_raindrop_project TARGET)
         LIST(APPEND MODULES ${mods})
     endforeach()
 
-    
     # Phase 1 - register available modules
-    # set(MODULE_REGISTRY)
-    register_modules(MODULE_REGISTRY ${MODULES})
+    register_modules(MODULE_REGISTRY "${MODULES}")
 
     list(LENGTH MODULE_REGISTRY length)
 

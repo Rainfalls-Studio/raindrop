@@ -1,6 +1,6 @@
 
 # =============================
-#  register_modules(MODULE_DIRS)
+#  register_modules(REGISTRY MODULE_DIRS)
 # =============================
 function(register_modules REGISTRY MODULE_DIRS)
     set(_tmp ${${REGISTRY}})
@@ -67,7 +67,7 @@ function(discover_modules MODULES PATH)
         endif()
     endforeach()
 
-    set(${MODULES} "${_result}" PARENT_SCOPE)
+    set(${MODULES} ${_result} PARENT_SCOPE)
 endfunction()
 
 
