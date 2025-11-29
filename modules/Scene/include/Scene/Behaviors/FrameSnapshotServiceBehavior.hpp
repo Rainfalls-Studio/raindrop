@@ -72,7 +72,7 @@ namespace Raindrop::Behaviors{
 
             template<typename T>
             struct Handle{
-                Handle(Offset offset, FrameSnapshotService& service) : offset{offset}, service{service}{}
+                Handle(Offset offset_, FrameSnapshotService& service_) : offset{offset_}, service{service_}{}
                 Handle(Handle<T>&& ) = default;
                 Handle(const Handle<T>&) = default;
 

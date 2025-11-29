@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Raindrop/Core/Scheduler/IStage.hpp"
+#include <Raindrop/Scheduler/IStage.hpp>
 #include "Scene.hpp"
 
 namespace Raindrop::Scene{

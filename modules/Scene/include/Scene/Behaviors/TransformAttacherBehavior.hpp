@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Raindrop/Modules/Scene/IBehavior.hpp"
+#include "Scene/IBehavior.hpp"
 
 namespace Raindrop::Behaviors{
     class TransformAttacherBehavior : public Scene::IBehavior{

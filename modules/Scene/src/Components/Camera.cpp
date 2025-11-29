@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Scene/Components/Camera.hpp"
+#include "Scene/Components/Camera.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
 

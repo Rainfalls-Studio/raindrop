@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Scene/Behaviors/FrameSnapshotServiceBehavior.hpp"
+#include "Scene/Behaviors/FrameSnapshotServiceBehavior.hpp"
 
 namespace Raindrop::Behaviors{
     const char* FrameSnapshotService::name() const{

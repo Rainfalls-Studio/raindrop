@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Raindrop/Modules/Scene/Scene.hpp"
+#include "Scene/Scene.hpp"
 
 namespace Raindrop::Components{
     class Hierarchy{

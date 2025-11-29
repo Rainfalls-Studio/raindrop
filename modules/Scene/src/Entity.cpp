@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Scene/Entity.hpp"
+#include "Scene/Entity.hpp"
 
 namespace Raindrop::Scene{
     Entity::Entity() : 

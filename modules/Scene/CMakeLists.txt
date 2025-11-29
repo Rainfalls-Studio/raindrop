@@ -4,13 +4,9 @@ project(Scene
 )
 
 find_package(EnTT CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
 
 module_link_libraries(
     PUBLIC
-        spdlog::spdlog
-        glm::glm
         EnTT::EnTT
 )
 

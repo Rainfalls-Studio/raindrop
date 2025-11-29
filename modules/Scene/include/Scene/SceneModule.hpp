@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Raindrop/Core/Modules/IModule.hpp"
+#include <Raindrop/Modules/IModule.hpp>
 #include "Raindrop/Engine.hpp"
 #include "Scene.hpp"
 

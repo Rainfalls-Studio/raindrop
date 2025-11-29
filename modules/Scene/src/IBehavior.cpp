@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Scene/IBehavior.hpp"
+#include "Scene/IBehavior.hpp"
 
 namespace Raindrop::Scene{
     void IBehavior::onCreate(Entity&){}

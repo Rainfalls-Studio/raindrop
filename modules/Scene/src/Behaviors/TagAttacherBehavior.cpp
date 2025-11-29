@@ -1,6 +1,6 @@
-#include "Raindrop/Modules/Scene/Behaviors/TagAttacherBehavior.hpp"
-#include "Raindrop/Modules/Scene/Components/Tag.hpp"
-#include "Raindrop/Modules/Scene/Entity.hpp"
+#include "Scene/Behaviors/TagAttacherBehavior.hpp"
+#include "Scene/Components/Tag.hpp"
+#include "Scene/Entity.hpp"
 
 namespace Raindrop::Behaviors{
     void TagAttacherBehavior::onCreate(Scene::Entity& entity){

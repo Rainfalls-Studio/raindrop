@@ -28,6 +28,8 @@ raindrop_dependencies(Sim
         Asset
         Event
         Window
+        Layers
+        Scene
 )
 
 

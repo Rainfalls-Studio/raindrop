@@ -1,6 +1,6 @@
-#include "Raindrop/Modules/Scene/Scene.hpp"
-#include "Raindrop/Modules/Scene/Entity.hpp"
-#include "Raindrop/Modules/Scene/IBehavior.hpp"
+#include "Scene/Scene.hpp"
+#include "Scene/Entity.hpp"
+#include "Scene/IBehavior.hpp"
 
 namespace Raindrop::Scene{
     Scene::Scene(){}

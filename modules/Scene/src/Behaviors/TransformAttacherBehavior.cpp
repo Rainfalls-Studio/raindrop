@@ -1,6 +1,6 @@
-#include "Raindrop/Modules/Scene/Behaviors/TransformAttacherBehavior.hpp"
-#include "Raindrop/Modules/Scene/Components/Transform.hpp"
-#include "Raindrop/Modules/Scene/Entity.hpp"
+#include "Scene/Behaviors/TransformAttacherBehavior.hpp"
+#include "Scene/Components/Transform.hpp"
+#include "Scene/Entity.hpp"
 
 namespace Raindrop::Behaviors{
     void TransformAttacherBehavior::onCreate(Scene::Entity& entity){

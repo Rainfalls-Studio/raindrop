@@ -1,5 +1,5 @@
-#include "Raindrop/Modules/Scene/SceneModule.hpp"
-#include "Raindrop/Core/Modules/InitHelper.hpp"
+#include "Scene/SceneModule.hpp"
+#include <Raindrop/Modules/InitHelper.hpp>
 
 namespace Raindrop::Scene{
     SceneModule::Name SceneModule::name() const noexcept{

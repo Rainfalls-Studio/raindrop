@@ -1,6 +1,6 @@
-#include "Raindrop/Modules/Scene/Behaviors/HierarchyTransformPropagator.hpp"
-#include "Raindrop/Modules/Scene/Components/Hierarchy.hpp"
-#include "Raindrop/Modules/Scene/Components/Transform.hpp"
+#include "Scene/Behaviors/HierarchyTransformPropagator.hpp"
+#include "Scene/Components/Hierarchy.hpp"
+#include "Scene/Components/Transform.hpp"
 #include <queue>
 #include <unordered_set>
 

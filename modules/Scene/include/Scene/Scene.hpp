@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <entt/entt.hpp>
 
-#include "Raindrop/Engine.hpp"
+#include <Raindrop/Engine.hpp>
 
 namespace Raindrop::Scene{
     using EntityHandle = uint32_t;
@@ -30,7 +30,7 @@ namespace Raindrop::Scene{
                 // it's name for debug and development
                 std::string name;
                 
-                uint64_t executionCount;
+                uint64_t executionCount=0;
             };
 
             Scene();
