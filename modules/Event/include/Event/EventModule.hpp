@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Raindrop/Modules/Layers/LayerModule.hpp>
-#include "Raindrop/Core/Modules/IModule.hpp"
+#include <Layers/LayerModule.hpp>
+#include <Raindrop/Modules/IModule.hpp>
 #include "Event.hpp"
 
 namespace Raindrop::Event{

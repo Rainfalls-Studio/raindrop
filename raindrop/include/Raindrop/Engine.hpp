@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core/Modules/Manager.hpp"
-#include "Core/Scheduler/Scheduler.hpp"
-#include "Core/Tasks/TaskManager.hpp"
+#include "Modules/Manager.hpp"
+#include "Scheduler/Scheduler.hpp"
+#include "Tasks/TaskManager.hpp"
 
 namespace Raindrop{
     class Engine{

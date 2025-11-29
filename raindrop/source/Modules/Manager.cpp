@@ -1,5 +1,5 @@
-#include "Raindrop/Core/Modules/Manager.hpp"
-#include "Raindrop/Core/Modules/InitHelper.hpp"
+#include "Raindrop/Modules/Manager.hpp"
+#include "Raindrop/Modules/InitHelper.hpp"
 
 #include <cassert>
 #include <spdlog/spdlog.h>

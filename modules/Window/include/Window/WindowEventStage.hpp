@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Raindrop/Core/Scheduler/IStage.hpp"
-#include "Raindrop/Modules/Window/WindowModule.hpp"
+#include <Raindrop/Scheduler/IStage.hpp>
+#include "WindowModule.hpp"
 
 namespace Raindrop::Window{
     class EventStage : public Scheduler::IStage{

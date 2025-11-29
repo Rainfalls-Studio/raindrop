@@ -6,7 +6,6 @@ project(
     Raindrop
     VERSION 0.1.0
     DESCRIPTION "Game engine"
-    # HOMEPAGE_URL "https://example.com/"
     LANGUAGES CXX
 )
 
@@ -17,54 +16,33 @@ include(cmake/variables.cmake)
 
 file(GLOB_RECURSE SOURCES "source/*.cpp")
 
-add_library(
-    Raindrop STATIC
-    ${SOURCES}
-)
+add_library(Raindrop SHARED ${SOURCES})
 
 target_compile_features(Raindrop PUBLIC cxx_std_23)
 
 target_include_directories(
     Raindrop ${warning_guard}
     PUBLIC
-    "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+        "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
 
 find_package(spdlog CONFIG REQUIRED)
-find_package(EnTT CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(vk-bootstrap CONFIG REQUIRED)
-find_package(VulkanMemoryAllocator CONFIG REQUIRED)
-find_package(Vulkan REQUIRED)
-find_package(RenderGraph REQUIRED)
-find_package(ImGui REQUIRED)
-find_package(glslang REQUIRED)
 
 find_package(SDL3 REQUIRED) # Not specified in vcpkg.json as it's not currently supported on all linux distros (such as mine)
 
 target_link_libraries(Raindrop
-    PRIVATE
-    spdlog::spdlog
-    glm::glm
-    SDL3::SDL3
-    Vulkan::Vulkan
-    vk-bootstrap::vk-bootstrap
-    vk-bootstrap::vk-bootstrap-compiler-warnings
-    GPUOpen::VulkanMemoryAllocator
-    crg::RenderGraph
-    imgui::imgui
-    glslang::glslang
-
     PUBLIC
-    EnTT::EnTT
+        spdlog::spdlog
+        glm::glm
 )
 
 add_library(Raindrop::Raindrop ALIAS Raindrop)
 
 target_compile_definitions(Raindrop
     PUBLIC
-    VULKAN_HPP_NO_EXCEPTIONS
-    VULKAN_HPP_ASSERT_ON_RESULT="(expression)((void)0)"
+        VULKAN_HPP_NO_EXCEPTIONS
+        VULKAN_HPP_ASSERT_ON_RESULT="(expression)((void)0)"
 )
 
 # ---- Install rules ----

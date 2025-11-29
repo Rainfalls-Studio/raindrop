@@ -168,7 +168,6 @@ class Sim : public Raindrop::Modules::IModule{
                 Dependency("Event"),
                 Dependency("RenderCore"),
                 Dependency("RenderOutput"),
-                Dependency("RenderGraph"),
                 Dependency("Window"),
                 Dependency("Scene"),
                 Dependency("ImGui"),

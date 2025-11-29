@@ -26,6 +26,8 @@ raindrop_add_module_dir(Sim "${CMAKE_SOURCE_DIR}/modules")
 raindrop_dependencies(Sim
     HARD
         Asset
+        Event
+        Window
 )
 
 

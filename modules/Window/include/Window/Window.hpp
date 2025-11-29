@@ -6,7 +6,7 @@
 #include <vulkan/vulkan.hpp>
 #include <memory>
 
-#include "Raindrop/Core/Error.hpp"
+#include <Raindrop/Error.hpp>
 #include "WindowConfig.hpp"
 #include "Display.hpp"
 

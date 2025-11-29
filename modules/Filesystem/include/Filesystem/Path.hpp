@@ -92,8 +92,8 @@ namespace std{
     template<>
     struct hash<Raindrop::Filesystem::Path>{
         std::size_t operator()(const Raindrop::Filesystem::Path& path) const noexcept{
-            static std::hash<std::filesystem::path> hash;
-            return hash(path._storage);
+            static std::hash<std::filesystem::path> h; 
+            return h(path._storage);
         }
     };
 

@@ -4,9 +4,9 @@ project(Asset
     DESCRIPTION "Simple asset manager with factories and async friendly loading" 
 )
 
-
-module_link_libraries(
-    PUBLIC spdlog::spdlog
+module_dependencies(
+    HARD
+        Filesystem
 )
 
 # create library

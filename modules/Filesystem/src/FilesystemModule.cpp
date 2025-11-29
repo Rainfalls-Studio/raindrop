@@ -1,5 +1,5 @@
-#include "Raindrop/Modules/Filesystem/FilesystemModule.hpp"
-#include "Raindrop/Core/Modules/InitHelper.hpp"
+#include "Filesystem/FilesystemModule.hpp"
+#include "Raindrop/Modules/InitHelper.hpp"
 
 #include <algorithm>
 
@@ -15,7 +15,7 @@ namespace Raindrop::Filesystem{
     }
 
     FilesystemModule::Name FilesystemModule::name() const noexcept{
-        return "Filesystem";
+        return RAINDROP_CURRENT_MODULE_NAME;
     }
 
     MountTable& FilesystemModule::mountTable() noexcept{

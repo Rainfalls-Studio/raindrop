@@ -1,7 +1,7 @@
-#include "Raindrop/Modules/Event/EventModule.hpp"
-#include <Raindrop/Modules/Layers/LayerModule.hpp>
-#include <Raindrop/Modules/Layers/LayerManager.hpp>
-#include "Raindrop/Core/Modules/InitHelper.hpp"
+#include "Event/EventModule.hpp"
+#include <Layers/LayerModule.hpp>
+#include <Layers/LayerManager.hpp>
+#include <Raindrop/Modules/InitHelper.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace Raindrop::Event{
@@ -25,7 +25,7 @@ namespace Raindrop::Event{
     }
 
     std::string EventModule::name() const noexcept{
-        return "Event";
+        return RAINDROP_CURRENT_MODULE_NAME;
     }
 
     void EventModule::poll(){
@@ -45,7 +45,7 @@ namespace Raindrop::Event{
 
     inline Modules::DependencyList EventModule::dependencies() const noexcept{
         return {
-            Modules::Dependency("Layer")
+            Modules::Dependency("Layers")
         };
     }
 

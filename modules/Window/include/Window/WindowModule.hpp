@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Raindrop/Core/Modules/IModule.hpp"
+#include <Raindrop/Modules/IModule.hpp>
 #include "WindowConfig.hpp"
 #include "Window.hpp"
 #include <memory>

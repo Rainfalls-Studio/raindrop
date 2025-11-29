@@ -84,20 +84,19 @@ endfunction()
 # =============================
 #  resolve_dependencies(RESOLVED NAME)
 # =============================
-function(resolve_dependencies RESOLVED NAME)
-    if (${NAME} IN_LIST ${RESOLVED})
+function(resolve_dependencies RESOLVED REGISTRY NAME)
+    if (NAME IN_LIST ${RESOLVED})
         return()
     endif()
 
-    set(_tmp ${${RESOLVED}})
-    list(APPEND _tmp ${NAME})
-    set(${RESOLVED} ${_tmp} PARENT_SCOPE)
+    list(APPEND ${RESOLVED} "${NAME}")
 
+    # Get hard dependencies
     get_property(HARD GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_HARD_DEPS)
+
     foreach(dep IN LISTS HARD)
-        module_exists(EXISTS ${dep})
-        if (EXISTS)
-            resolve_dependencies(${RESOLVED} ${dep})
+        if (dep IN_LIST ${REGISTRY})
+            resolve_dependencies(${RESOLVED} ${REGISTRY} "${dep}")
         else()
             message(FATAL_ERROR "Module ${NAME} is missing hard dependency ${dep}")
         endif()
@@ -106,13 +105,15 @@ function(resolve_dependencies RESOLVED NAME)
 
     get_property(SOFT GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_SOFT_DEPS)
     foreach(dep IN LISTS SOFT)
-        module_exists(EXISTS ${dep})
-        if (EXISTS)
-            resolve_dependencies(${RESOLVED} ${dep})
+        if (dep IN_LIST ${REGISTRY})
+            resolve_dependencies(${RESOLVED} "${REGISTRY}" "${dep}")
         else()
             message(WARNING "Module ${NAME} is missing soft dependency ${dep}")
         endif()
     endforeach()
+
+
+    set(${RESOLVED} "${${RESOLVED}}" PARENT_SCOPE)
 endfunction()
 
 
@@ -320,7 +321,7 @@ function(link_module_library NAME)
     if (DEPENDENCIES)
         target_link_libraries(
             ${LIBRARY}
-            PRIVATE
+            PUBLIC
             ${DEPENDENCIES}
         )
     endif()
@@ -328,10 +329,16 @@ function(link_module_library NAME)
     if (DEFINES)
         target_compile_definitions(
             ${LIBRARY}
-            PUBLIC
-            ${DEFINES}
+            PUBLIC ${DEFINES}
         )
     endif()
+
+    target_compile_definitions(
+        ${LIBRARY}
+        PRIVATE
+            "RAINDROP_CURRENT_MODULE_NAME=\"${NAME}\""
+            "RAINDROP_CURRENT_MODULE_VERSION=1"
+    )
 
 endfunction()
 

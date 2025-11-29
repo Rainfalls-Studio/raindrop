@@ -1,5 +1,5 @@
-#include "Raindrop/Core/Scheduler/StageInitHelper.hpp"
-#include "Raindrop/Core/Scheduler/Loop.hpp"
+#include "Raindrop/Scheduler/StageInitHelper.hpp"
+#include "Raindrop/Scheduler/Loop.hpp"
 #include "Raindrop/Engine.hpp"
 
 namespace Raindrop::Scheduler{

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.hpp"
-#include "Raindrop/Modules/Event/Event.hpp"
+#include <Event/Event.hpp>
 #include <glm/glm.hpp>
 #include <memory>
 

@@ -2,7 +2,7 @@
 
 #include "LoopData.hpp"
 #include "Loop.hpp"
-#include "Raindrop/Core/Tasks/TaskManager.hpp"
+#include "Raindrop/Tasks/TaskManager.hpp"
 
 namespace Raindrop{
     class Engine;

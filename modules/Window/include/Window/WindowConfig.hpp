@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <string>
-#include "Raindrop/Utils/Flags.hpp"
+#include <Raindrop/Utils/Flags.hpp>
 
 namespace Raindrop::Window{
     enum class WindowFlagBits {
@@ -16,7 +16,7 @@ namespace Raindrop::Window{
         HIDDEN = 1 << 6
     };
 
-    RAINDROP_FLAG(WindowFlags, WindowFlagBits);
+    RAINDROP_FLAG(WindowFlags, WindowFlagBits)
 
     struct WindowConfig{
         glm::u32vec2 resolution;

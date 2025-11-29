@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Window/Display.hpp"
+#include "Window/Display.hpp"
 #include <stdexcept>
 
 namespace Raindrop::Window{

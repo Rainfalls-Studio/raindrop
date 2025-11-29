@@ -1,12 +1,13 @@
-#include "Raindrop/Modules/Window/WindowModule.hpp"
-#include "Raindrop/Modules/Window/WindowEvents.hpp"
-#include "Raindrop/Modules/Event/EventModule.hpp"
-#include "Raindrop/Core/Modules/InitHelper.hpp"
-#include "Raindrop/Engine.hpp"
+#include "Window/WindowModule.hpp"
+#include "Window/WindowEvents.hpp"
+
+#include <Event/EventModule.hpp>
+#include <Raindrop/Modules/InitHelper.hpp>
+#include <Raindrop/Engine.hpp>
+#include <Event/MouseEvent.hpp>
+#include <Event/KeyboardEvent.hpp>
+
 #include <SDL3/SDL.h>
-#include "Raindrop/Modules/Event/MouseEvent.hpp"
-#include "Raindrop/Modules/Event/KeyboardEvent.hpp"
-#include "Raindrop/Modules/ImGui/backend/imgui_impl_sdl3.h"
 
 namespace Raindrop::Window{
     Modules::Result WindowModule::initialize(Modules::InitHelper& init){
@@ -395,10 +396,6 @@ namespace Raindrop::Window{
         
         // SDL_PumpEvents();
         while (SDL_PollEvent(&e)){
-
-            // TODO: move this
-            // if (ImGui::GetCurrentContext() != nullptr)
-                // ImGui_ImplSDL3_ProcessEvent(&e);
 
             switch (e.type){
 

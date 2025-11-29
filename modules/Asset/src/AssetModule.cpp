@@ -1,5 +1,5 @@
 #include <Asset/AssetModule.hpp>
-#include <Raindrop/Core/Modules/InitHelper.hpp>
+#include <Raindrop/Modules/InitHelper.hpp>
 
 #include "spdlog/spdlog.h"
 #include <exception>
@@ -24,7 +24,13 @@ namespace Raindrop::Asset{
 	}
 
 	AssetModule::Name AssetModule::name() const noexcept{
-		return "Asset";
+		return RAINDROP_CURRENT_MODULE_NAME;
+	}
+
+	Modules::DependencyList AssetModule::dependencies() const noexcept{
+		return {
+			Modules::Dependency("Filesystem")
+		};
 	}
 
 	void AssetModule::insertFactory(const std::type_info& typeInfo, std::shared_ptr<Factory>&& factory){

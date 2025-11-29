@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "Raindrop/Core/Modules/Manager.hpp"
+#include "Raindrop/Modules/Manager.hpp"
 
 namespace Raindrop{
     class Engine;

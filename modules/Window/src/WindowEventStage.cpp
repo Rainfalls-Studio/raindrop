@@ -1,6 +1,6 @@
-#include "Raindrop/Modules/Window/WindowEventStage.hpp"
-#include "Raindrop/Engine.hpp"
-#include "Raindrop/Modules/Window/WindowModule.hpp"
+#include "Window/WindowEventStage.hpp"
+#include "Window/WindowModule.hpp"
+#include <Raindrop/Engine.hpp>
 
 namespace Raindrop::Window{
     void EventStage::initialize(Scheduler::StageInitHelper& helper){

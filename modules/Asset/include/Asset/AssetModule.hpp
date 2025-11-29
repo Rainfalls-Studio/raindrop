@@ -2,8 +2,8 @@
 
 #include <memory>
 #include <spdlog/logger.h>
-#include <Raindrop/Modules/Filesystem/Path.hpp>
-#include <Raindrop/Core/Modules/IModule.hpp>
+#include <Filesystem/Path.hpp>
+#include <Raindrop/Modules/IModule.hpp>
 
 namespace Raindrop{
 	class Engine;
@@ -26,6 +26,8 @@ namespace Raindrop{
 				virtual void shutdown() override;
 
             	virtual Name name() const noexcept override;
+
+            	inline virtual Modules::DependencyList dependencies() const noexcept override;
 
 				/**
 				* @brief Inserts a new asset factory in the manager

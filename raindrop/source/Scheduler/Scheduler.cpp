@@ -1,6 +1,6 @@
-#include "Raindrop/Core/Scheduler/Scheduler.hpp"
-#include "Raindrop/Core/Tasks/TaskManager.hpp"
-#include "Raindrop/Core/Time/Clock.hpp"
+#include "Raindrop/Scheduler/Scheduler.hpp"
+#include "Raindrop/Tasks/TaskManager.hpp"
+#include "Raindrop/Time/Clock.hpp"
 #include "Raindrop/Engine.hpp"
 #include <spdlog/spdlog.h>
 

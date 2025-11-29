@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <string>
-#include "Raindrop/Modules/Filesystem/Path.hpp"
+#include "Filesystem/Path.hpp"
 
 namespace Raindrop::Asset{
 	class Asset;
