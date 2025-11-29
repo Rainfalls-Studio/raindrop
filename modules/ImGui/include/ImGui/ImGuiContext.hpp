@@ -1,14 +1,14 @@
 #pragma once
 
-#include <Raindrop/Modules/Event/Event.hpp>
-#include <Raindrop/Modules/Event/MouseEvent.hpp>
-#include <Raindrop/Modules/Event/KeyboardEvent.hpp>
-#include <Raindrop/Modules/Window/WindowEvents.hpp>
+#include <Event/Event.hpp>
+#include <Event/MouseEvent.hpp>
+#include <Event/KeyboardEvent.hpp>
+#include <Window/WindowEvents.hpp>
 #include <imgui.h>
 
-#include <Raindrop/Modules/Layers/Layer.hpp>
-#include <Raindrop/Modules/Render/RenderOutput/IRenderOutput.hpp>
-#include <Raindrop/Modules/Render/Core/RenderCoreModule.hpp>
+#include <Layers/Layer.hpp>
+#include <RenderOutput/IRenderOutput.hpp>
+#include <RenderCore/RenderCoreModule.hpp>
 
 namespace Raindrop::ImGui{
     class ImGuiContext{

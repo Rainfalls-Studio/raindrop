@@ -3,15 +3,21 @@ project(Shader
     VERSION 0.1.0 
 )
 
-find_package(EnTT CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
+find_package(glslang REQUIRED)
+find_package(Vulkan REQUIRED)
 
 module_link_libraries(
+    PRIVATE
+        glslang::glslang
     PUBLIC
-        spdlog::spdlog
-        glm::glm
-        EnTT::EnTT
+        Vulkan::Vulkan
+)
+
+module_dependencies(
+    HARD
+        Asset
+        RenderCore
+        Filesystem
 )
 
 # create library

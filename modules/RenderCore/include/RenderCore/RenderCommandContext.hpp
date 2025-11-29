@@ -6,8 +6,9 @@
 #include <vulkan/vulkan.hpp>
 
 #include "RenderCoreModule.hpp"
-#include "Raindrop/Core/Scheduler/IStage.hpp"
-#include "Raindrop/Core/Error.hpp"
+
+#include <Raindrop/Scheduler/IStage.hpp>
+#include <Raindrop/Error.hpp>
 
 namespace Raindrop::Render{
     class RenderCommandContext{

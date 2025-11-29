@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Render/Shaders/Shader.hpp"
+#include "Shader/Shader.hpp"
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Render{

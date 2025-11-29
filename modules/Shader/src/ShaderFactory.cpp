@@ -1,6 +1,7 @@
-#include "Raindrop/Modules/Render/Shaders/ShaderFactory.hpp"
-#include "Raindrop/Modules/Render/Shaders/GLSLShader.hpp"
-#include "Raindrop/Engine.hpp"
+#include "Shader/ShaderFactory.hpp"
+#include "Shader/GLSLShader.hpp"
+
+#include <Raindrop/Engine.hpp>
 
 namespace Raindrop::Render{
     ShaderFactory::ShaderFactory(Engine& engine){

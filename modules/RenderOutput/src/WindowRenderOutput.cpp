@@ -1,5 +1,8 @@
-#include "Raindrop/Modules/Render/RenderOutput/WindowRenderOutput.hpp"
-#include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
+
+#if RAINDROP_MODULE_Window_AVAILABLE
+
+#include "RenderOutput/WindowRenderOutput.hpp"
+#include "RenderOutput/RenderOutputModule.hpp"
 #include <spdlog/spdlog.h>
 
 // this will make the window use render pass
@@ -672,3 +675,5 @@ namespace Raindrop::Render{
         return _epoch;
     }
 }
+
+#endif

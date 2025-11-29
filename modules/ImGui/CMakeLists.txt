@@ -4,13 +4,22 @@ project(ImGui
     DESCRIPTION "Dear ImGui module" 
 )
 
-find_package(spdlog REQUIRED)
 find_package(ImGui REQUIRED)
+find_package(SDL3 REQUIRED)
 
 module_link_libraries(
     PUBLIC
-        spdlog::spdlog
         imgui::imgui
+        SDL3::SDL3
+)
+
+module_dependencies(
+    HARD
+        RenderCore
+        RenderOutput
+        Event
+        Window
+        Layers
 )
 
 # create library

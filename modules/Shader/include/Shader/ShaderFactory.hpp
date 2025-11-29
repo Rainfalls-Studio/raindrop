@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Raindrop/Modules/Filesystem/FilesystemModule.hpp"
-#include "Raindrop/Modules/Render/Core/RenderCoreModule.hpp"
-#include "Raindrop/Modules/Asset/Factory.hpp"
+#include <Filesystem/FilesystemModule.hpp>
+#include <RenderCore/RenderCoreModule.hpp>
+#include <Asset/Factory.hpp>
+
 #include "Shader.hpp"
 
 namespace Raindrop::Render{

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Raindrop/Core/Modules/IModule.hpp"
+#include <Raindrop/Engine.hpp>
+#include <Raindrop/Modules/IModule.hpp>
+#include <RenderCore/RenderCoreModule.hpp>
+
 #include "IRenderOutput.hpp"
-#include "../Core/RenderCoreModule.hpp"
-#include "Raindrop/Engine.hpp"
 
 namespace Raindrop::Render{
     class RenderOutputModule : public Modules::IModule{

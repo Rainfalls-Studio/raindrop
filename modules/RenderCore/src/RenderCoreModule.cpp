@@ -6,8 +6,8 @@
 
 #define VMA_IMPLEMENTATION 1
 
-#include "Raindrop/Modules/Render/Core/RenderCoreModule.hpp"
-#include "Raindrop/Core/Modules/InitHelper.hpp"
+#include "RenderCore/RenderCoreModule.hpp"
+#include <Raindrop/Modules/InitHelper.hpp>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>

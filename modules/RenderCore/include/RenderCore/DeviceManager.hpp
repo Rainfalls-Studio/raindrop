@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Raindrop/Core/Error.hpp>
-#include <Raindrop/Modules/Window/Window.hpp>
-#include <Raindrop/Modules/Window/WindowModule.hpp>
+#include <Raindrop/Error.hpp>
+#include <Window/Window.hpp>
+#include <Window/WindowModule.hpp>
 #include <vulkan/vulkan.hpp>
 #include <VkBootstrap.h>
 

@@ -63,7 +63,7 @@
 
 #include "imgui.h"
 #ifndef IMGUI_DISABLE
-#include "Raindrop/Modules/ImGui/backend/imgui_impl_sdl3.h"
+#include "ImGui/backend/imgui_impl_sdl3.h"
 
 // Clang warnings with -Weverything
 #if defined(__clang__)
@@ -108,7 +108,7 @@
 // FIXME: some shared resources (mouse cursor shape, gamepad) are mishandled when using multi-context.
 ImGui_ImplSDL3_Data* ImGui_ImplSDL3_GetBackendData()
 {
-    return ImGui::GetCurrentContext() ? (ImGui_ImplSDL3_Data*)ImGui::GetIO().BackendPlatformUserData : nullptr;
+    return ImGui::GetCurrentContext() ? static_cast<ImGui_ImplSDL3_Data*>(ImGui::GetIO().BackendPlatformUserData) : nullptr;
 }
 
 // Functions
@@ -129,7 +129,7 @@ static void ImGui_ImplSDL3_SetClipboardText(ImGuiContext*, const char* text)
 static void ImGui_ImplSDL3_PlatformSetImeData(ImGuiContext*, ImGuiViewport* viewport, ImGuiPlatformImeData* data)
 {
     ImGui_ImplSDL3_Data* bd = ImGui_ImplSDL3_GetBackendData();
-    SDL_WindowID window_id = (SDL_WindowID)(intptr_t)viewport->PlatformHandle;
+    SDL_WindowID window_id = static_cast<SDL_WindowID>(reinterpret_cast<intptr_t>(viewport->PlatformHandle));
     SDL_Window* window = SDL_GetWindowFromID(window_id);
     if ((!(data->WantVisible/* || data->WantTextInput*/) || bd->ImeWindow != window) && bd->ImeWindow != nullptr)
     {
@@ -139,10 +139,10 @@ static void ImGui_ImplSDL3_PlatformSetImeData(ImGuiContext*, ImGuiViewport* view
     if (data->WantVisible)
     {
         SDL_Rect r;
-        r.x = (int)data->InputPos.x;
-        r.y = (int)data->InputPos.y;
+        r.x = static_cast<int>(data->InputPos.x);
+        r.y = static_cast<int>(data->InputPos.y);
         r.w = 1;
-        r.h = (int)data->InputLineHeight;
+        r.h = static_cast<int>(data->InputLineHeight);
         SDL_SetTextInputArea(window, &r, 0);
         bd->ImeWindow = window;
     }
@@ -152,8 +152,7 @@ static void ImGui_ImplSDL3_PlatformSetImeData(ImGuiContext*, ImGuiViewport* view
 
 // Not static to allow third-party code to use that if they want to (but undocumented)
 ImGuiKey ImGui_ImplSDL3_KeyEventToImGuiKey(SDL_Keycode keycode, SDL_Scancode scancode);
-ImGuiKey ImGui_ImplSDL3_KeyEventToImGuiKey(SDL_Keycode keycode, SDL_Scancode scancode)
-{
+ImGuiKey ImGui_ImplSDL3_KeyEventToImGuiKey(SDL_Keycode keycode, SDL_Scancode scancode){
     // Keypad doesn't have individual key values in SDL3
     switch (scancode)
     {
@@ -336,7 +335,10 @@ bool ImGui_ImplSDL3_ProcessEvent(const SDL_Event* event)
         {
             if (ImGui_ImplSDL3_GetViewportForWindowID(event->motion.windowID) == nullptr)
                 return false;
-            ImVec2 mouse_pos((float)event->motion.x, (float)event->motion.y);
+            ImVec2 mouse_pos(
+                static_cast<float>(event->motion.x),
+                static_cast<float>(event->motion.y)
+            );
             io.AddMouseSourceEvent(event->motion.which == SDL_TOUCH_MOUSEID ? ImGuiMouseSource_TouchScreen : ImGuiMouseSource_Mouse);
             io.AddMousePosEvent(mouse_pos.x, mouse_pos.y);
             return true;
@@ -382,12 +384,17 @@ bool ImGui_ImplSDL3_ProcessEvent(const SDL_Event* event)
         {
             if (ImGui_ImplSDL3_GetViewportForWindowID(event->key.windowID) == nullptr)
                 return false;
-            ImGui_ImplSDL3_UpdateKeyModifiers((SDL_Keymod)event->key.mod);
+            ImGui_ImplSDL3_UpdateKeyModifiers(static_cast<SDL_Keymod>(event->key.mod));
             //IMGUI_DEBUG_LOG("SDL_EVENT_KEY_%s : key=%d ('%s'), scancode=%d ('%s'), mod=%X\n",
             //    (event->type == SDL_EVENT_KEY_DOWN) ? "DOWN" : "UP  ", event->key.key, SDL_GetKeyName(event->key.key), event->key.scancode, SDL_GetScancodeName(event->key.scancode), event->key.mod);
             ImGuiKey key = ImGui_ImplSDL3_KeyEventToImGuiKey(event->key.key, event->key.scancode);
             io.AddKeyEvent(key, (event->type == SDL_EVENT_KEY_DOWN));
-            io.SetKeyEventNativeData(key, (int)event->key.key, (int)event->key.scancode, (int)event->key.scancode); // To support legacy indexing (<1.87 user code). Legacy backend uses SDLK_*** as indices to IsKeyXXX() functions.
+            io.SetKeyEventNativeData(
+                key,
+                static_cast<int>(event->key.key),
+                static_cast<int>(event->key.scancode),
+                static_cast<int>(event->key.scancode)
+            ); // To support legacy indexing (<1.87 user code). Legacy backend uses SDLK_*** as indices to IsKeyXXX() functions.
             return true;
         }
         case SDL_EVENT_WINDOW_MOUSE_ENTER:
@@ -431,7 +438,7 @@ bool ImGui_ImplSDL3_ProcessEvent(const SDL_Event* event)
 
 static void ImGui_ImplSDL3_SetupPlatformHandles(ImGuiViewport* viewport, SDL_Window* window)
 {
-    viewport->PlatformHandle = (void*)(intptr_t)SDL_GetWindowID(window);
+    viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(SDL_GetWindowID(window)));
     viewport->PlatformHandleRaw = nullptr;
 #if defined(_WIN32) && !defined(__WINRT__)
     viewport->PlatformHandleRaw = (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
@@ -453,7 +460,7 @@ static bool ImGui_ImplSDL3_Init(SDL_Window* window, SDL_Renderer* renderer, void
     ImGui_ImplSDL3_Data* bd = IM_NEW(ImGui_ImplSDL3_Data)();
     snprintf(bd->BackendPlatformName, sizeof(bd->BackendPlatformName), "imgui_impl_sdl3 (%d.%d.%d; %d.%d.%d)",
         SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_MICRO_VERSION, SDL_VERSIONNUM_MAJOR(ver_linked), SDL_VERSIONNUM_MINOR(ver_linked), SDL_VERSIONNUM_MICRO(ver_linked));
-    io.BackendPlatformUserData = (void*)bd;
+    io.BackendPlatformUserData = static_cast<void*>(bd);
     io.BackendPlatformName = bd->BackendPlatformName;
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;           // We can honor GetMouseCursor() values (optional)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;            // We can honor io.WantSetMousePos requests (optional, rarely used)
@@ -565,7 +572,7 @@ void ImGui_ImplSDL3_Shutdown()
     ImGui_ImplSDL3_Data* bd = ImGui_ImplSDL3_GetBackendData();
     IM_ASSERT(bd != nullptr && "No platform backend to shutdown, or already shutdown?");
     ImGuiIO& io = ImGui::GetIO();
-    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+    // ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
 
     if (bd->ClipboardTextData)
         SDL_free(bd->ClipboardTextData);
@@ -621,8 +628,8 @@ static void ImGui_ImplSDL3_UpdateMouseData()
             int window_x, window_y;
             SDL_GetGlobalMouseState(&mouse_x, &mouse_y);
             SDL_GetWindowPosition(focused_window, &window_x, &window_y);
-            mouse_x -= window_x;
-            mouse_y -= window_y;
+            mouse_x -= static_cast<float>(window_x);
+            mouse_y -= static_cast<float>(window_y);
             io.AddMousePosEvent(mouse_x, mouse_y);
         }
     }
@@ -695,7 +702,7 @@ static void ImGui_ImplSDL3_UpdateGamepadAnalog(ImGui_ImplSDL3_Data* bd, ImGuiIO&
     float merged_value = 0.0f;
     for (SDL_Gamepad* gamepad : bd->Gamepads)
     {
-        float vn = Saturate((float)(SDL_GetGamepadAxis(gamepad, axis_no) - v0) / (float)(v1 - v0));
+        float vn = Saturate(static_cast<float>(SDL_GetGamepadAxis(gamepad, axis_no) - v0) / static_cast<float>(v1 - v0));
         if (merged_value < vn)
             merged_value = vn;
     }
@@ -770,12 +777,12 @@ static void ImGui_ImplSDL3_GetWindowSizeAndFramebufferScale(SDL_Window* window, 
 #else
     int display_w, display_h;
     SDL_GetWindowSizeInPixels(window, &display_w, &display_h);
-    float fb_scale_x = (w > 0) ? (float)display_w / w : 1.0f;
-    float fb_scale_y = (h > 0) ? (float)display_h / h : 1.0f;
+    float fb_scale_x = (w > 0) ? static_cast<float>(display_w) / static_cast<float>(w) : 1.0f;
+    float fb_scale_y = (h > 0) ? static_cast<float>(display_h) / static_cast<float>(h) : 1.0f;
 #endif
 
     if (out_size != nullptr)
-        *out_size = ImVec2((float)w, (float)h);
+        *out_size = ImVec2(static_cast<float>(w), static_cast<float>(h));
     if (out_framebuffer_scale != nullptr)
         *out_framebuffer_scale = ImVec2(fb_scale_x, fb_scale_y);
 }
@@ -795,7 +802,7 @@ void ImGui_ImplSDL3_NewFrame()
     Uint64 current_time = SDL_GetPerformanceCounter();
     if (current_time <= bd->Time)
         current_time = bd->Time + 1;
-    io.DeltaTime = bd->Time > 0 ? (float)((double)(current_time - bd->Time) / frequency) : (float)(1.0f / 60.0f);
+    io.DeltaTime = bd->Time > 0 ? static_cast<float>(static_cast<double>(current_time - bd->Time) / static_cast<double>(frequency)) : static_cast<float>(1.0f / 60.0f);
     bd->Time = current_time;
 
     if (bd->MousePendingLeaveFrame && bd->MousePendingLeaveFrame >= ImGui::GetFrameCount() && bd->MouseButtonsDown == 0)

@@ -2,8 +2,8 @@
 
 #include <memory>
 #include <unordered_map>
-#include "Raindrop/Core/Scheduler/IStage.hpp"
-#include "Raindrop/Modules/Render/Core/RenderCommandContext.hpp"
+#include <Raindrop/Scheduler/IStage.hpp>
+#include <RenderCore/RenderCommandContext.hpp>
 
 namespace Raindrop::Render{
     class IRenderOutput{

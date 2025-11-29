@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Shader.hpp"
+#include <Filesystem/FilesystemModule.hpp>
 
 namespace Raindrop::Render{
     class GLSLShader : public Shader{

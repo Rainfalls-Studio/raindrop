@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Raindrop/Modules/Asset/Asset.hpp"
-#include "Raindrop/Modules/Render/Core/RenderCoreModule.hpp"
+#include <Asset/Asset.hpp>
+#include <RenderCore/RenderCoreModule.hpp>
 
-#include <Raindrop/Modules/Filesystem/FilesystemModule.hpp>
+#include <Filesystem/FilesystemModule.hpp>
 #include <vulkan/vulkan.hpp>
 
 namespace Raindrop::Render{

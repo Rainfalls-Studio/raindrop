@@ -55,7 +55,7 @@ struct ImGui_ImplSDL3_Data
     ImGui_ImplSDL3_GamepadMode  GamepadMode;
     bool                        WantUpdateGamepadsList;
 
-    ImGui_ImplSDL3_Data()   { memset((void*)this, 0, sizeof(*this)); }
+    ImGui_ImplSDL3_Data()   { memset(static_cast<void*>(this), 0, sizeof(*this)); }
 };
 
 ImGui_ImplSDL3_Data* ImGui_ImplSDL3_GetBackendData();

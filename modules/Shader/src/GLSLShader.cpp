@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Render/Shaders/GLSLShader.hpp"
+#include "Shader/GLSLShader.hpp"
 #include <glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
 

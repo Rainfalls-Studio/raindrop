@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Raindrop/Core/Modules/IModule.hpp"
-#include "Raindrop/Engine.hpp"
-#include "Raindrop/Modules/Render/Core/RenderCoreModule.hpp"
+#include <Raindrop/Modules/IModule.hpp>
+#include <Raindrop/Engine.hpp>
+#include <RenderCore/RenderCoreModule.hpp>
 #include "ImGuiContext.hpp"
 
 namespace Raindrop::ImGui{

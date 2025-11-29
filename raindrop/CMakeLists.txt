@@ -56,10 +56,10 @@ endif()
 if(NOT Raindrop_DEVELOPER_MODE)
   return()
 elseif(NOT PROJECT_IS_TOP_LEVEL)
-  message(
-      AUTHOR_WARNING
-      "Developer mode is intended for developers of Raindrop"
-  )
+  # message(
+  #     AUTHOR_WARNING
+  #     "Developer mode is intended for developers of Raindrop"
+  # )
 endif()
 
 include(cmake/dev-mode.cmake)

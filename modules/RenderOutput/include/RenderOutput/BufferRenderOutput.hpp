@@ -4,7 +4,6 @@
 #include <vulkan/vulkan.hpp>
 
 #include "IRenderOutput.hpp"
-#include "Raindrop/Modules/Window/Window.hpp"
 
 namespace Raindrop::Render{
     class BufferRenderOutput : public IRenderOutput{

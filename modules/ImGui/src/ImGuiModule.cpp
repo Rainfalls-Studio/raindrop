@@ -1,5 +1,6 @@
-#include "Raindrop/Modules/ImGui/ImGuiModule.hpp"
-#include "Raindrop/Core/Modules/InitHelper.hpp"
+#include "ImGui/ImGuiModule.hpp"
+
+#include <Raindrop/Modules/InitHelper.hpp>
 #include <imgui.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 

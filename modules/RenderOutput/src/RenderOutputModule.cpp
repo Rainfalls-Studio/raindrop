@@ -1,5 +1,5 @@
-#include "Raindrop/Modules/Render/RenderOutput/RenderOutputModule.hpp"
-#include "Raindrop/Core/Modules/InitHelper.hpp"
+#include <RenderOutput/RenderOutputModule.hpp>
+#include <Raindrop/Modules/InitHelper.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -41,7 +41,7 @@ namespace Raindrop::Render{
     }
 
     RenderOutputModule::Name RenderOutputModule::name() const noexcept{
-        return "RenderOutput";
+        return RAINDROP_CURRENT_MODULE_NAME;
     }
 
     Modules::DependencyList RenderOutputModule::dependencies() const noexcept{

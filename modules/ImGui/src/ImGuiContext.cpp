@@ -1,9 +1,11 @@
-#include "Raindrop/Modules/ImGui/ImGuiContext.hpp"
-#include "Raindrop/Modules/Render/RenderOutput/WindowRenderOutput.hpp"
-#include "Raindrop/Modules/ImGui/backend/imgui_impl_sdl3.h"
-#include "Raindrop/Modules/Event/MouseEvent.hpp"
-#include "Raindrop/Modules/Event/KeyboardEvent.hpp"
-#include "Raindrop/Modules/Window/WindowEvents.hpp"
+#include "ImGui/ImGuiContext.hpp"
+#include "ImGui/backend/imgui_impl_sdl3.h"
+
+#include <RenderOutput/WindowRenderOutput.hpp>
+#include <Event/MouseEvent.hpp>
+#include <Event/KeyboardEvent.hpp>
+#include <Window/WindowEvents.hpp>
+
 #include <imgui_impl_vulkan.h>
 #include <spdlog/spdlog.h>
 

@@ -30,6 +30,10 @@ raindrop_dependencies(Sim
         Window
         Layers
         Scene
+        RenderCore
+        RenderOutput
+        ImGui
+        Shader
 )
 
 

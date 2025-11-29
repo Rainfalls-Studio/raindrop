@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Render/RenderOutput/IRenderOutput.hpp"
+#include <RenderOutput/IRenderOutput.hpp>
 
 namespace Raindrop::Render{
 
@@ -107,7 +107,7 @@ namespace Raindrop::Render{
             auto result = output->present(semaphore);
 
             if (!result){
-                const auto& error = result.error();
+                // const auto& error = result.error();
                 return StageResult::Skip("Failed to present render output");
             }
         } else {

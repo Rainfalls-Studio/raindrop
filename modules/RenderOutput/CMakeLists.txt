@@ -19,5 +19,12 @@ module_link_libraries(
         GPUOpen::VulkanMemoryAllocator
 )
 
+module_dependencies(
+    HARD
+        RenderCore
+    SOFT
+        Window
+)
+
 # create library
 add_raindrop_module()

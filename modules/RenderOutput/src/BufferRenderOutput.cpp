@@ -1,4 +1,4 @@
-#include "Raindrop/Modules/Render/RenderOutput/BufferRenderOutput.hpp"
+#include <RenderOutput/BufferRenderOutput.hpp>
 #include <spdlog/spdlog.h>
 
 namespace Raindrop::Render{

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Raindrop/Core/Modules/IModule.hpp"
-#include "Raindrop/Modules/Window/WindowModule.hpp"
+#include <Raindrop/Modules/IModule.hpp>
+#include <Window/WindowModule.hpp>
 #include <VkBootstrap.h>
 
 #include "DeviceManager.hpp"

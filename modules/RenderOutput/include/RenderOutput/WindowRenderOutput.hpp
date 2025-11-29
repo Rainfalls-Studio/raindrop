@@ -1,10 +1,11 @@
 #pragma once
+#if RAINDROP_MODULE_Window_AVAILABLE
 
 #include <VkBootstrap.h>
 #include <vulkan/vulkan.hpp>
 
 #include "IRenderOutput.hpp"
-#include "Raindrop/Modules/Window/Window.hpp"
+#include <Window/Window.hpp>
 
 namespace Raindrop::Render{
     class WindowRenderOutput : public IRenderOutput{
@@ -89,7 +90,7 @@ namespace Raindrop::Render{
             vk::SurfaceKHR _surface;
             vk::SurfaceFormatKHR _surfaceFormat;
             vk::PresentModeKHR _presentMode;
-			vk::ClearColorValue _clearColor;
+            vk::ClearColorValue _clearColor;
             vk::Extent2D _extent;
             vk::RenderPass _renderPass;
             SwapchainSupport _support;
@@ -121,3 +122,5 @@ namespace Raindrop::Render{
             std::expected<void, Error> createRenderPass();
     };
 }
+
+#endif
