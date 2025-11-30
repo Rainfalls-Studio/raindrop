@@ -5,6 +5,13 @@
 #include <exception>
 #include <stdexcept>
 
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* createModule(){
+	return new Raindrop::Asset::AssetModule();
+}
+
+extern "C" RAINDROP_EXPORT void destroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
 
 namespace Raindrop::Asset{
 	AssetModule::AssetModule() noexcept : _factories{}{}
@@ -23,13 +30,13 @@ namespace Raindrop::Asset{
 		_nameToFactoryID.clear();
 	}
 
-	AssetModule::Name AssetModule::name() const noexcept{
+	Modules::Name AssetModule::name() const noexcept{
 		return RAINDROP_CURRENT_MODULE_NAME;
 	}
 
 	Modules::DependencyList AssetModule::dependencies() const noexcept{
 		return {
-			Modules::Dependency("Filesystem")
+			Modules::HardDependency("Filesystem")
 		};
 	}
 

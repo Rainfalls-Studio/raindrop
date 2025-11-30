@@ -14,36 +14,47 @@ include(cmake/variables.cmake)
 
 # ---- Declare library ----
 
-file(GLOB_RECURSE SOURCES "source/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_library(Raindrop SHARED ${SOURCES})
+add_library(RaindropEngine SHARED ${SOURCES})
 
-target_compile_features(Raindrop PUBLIC cxx_std_23)
+target_compile_features(RaindropEngine PUBLIC cxx_std_23)
 
 target_include_directories(
-    Raindrop ${warning_guard}
+    RaindropEngine ${warning_guard}
     PUBLIC
         "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
 
 find_package(spdlog CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 find_package(SDL3 REQUIRED) # Not specified in vcpkg.json as it's not currently supported on all linux distros (such as mine)
 
-target_link_libraries(Raindrop
+target_link_libraries(RaindropEngine
     PUBLIC
         spdlog::spdlog
         glm::glm
+    
+    PRIVATE
+        nlohmann_json::nlohmann_json
 )
 
-add_library(Raindrop::Raindrop ALIAS Raindrop)
+add_library(Raindrop::Engine ALIAS RaindropEngine)
 
-target_compile_definitions(Raindrop
+target_compile_definitions(RaindropEngine
     PUBLIC
         VULKAN_HPP_NO_EXCEPTIONS
         VULKAN_HPP_ASSERT_ON_RESULT="(expression)((void)0)"
 )
+
+add_custom_command(TARGET RaindropEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo
+        "Setting RAINDROP_ENGINE_LIBRARY_PATH to: $<TARGET_FILE:RaindropEngine>"
+)
+
+set_property(GLOBAL PROPERTY RAINDROP_ENGINE_LIBRARY_PATH "$<TARGET_FILE:RaindropEngine>")
 
 # ---- Install rules ----
 

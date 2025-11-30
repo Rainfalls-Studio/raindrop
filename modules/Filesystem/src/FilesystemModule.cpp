@@ -14,7 +14,7 @@ namespace Raindrop::Filesystem{
         
     }
 
-    FilesystemModule::Name FilesystemModule::name() const noexcept{
+    Modules::Name FilesystemModule::name() const noexcept{
         return RAINDROP_CURRENT_MODULE_NAME;
     }
 

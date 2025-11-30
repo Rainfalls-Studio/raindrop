@@ -372,12 +372,14 @@ namespace Raindrop::ImGui{
     void ImGuiContext::setLayer(const std::shared_ptr<Layers::Layer>& layer){
         _layer = layer->createChild("ImGui", 1.f);
 
-        _eventSubscriber = layer->subscribe<Event::Event>([this](const Event::Event& event) -> Layers::Result {
-            if (handleEvent(event)){
-                return Layers::Result::Consume();
+        _eventSubscriber = layer->subscribe<Event::Event>(
+            [this](const Event::Event& event) -> Layers::Result {
+                if (handleEvent(event)){
+                    return Layers::Result::Consume();
+                }
+                return Layers::Result::Continue();
             }
-            return Layers::Result::Continue();
-        });
+        );
     }
 
     bool ImGuiContext::handleEvent(const Event::Event& e){

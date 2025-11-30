@@ -8,9 +8,10 @@
 
 namespace Raindrop::Modules{
     class InitHelper;
+    using Name = std::string;  
+
     class IModule{
         public:
-            using Name = std::string;
 
             virtual ~IModule() = default;
 
@@ -31,6 +32,6 @@ namespace Raindrop::Modules{
 
     using SharedModule = std::shared_ptr<IModule>;
     using WeakModule = std::shared_ptr<IModule>;
-    using ModuleMap = std::unordered_map<IModule::Name, SharedModule>;
-    using WeakModuleMap = std::unordered_map<IModule::Name, WeakModule>;
+    using ModuleMap = std::unordered_map<Name, SharedModule>;
+    using WeakModuleMap = std::unordered_map<Name, WeakModule>;
 }

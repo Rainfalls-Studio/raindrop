@@ -160,6 +160,20 @@ function(create_module_manifest NAME)
         string(REGEX REPLACE ",\n$" "\n" SOFT_JSON "${SOFT_JSON}") 
     endif()
 
+    # === the binaries
+    
+    set(MODULE_WINDOWS_BIN_PATH)
+    set(MODULE_LINUX_BIN_PATH)
+    set(MODULE_MAC_BIN_PATH)
+
+    if (WIN32)
+        set(MODULE_WINDOWS_BIN_PATH "bin/windows/${NAME}.dll")
+    elseif (APPLE)
+        set(MODULE_LINUX_BIN_PATH "bin/max/${NAME}.dylib")
+    else ()
+        set(MODULE_LINUX_BIN_PATH "bin/linux/${NAME}.so")
+    endif()
+
     # === variable setup for manifest template
 
     set(MODULE_NAME ${NAME})
@@ -167,6 +181,7 @@ function(create_module_manifest NAME)
     set(MODULE_DESCRIPTION ${DESCRIPTION})
     set(MODULE_HARD_DEPENDENCIES ${HARD_JSON})
     set(MODULE_SOFT_DEPENDENCIES ${SOFT_JSON})
+
 
     set(MANIFEST_OUTPUT "${BINARY_DIR}/clean/manifest.json")
 
@@ -237,38 +252,51 @@ function(create_module_library NAME)
 
     # query files
     file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/src/*")
+    file(GLOB_RECURSE HEADERS "${SOURCE_DIR}/include/*")
 
     # create the library 
-    add_library(${NAME} SHARED ${SOURCES})
+    add_library(${NAME} MODULE ${SOURCES} ${HEADERS})
+    add_library(${NAME}_interface INTERFACE)
 
     # Set the library output
     set(LIBRARY_OUTPUT "")
+    set(EXPORT_DEFINE "")
+
     if (WIN32)
         set(LIBRARY_OUTPUT "${BIN_DIR}/clean/bin/windows")
+        set(EXPORT_DEFINE "__declspec(dllexport)")
+        set_target_properties(${NAME} PROPERTIES SUFFIX ".dll")
     elseif (APPLE)
         set(LIBRARY_OUTPUT "${BIN_DIR}/clean/bin/mac")
+        set(EXPORT_DEFINE "__attribute__((visibility(\"default\")))")
+        set_target_properties(${NAME} PROPERTIES SUFFIX ".dylib")
     else ()
         set(LIBRARY_OUTPUT "${BIN_DIR}/clean/bin/linux")
+        set(EXPORT_DEFINE "__attribute__((visibility(\"default\")))")
+        set_target_properties(${NAME} PROPERTIES SUFFIX ".so")
     endif()
 
     set_target_properties(${NAME} PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY ${LIBRARY_OUTPUT}
-        RUNTIME_OUTPUT_DIRECTORY ${LIBRARY_OUTPUT}
+        PREFIX ""
     )
+
+    target_compile_definitions(${NAME} PRIVATE "RAINDROP_EXPORT=${EXPORT_DEFINE}")
 
     # include directories and link raindrop
 
-    target_include_directories(${NAME} PUBLIC "${SOURCE_DIR}/include")
-    target_link_libraries(
-        ${NAME} PRIVATE Raindrop::Raindrop
-    )
+    target_include_directories(${NAME}_interface INTERFACE "${SOURCE_DIR}/include")
+    target_link_libraries(${NAME} PRIVATE Raindrop::Engine ${NAME}_interface)
 
     set_property(GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_LIBRARY ${NAME})
+    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_INTERFACE ${NAME}_interface)
+
     create_module_manifest(${NAME})
     copy_module_data(${NAME})
 
-endfunction()
+    set_property(TARGET ${NAME} PROPERTY EXCLUDE_FROM_ALL FALSE)
 
+endfunction()
 
 # =============================
 #  link_module_library(NAME)
@@ -285,7 +313,7 @@ function(link_module_library NAME)
 
     get_property(HARD GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_HARD_DEPS)
     foreach(dep IN LISTS HARD)
-        get_property(DEP_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${dep}_LIBRARY)
+        get_property(DEP_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${dep}_INTERFACE)
 
         if (DEP_LIBRARY)
             list(APPEND DEPENDENCIES ${DEP_LIBRARY})
@@ -293,6 +321,8 @@ function(link_module_library NAME)
                 "RAINDROP_MODULE_${dep}_AVAILABLE=1"
                 "RAINDROP_MODULE_${dep}_VERSION=1" # TODO: support versioning
             )
+
+            add_dependencies(${NAME} ${DEP_LIBRARY})
         else()
             message(FATAL_ERROR "Module ${NAME} is missing hard dependency ${dep}")
         endif()
@@ -302,7 +332,7 @@ function(link_module_library NAME)
     get_property(SOFT GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_SOFT_DEPS)
 
     foreach(dep IN LISTS SOFT)
-        get_property(DEP_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${dep}_LIBRARY)
+        get_property(DEP_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${dep}_INTERFACE)
         
         if (DEP_LIBRARY)
             list(APPEND DEPENDENCIES ${DEP_LIBRARY})
@@ -311,6 +341,8 @@ function(link_module_library NAME)
                 "RAINDROP_MODULE_${dep}_AVAILABLE=1"
                 "RAINDROP_MODULE_${dep}_VERSION=1" # TODO: support versioning
             )
+
+            add_dependencies(${NAME} ${DEP_LIBRARY})
         else()
             list(APPEND DEFINES 
                 "RAINDROP_MODULE_${dep}_AVAILABLE=0"
@@ -319,18 +351,11 @@ function(link_module_library NAME)
     endforeach()
 
     if (DEPENDENCIES)
-        target_link_libraries(
-            ${LIBRARY}
-            PUBLIC
-            ${DEPENDENCIES}
-        )
+        target_link_libraries(${LIBRARY} PUBLIC ${DEPENDENCIES})
     endif()
 
     if (DEFINES)
-        target_compile_definitions(
-            ${LIBRARY}
-            PUBLIC ${DEFINES}
-        )
+        target_compile_definitions(${LIBRARY} PUBLIC ${DEFINES})
     endif()
 
     target_compile_definitions(
@@ -339,7 +364,6 @@ function(link_module_library NAME)
             "RAINDROP_CURRENT_MODULE_NAME=\"${NAME}\""
             "RAINDROP_CURRENT_MODULE_VERSION=1"
     )
-
 endfunction()
 
 
@@ -363,10 +387,16 @@ function(copy_module_clean TARGET NAME DESTINATION)
     set(STAMP_FILE "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.stamp")
 
     add_custom_command(
-        TARGET ${TARGET} POST_BUILD
-        # COMMAND ${CMAKE_COMMAND} -E make_directory "${MODULE_DST}"
+        OUTPUT ${MODULE_DST}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CLEAN_ROOT} ${MODULE_DST}
-        COMMENT "[Module] Cleaning and copying module ${NAME} to ${MODULE_DST}"
+        DEPENDS ${NAME}
     )
+
+    add_custom_target(copy_${NAME}_${TARGET}
+        DEPENDS ${MODULE_DST}
+        COMMENT "Cleaning and copying module \"${NAME}\" to \"${TARGET}\" module folder"
+    )
+
+    add_dependencies(${TARGET} copy_${NAME}_${TARGET})
 
 endfunction()

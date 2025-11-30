@@ -26,8 +26,8 @@ namespace Raindrop::Layers{
         public:
             using Callback = std::function<Result(const T&)>;
             inline Subscriber(const Callback& callback, float priority = 0.f) :
-                _callback(callback),
-                SubscriberBase{priority}{}
+            SubscriberBase{priority},
+            _callback(callback){}
 
             virtual ~Subscriber() = default;
 

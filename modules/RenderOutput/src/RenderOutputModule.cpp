@@ -40,17 +40,17 @@ namespace Raindrop::Render{
         _outputs.clear();
     }
 
-    RenderOutputModule::Name RenderOutputModule::name() const noexcept{
+    Modules::Name RenderOutputModule::name() const noexcept{
         return RAINDROP_CURRENT_MODULE_NAME;
     }
 
     Modules::DependencyList RenderOutputModule::dependencies() const noexcept{
         return {
-            Modules::Dependency("RenderCore")
+            Modules::HardDependency("RenderCore")
         };
     }
 
-    Modules::Result RenderOutputModule::dependencyReload(const Name& name){
+    Modules::Result RenderOutputModule::dependencyReload(const Modules::Name& name){
         if (name == "RenderCore"){
             _core = _engine->getModuleManager().getModuleAs<RenderCoreModule>("RenderCore");
             rebuildAllOutputs();
@@ -58,7 +58,7 @@ namespace Raindrop::Render{
         return Modules::Result::Success();
     }
 
-    Modules::Result RenderOutputModule::dependencyShutdown(const Name&){
+    Modules::Result RenderOutputModule::dependencyShutdown(const Modules::Name&){
         return Modules::Result::Error();
     }
 

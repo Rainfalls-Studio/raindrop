@@ -13,8 +13,8 @@ namespace Raindrop::Layers{
         _manager.reset();
     }
  
-    LayerModule::Name LayerModule::name() const noexcept{
-        return "Layer";
+    Modules::Name LayerModule::name() const noexcept{
+        return RAINDROP_CURRENT_MODULE_NAME;
     }
 
     Modules::DependencyList LayerModule::dependencies() const noexcept{

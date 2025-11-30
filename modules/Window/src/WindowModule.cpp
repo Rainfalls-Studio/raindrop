@@ -24,7 +24,7 @@ namespace Raindrop::Window{
 
     Modules::DependencyList WindowModule::dependencies() const noexcept{
         return {
-            Modules::Dependency("Event")
+            Modules::HardDependency("Event")
         };
     }
 

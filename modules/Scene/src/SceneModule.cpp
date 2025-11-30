@@ -2,7 +2,7 @@
 #include <Raindrop/Modules/InitHelper.hpp>
 
 namespace Raindrop::Scene{
-    SceneModule::Name SceneModule::name() const noexcept{
+    Modules::Name SceneModule::name() const noexcept{
         return RAINDROP_CURRENT_MODULE_NAME;
     }
 

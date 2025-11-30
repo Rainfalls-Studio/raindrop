@@ -1,9 +1,13 @@
 #include "Raindrop/Modules/Manager.hpp"
 #include "Raindrop/Modules/InitHelper.hpp"
+#include "Raindrop/Modules/Loaders/DynamicModuleLoader.hpp"
 
 #include <cassert>
 #include <spdlog/spdlog.h>
 #include <queue>
+
+#include <filesystem>
+namespace fs = std::filesystem;
 
 namespace Raindrop::Modules{
     Manager::Manager(Engine& engine) : _engine{engine}{}
@@ -12,8 +16,25 @@ namespace Raindrop::Modules{
         shutdown();
     }
 
-    void Manager::registerModule(const SharedModule& module){
+    void Manager::loadModules(const std::filesystem::path& directoryPath){
+        spdlog::info("Loading modules from \"{}\"", directoryPath.string());
+
+        for (const auto & entry : fs::directory_iterator(directoryPath)){
+            if (!entry.is_directory()) continue;
+            loadModule(entry.path());
+        }
+    }
+
+
+    void Manager::loadModule(const std::filesystem::path& path){
+        registerModule(std::make_unique<DynamicModuleLoader>(path));
+    }
+
+
+    void Manager::registerModule(std::unique_ptr<IModuleLoader>&& loader){
         std::unique_lock<std::mutex> lock(_mtx);
+
+        std::shared_ptr<IModule> module = loader->create();
 
         // lock.lock();
 
@@ -23,6 +44,7 @@ namespace Raindrop::Modules{
 
         node.module = module;
         node.status = Status::NEW;
+        node.loader = std::move(loader);
 
         std::string nodeName = node.name();
 
@@ -38,7 +60,7 @@ namespace Raindrop::Modules{
 
         for (const auto& dependency : module->dependencies()){
             auto& depNode = _nodes[dependency.get()];
-            node.dependencies.push_back(dependency.get());
+            node.dependencies.push_back(dependency);
             depNode.dependents.push_back(nodeName);
 
             if (!dependency.optional() && depNode.status != Status::INITIALIZED){
@@ -61,8 +83,8 @@ namespace Raindrop::Modules{
 
     void Manager::propagateInitialization(Manager::Node& source){
         struct QueueData{
-            IModule::Name parentName;
-            IModule::Name currentName;
+            Name parentName;
+            Name currentName;
 
             inline Node& parent(Map& map) const noexcept{
                 return map[parentName];
@@ -76,7 +98,7 @@ namespace Raindrop::Modules{
         std::queue<QueueData> queue;
 
         for (const auto& dep : source.dependents){
-            queue.emplace(source.name(), dep.get());
+            queue.emplace(source.name(), dep);
         }
 
         while (!queue.empty()){
@@ -122,7 +144,7 @@ namespace Raindrop::Modules{
 
             // add dependents
             for (const auto& dep : current.dependents){
-                queue.emplace(current.name(), dep.get());
+                queue.emplace(current.name(), dep);
             }
         }
     }
@@ -141,12 +163,12 @@ namespace Raindrop::Modules{
     void Manager::initializeModule(Node& node){
         Result result = Result::Level::ERROR;
         SharedModule module = node.module;
-        IModule::Name nodeName = node.name();
+        Name nodeName = node.name();
 
         ModuleMap dependencies;
 
         for (auto & dependency : node.dependencies){
-            IModule::Name depName = dependency.get();
+            Name depName = dependency.get();
             Node& depNode = _nodes[depName];
 
             dependencies[depName] = depNode.status == Status::INITIALIZED ? depNode.module : nullptr;
@@ -161,7 +183,7 @@ namespace Raindrop::Modules{
         node.status = catchResultError(nodeName, result);
     }
 
-    Status Manager::catchResultError(const IModule::Name& name, const Result& result){
+    Status Manager::catchResultError(const Name& name, const Result& result){
 
         const std::string result_msg = result.message().empty() ? "no message" : result.message();
 
@@ -200,7 +222,7 @@ namespace Raindrop::Modules{
     void Manager::shutdown(){
         spdlog::info("Shuting down modules...");
 
-        std::queue<IModule::Name> queue;
+        std::queue<Name> queue;
 
         // push leafs
         for (auto& [name, node] : _nodes){
@@ -211,7 +233,7 @@ namespace Raindrop::Modules{
 
         // for each nodes
         while (!queue.empty()){
-            IModule::Name name = queue.front();
+            Name name = queue.front();
             queue.pop();
 
             Node& node = _nodes[name];

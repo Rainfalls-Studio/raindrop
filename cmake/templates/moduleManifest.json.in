@@ -4,10 +4,15 @@
     "description": "@MODULE_DESCRIPTION@",
     "dependencies": {
         "hard": {
-            @MODULE_HARD_DEPENDENCIES@
+@MODULE_HARD_DEPENDENCIES@
         },
         "soft": {
-            @MODULE_SOFT_DEPENDENCIES@
+@MODULE_SOFT_DEPENDENCIES@
         }
+    },
+    "binaries": {
+        "windows": "@MODULE_WINDOWS_BIN_PATH@",
+        "linux": "@MODULE_LINUX_BIN_PATH@",
+        "apple": "@MODULE_MAC_BIN_PATH@"
     }
 }

@@ -45,7 +45,7 @@ namespace Raindrop::Event{
 
     inline Modules::DependencyList EventModule::dependencies() const noexcept{
         return {
-            Modules::Dependency("Layers")
+            Modules::HardDependency("Layers")
         };
     }
 

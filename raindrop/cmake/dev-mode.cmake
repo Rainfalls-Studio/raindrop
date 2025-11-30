@@ -1,10 +1,10 @@
 include(cmake/folders.cmake)
 
-target_compile_definitions(Raindrop PRIVATE SPDLOG_ACTIVE_LEVEL=0)
+target_compile_definitions(RaindropEngine PRIVATE SPDLOG_ACTIVE_LEVEL=0)
 
 include(CTest)
 if(BUILD_TESTING)
-  target_compile_definitions(Raindrop PRIVATE RAINDROP_MOCK)
+  target_compile_definitions(RaindropEngine PRIVATE RAINDROP_MOCK)
   # add_subdirectory(test)
 endif()
 

@@ -8,8 +8,9 @@
     "vk-bootstrap",
     "vulkan-headers",
     "vulkan-memory-allocator",
-    "rendergraph",
     "glslang",
+    "nlohmann-json",
+    "z4kn4fein-semver",
     {
       "name": "imgui",
       "features": [ "vulkan-binding", "docking-experimental" ]

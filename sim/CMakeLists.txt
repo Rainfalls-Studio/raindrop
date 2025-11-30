@@ -12,7 +12,7 @@ include(RaindropProject)
 
 # create executable
 
-file(GLOB_RECURSE SOURCES "source/*.cpp")
+file(GLOB_RECURSE SOURCES "test_source/*.cpp")
 add_executable(Sim ${SOURCES})
 
 set(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/Sim/")
@@ -25,15 +25,7 @@ raindrop_add_module_dir(Sim "${CMAKE_SOURCE_DIR}/modules")
 
 raindrop_dependencies(Sim
     HARD
-        Asset
-        Event
-        Window
-        Layers
-        Scene
-        RenderCore
-        RenderOutput
-        ImGui
-        Shader
+        Test
 )
 
 

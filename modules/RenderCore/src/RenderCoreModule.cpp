@@ -99,17 +99,17 @@ namespace Raindrop::Render{
         _deviceManager.shutdown();
     }
 
-    RenderCoreModule::Name RenderCoreModule::name() const noexcept{
-        return "RenderCore";
+    Modules::Name RenderCoreModule::name() const noexcept{
+        return RAINDROP_CURRENT_MODULE_NAME;
     }
 
     Modules::DependencyList RenderCoreModule::dependencies() const noexcept{
         return {
-            Modules::Dependency("Window", true)
+            Modules::HardDependency("Window")
         };
     }
 
-    Modules::Result RenderCoreModule::dependencyReload(const Name& name){
+    Modules::Result RenderCoreModule::dependencyReload(const Modules::Name& name){
         if (name == "Window"){
             _windowModule = _engine->getModuleManager().getModuleAs<Window::WindowModule>("Window");
             // destroyVulkan();
@@ -119,7 +119,7 @@ namespace Raindrop::Render{
         return Modules::Result::Success();
     }
 
-    Modules::Result RenderCoreModule::dependencyShutdown(const Name& name){
+    Modules::Result RenderCoreModule::dependencyShutdown(const Modules::Name& name){
         if (name == "Window"){
             _windowModule.reset();
             // destroyVulkan();

@@ -196,15 +196,20 @@ function(add_raindrop_project TARGET)
         set(MODULES_LIBRARIES "")
 
         foreach(mod IN LISTS DIRECT_DEPENDENCIES)
-            get_property(MOD_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${mod}_LIBRARY)
+            get_property(MOD_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${mod}_INTERFACE)
             list(APPEND MODULES_LIBRARIES ${MOD_LIBRARY})
+
+            add_dependencies(${TARGET} ${MOD_LIBRARY})
         endforeach()
 
-        target_link_libraries(
-            ${TARGET}
-            PRIVATE
-            ${MODULES_LIBRARIES}
-        )
+        if (MODULES_LIBRARIES)
+            target_link_libraries(
+                ${TARGET}
+                PRIVATE
+                ${MODULES_LIBRARIES}
+            )
+        endif()
+
     endif()
 
     if (DEFINES)
@@ -227,19 +232,34 @@ function(add_raindrop_project TARGET)
     # Copy the modules
     message(STATUS "Copying modules to the project's modules folder...")
 
-
-
     foreach(mod IN LISTS DEPENDENCIES)
         copy_module_clean(${TARGET} ${mod} "${TARGET_DIR}/modules")
     endforeach()
     
 
-    
-
     # Link project to Raindrop
-    target_link_libraries(${TARGET} PRIVATE Raindrop::Raindrop)
+    target_link_libraries(${TARGET} PRIVATE Raindrop::Engine)
+
+    # Copy the raindrop shader library next to the executable
+    get_property(RAINDROP_LIB_PATH GLOBAL PROPERTY RAINDROP_ENGINE_LIBRARY_PATH)
+
+    if (NOT RAINDROP_LIB_PATH)
+        message(FATAL_ERROR "The raindrop library path has not been set !")
+    endif()
+
+    add_custom_command(
+        TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${RAINDROP_LIB_PATH} ${TARGET_DIR}
+    )
 
     # confirm project built
     set_property(TARGET ${TARGET} PROPERTY RAINDROP_BUILT TRUE)
+
+    set_target_properties(${TARGET} PROPERTIES
+        BUILD_RPATH "\$ORIGIN"
+        INSTALL_RPATH "\$ORIGIN"
+    )
+
+    message(STATUS "Raindrop project ${TARGET} set up with success !")
 
 endfunction()

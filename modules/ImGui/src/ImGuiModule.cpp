@@ -31,24 +31,22 @@ namespace Raindrop::ImGui{
         );
     }
 
-
-    ImGuiModule::Name ImGuiModule::name() const noexcept{
-        return "ImGui";
+    Modules::Name ImGuiModule::name() const noexcept{
+        return RAINDROP_CURRENT_MODULE_NAME;
     }
 
     Modules::DependencyList ImGuiModule::dependencies() const noexcept{
-        using Dependency = Modules::Dependency;
         return {
-            Dependency("RenderCore")
+            Modules::HardDependency("RenderCore")
         };
     }
 
-    Modules::Result ImGuiModule::dependencyReload(const Name& dep){
+    Modules::Result ImGuiModule::dependencyReload(const Modules::Name& dep [[__maybe_unused__]]){
 
         return Modules::Result::Success();
     }
 
-    Modules::Result ImGuiModule::dependencyShutdown(const Name& dep){
+    Modules::Result ImGuiModule::dependencyShutdown(const Modules::Name& dep [[__maybe_unused__]]){
 
         return Modules::Result::Success();
     }
