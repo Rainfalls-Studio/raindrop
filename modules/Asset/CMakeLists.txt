@@ -4,10 +4,17 @@ project(Asset
     DESCRIPTION "Simple asset manager with factories and async friendly loading" 
 )
 
-module_dependencies(
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*")
+
+raindrop_add_module(Asset
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION ${PROJECT_DESCRIPTION}
+    SOURCE ${SOURCES}
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+)
+
+raindrop_module_dependencies(Asset
     HARD
         Filesystem
 )
-
-# create library
-add_raindrop_module()

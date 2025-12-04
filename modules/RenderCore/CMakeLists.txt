@@ -3,22 +3,33 @@ project(RenderCore
     VERSION 0.1.0 
 )
 
-find_package(vk-bootstrap CONFIG REQUIRED)
-find_package(VulkanMemoryAllocator CONFIG REQUIRED)
-find_package(Vulkan REQUIRED)
+file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-module_link_libraries(
-    PUBLIC
-        Vulkan::Vulkan
-        GPUOpen::VulkanMemoryAllocator
-        vk-bootstrap::vk-bootstrap
-        vk-bootstrap::vk-bootstrap-compiler-warnings
+raindrop_add_module(RenderCore
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION ${PROJECT_DESCRIPTION}
+    SOURCE ${SOURCES}
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-module_dependencies(
+raindrop_module_dependencies(RenderCore
     HARD
         Window
 )
 
-# create library
-add_raindrop_module()
+find_package(vk-bootstrap CONFIG REQUIRED)
+find_package(VulkanMemoryAllocator CONFIG REQUIRED)
+find_package(Vulkan REQUIRED)
+
+raindrop_module_link_libraries(RenderCore
+    Vulkan::Vulkan
+    GPUOpen::VulkanMemoryAllocator
+    vk-bootstrap::vk-bootstrap
+    vk-bootstrap::vk-bootstrap-compiler-warnings
+)
+
+target_compile_definitions(RenderCore
+    PUBLIC
+        VULKAN_HPP_NO_EXCEPTIONS
+        VULKAN_HPP_ASSERT_ON_RESULT="(expression)((void)0)"
+)

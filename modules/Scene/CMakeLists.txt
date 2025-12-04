@@ -3,12 +3,18 @@ project(Scene
     VERSION 0.1.0 
 )
 
-find_package(EnTT CONFIG REQUIRED)
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*")
 
-module_link_libraries(
-    PUBLIC
-        EnTT::EnTT
+raindrop_add_module(Scene
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION ${PROJECT_DESCRIPTION}
+    SOURCE ${SOURCES}
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-# create library
-add_raindrop_module()
+find_package(EnTT CONFIG REQUIRED)
+
+raindrop_module_link_libraries(Scene
+    EnTT::EnTT
+)

@@ -1,59 +1,5 @@
 
 # =============================
-#  register_modules(REGISTRY MODULE_DIRS)
-# =============================
-function(register_modules REGISTRY MODULE_DIRS)
-    set(_tmp ${${REGISTRY}})
-
-    foreach(dir IN LISTS MODULE_DIRS)
-
-        # Check if the module directory contains a CMakeLists.txt file
-        if (NOT EXISTS "${dir}/CMakeLists.txt")
-            message(WARNING "directory ${dir} does not contain a CMakeLists.txt file. Skipped")
-            continue()
-        endif()
-
-        # setup the module output directory
-        # the modules are setup this way : 
-        # modules/ (the output binary folder)
-        #    MyModule/
-        #        bin/
-        #        data/
-        #        manifest.json
-        #    MySecondModule/
-        #        ...
-        #    MyThirdModule/
-        #        ...
-        #    ...
-
-        get_filename_component(dir_name ${dir} NAME)
-        set(binary_dir "${CMAKE_BINARY_DIR}/modules/${dir_name}")
-        set_property(DIRECTORY PROPERTY RAINDROP_MODULE_BINARY_DIR ${binary_dir})
-
-        # Helper functions to setup the module
-        include(RaindropModule)
-        add_subdirectory(${dir} ${binary_dir} EXCLUDE_FROM_ALL)
-
-        get_property(MODULE_NAME GLOBAL PROPERTY RAINDROP_CURRENT_MODULE_NAME)
-        set_property(GLOBAL PROPERTY RAINDROP_CURRENT_MODULE_NAME "")
-
-        # check if module has correctly been built
-        if (NOT MODULE_NAME)
-            message(WARNING "module \"${MODULE_NAME}\" in \"${dir}\" did not called add_raindrop_module(). Skipped")
-            continue()
-        endif()
-
-        # If valid name (and thus valid module) store the binary dir
-        set_property(GLOBAL PROPERTY RAINDROP_MODULE_${MODULE_NAME}_BINARY_DIR ${binary_dir})
-        
-        list(APPEND _tmp ${MODULE_NAME})
-    endforeach()
-        
-    set(${REGISTRY} ${_tmp} PARENT_SCOPE)
-endfunction()
-
-
-# =============================
 #  discover_modules(MODULES PATH)
 # =============================
 function(discover_modules MODULES PATH)
@@ -74,9 +20,9 @@ endfunction()
 # =============================
 #  module_exists(NAME)
 # =============================
-function(module_exists EXISTS NAME)
-    get_property(BUILT GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_BUILT)
-    set(${EXISTS} ${BUILT} PARENT_SCOPE)
+function(module_exists MODULE NAME)
+    get_property(MODULE GLOBAL PROPERTY RAINDROP_MODULE_${NAME})
+    set(${MODULE} ${MODULE} PARENT_SCOPE)
 endfunction()
 
 
@@ -121,16 +67,28 @@ endfunction()
 # =============================
 #  create_module_manifest(NAME)
 # =============================
-function(create_module_manifest NAME)
-    get_property(VERSION GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_VERSION)
-    get_property(DESCRIPTION GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_DESCRIPTION)
-    get_property(HARD_DEPS GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_HARD_DEPS)
-    get_property(SOFT_DEPS GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_SOFT_DEPS)
-    get_property(BINARY_DIR GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_BINARY_DIR)
+function(create_module_manifest MODULE)
+    get_target_property(VERSION ${MODULE} VERSION)
+    get_target_property(DESCRIPTION ${MODULE} DESCRIPTION)
+    get_target_property(HARD_DEPS ${MODULE} RAINDROP_HARD_DEPS)
+    get_target_property(SOFT_DEPS ${MODULE} RAINDROP_SOFT_DEPS)
+    get_target_property(OUTPUT_DIR ${MODULE} RAINDROP_OUTPUT_DIR)
 
     # === Validation
     if (NOT VERSION)
-        message(FATAL_ERROR "Module ${NAME} is missing a version")
+        message(FATAL_ERROR "Module ${MODULE} is missing a version")
+    endif()
+
+    if (NOT DESCRIPTION)
+        set(DESCRIPTION "")
+    endif()
+
+    if (NOT HARD_DEPS)
+        set(HARD_DEPS "")
+    endif()
+
+    if (NOT SOFT_DEPS)
+        set(SOFT_DEPS "")
     endif()
 
     # === Format dependencies
@@ -167,23 +125,23 @@ function(create_module_manifest NAME)
     set(MODULE_MAC_BIN_PATH)
 
     if (WIN32)
-        set(MODULE_WINDOWS_BIN_PATH "bin/windows/${NAME}.dll")
+        set(MODULE_WINDOWS_BIN_PATH "bin/windows/${MODULE}.dll")
     elseif (APPLE)
-        set(MODULE_LINUX_BIN_PATH "bin/max/${NAME}.dylib")
+        set(MODULE_LINUX_BIN_PATH "bin/max/${MODULE}.dylib")
     else ()
-        set(MODULE_LINUX_BIN_PATH "bin/linux/${NAME}.so")
+        set(MODULE_LINUX_BIN_PATH "bin/linux/${MODULE}.so")
     endif()
 
     # === variable setup for manifest template
 
-    set(MODULE_NAME ${NAME})
+    set(MODULE_NAME ${MODULE})
     set(MODULE_VERSION ${VERSION})
     set(MODULE_DESCRIPTION ${DESCRIPTION})
     set(MODULE_HARD_DEPENDENCIES ${HARD_JSON})
     set(MODULE_SOFT_DEPENDENCIES ${SOFT_JSON})
 
 
-    set(MANIFEST_OUTPUT "${BINARY_DIR}/clean/manifest.json")
+    set(MANIFEST_OUTPUT "${OUTPUT_DIR}/manifest.json")
 
     configure_file(
         "${CMAKE_SOURCE_DIR}/cmake/templates/moduleManifest.json.in"
@@ -194,23 +152,28 @@ endfunction()
 
 
 # =============================
-#  copy_module_data(NAME)
+#  copy_module_data(MODULE)
 # =============================
-function(copy_module_data NAME)
-    get_property(SOURCE_DIR GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_SOURCE_DIR)
-    get_property(BINARY_DIR GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_BINARY_DIR)
+function(copy_module_data MODULE)
+    get_target_property(OUTPUT_DIR ${MODULE} RAINDROP_OUTPUT_DIR)
+    get_target_property(SOURCE_DIR ${MODULE} RAINDROP_SOURCE_DIR)
+    get_target_property(BINARY_DIR ${MODULE} RAINDROP_BINARY_DIR)
 
     if (NOT SOURCE_DIR)
-        message(FATAL_ERROR "The source directory of module \"${NAME}\" has not been setup correctly")
+        message(FATAL_ERROR "[Raindrop] The source directory of module \"${MODULE}\" has not been setup correctly")
+    endif()
+
+    if (NOT OUTPUT_DIR)
+        message(FATAL_ERROR "[Raindrop] The output directory of module \"${MODULE}\" has not been setup correctly")
     endif()
 
     if (NOT BINARY_DIR)
-        message(FATAL_ERROR "The binary directory of module \"${NAME}\" has not been setup correctly")
+        message(FATAL_ERROR "[Raindrop] The binary directory of module \"${MODULE}\" has not been setup correctly")
     endif()
 
     
     set(SRC "${SOURCE_DIR}/data")
-    set(DST "${BINARY_DIR}/clean/data")
+    set(DST "${OUTPUT_DIR}/data")
 
     if (NOT EXISTS ${SRC})
         return()
@@ -230,90 +193,16 @@ function(copy_module_data NAME)
 endfunction()
 
 
-
-# =============================
-#  create_module_library(NAME)
-# =============================
-function(create_module_library NAME)
-    get_property(LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_LIBRARY)
-
-    if (LIBRARY)
-        # The library has already been created
-        return()
-    endif()
-
-    # get the source dir
-    get_property(SOURCE_DIR GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_SOURCE_DIR)
-    get_property(BIN_DIR GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_BINARY_DIR)
-
-    if (NOT EXISTS ${SOURCE_DIR})
-        message(FATAL_ERROR "The source diectory of module ${NAME} is not defined or valid")
-    endif()
-
-    # query files
-    file(GLOB_RECURSE SOURCES "${SOURCE_DIR}/src/*")
-    file(GLOB_RECURSE HEADERS "${SOURCE_DIR}/include/*")
-
-    # create the library 
-    add_library(${NAME} MODULE ${SOURCES} ${HEADERS})
-    add_library(${NAME}_interface INTERFACE)
-
-    # Set the library output
-    set(LIBRARY_OUTPUT "")
-    set(EXPORT_DEFINE "")
-
-    if (WIN32)
-        set(LIBRARY_OUTPUT "${BIN_DIR}/clean/bin/windows")
-        set(EXPORT_DEFINE "__declspec(dllexport)")
-        set_target_properties(${NAME} PROPERTIES SUFFIX ".dll")
-    elseif (APPLE)
-        set(LIBRARY_OUTPUT "${BIN_DIR}/clean/bin/mac")
-        set(EXPORT_DEFINE "__attribute__((visibility(\"default\")))")
-        set_target_properties(${NAME} PROPERTIES SUFFIX ".dylib")
-    else ()
-        set(LIBRARY_OUTPUT "${BIN_DIR}/clean/bin/linux")
-        set(EXPORT_DEFINE "__attribute__((visibility(\"default\")))")
-        set_target_properties(${NAME} PROPERTIES SUFFIX ".so")
-    endif()
-
-    set_target_properties(${NAME} PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY ${LIBRARY_OUTPUT}
-        PREFIX ""
-    )
-
-    target_compile_definitions(${NAME} PRIVATE "RAINDROP_EXPORT=${EXPORT_DEFINE}")
-
-    # include directories and link raindrop
-
-    target_include_directories(${NAME}_interface INTERFACE "${SOURCE_DIR}/include")
-    target_link_libraries(${NAME} PRIVATE Raindrop::Engine ${NAME}_interface)
-
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_LIBRARY ${NAME})
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_INTERFACE ${NAME}_interface)
-
-    create_module_manifest(${NAME})
-    copy_module_data(${NAME})
-
-    set_property(TARGET ${NAME} PROPERTY EXCLUDE_FROM_ALL FALSE)
-
-endfunction()
-
 # =============================
 #  link_module_library(NAME)
 # =============================
-function(link_module_library NAME)
-    get_property(LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_LIBRARY)
-
-    if (NOT LIBRARY)
-        message(FATAL_ERROR "Cannot link module ${NAME}, it's library has not been created")
-    endif()
-
+function(link_module_library MODULE)
     set(DEPENDENCIES "")
     set(DEFINES "")
 
-    get_property(HARD GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_HARD_DEPS)
+    get_property(HARD GLOBAL PROPERTY RAINDROP_MODULE_${MODULE}_HARD_DEPS)
     foreach(dep IN LISTS HARD)
-        get_property(DEP_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${dep}_INTERFACE)
+        get_target_property(interface_library ${dep} RAINDROP_MODULE_INTERFACE)
 
         if (DEP_LIBRARY)
             list(APPEND DEPENDENCIES ${DEP_LIBRARY})
@@ -322,14 +211,14 @@ function(link_module_library NAME)
                 "RAINDROP_MODULE_${dep}_VERSION=1" # TODO: support versioning
             )
 
-            add_dependencies(${NAME} ${DEP_LIBRARY})
+            add_dependencies(${MODULE} ${DEP_LIBRARY})
         else()
             message(FATAL_ERROR "Module ${NAME} is missing hard dependency ${dep}")
         endif()
     endforeach()
 
 
-    get_property(SOFT GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_SOFT_DEPS)
+    get_property(SOFT GLOBAL PROPERTY RAINDROP_MODULE_${MODULE}_SOFT_DEPS)
 
     foreach(dep IN LISTS SOFT)
         get_property(DEP_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${dep}_INTERFACE)
@@ -342,7 +231,7 @@ function(link_module_library NAME)
                 "RAINDROP_MODULE_${dep}_VERSION=1" # TODO: support versioning
             )
 
-            add_dependencies(${NAME} ${DEP_LIBRARY})
+            add_dependencies(${MODULE} ${DEP_LIBRARY})
         else()
             list(APPEND DEFINES 
                 "RAINDROP_MODULE_${dep}_AVAILABLE=0"
@@ -351,17 +240,17 @@ function(link_module_library NAME)
     endforeach()
 
     if (DEPENDENCIES)
-        target_link_libraries(${LIBRARY} PUBLIC ${DEPENDENCIES})
+        target_link_libraries(${MODULE} PUBLIC ${DEPENDENCIES})
     endif()
 
     if (DEFINES)
-        target_compile_definitions(${LIBRARY} PUBLIC ${DEFINES})
+        target_compile_definitions(${MODULE} PUBLIC ${DEFINES})
     endif()
 
     target_compile_definitions(
-        ${LIBRARY}
+        ${MODULE}
         PRIVATE
-            "RAINDROP_CURRENT_MODULE_NAME=\"${NAME}\""
+            "RAINDROP_CURRENT_MODULE_NAME=\"${MODULE}\""
             "RAINDROP_CURRENT_MODULE_VERSION=1"
     )
 endfunction()
@@ -369,34 +258,109 @@ endfunction()
 
 
 # =============================
-#  copy_module_clean(TARGET NAME DESTINATION)
+#  copy_module_clean(TARGET MODULE DESTINATION)
 # =============================
-function(copy_module_clean TARGET NAME DESTINATION)
-    get_property(BINARY_DIR GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_BINARY_DIR)
-    get_property(SOURCE_DIR GLOBAL PROPERTY RAINDROP_MODULE_${NAME}_SOURCE_DIR)
+function(copy_module_clean TARGET MODULE DESTINATION)
+    get_target_property(OUTPUT_DIR ${MODULE} RAINDROP_OUTPUT_DIR)
+    get_target_property(BINARY_DIR ${MODULE} RAINDROP_BINARY_DIR)
+    get_target_property(SOURCE_DIR ${MODULE} RAINDROP_SOURCE_DIR)
 
-    if (NOT BINARY_DIR)
-        message(FATAL_ERROR "The module \"${NAME}\" doesn't have a valid binary directory")
+    if (NOT OUTPUT_DIR)
+        message(FATAL_ERROR "The module \"${MODULE}\" doesn't have a valid output directory")
     endif()
 
     get_filename_component(DIR_NAME ${SOURCE_DIR} NAME)
 
-    set(CLEAN_ROOT "${BINARY_DIR}/clean")
     set(MODULE_DST "${DESTINATION}/${DIR_NAME}")
 
-    set(STAMP_FILE "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.stamp")
+    set(STAMP_FILE "${CMAKE_CURRENT_BINARY_DIR}/${MODULE}.stamp")
 
     add_custom_command(
         OUTPUT ${MODULE_DST}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CLEAN_ROOT} ${MODULE_DST}
-        DEPENDS ${NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${OUTPUT_DIR} ${MODULE_DST}
+        DEPENDS ${MODULE}
     )
 
-    add_custom_target(copy_${NAME}_${TARGET}
+    add_custom_target(copy_${MODULE}_${TARGET}
         DEPENDS ${MODULE_DST}
-        COMMENT "Cleaning and copying module \"${NAME}\" to \"${TARGET}\" module folder"
+        COMMENT "Cleaning and copying module \"${MODULE}\" to \"${TARGET}\" module folder"
     )
 
-    add_dependencies(${TARGET} copy_${NAME}_${TARGET})
+    add_dependencies(${TARGET} copy_${MODULE}_${TARGET})
+
+endfunction()
+
+
+# =============================
+#  raindrop_link_modules()
+# ============================
+function(raindrop_link_modules)
+    get_property(MODULES GLOBAL PROPERTY RAINDROP_MODULES)
+
+    if (NOT MODULES)
+        return()
+    endif()
+
+
+    foreach(MODULE IN LISTS MODULES)
+        get_target_property(INTERFACE ${MODULE} RAINDROP_MODULE_INTERFACE)
+        get_target_property(HARD_DEPS ${MODULE} RAINDROP_HARD_DEPS)
+        get_target_property(SOFT_DEPS ${MODULE} RAINDROP_SOFT_DEPS)
+
+        message("module ${MODULE}")
+        message("hard deps : ${HARD_DEPS}")
+        message("soft deps : ${SOFT_DEPS}")
+
+        if (HARD_DEPS)
+            foreach(DEP IN LISTS HARD_DEPS)
+                get_target_property(DEP_INTERFACE ${DEP} RAINDROP_MODULE_INTERFACE)
+                get_target_property(DEP_VERSION ${DEP} VERSION)
+
+                if (DEP_INTERFACE)
+                    
+                    target_link_libraries(${INTERFACE} INTERFACE ${DEP_INTERFACE})    
+                    target_compile_definitions(${MODULE} PRIVATE
+                        "RAINDROP_MODULE_${DEP}_AVAILABLE=1"
+                        "RAINDROP_MODULE_${DEP}_VERSION=\"${DEP_VERSION}\""
+                    )
+                else()  
+                    message(FATAL_ERROR "[Raindrop] Module ${MODULE} is missing hard dependency ${DEP}")
+                endif()
+            endforeach()
+        endif()
+
+        if (SOFT_DEPS)
+            foreach(DEP IN LISTS SOFT_DEPS)
+                get_target_property(DEP_INTERFACE ${DEP} RAINDROP_MODULE_INTERFACE)
+                get_target_property(DEP_VERSION ${DEP} VERSION)
+
+                if (DEP_INTERFACE)
+                    
+                    target_link_libraries(${INTERFACE} INTERFACE ${DEP_INTERFACE})    
+                    target_compile_definitions(${MODULE} PRIVATE
+                        "RAINDROP_MODULE_${DEP}_AVAILABLE=1"
+                        "RAINDROP_MODULE_${DEP}_VERSION=\"${DEP_VERSION}\""
+                    )
+                else()  
+                    message(WARNING "[Raindrop] Module ${MODULE} is missing hard dependency ${DEP}")
+                    target_compile_definitions(${MODULE} PRIVATE
+                        "RAINDROP_MODULE_${DEP}_AVAILABLE=0"
+                    )
+                endif()
+            endforeach()
+        endif()
+    endforeach()
+endfunction()
+
+function(raindrop_generate_modules_manifests)
+    get_property(MODULES GLOBAL PROPERTY RAINDROP_MODULES)
+
+    if (NOT MODULES)
+        return()
+    endif()
+
+    foreach(MODULE IN LISTS MODULES)
+        create_module_manifest(${MODULE})
+    endforeach()
 
 endfunction()

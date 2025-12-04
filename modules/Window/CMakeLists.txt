@@ -3,17 +3,23 @@ project(Window
     VERSION 0.1.0 
 )
 
-find_package(SDL3 REQUIRED)
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*")
 
-module_link_libraries(
-    PUBLIC
-        SDL3::SDL3
+raindrop_add_module(Window
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION ${PROJECT_DESCRIPTION}
+    SOURCE ${SOURCES}
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-module_dependencies(
+raindrop_module_dependencies(Window
     HARD
         Event
 )
 
-# create library
-add_raindrop_module()
+find_package(SDL3 REQUIRED)
+
+raindrop_module_link_libraries(Window
+    SDL3::SDL3
+)

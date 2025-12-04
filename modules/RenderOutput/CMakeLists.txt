@@ -3,28 +3,19 @@ project(RenderOutput
     VERSION 0.1.0 
 )
 
-find_package(spdlog CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(vk-bootstrap CONFIG REQUIRED)
-find_package(VulkanMemoryAllocator CONFIG REQUIRED)
-find_package(Vulkan REQUIRED)
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*")
 
-module_link_libraries(
-    PUBLIC
-        spdlog::spdlog
-        Vulkan::Vulkan
-        glm::glm
-        vk-bootstrap::vk-bootstrap
-        vk-bootstrap::vk-bootstrap-compiler-warnings
-        GPUOpen::VulkanMemoryAllocator
+raindrop_add_module(RenderOutput
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION ${PROJECT_DESCRIPTION}
+    SOURCE ${SOURCES}
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-module_dependencies(
+raindrop_module_dependencies(RenderOutput
     HARD
         RenderCore
     SOFT
         Window
 )
-
-# create library
-add_raindrop_module()

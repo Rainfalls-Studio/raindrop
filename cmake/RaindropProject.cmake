@@ -71,88 +71,52 @@ endfunction()
 function(add_raindrop_project TARGET)
     _check_project_not_added(${TARGET})
 
-    message(STATUS "New Raindrop project : ${TARGET}")
+    message(STATUS "[Raindrop] New project : ${TARGET}")
 
     # include internal helper functions
     include(RaindropModuleHelper)
 
     # list available modules
-    get_property(MODULE_DIRS TARGET ${TARGET} PROPERTY RAINDROP_MODULE_DIRS)
-    set(MODULES "")
-
-    # Phase 0 - discover modules
-    message(STATUS "Discovering module...")
-    foreach(dir IN LISTS MODULE_DIRS)
-        message(STATUS "\tChecking \"${dir}/\" ...")
-        discover_modules(mods ${dir})
-        LIST(APPEND MODULES ${mods})
-    endforeach()
-
-    # Phase 1 - register available modules
-    register_modules(MODULE_REGISTRY "${MODULES}")
-
-    list(LENGTH MODULE_REGISTRY length)
-
-    if (length EQUAL 0)
-        message(STATUS "Found 0 module")
-    else()
-        message(STATUS "Found ${length} module(s) : ")
-        foreach (mod IN LISTS MODULE_REGISTRY)
-            message("\t- ${mod}")
-        endforeach()
-    endif()
+    get_property(AVAILABLE_MODULES GLOBAL PROPERTY RAINDROP_MODULES)
+    list(LENGTH AVAILABLE_MODULES AVAILABLE_MODULE_COUNT)
+    message(STATUS "[Raindrop] ${AVAILABLE_MODULE_COUNT} module registred...")
 
     # Phase 2 - checking dependencies
-    message(STATUS "Checking dependencies...")
+    message(STATUS "[Raindrop] Checking dependencies...")
     
     get_property(HARD TARGET ${TARGET} PROPERTY RAINDROP_HARD_DEPS)
     get_property(SOFT TARGET ${TARGET} PROPERTY RAINDROP_SOFT_DEPS)
 
     set(DEPENDENCIES "")
     foreach(dep IN LISTS HARD)
-        module_exists(EXISTS ${dep})
-        if (EXISTS)
+        if (TARGET ${dep})
             resolve_dependencies(DEPENDENCIES MODULE_REGISTRY ${dep})
         else()
-            message(FATAL_ERROR "The project ${TARGET} is missing hard dependency ${dep}")
+            message(FATAL_ERROR "[Raindrop] The project ${TARGET} is missing hard dependency ${dep}")
         endif()
     endforeach()
 
     foreach(dep IN LISTS SOFT)
         module_exists(EXISTS ${dep})
-        if (EXISTS)
+        if (TARGET ${dep})
             resolve_dependencies(DEPENDENCIES MODULE_REGISTRY ${dep})
         else()
-            message(WARNING "The project ${TARGET} is missing soft dependency ${dep}")
+            message(WARNING "[Raindrop] The project ${TARGET} is missing soft dependency ${dep}")
         endif()
     endforeach()
 
-    message(STATUS "All required dependencies are present")
+    message(STATUS "[Raindrop] All required dependencies are present")
 
     list(LENGTH DEPENDENCIES length)
 
     if (length EQUAL 0)
-        message(STATUS "Using 0 module")
+        message(STATUS "[Raindrop] Using 0 module")
     else()
-        message(STATUS "Using ${length} module(s) : ")
+        message(STATUS "[Raindrop] Using ${length} module(s) : ")
         foreach(mod IN LISTS DEPENDENCIES)
             message("\t - ${mod}")
         endforeach()
     endif()
-
-    # Create modules
-    message(STATUS "Creating modules...")
-
-    foreach(mod IN LISTS DEPENDENCIES)
-        create_module_library(${mod})
-    endforeach()
-    
-    # Link the modules together
-    message(STATUS "Linking modules...")
-
-    foreach(mod IN LISTS DEPENDENCIES)
-        link_module_library(${mod})
-    endforeach()
 
     # List the project direct dependencies
 
@@ -160,9 +124,7 @@ function(add_raindrop_project TARGET)
     set(DEFINES "")
 
     foreach(dep IN LISTS HARD)
-        module_exists(EXISTS ${dep})
-
-        if (${EXISTS})
+        if (TARGET ${dep})
             list(APPEND DIRECT_DEPENDENCIES ${dep})
             list(APPEND DEFINES
                 "RAINDROP_MODULE_${dep}_AVAILABLE=1"
@@ -175,9 +137,8 @@ function(add_raindrop_project TARGET)
     endforeach()
 
     foreach(dep IN LISTS SOFT)
-        module_exists(EXISTS ${dep})
-
-        if (${EXISTS})
+    
+        if (TARGET ${dep})
             list(APPEND DIRECT_DEPENDENCIES ${dep})
             list(APPEND DEFINES
                 "RAINDROP_MODULE_${dep}_AVAILABLE=1"
@@ -196,7 +157,7 @@ function(add_raindrop_project TARGET)
         set(MODULES_LIBRARIES "")
 
         foreach(mod IN LISTS DIRECT_DEPENDENCIES)
-            get_property(MOD_LIBRARY GLOBAL PROPERTY RAINDROP_MODULE_${mod}_INTERFACE)
+            get_target_property(MOD_LIBRARY ${mod} RAINDROP_MODULE_INTERFACE)
             list(APPEND MODULES_LIBRARIES ${MOD_LIBRARY})
 
             add_dependencies(${TARGET} ${MOD_LIBRARY})

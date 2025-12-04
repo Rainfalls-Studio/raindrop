@@ -7,13 +7,22 @@ project(ImGui
 find_package(ImGui REQUIRED)
 find_package(SDL3 REQUIRED)
 
-module_link_libraries(
-    PUBLIC
-        imgui::imgui
-        SDL3::SDL3
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*")
+
+raindrop_add_module(ImGui
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION ${PROJECT_DESCRIPTION}
+    SOURCE ${SOURCES}
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-module_dependencies(
+raindrop_module_link_libraries(ImGui
+    imgui::imgui
+    SDL3::SDL3
+)
+
+raindrop_module_dependencies(ImGui
     HARD
         RenderCore
         RenderOutput
@@ -21,6 +30,3 @@ module_dependencies(
         Window
         Layers
 )
-
-# create library
-add_raindrop_module()

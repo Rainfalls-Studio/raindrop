@@ -21,11 +21,11 @@ set_target_properties(Sim PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DI
 
 
 # add raindrop modules
-raindrop_add_module_dir(Sim "${CMAKE_SOURCE_DIR}/modules")
-
 raindrop_dependencies(Sim
     HARD
-        Test
+        Asset
+        Filesystem
+        RenderCore
 )
 
 

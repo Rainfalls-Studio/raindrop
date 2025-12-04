@@ -3,5 +3,12 @@ project(Test
     VERSION 0.1.0 
 )
 
-# create library
-add_raindrop_module()
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*")
+
+raindrop_add_module(${PROJECT_NAME}
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION ${PROJECT_DESCRIPTION}
+    SOURCE ${SOURCES}
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+)

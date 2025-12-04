@@ -1,56 +1,16 @@
 
-# =============================
-#  Module global context
-# =============================
+macro(__raindrop_check_module_valid MODULE)
+    if (NOT TARGET ${MODULE})
+        message(FATAL_ERROR "The module ${MODULE} is not a valid module !")
+    endif()
 
-set(_MODULE_NAME "")
-set(_MODULE_VERSION "")
-set(_MODULE_DESCRIPTION "")
+    get_target_property(STAMP ${MODULE} RAINDROP_MODULE_STAMP)
 
-set(_MODULE_HARD_DEPS "")
-set(_MODULE_SOFT_DEPS "")
-
-set(_MODULE_LINK_PUBLIC_LIBS "")
-set(_MODULE_LINK_PRIVATE_LIBS "")
-set(_MODULE_LINK_INTERFACE_LIBS "")
-
-
-macro(_check_module_not_built)
-    get_property(BUILT GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_BUILT)
-    if (BUILT)
-        message(FATAL_ERROR "add_raindrop_module() already called")
+    if (NOT STAMP)
+        message(FATAL_ERROR "The module ${MODULE} was not created by raindrop_add_module() !")
     endif()
 endmacro()
 
-
-# =============================
-#   module_name(NAME)
-# =============================
-function(module_name NAME)
-    _check_module_not_built()
-
-    set(_MODULE_NAME ${NAME} PARENT_SCOPE)
-endfunction()
-
-
-# =============================
-#   module_description(NAME)
-# =============================
-function(module_description DESCRIPTION)
-    _check_module_not_built()
-    set(_MODULE_DESCRIPTION ${DESCRIPTION} PARENT_SCOPE)
-endfunction()
-
-
-
-# =============================
-#   module_version("1.0.0")
-# =============================
-function(module_version VERSION)
-    _check_module_not_built()
-
-    set(_MODULE_VERSION ${VERSION} PARENT_SCOPE)
-endfunction()
 
 
 # =============================
@@ -62,8 +22,8 @@ endfunction()
 #          Module::Layer
 #  )
 # =============================
-function(module_dependencies)
-    _check_module_not_built()
+function(raindrop_module_dependencies MODULE)
+    __raindrop_check_module_valid(${MODULE})
 
     set(options)
     set(oneValueArgs)
@@ -72,7 +32,13 @@ function(module_dependencies)
 
     set(_MODULE_HARD_DEPS "${DEPS_HARD}" PARENT_SCOPE)
     set(_MODULE_SOFT_DEPS "${DEPS_SOFT}" PARENT_SCOPE)
+
+    set_target_properties(${MODULE} PROPERTIES
+        RAINDROP_HARD_DEPS "${DEPS_HARD}"
+        RAINDROP_SOFT_DEPS "${DEPS_SOFT}"
+    )
 endfunction()
+
 
 
 # =============================
@@ -81,71 +47,112 @@ endfunction()
 #     PRIVATE spdlog::spdlog
 # )
 # =============================
-function(module_link_libraries)
-    _check_module_not_built()
+function(raindrop_module_link_libraries MODULE)
+    __raindrop_check_module_valid(${MODULE})
 
-    set(current_visibility "")
+    get_target_property(INTERFACE ${MODULE} RAINDROP_MODULE_INTERFACE)
 
-    foreach(arg IN LISTS ARGN)
-        if(arg STREQUAL "PUBLIC" OR arg STREQUAL "PRIVATE" OR arg STREQUAL "INTERFACE")
-            # We switched to a new block
-            set(current_visibility "${arg}")
-        else()
-            # It's a library → store in the correct group
-            if(current_visibility STREQUAL "PUBLIC")
-                list(APPEND _MODULE_LINK_PUBLIC_LIBS "${arg}")
-            elseif(current_visibility STREQUAL "PRIVATE")
-                list(APPEND _MODULE_LINK_PRIVATE_LIBS "${arg}")
-            elseif(current_visibility STREQUAL "INTERFACE")
-                list(APPEND _MODULE_LINK_INTERFACE_LIBS "${arg}")
-            else()
-                message(FATAL_ERROR "module_link_libraries(): library '${arg}' provided outside PUBLIC/PRIVATE/INTERFACE block.")
-            endif()
-        endif()
-    endforeach()
+    if (NOT INTERFACE)
+        message(FATAL_ERROR "[Raindrop] The module ${MODULE} is missing an interface library")
+    endif()
 
-    # Push values to parent scope (so add_raindrop_module can use them)
-    set(_MODULE_LINK_PUBLIC_LIBS "${_MODULE_LINK_PUBLIC_LIBS}" PARENT_SCOPE)
-    set(_MODULE_LINK_PRIVATE_LIBS "${_MODULE_LINK_PRIVATE_LIBS}" PARENT_SCOPE)
-    set(_MODULE_LINK_INTERFACE_LIBS "${_MODULE_LINK_INTERFACE_LIBS}" PARENT_SCOPE)
+    target_link_libraries(${INTERFACE} INTERFACE ${ARGN})
 endfunction()
 
+
+
 # =============================
-#  add_raindrop_module()
+#  raindrop_add_module(
+#     (REQUIRED) MODULE 
+#     (REQUIRED) VERSION 0.0.1
+#     (OPTIONAL) DESCRIPTION "Lorem Ipsum" 
+#     (REQUIRED) SOURCE sources
+#     (OPTIONAL) HEADERS headers 
+# )
 # =============================
-function(add_raindrop_module)
-    _check_module_not_built()
-
-    # check if module meta data
-    if(NOT _MODULE_NAME)
-        set(_MODULE_NAME ${PROJECT_NAME})
-    endif()
-
-    if (NOT _MODULE_VERSION)
-        if (NOT PROJECT_VERSION)
-            message("if module_version() is not called, the module MUST set the version with the cmake project VERSION variable")
-        endif()
-        set(_MODULE_VERSION ${PROJECT_VERSION})
-    endif()
-
-    if (NOT _MODULE_DESCRIPTION)
-        set(_MODULE_DESCRIPTION ${PROJECT_DESCRIPTION})
-    endif()
-
+function(raindrop_add_module MODULE)
+    set(options)  # No boolean options in your example
+    set(oneValueArgs VERSION DESCRIPTION)  # Single value arguments
+    set(multiValueArgs SOURCE HEADERS)     # Multi-value arguments
     
-    # Set module global properties
+    # Parse the arguments passed to the function
+    cmake_parse_arguments(
+        ARG
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
 
-    set_property(GLOBAL PROPERTY RAINDROP_CURRENT_MODULE_NAME ${_MODULE_NAME})
+    # ============ Checking arguments
 
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_BUILT TRUE)
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_VERSION ${_MODULE_VERSION})
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_DESCRIPTION ${_MODULE_DESCRIPTION})
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_HARD_DEPS ${_MODULE_HARD_DEPS})
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_SOFT_DEPS ${_MODULE_SOFT_DEPS})
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_LINK_PUBLIC_LIBS ${_MODULE_LINK_PUBLIC_LIBS})
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_LINK_PRIVATE_LIBS ${_MODULE_LINK_PRIVATE_LIBS})
-    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${_MODULE_NAME}_LINK_INTERFACE_LIBS ${_MODULE_LINK_INTERFACE_LIBS})
+    if(NOT ARG_VERSION)
+        message(FATAL_ERROR "[Raindrop] VERSION is required for raindrop_add_module")
+    endif()
 
-    set(_MODULE_HAS_BEEN_BUILT TRUE PARENT_SCOPE)
+    if(NOT ARG_SOURCE)
+        message(FATAL_ERROR "[Raindrop] SOURCE is required for add_raindrop_module")
+    endif()
+
+    message(STATUS "[Raindrop] New module : \"${MODULE}\" (Version : ${ARG_VERSION})")
+
+    add_library(${MODULE} MODULE ${ARG_SOURCE})
+    add_library(${MODULE}_interface INTERFACE)
+
+    target_link_libraries(${MODULE} PUBLIC ${MODULE}_interface Raindrop::Engine)
+
+    if(ARG_HEADERS)
+        target_include_directories(${MODULE}_interface INTERFACE 
+            ${ARG_HEADERS}
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        )
+    endif()
+
+    set(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/out")
+    
+    if (WIN32)
+        set(LIBRARY_OUTPUT "${OUTPUT_DIR}/bin/windows")
+        set(EXPORT_DEFINE "__declspec(dllexport)")
+        set_target_properties(${NAME} PROPERTIES SUFFIX ".dll")
+    elseif (APPLE)
+        set(LIBRARY_OUTPUT "${OUTPUT_DIR}/bin/mac")
+        set(EXPORT_DEFINE "__attribute__((visibility(\"default\")))")
+        set_target_properties(${NAME} PROPERTIES SUFFIX ".dylib")
+    else ()
+        set(LIBRARY_OUTPUT "${OUTPUT_DIR}/bin/linux")
+        set(EXPORT_DEFINE "__attribute__((visibility(\"default\")))")
+        set_target_properties(${NAME} PROPERTIES SUFFIX ".so")
+    endif()
+
+    set_target_properties(${MODULE} PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT}"
+        PREFIX ""
+        VERSION "${ARG_VERSION}"
+        DESCRIPTION "${ARG_DESCRIPTION}"
+        RAINDROP_MODULE_INTERFACE "${MODULE}_interface"
+        RAINDROP_MODULE_STAMP TRUE
+        RAINDROP_OUTPUT_DIR "${OUTPUT_DIR}"
+        RAINDROP_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}"
+        RAINDROP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+
+    target_compile_definitions(${MODULE} PRIVATE
+        "RAINDROP_EXPORT=${EXPORT_DEFINE}"
+        "RAINDROP_CURRENT_MODULE_NAME=\"${MODULE}\""
+        "RAINDROP_CURRENT_MODULE_VERSION=\"${ARG_VERSION}\""
+    )
+
+    set_target_properties(${MODULE}_interface PROPERTIES
+        VERSION ${ARG_VERSION}
+        DESCRIPTION "Interface for ${MODULE}"
+    )
+
+    set_property(GLOBAL PROPERTY RAINDROP_MODULE_${MODULE} ${MODULE})
+
+    get_property(MODULES GLOBAL PROPERTY RAINDROP_MODULES)
+    list(APPEND MODULES ${MODULE})
+    set_property(GLOBAL PROPERTY RAINDROP_MODULES ${MODULES})
+
+    set(${MODULE} ${MODULE} PARENT_SCOPE)
+
 endfunction()

@@ -4,5 +4,12 @@ project(Filesystem
     DESCRIPTION "A filesystem abstraction layer to ease virtual storage and mocking" 
 )
 
-# create library
-add_raindrop_module()
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*")
+
+raindrop_add_module(Filesystem
+    VERSION ${PROJECT_VERSION}
+    DESCRIPTION ${PROJECT_DESCRIPTION}
+    SOURCE ${SOURCES}
+    HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+)
