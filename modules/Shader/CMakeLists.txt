@@ -14,11 +14,10 @@ raindrop_add_module(Shader
 )
 
 
-raindrop_module_dependencies(Shader
-    HARD
-        Asset
-        RenderCore
-        Filesystem
+raindrop_add_dependencies(Shader
+    Asset
+    RenderCore
+    Filesystem
 )
 
 find_package(glslang REQUIRED)

@@ -1,5 +1,4 @@
 #pragma once
-#if RAINDROP_MODULE_Window_AVAILABLE
 
 #include <VkBootstrap.h>
 #include <vulkan/vulkan.hpp>
@@ -122,5 +121,3 @@ namespace Raindrop::Render{
             std::expected<void, Error> createRenderPass();
     };
 }
-
-#endif

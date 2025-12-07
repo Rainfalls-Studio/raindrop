@@ -4,6 +4,15 @@
 #include <imgui.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+	return new Raindrop::ImGui::ImGuiModule();
+}
+
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
+
+
 namespace Raindrop::ImGui{
     ImGuiModule::ImGuiModule(){}
     ImGuiModule::~ImGuiModule(){}
@@ -37,7 +46,7 @@ namespace Raindrop::ImGui{
 
     Modules::DependencyList ImGuiModule::dependencies() const noexcept{
         return {
-            Modules::HardDependency("RenderCore")
+            Modules::Dependency("RenderCore")
         };
     }
 

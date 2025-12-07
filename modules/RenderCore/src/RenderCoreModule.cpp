@@ -26,6 +26,14 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
 	return VK_FALSE;
 }
 
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+	return new Raindrop::Render::RenderCoreModule();
+}
+
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
+
 
 namespace Raindrop::Render{
     class RenderCoreErrorCategory : public std::error_category{
@@ -105,7 +113,7 @@ namespace Raindrop::Render{
 
     Modules::DependencyList RenderCoreModule::dependencies() const noexcept{
         return {
-            Modules::HardDependency("Window")
+            Modules::Dependency("Window")
         };
     }
 

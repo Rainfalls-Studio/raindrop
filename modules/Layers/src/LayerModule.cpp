@@ -1,5 +1,13 @@
 #include "Layers/LayerModule.hpp"
 
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+	return new Raindrop::Layers::LayerModule();
+}
+
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
+
 namespace Raindrop::Layers{
     LayerModule::LayerModule(){}
     LayerModule::~LayerModule(){}

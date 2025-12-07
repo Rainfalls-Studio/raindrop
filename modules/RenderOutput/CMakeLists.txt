@@ -13,9 +13,7 @@ raindrop_add_module(RenderOutput
     HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-raindrop_module_dependencies(RenderOutput
-    HARD
-        RenderCore
-    SOFT
-        Window
+raindrop_add_dependencies(RenderOutput
+    RenderCore
+    Window
 )

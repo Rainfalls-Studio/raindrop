@@ -22,11 +22,10 @@ raindrop_module_link_libraries(ImGui
     SDL3::SDL3
 )
 
-raindrop_module_dependencies(ImGui
-    HARD
-        RenderCore
-        RenderOutput
-        Event
-        Window
-        Layers
+raindrop_add_dependencies(ImGui
+    RenderCore
+    RenderOutput
+    Event
+    Window
+    Layers
 )

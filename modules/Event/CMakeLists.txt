@@ -14,7 +14,6 @@ raindrop_add_module(Event
     HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-raindrop_module_dependencies(Event
-    HARD
-        Layers
+raindrop_add_dependencies(Event
+    Layers
 )

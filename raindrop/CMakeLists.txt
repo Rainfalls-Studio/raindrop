@@ -45,8 +45,8 @@ add_library(Raindrop::Engine ALIAS RaindropEngine)
 
 target_compile_definitions(RaindropEngine
     PUBLIC
-        VULKAN_HPP_NO_EXCEPTIONS
-        VULKAN_HPP_ASSERT_ON_RESULT="(expression)((void)0)"
+        "VULKAN_HPP_NO_EXCEPTIONS"
+        # "VULKAN_HPP_ASSERT_ON_RESULT=(expression)((void)0)"
 )
 
 add_custom_command(TARGET RaindropEngine POST_BUILD

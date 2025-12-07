@@ -14,7 +14,6 @@ raindrop_add_module(Asset
     HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-raindrop_module_dependencies(Asset
-    HARD
-        Filesystem
+raindrop_add_dependencies(Asset
+    Filesystem
 )

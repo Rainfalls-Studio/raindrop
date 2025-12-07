@@ -18,13 +18,6 @@ namespace Raindrop::Modules{
     DynamicModuleLoader::DynamicModuleLoader(const std::filesystem::path& path){
         // formtPath();
         std::filesystem::path libraryPath = path / readManifest(path);
-
-        spdlog::info("{}", libraryPath.string());
-
-        char a[255];
-        getcwd(a, 255);
-
-        spdlog::info("{}", a);
         
         #ifdef _WIN32
 
@@ -87,8 +80,6 @@ namespace Raindrop::Modules{
         }
         
         auto dependenciesNode = manifest["dependencies"];
-        auto hardDependenciesNode = dependenciesNode["hard"];
-        auto softDependenciesNode = dependenciesNode["soft"];
 
         auto binaries = manifest["binaries"];
         std::filesystem::path libraryPath;

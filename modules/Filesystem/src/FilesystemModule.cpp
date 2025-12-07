@@ -3,6 +3,15 @@
 
 #include <algorithm>
 
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+	return new Raindrop::Filesystem::FilesystemModule();
+}
+
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
+
+
 namespace Raindrop::Filesystem{
     FilesystemModule::FilesystemModule(){}
 

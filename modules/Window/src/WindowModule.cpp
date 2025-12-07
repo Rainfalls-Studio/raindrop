@@ -9,6 +9,15 @@
 
 #include <SDL3/SDL.h>
 
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+	return new Raindrop::Window::WindowModule();
+}
+
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
+
+
 namespace Raindrop::Window{
     Modules::Result WindowModule::initialize(Modules::InitHelper& init){
         _engine = &init.engine();
@@ -24,7 +33,7 @@ namespace Raindrop::Window{
 
     Modules::DependencyList WindowModule::dependencies() const noexcept{
         return {
-            Modules::HardDependency("Event")
+            Modules::Dependency("Event")
         };
     }
 

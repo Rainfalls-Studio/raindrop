@@ -5,11 +5,11 @@
 #include <exception>
 #include <stdexcept>
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* createModule(){
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
 	return new Raindrop::Asset::AssetModule();
 }
 
-extern "C" RAINDROP_EXPORT void destroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
 	delete module;
 }
 
@@ -36,7 +36,7 @@ namespace Raindrop::Asset{
 
 	Modules::DependencyList AssetModule::dependencies() const noexcept{
 		return {
-			Modules::HardDependency("Filesystem")
+			Modules::Dependency("Filesystem")
 		};
 	}
 

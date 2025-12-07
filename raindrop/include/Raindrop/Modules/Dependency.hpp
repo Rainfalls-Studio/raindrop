@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <list>
 #include "common.hpp"
 #include "../Version.hpp"
@@ -10,15 +9,13 @@ namespace Raindrop::Modules{
     class Dependency{
         public:
             inline Dependency(
-                bool optional,
                 Name dependency,
                 Version version = Version{},
                 CompareOperator op = CompareOperator::EQUAL
             ) :
                 _dependency(dependency),
                 _version{version},
-                _op{op},
-                _optional(optional)
+                _op{op}
             {}
 
             Dependency(const Dependency& other) = default;
@@ -29,10 +26,6 @@ namespace Raindrop::Modules{
 
             inline const Name& get() const noexcept{
                 return _dependency;
-            }
-
-            inline bool optional() const noexcept{
-                return _optional;
             }
 
             inline const Version& version() const noexcept{
@@ -55,24 +48,7 @@ namespace Raindrop::Modules{
             Name _dependency;
             Version _version;
             CompareOperator _op;
-            bool _optional;
     };
-
-    inline Dependency HardDependency(
-        Name dependency,
-        Version version = Version{},
-        CompareOperator op = CompareOperator::EQUAL
-    ) noexcept{
-        return Dependency(false, dependency, version, op);
-    }
-
-    inline Dependency SoftDependency(
-        Name dependency,
-        Version version = Version{},
-        CompareOperator op = CompareOperator::EQUAL
-    ) noexcept{
-        return Dependency(true, dependency, version, op);
-    }
 
     using DependencyList = std::list<Dependency>;
 }

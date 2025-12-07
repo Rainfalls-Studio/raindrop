@@ -3,12 +3,7 @@
     "version": "@MODULE_VERSION@",
     "description": "@MODULE_DESCRIPTION@",
     "dependencies": {
-        "hard": {
-@MODULE_HARD_DEPENDENCIES@
-        },
-        "soft": {
-@MODULE_SOFT_DEPENDENCIES@
-        }
+@MODULE_DEPENDENCIES@
     },
     "binaries": {
         "windows": "@MODULE_WINDOWS_BIN_PATH@",

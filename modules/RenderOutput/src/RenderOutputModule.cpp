@@ -3,6 +3,15 @@
 
 #include <spdlog/spdlog.h>
 
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+	return new Raindrop::Render::RenderOutputModule();
+}
+
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
+
+
 namespace Raindrop::Render{
     class RenderOutputErrorCategory : public std::error_category{
         public:
@@ -46,7 +55,7 @@ namespace Raindrop::Render{
 
     Modules::DependencyList RenderOutputModule::dependencies() const noexcept{
         return {
-            Modules::HardDependency("RenderCore")
+            Modules::Dependency("RenderCore")
         };
     }
 

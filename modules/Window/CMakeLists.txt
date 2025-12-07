@@ -13,9 +13,8 @@ raindrop_add_module(Window
     HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-raindrop_module_dependencies(Window
-    HARD
-        Event
+raindrop_add_dependencies(Window
+    Event
 )
 
 find_package(SDL3 REQUIRED)

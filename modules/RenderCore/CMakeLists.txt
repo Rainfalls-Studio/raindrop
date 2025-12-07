@@ -12,9 +12,8 @@ raindrop_add_module(RenderCore
     HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 
-raindrop_module_dependencies(RenderCore
-    HARD
-        Window
+raindrop_add_dependencies(RenderCore
+    Window
 )
 
 find_package(vk-bootstrap CONFIG REQUIRED)
@@ -28,8 +27,8 @@ raindrop_module_link_libraries(RenderCore
     vk-bootstrap::vk-bootstrap-compiler-warnings
 )
 
-target_compile_definitions(RenderCore
-    PUBLIC
-        VULKAN_HPP_NO_EXCEPTIONS
-        VULKAN_HPP_ASSERT_ON_RESULT="(expression)((void)0)"
-)
+# target_compile_definitions(RenderCore
+    # PUBLIC
+        # "VULKAN_HPP_NO_EXCEPTIONS"
+        # "VULKAN_HPP_ASSERT_ON_RESULT=(expression)((void)0)"
+# )

@@ -7,7 +7,7 @@ project(
 
 # include raindrop
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(RaindropProject)
+include(Raindrop)
 
 
 # create executable
@@ -21,15 +21,18 @@ set_target_properties(Sim PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DI
 
 
 # add raindrop modules
-raindrop_dependencies(Sim
-    HARD
-        Asset
-        Filesystem
-        RenderCore
+raindrop_add_dependencies(Sim
+    Event VERSION >= 0.0.2
+    Window
+    RenderCore
+    RenderOutput
+    Scene
+    Asset
+    ImGui
+    Layers
 )
 
-
-add_raindrop_project(Sim)
+raindrop_add_project(Sim)
 
 
 # =============================

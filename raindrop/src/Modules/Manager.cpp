@@ -25,11 +25,13 @@ namespace Raindrop::Modules{
         }
     }
 
-
     void Manager::loadModule(const std::filesystem::path& path){
-        registerModule(std::make_unique<DynamicModuleLoader>(path));
+        try{
+            registerModule(std::make_unique<DynamicModuleLoader>(path));
+        } catch (const std::exception& e){
+            spdlog::error("Failed to load module at path \"{}\" : {}", path.string(), e.what());
+        }
     }
-
 
     void Manager::registerModule(std::unique_ptr<IModuleLoader>&& loader){
         std::unique_lock<std::mutex> lock(_mtx);
@@ -37,7 +39,6 @@ namespace Raindrop::Modules{
         std::shared_ptr<IModule> module = loader->create();
 
         // lock.lock();
-
         // TODO: module override
 
         auto& node = _nodes[module->name()];
@@ -63,7 +64,7 @@ namespace Raindrop::Modules{
             node.dependencies.push_back(dependency);
             depNode.dependents.push_back(nodeName);
 
-            if (!dependency.optional() && depNode.status != Status::INITIALIZED){
+            if (depNode.status != Status::INITIALIZED){
                 dependenciesRequirements = false;
             }
         }
@@ -152,7 +153,7 @@ namespace Raindrop::Modules{
     bool Manager::areModuleDependenciesMet(Node& node){
         for (const auto& dep : node.dependencies){
             const auto& depNode = _nodes[dep.get()];
-            if (!dep.optional() && depNode.status != Status::INITIALIZED){
+            if (depNode.status != Status::INITIALIZED){
                 return false;
             }
         }

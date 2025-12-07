@@ -1,6 +1,6 @@
 
 
-include("${CMAKE_SOURCE_DIR}/cmake/RaindropModule.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/Raindrop.cmake")
 
 file(GLOB subdirectories RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
     
@@ -21,10 +21,4 @@ foreach(subdir ${dir_list})
     endif()
 endforeach()
 
-function(link_modules)
-    include("${CMAKE_SOURCE_DIR}/cmake/RaindropModuleHelper.cmake")
-    raindrop_generate_modules_manifests()
-    raindrop_link_modules()
-endfunction()
-
-link_modules()
+raindrop_finalize_modules()

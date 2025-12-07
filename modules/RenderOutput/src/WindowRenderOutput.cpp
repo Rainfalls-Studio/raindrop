@@ -1,6 +1,4 @@
 
-#if RAINDROP_MODULE_Window_AVAILABLE
-
 #include "RenderOutput/WindowRenderOutput.hpp"
 #include "RenderOutput/RenderOutputModule.hpp"
 #include <spdlog/spdlog.h>
@@ -675,5 +673,3 @@ namespace Raindrop::Render{
         return _epoch;
     }
 }
-
-#endif
