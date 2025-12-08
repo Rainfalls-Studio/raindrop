@@ -2,6 +2,7 @@
     "name": "@MODULE_NAME@",
     "version": "@MODULE_VERSION@",
     "description": "@MODULE_DESCRIPTION@",
+    "critical": @MODULE_CRITICAL@,
     "dependencies": {
 @MODULE_DEPENDENCIES@
     },

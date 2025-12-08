@@ -18,8 +18,11 @@ raindrop_add_module(ImGui
 )
 
 raindrop_module_link_libraries(ImGui
-    imgui::imgui
-    SDL3::SDL3
+    PUBLIC
+        imgui::imgui
+    
+    PRIVATE
+        SDL3::SDL3
 )
 
 raindrop_add_dependencies(ImGui

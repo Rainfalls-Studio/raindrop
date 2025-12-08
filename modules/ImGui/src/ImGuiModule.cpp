@@ -39,24 +39,4 @@ namespace Raindrop::ImGui{
             output
         );
     }
-
-    Modules::Name ImGuiModule::name() const noexcept{
-        return RAINDROP_CURRENT_MODULE_NAME;
-    }
-
-    Modules::DependencyList ImGuiModule::dependencies() const noexcept{
-        return {
-            Modules::Dependency("RenderCore")
-        };
-    }
-
-    Modules::Result ImGuiModule::dependencyReload(const Modules::Name& dep [[__maybe_unused__]]){
-
-        return Modules::Result::Success();
-    }
-
-    Modules::Result ImGuiModule::dependencyShutdown(const Modules::Name& dep [[__maybe_unused__]]){
-
-        return Modules::Result::Success();
-    }
 }

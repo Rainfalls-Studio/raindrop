@@ -13,12 +13,6 @@ namespace Raindrop::ImGui{
 
             virtual Modules::Result initialize(Modules::InitHelper& helper) override;
             virtual void shutdown() override;
- 
-            virtual Modules::Name name() const noexcept override;
-            virtual Modules::DependencyList dependencies() const noexcept override;
-
-            inline virtual Modules::Result dependencyReload(const Modules::Name& dep) override;
-            inline virtual Modules::Result dependencyShutdown(const Modules::Name& dep) override;
 
             std::shared_ptr<ImGuiContext> createContext(std::shared_ptr<Render::IRenderOutput> output);
 

@@ -17,8 +17,6 @@ namespace Raindrop::Filesystem{
             virtual Modules::Result initialize(Modules::InitHelper& helper) override;
             virtual void shutdown() override;
 
-            virtual Modules::Name name() const noexcept override;
-
             MountTable& mountTable() noexcept;
 
             inline void mount(const Path& path, SharedProvider provider, int priority){

@@ -25,10 +25,6 @@ namespace Raindrop{
 				virtual Modules::Result initialize(Modules::InitHelper& helper) override;
 				virtual void shutdown() override;
 
-            	virtual Modules::Name name() const noexcept override;
-
-            	inline virtual Modules::DependencyList dependencies() const noexcept override;
-
 				/**
 				* @brief Inserts a new asset factory in the manager
 				* 

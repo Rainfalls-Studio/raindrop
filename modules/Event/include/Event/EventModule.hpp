@@ -27,10 +27,6 @@ namespace Raindrop::Event{
             virtual Modules::Result initialize(Modules::InitHelper& init) override;
             virtual void shutdown() override;
 
-            virtual std::string name() const noexcept override;
-            inline virtual Modules::DependencyList dependencies() const noexcept override;
-
-
             template<typename T, typename... Args>
             void trigger(Args&&... args){
                 pushEvent(std::make_unique<T>(std::forward<Args>(args)...));

@@ -297,6 +297,7 @@ function(raindrop_module_link_libraries MODULE)
         "${options}"
         "${oneValueArgs}"
         "${multiValueArgs}"
+        ${ARGN}
     )
 
     if (ARG_PUBLIC)
@@ -311,6 +312,7 @@ endfunction()
 
 # =============================
 #  raindrop_add_module(
+#     (OPTIONAL) CRITICAL
 #     (REQUIRED) MODULE 
 #     (REQUIRED) VERSION 0.0.1
 #     (OPTIONAL) DESCRIPTION "Lorem Ipsum" 
@@ -322,7 +324,7 @@ endfunction()
 function(raindrop_add_module MODULE)
     __check_module_not_added(${MODULE})
 
-    set(options)
+    set(options CRITICAL)
     set(oneValueArgs VERSION DESCRIPTION)
     set(multiValueArgs SOURCE HEADERS)
     
@@ -384,6 +386,7 @@ function(raindrop_add_module MODULE)
         RAINDROP_OUTPUT_DIR "${OUTPUT_DIR}"
         RAINDROP_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}"
         RAINDROP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+        RAINDROP_MODULE_CRITICAL "${ARG_CRITICAL}"
     )
 
     target_compile_definitions(${MODULE} PRIVATE
@@ -462,6 +465,7 @@ function(__raindrop_create_module_manifest MODULE)
     get_target_property(DESCRIPTION ${MODULE} DESCRIPTION)
     get_target_property(DEPS ${MODULE} RAINDROP_DEPENDENCIES)
     get_target_property(OUTPUT_DIR ${MODULE} RAINDROP_OUTPUT_DIR)
+    get_target_property(CRITICAL ${MODULE} RAINDROP_MODULE_CRITICAL)
 
     # === Validation
     if (NOT VERSION)
@@ -483,7 +487,7 @@ function(__raindrop_create_module_manifest MODULE)
 
     foreach (dep IN LISTS DEPS)
         list(GET dep 0 dep_name)
-        string(APPEND DEPS_JSON "\t\t\t\"${dep_name}\": \"0.0.0\",\n")
+        string(APPEND DEPS_JSON "\t\t\"${dep_name}\": \"=>0.0.0\",\n")
     endforeach()
 
     if (DEPS_JSON)
@@ -511,6 +515,12 @@ function(__raindrop_create_module_manifest MODULE)
     set(MODULE_VERSION ${VERSION})
     set(MODULE_DESCRIPTION ${DESCRIPTION})
     set(MODULE_DEPENDENCIES ${DEPS_JSON})
+
+    if (CRTICICAL)
+        set(MODULE_CRITICAL true)
+    else()
+        set(MODULE_CRITICAL false)
+    endif()
 
 
     set(MANIFEST_OUTPUT "${OUTPUT_DIR}/manifest.json")

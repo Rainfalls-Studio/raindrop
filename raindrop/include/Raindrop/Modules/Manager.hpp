@@ -6,8 +6,8 @@
 
 #include "IModule.hpp"
 #include "Status.hpp"
-#include "IModuleLoader.hpp"
-#include "Loaders/StaticModuleLoader.hpp"
+#include "IModuleInstance.hpp"
+#include "Instances/StaticModuleInstance.hpp"
 
 namespace Raindrop{
     class Engine;
@@ -19,12 +19,12 @@ namespace Raindrop::Modules{
             Manager(Engine& engine);
             ~Manager();
 
-            void registerModule(std::unique_ptr<IModuleLoader>&& loader);
+            void registerModule(std::unique_ptr<IModuleInstance>&& loader);
 
             template<typename T>
             void registerModule(){
                 registerModule(
-                    std::make_unique<StaticModuleLoader>(
+                    std::make_unique<StaticModuleInstance>(
                         []() -> IModule* { return new T();},
                         [](IModule* module) -> void {delete module;}
                     )
@@ -34,7 +34,7 @@ namespace Raindrop::Modules{
             template<typename T, typename... Args>
             void registerModule(Args&&... args){
                 registerModule(
-                    std::make_unique<StaticModuleLoader>(
+                    std::make_unique<StaticModuleInstance>(
                         [args...]() -> IModule* { return new T(std::forward<Args>(args)...);},
                         [](IModule* module) -> void {delete module;}
                     )
@@ -67,16 +67,16 @@ namespace Raindrop::Modules{
 
             void shutdown();
 
+            void shutdownModule(Name module);
+
         private:
             struct Node{
-                SharedModule module = {};
-                DependencyList dependencies = {};
                 std::list<Name> dependents = {};
                 std::atomic<Status> status = Status::UNREGISTRED;
-                std::unique_ptr<IModuleLoader> loader = {};
+                std::unique_ptr<IModuleInstance> instance = {};
 
                 inline Name name() const noexcept{
-                    return module ? module->name() : "";
+                    return instance ? instance->name() : "";
                 }
             };
 
@@ -85,10 +85,10 @@ namespace Raindrop::Modules{
             Engine& _engine;
             Map _nodes;
             mutable std::mutex _mtx;
-
-            void initializeModule(Node& node);
-            bool areModuleDependenciesMet(Node& node);
+            
+            void shutdownModuleNode(Node& node);
+            void tryInitializeModule(Node& node);
             Status catchResultError(const Name& name, const Result& result);
-            void propagateInitialization(Node& source);
+            void initializeModule(Node& node);
     };
 }

@@ -1,6 +1,6 @@
 #include "Raindrop/Modules/Manager.hpp"
 #include "Raindrop/Modules/InitHelper.hpp"
-#include "Raindrop/Modules/Loaders/DynamicModuleLoader.hpp"
+#include "Raindrop/Modules/Instances/DynamicModuleInstance.hpp"
 
 #include <cassert>
 #include <spdlog/spdlog.h>
@@ -27,152 +27,136 @@ namespace Raindrop::Modules{
 
     void Manager::loadModule(const std::filesystem::path& path){
         try{
-            registerModule(std::make_unique<DynamicModuleLoader>(path));
+            registerModule(std::make_unique<DynamicModuleInstance>(path));
         } catch (const std::exception& e){
             spdlog::error("Failed to load module at path \"{}\" : {}", path.string(), e.what());
         }
     }
 
-    void Manager::registerModule(std::unique_ptr<IModuleLoader>&& loader){
+    void Manager::registerModule(std::unique_ptr<IModuleInstance>&& instance){
         std::unique_lock<std::mutex> lock(_mtx);
 
-        std::shared_ptr<IModule> module = loader->create();
+        // std::shared_ptr<IModule> module = loader->create();
 
         // lock.lock();
         // TODO: module override
 
-        auto& node = _nodes[module->name()];
+        auto& node = _nodes[instance->name()];
 
-        node.module = module;
         node.status = Status::NEW;
-        node.loader = std::move(loader);
+        node.instance = std::move(instance);
+        auto& inst = node.instance;
 
-        std::string nodeName = node.name();
+        const Name& nodeName = node.name();
 
-        // unregister previous dependencies
-        for (const auto& dependency : node.dependencies){
+        // simply push as dependent of dependencies
+        const DependencyList& dependencies = node.instance->dependencies();
+        for (const auto& dependency : dependencies){
             auto& depNode = _nodes[dependency.get()];
-            depNode.dependents.remove(nodeName);
-        }
-        node.dependencies.clear();
-
-        // check if dependencies are met and push dependencies
-        bool dependenciesRequirements = true;
-
-        for (const auto& dependency : module->dependencies()){
-            auto& depNode = _nodes[dependency.get()];
-            node.dependencies.push_back(dependency);
             depNode.dependents.push_back(nodeName);
-
-            if (depNode.status != Status::INITIALIZED){
-                dependenciesRequirements = false;
-            }
         }
 
-        // if dependencies are met. initialize module
-        if (dependenciesRequirements){
-            initializeModule(node);
-        }
+        tryInitializeModule(node);
 
-        if (node.module->critical() && node.status != Status::INITIALIZED){
+        if (inst->critical() && node.status != Status::INITIALIZED){
             spdlog::critical("Failed to initialize critical module \"{}\" !", nodeName);
             throw std::runtime_error("Failed to initialize critical module");
         }
+    }
+
+    void Manager::tryInitializeModule(Node& node){
         
-        propagateInitialization(node);
-    }
+        if (node.status == Status::INITIALIZED) return;
+        auto& instance = node.instance;
 
-    void Manager::propagateInitialization(Manager::Node& source){
-        struct QueueData{
-            Name parentName;
-            Name currentName;
+        if (!instance) return;
 
-            inline Node& parent(Map& map) const noexcept{
-                return map[parentName];
-            }
+        const Name& nodeName = instance->name();
+        bool dependenciesAvailable = true;
 
-            inline Node& current(Map& map) const noexcept{
-                return map[currentName];
-            }
-        };
+        const DependencyList& dependencies = instance->dependencies();
 
-        std::queue<QueueData> queue;
+        for (const auto& dependency : dependencies){
+            auto& depNode = _nodes[dependency.get()];
 
-        for (const auto& dep : source.dependents){
-            queue.emplace(source.name(), dep);
-        }
-
-        while (!queue.empty()){
-            QueueData data = queue.front();
-            queue.pop();
-
-            Node& current = data.current(_nodes);
-            Node& parent = data.parent(_nodes);
-
-            // if (currentNode.version == source.version){
-            //     continue;
-            // }
-
-            // current.version = source.version;
-
-            // if initialized, propagate initialization. Else propagate failure
-            if (parent.status == Status::INITIALIZED){
-
-                // if initialized, reload
-                if (current.status == Status::INITIALIZED){
-                    Result result = current.module->dependencyReload(data.parentName);
-                    current.status = catchResultError(data.currentName, result);
-                
-                // if not initialized, initialize
-                } else {
-                    initializeModule(current);
-                    // current.version = parent.version;
-                }
-            } else {
-                // if initialized, signal shutdown
-                if (current.status == Status::INITIALIZED){
-                    Result result = current.module->dependencyShutdown(data.parentName);
-                    current.status = catchResultError(data.currentName, result);
-                }
-
-                // if not, do nothing
-            }
-
-            // if the status is not initialized, reset module
-            if (current.status != Status::INITIALIZED){
-                // current.module = nullptr;
-            }
-
-            // add dependents
-            for (const auto& dep : current.dependents){
-                queue.emplace(current.name(), dep);
-            }
-        }
-    }
-
-    bool Manager::areModuleDependenciesMet(Node& node){
-        for (const auto& dep : node.dependencies){
-            const auto& depNode = _nodes[dep.get()];
             if (depNode.status != Status::INITIALIZED){
-                return false;
+                dependenciesAvailable = false;
+                spdlog::trace("The module {} is missing dependency {}", nodeName, dependency.get());
+                break;
+            }
+
+            auto& depInstance = depNode.instance;
+
+            if (!dependency.constraint().satisfies(depInstance->version())){
+                dependenciesAvailable = false;
+
+                auto& constraint = dependency.constraint();
+
+                spdlog::trace("The module {} is expexting dependency {} with constraints {} but got version {}",
+                    nodeName,
+                    dependency.get(),
+                    constraint.toString(),
+                    depInstance->version()
+                );
+
+                break;
             }
         }
 
-        return true;
+        if (!dependenciesAvailable){
+            return;
+        }
+
+
+        initializeModule(node);
+
+        if (node.status != Status::INITIALIZED) return;
+
+        for (const auto& dep : node.dependents){
+            tryInitializeModule(_nodes[dep]);
+        }
+    }
+
+
+    void Manager::shutdownModule(Name module){
+        auto& node = _nodes[module];
+        shutdownModuleNode(node);
+    }
+
+    void Manager::shutdownModuleNode(Node& node){
+        if (node.status != Status::INITIALIZED) return;
+        node.status = Status::QUIESCING;
+
+        auto& instance = node.instance;
+
+        if (!instance){
+            // technically a warning, but mark as error so dev can see
+            spdlog::error("A module was marked as 'INITIALIZED' yet contained no valid instance");
+            return;
+        }
+
+        for (const auto& dep : instance->dependencies()){
+            shutdownModule(dep.get());
+        }
+
+        // finally shutdown
+        node.instance->shutdown();
+        node.status = Status::TERMINATED;
+        node.instance.reset();
     }
 
     void Manager::initializeModule(Node& node){
         Result result = Result::Level::ERROR;
-        SharedModule module = node.module;
+        auto& instance = node.instance;
         Name nodeName = node.name();
 
         ModuleMap dependencies;
 
-        for (auto & dependency : node.dependencies){
-            Name depName = dependency.get();
+        for (auto & dependency : instance->dependencies()){
+            const auto& depName = dependency.get();
             Node& depNode = _nodes[depName];
 
-            dependencies[depName] = depNode.status == Status::INITIALIZED ? depNode.module : nullptr;
+            dependencies[depName] = depNode.instance->module();
         }
 
         InitHelper helper(_engine, dependencies);
@@ -180,7 +164,7 @@ namespace Raindrop::Modules{
         spdlog::trace("initializing node \"{}\"...", nodeName);
 
         // node.version = _version;
-        result = module->initialize(helper);
+        result = instance->initialize(helper);
         node.status = catchResultError(nodeName, result);
     }
 
@@ -214,7 +198,7 @@ namespace Raindrop::Modules{
         auto& node = _nodes[name];
 
         if (node.status == Status::INITIALIZED){
-            return node.module;
+            return node.instance->module();
         }
 
         return {};
@@ -227,35 +211,12 @@ namespace Raindrop::Modules{
 
         // push leafs
         for (auto& [name, node] : _nodes){
-            if (node.dependents.size() == 0){
-                queue.push(name);
-            }
-        }
+            if (node.status != Status::INITIALIZED) continue;
 
-        // for each nodes
-        while (!queue.empty()){
-            Name name = queue.front();
-            queue.pop();
+            auto& instance = node.instance;
 
-            Node& node = _nodes[name];
-
-            // if node has still dependents, skip it.
-            if (!node.dependents.empty()) continue;
-
-            // if not, reset
-            if (node.module){
-                spdlog::info("Shuting down module \"{}\"...", node.name());
-                node.module->shutdown();
-            }
-            
-            node.module = nullptr;
-
-            // push dependents and remove self from dependents
-            for (auto& dep : node.dependencies){
-                auto& depNode = _nodes[dep.get()];
-
-                depNode.dependents.remove(name);
-                queue.push(dep.get());
+            if (instance->dependencies().empty()){
+                shutdownModuleNode(node);
             }
         }
     }

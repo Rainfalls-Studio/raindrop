@@ -31,10 +31,6 @@ namespace Raindrop::Event{
         
     }
 
-    std::string EventModule::name() const noexcept{
-        return RAINDROP_CURRENT_MODULE_NAME;
-    }
-
     void EventModule::poll(){
         std::lock_guard lk(_mtx);
 
@@ -48,12 +44,6 @@ namespace Raindrop::Event{
             layers->manager()->get()->transmit(*event);
         }
         _events.clear();
-    }
-
-    inline Modules::DependencyList EventModule::dependencies() const noexcept{
-        return {
-            Modules::Dependency("Layers")
-        };
     }
 
     void EventModule::pushEvent(std::unique_ptr<Event>&& event){

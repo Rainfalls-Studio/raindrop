@@ -30,16 +30,6 @@ namespace Raindrop::Asset{
 		_nameToFactoryID.clear();
 	}
 
-	Modules::Name AssetModule::name() const noexcept{
-		return RAINDROP_CURRENT_MODULE_NAME;
-	}
-
-	Modules::DependencyList AssetModule::dependencies() const noexcept{
-		return {
-			Modules::Dependency("Filesystem")
-		};
-	}
-
 	void AssetModule::insertFactory(const std::type_info& typeInfo, std::shared_ptr<Factory>&& factory){
 		const auto typeID = typeInfo.hash_code();
 		if (_factories.count(typeID) != 0){

@@ -21,10 +21,11 @@ find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 
 raindrop_module_link_libraries(RenderCore
-    Vulkan::Vulkan
-    GPUOpen::VulkanMemoryAllocator
-    vk-bootstrap::vk-bootstrap
-    vk-bootstrap::vk-bootstrap-compiler-warnings
+    PUBLIC
+        Vulkan::Vulkan
+        GPUOpen::VulkanMemoryAllocator
+        vk-bootstrap::vk-bootstrap
+        vk-bootstrap::vk-bootstrap-compiler-warnings
 )
 
 # target_compile_definitions(RenderCore

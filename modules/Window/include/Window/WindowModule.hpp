@@ -18,9 +18,6 @@ namespace Raindrop::Window{
             virtual Modules::Result initialize(Modules::InitHelper& init) override;
             virtual void shutdown() override;
 
-            virtual std::string name() const noexcept override;
-            virtual Modules::DependencyList dependencies() const noexcept override;
-
             void event();
 
             std::shared_ptr<Window> createWindow(const WindowConfig& config);

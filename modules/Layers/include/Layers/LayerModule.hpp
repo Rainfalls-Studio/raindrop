@@ -13,10 +13,7 @@ namespace Raindrop::Layers{
 
             virtual Modules::Result initialize(Modules::InitHelper& helper) override;
             virtual void shutdown() override;
- 
-            virtual Modules::Name name() const noexcept override;
-            virtual Modules::DependencyList dependencies() const noexcept override;
-
+            
             LayerManager* manager();
             const LayerManager* manager() const;
 

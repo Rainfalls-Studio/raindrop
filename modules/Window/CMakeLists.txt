@@ -20,5 +20,6 @@ raindrop_add_dependencies(Window
 find_package(SDL3 REQUIRED)
 
 raindrop_module_link_libraries(Window
-    SDL3::SDL3
+    PRIVATE
+        SDL3::SDL3
 )

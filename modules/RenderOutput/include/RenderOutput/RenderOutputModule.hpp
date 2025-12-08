@@ -29,12 +29,6 @@ namespace Raindrop::Render{
             virtual Modules::Result initialize(Modules::InitHelper& helper) override;
             virtual void shutdown() override;
 
-            virtual Modules::Name name() const noexcept override;
-            virtual Modules::DependencyList dependencies() const noexcept override;
-
-            virtual Modules::Result dependencyReload(const Modules::Name& name) override;
-            virtual Modules::Result dependencyShutdown(const Modules::Name& name) override;
-
             SharedRenderOutput getOutput(const IRenderOutput::Name& name);
 
             void setMainOutput(const IRenderOutput::Name& name);

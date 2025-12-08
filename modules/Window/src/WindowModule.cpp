@@ -31,13 +31,6 @@ namespace Raindrop::Window{
         return Modules::Result::Success();
     }
 
-    Modules::DependencyList WindowModule::dependencies() const noexcept{
-        return {
-            Modules::Dependency("Event")
-        };
-    }
-
-
     std::shared_ptr<Window> WindowModule::createWindow(const WindowConfig& config){
         std::shared_ptr<Window> win = std::make_shared<Window>(config);
         _windows[SDL_GetWindowID(win->getWindow())] = win;
@@ -534,9 +527,5 @@ namespace Raindrop::Window{
 			#endif
 			}
 		}
-    }
-
-    std::string WindowModule::name() const noexcept{
-        return "Window";
     }
 }

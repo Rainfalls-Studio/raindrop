@@ -3,41 +3,30 @@
 #include <list>
 #include "common.hpp"
 #include "../Version.hpp"
-#include "../Operator.hpp"
 
 namespace Raindrop::Modules{
     class Dependency{
         public:
             inline Dependency(
                 Name dependency,
-                Version version = Version{},
-                CompareOperator op = CompareOperator::EQUAL
+                VersionConstraint constraint = {}
             ) :
                 _dependency(dependency),
-                _version{version},
-                _op{op}
+                _constraint{std::move(constraint)}
             {}
 
-            Dependency(const Dependency& other) = default;
-            Dependency(Dependency&& other) = default;
+            Dependency(const Dependency& other) = delete;
+            Dependency& operator=(const Dependency& other) = delete;
 
-            Dependency& operator=(const Dependency& other) = default;
+            Dependency(Dependency&& other) = default;
             Dependency& operator=(Dependency&& other) = default;
 
             inline const Name& get() const noexcept{
                 return _dependency;
             }
 
-            inline const Version& version() const noexcept{
-                return _version;
-            }
-
-            inline CompareOperator comparator() const noexcept{
-                return _op;
-            }
-
-            inline bool versionCheck(const Version& other) const noexcept{
-                return _op.getComparator<Version>()(_version, other);
+            inline const VersionConstraint& constraint() const noexcept{
+                return _constraint;
             }
 
             inline bool operator==(const Dependency& other) const noexcept{
@@ -46,8 +35,7 @@ namespace Raindrop::Modules{
 
         private:
             Name _dependency;
-            Version _version;
-            CompareOperator _op;
+            VersionConstraint _constraint;
     };
 
     using DependencyList = std::list<Dependency>;

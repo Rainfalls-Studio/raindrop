@@ -12,7 +12,6 @@ namespace Raindrop::Scene{
             virtual ~SceneModule() override = default;
 
             virtual Modules::Result initialize(Modules::InitHelper& helper) override;
-            virtual Modules::Name name() const noexcept override;
         
         private:
             Engine* _engine;
