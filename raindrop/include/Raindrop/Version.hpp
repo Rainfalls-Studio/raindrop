@@ -74,6 +74,7 @@ namespace Raindrop{
             
         public:
             VersionConstraint() = default;
+            VersionConstraint(const VersionConstraint& other);
             
             // Parse from string
             static VersionConstraint Parse(const std::string& constraint_str);

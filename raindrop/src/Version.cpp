@@ -130,6 +130,13 @@ namespace Raindrop{
 
     // ============= VersionConstraint
 
+    VersionConstraint::VersionConstraint(const VersionConstraint& other){
+
+        // Very ugly indeed, yet works
+        constraint_ = std::move(Parse(other.toString()).constraint_);
+    }
+
+
 
     VersionConstraint VersionConstraint::Parse(const std::string& constraint_str) {
         VersionConstraint vc;
