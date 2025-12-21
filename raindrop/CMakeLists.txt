@@ -51,7 +51,7 @@ target_compile_definitions(RaindropEngine
 
 add_custom_command(TARGET RaindropEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E echo
-        "Setting RAINDROP_ENGINE_LIBRARY_PATH to: $<TARGET_FILE:RaindropEngine>"
+        "[Raindrop] Setting RAINDROP_ENGINE_LIBRARY_PATH to: $<TARGET_FILE:RaindropEngine>"
 )
 
 set_property(GLOBAL PROPERTY RAINDROP_ENGINE_LIBRARY_PATH "$<TARGET_FILE:RaindropEngine>")

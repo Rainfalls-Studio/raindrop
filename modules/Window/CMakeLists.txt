@@ -15,6 +15,7 @@ raindrop_add_module(Window
 
 raindrop_add_dependencies(Window
     Event
+    Scheduler
 )
 
 find_package(SDL3 REQUIRED)

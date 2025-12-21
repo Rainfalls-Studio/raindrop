@@ -7,7 +7,7 @@
 
 #include "RenderCoreModule.hpp"
 
-#include <Raindrop/Scheduler/IStage.hpp>
+#include <Scheduler/IStage.hpp>
 #include <Raindrop/Error.hpp>
 
 namespace Raindrop::Render{

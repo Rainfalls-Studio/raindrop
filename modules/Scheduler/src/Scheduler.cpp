@@ -1,8 +1,19 @@
-#include "Raindrop/Scheduler/Scheduler.hpp"
-#include "Raindrop/Tasks/TaskManager.hpp"
-#include "Raindrop/Time/Clock.hpp"
-#include "Raindrop/Engine.hpp"
+#include "Scheduler/Scheduler.hpp"
+#include <Tasks/TaskManager.hpp>
+
+#include <Raindrop/Time/Clock.hpp>
+#include <Raindrop/Engine.hpp>
+#include <Raindrop/Modules/InitHelper.hpp>
 #include <spdlog/spdlog.h>
+
+
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+	return new Raindrop::Scheduler::Scheduler();
+}
+
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
 
 namespace Raindrop::Scheduler{
     Tasks::TaskStatus StageResultToTaskStatus(const char* name, StageResult&& r){
@@ -14,14 +25,18 @@ namespace Raindrop::Scheduler{
         return Tasks::TaskStatus::Failed("Unknown hook result !");
     }
 
-    Scheduler::Scheduler(Engine& engine) :
-        _engine{engine},
-        _taskManager{engine.getTaskManager()}
-    {}
+    Scheduler::Scheduler(){}
 
     Scheduler::~Scheduler(){
-        shutdown();
     }
+
+    Modules::Result Scheduler::initialize(Modules::InitHelper& helper){
+        _engine = &helper.engine();
+        _taskManager = helper.getDependencyAs<Tasks::TaskManager>("TaskManager");
+
+        return Modules::Result::Success();
+    }
+
 
     void Scheduler::shutdown(){
         spdlog::info("Shuting down loop scheduler...");
@@ -43,13 +58,18 @@ namespace Raindrop::Scheduler{
 
         LoopData& loop = *it->second;
         loop.name = name;
-        loop.engine = &_engine;
+        loop.engine = _engine;
 
         return Loop(it->second);
     }
 
     void Scheduler::run(const Loop& loop){
         assert(loop);
+
+        auto taskManager = _taskManager.lock();
+        if (!taskManager){
+            spdlog::warn("The task manager is not valid");
+        }
         
         auto data = loop.data();
         auto& runtime = data->runtime;
@@ -60,7 +80,7 @@ namespace Raindrop::Scheduler{
         runtime->loop = data.get();
         runtime->lastRunTime = Time::now();
 
-        runtime->controller = _taskManager.createTask(
+        runtime->controller = taskManager->createTask(
             [this, data]() -> Tasks::TaskStatus {
                 
                 auto& loopRuntime = data->runtime;
@@ -91,7 +111,7 @@ namespace Raindrop::Scheduler{
             loop.name() + " - controller"
         );
 
-        _taskManager.submit(runtime->controller);
+        taskManager->submit(runtime->controller);
     }
 
     Loop Scheduler::getLoop(const std::string& name){
@@ -103,6 +123,11 @@ namespace Raindrop::Scheduler{
     }
 
     void Scheduler::submitLoopIteration(LoopData& loop) {
+        auto taskManager = _taskManager.lock();
+        if (!taskManager){
+            spdlog::warn("The task manager is not valid");
+        }
+
         auto controller = loop.runtime->controller;
 
         Tasks::TaskHandle prev = controller;
@@ -110,7 +135,7 @@ namespace Raindrop::Scheduler{
 
         for (size_t i=stages.size(); i>0; i--) {
             auto& stage = stages[i-1];
-            auto h = _taskManager.createTask(
+            auto h = taskManager->createTask(
                 [stage] -> Tasks::TaskStatus {return StageResultToTaskStatus(stage->name(),  stage->execute());},
                 loop.executionPriority,
                 loop.name + " - stage: " + stage->name());
@@ -118,6 +143,6 @@ namespace Raindrop::Scheduler{
             prev = h;
         }
         
-        _taskManager.submit(prev);
+        taskManager->submit(prev);
     }
 }

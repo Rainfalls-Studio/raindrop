@@ -18,3 +18,7 @@ find_package(EnTT CONFIG REQUIRED)
 raindrop_module_link_libraries(Scene
     EnTT::EnTT
 )
+
+raindrop_add_dependencies(Scene
+    Scheduler
+)

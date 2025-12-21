@@ -9,8 +9,8 @@
 #include "IStage.hpp"
 #include "StageInitHelper.hpp"
 #include "LoopStorageRegistry.hpp"
-#include "Raindrop/Time/Clock.hpp"
-#include "Raindrop/Tasks/TaskHandle.hpp"
+#include <Raindrop/Time/Clock.hpp>
+#include <Tasks/TaskHandle.hpp>
 
 namespace Raindrop{
     class Engine;

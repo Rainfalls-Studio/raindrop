@@ -12,10 +12,6 @@ namespace Raindrop::Modules{
                 return _engine;
             }
 
-            inline Scheduler::Scheduler& scheduler() const noexcept{
-                return _engine.getScheduler();
-            }
-
             inline Modules::Manager& modules() const noexcept{
                 return _engine.getModuleManager();
             }

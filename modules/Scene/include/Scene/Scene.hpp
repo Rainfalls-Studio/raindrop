@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <entt/entt.hpp>
 
+#include <typeindex>
 #include <Raindrop/Engine.hpp>
 
 namespace Raindrop::Scene{

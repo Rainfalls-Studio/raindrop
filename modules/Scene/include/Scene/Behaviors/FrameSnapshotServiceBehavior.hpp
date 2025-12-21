@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../IBehavior.hpp"
+#include <condition_variable>
 
 namespace Raindrop::Behaviors{
     

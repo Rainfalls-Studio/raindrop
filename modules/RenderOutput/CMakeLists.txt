@@ -16,4 +16,5 @@ raindrop_add_module(RenderOutput
 raindrop_add_dependencies(RenderOutput
     RenderCore
     Window
+    Scheduler
 )

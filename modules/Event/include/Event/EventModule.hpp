@@ -2,6 +2,7 @@
 
 #include <Layers/LayerModule.hpp>
 #include <Raindrop/Modules/IModule.hpp>
+#include <Scheduler/Scheduler.hpp>
 #include "Event.hpp"
 
 namespace Raindrop::Event{

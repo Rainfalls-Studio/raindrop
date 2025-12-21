@@ -1,16 +1,37 @@
-#include "Raindrop/Tasks/TaskManager.hpp"
+#include "Tasks/TaskManager.hpp"
 #include <spdlog/spdlog.h>
+#include <Raindrop/Modules/InitHelper.hpp>
 
 constexpr static Raindrop::Time::Duration safetyMargin = Raindrop::Time::nanoseconds(500);
 
+
+extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+	return new Raindrop::Tasks::TaskManager();
+}
+
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+	delete module;
+}
+
+
 namespace Raindrop::Tasks{
-    TaskManager::TaskManager(Engine& engine, unsigned workers) : _engine(engine) {
+    TaskManager::TaskManager(){}
+
+    TaskManager::~TaskManager() {}
+
+    Modules::Result TaskManager::initialize(Modules::InitHelper& helper){
+        _engine = &helper.engine();
+
+        size_t workers = std::thread::hardware_concurrency() - 2;
+
         running.store(true);
-        for (unsigned i = 0; i < workers; ++i)
+        for (unsigned i = 0; i < workers; ++i){
             threads.emplace_back(&TaskManager::workerLoop, this);
+        }
+
+        return Modules::Result::Success();
     }
 
-    TaskManager::~TaskManager() { shutdown(); }
 
     TaskHandle TaskManager::createTask(std::function<TaskStatus()> fn, Priority priority, std::string name) {
         return TaskHandle(std::make_shared<TaskHandle::TaskDef>(std::move(fn), priority, std::move(name), TaskProfile{}));

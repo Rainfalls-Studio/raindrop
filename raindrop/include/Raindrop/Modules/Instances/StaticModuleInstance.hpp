@@ -17,6 +17,7 @@ namespace Raindrop::Modules{
                 DependencyList dependencies,
                 bool critical = false
             );
+            
             virtual ~StaticModuleInstance() override = default;
 
             virtual const DependencyList& dependencies() const override;

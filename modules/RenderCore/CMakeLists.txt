@@ -14,6 +14,7 @@ raindrop_add_module(RenderCore
 
 raindrop_add_dependencies(RenderCore
     Window
+    Scheduler
 )
 
 find_package(vk-bootstrap CONFIG REQUIRED)

@@ -1,20 +1,13 @@
-project(Event
+project(ResourceRegistry
     LANGUAGES CXX
-    VERSION 0.1.0
-    DESCRIPTION "Simple asset manager with factories and async friendly loading" 
+    VERSION 0.1.0 
 )
-
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-raindrop_add_module(Event
+raindrop_add_module(ResourceRegistry
     VERSION ${PROJECT_VERSION}
     DESCRIPTION ${PROJECT_DESCRIPTION}
     SOURCE ${SOURCES}
     HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-)
-
-raindrop_add_dependencies(Event
-    Layers
-    Scheduler
 )

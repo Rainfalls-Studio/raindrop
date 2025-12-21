@@ -3,6 +3,7 @@
 #include "Raindrop/Modules/Instances/DynamicModuleInstance.hpp"
 
 #include <cassert>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <queue>
 
@@ -10,14 +11,16 @@
 namespace fs = std::filesystem;
 
 namespace Raindrop::Modules{
-    Manager::Manager(Engine& engine) : _engine{engine}{}
+    Manager::Manager(Engine& engine) : _engine{engine}{
+        _logger = spdlog::stdout_color_mt("ModuleManager");
+    }
     
     Manager::~Manager(){
         shutdown();
     }
 
     void Manager::loadModules(const std::filesystem::path& directoryPath){
-        spdlog::info("Loading modules from \"{}\"", directoryPath.string());
+        _logger->info("Loading modules from \"{}\"", directoryPath.string());
 
         for (const auto & entry : fs::directory_iterator(directoryPath)){
             if (!entry.is_directory()) continue;
@@ -29,7 +32,7 @@ namespace Raindrop::Modules{
         try{
             registerModule(std::make_unique<DynamicModuleInstance>(path));
         } catch (const std::exception& e){
-            spdlog::error("Failed to load module at path \"{}\" : {}", path.string(), e.what());
+            _logger->error("Failed to load module at path \"{}\" : {}", path.string(), e.what());
         }
     }
 
@@ -40,6 +43,8 @@ namespace Raindrop::Modules{
 
         // lock.lock();
         // TODO: module override
+
+        
 
         auto& node = _nodes[instance->name()];
 
@@ -59,7 +64,7 @@ namespace Raindrop::Modules{
         tryInitializeModule(node);
 
         if (inst->critical() && node.status != Status::INITIALIZED){
-            spdlog::critical("Failed to initialize critical module \"{}\" !", nodeName);
+            _logger->critical("Failed to initialize critical module \"{}\" !", nodeName);
             throw std::runtime_error("Failed to initialize critical module");
         }
     }
@@ -81,7 +86,7 @@ namespace Raindrop::Modules{
 
             if (depNode.status != Status::INITIALIZED){
                 dependenciesAvailable = false;
-                spdlog::trace("The module {} is missing dependency {}", nodeName, dependency.get());
+                _logger->trace("The module {} is missing dependency {}", nodeName, dependency.get());
                 break;
             }
 
@@ -92,7 +97,7 @@ namespace Raindrop::Modules{
 
                 auto& constraint = dependency.constraint();
 
-                spdlog::trace("The module {} is expexting dependency {} with constraints {} but got version {}",
+                _logger->trace("The module {} is expexting dependency {} with constraints {} but got version {}",
                     nodeName,
                     dependency.get(),
                     constraint.toString(),
@@ -131,7 +136,7 @@ namespace Raindrop::Modules{
 
         if (!instance){
             // technically a warning, but mark as error so dev can see
-            spdlog::error("A module was marked as 'INITIALIZED' yet contained no valid instance");
+            _logger->error("A module was marked as 'INITIALIZED' yet contained no valid instance");
             return;
         }
 
@@ -161,7 +166,7 @@ namespace Raindrop::Modules{
 
         InitHelper helper(_engine, dependencies);
 
-        spdlog::trace("initializing node \"{}\"...", nodeName);
+        _logger->trace("initializing node \"{}\"...", nodeName);
 
         // node.version = _version;
         result = instance->initialize(helper);
@@ -175,22 +180,22 @@ namespace Raindrop::Modules{
         // catch result
         switch (result.level()){
             case Result::Level::SUCCESS:{
-                spdlog::info("Successfully initialized module \"{}\" : {} !", name, result_msg);
+                _logger->info("Successfully initialized module \"{}\" : {} !", name, result_msg);
                 return Status::INITIALIZED;
             }
 
             case Result::Level::ERROR:{
-                spdlog::warn("Failed to initialize module \"{}\" : {}", name, result_msg);
+                _logger->warn("Failed to initialize module \"{}\" : {}", name, result_msg);
                 return Status::FAILED;
             }
 
             case Result::Level::FATAL:{
-                spdlog::critical("Failed to initialize critical module \"{}\" : {}", name, result_msg);
+                _logger->critical("Failed to initialize critical module \"{}\" : {}", name, result_msg);
                 throw std::runtime_error(result.message());
             }
         }
 
-        spdlog::warn("Unknown result level : {} : {}", static_cast<int>(result.level()), result_msg);
+        _logger->warn("Unknown result level : {} : {}", static_cast<int>(result.level()), result_msg);
         return Status::FAILED;
     }
 
@@ -204,8 +209,12 @@ namespace Raindrop::Modules{
         return {};
     }
 
+    void Manager::initialize(){
+
+    }
+
     void Manager::shutdown(){
-        spdlog::info("Shuting down modules...");
+        _logger->info("Shuting down modules...");
 
         std::queue<Name> queue;
 

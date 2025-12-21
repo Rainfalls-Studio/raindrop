@@ -30,6 +30,7 @@ raindrop_add_dependencies(Sim
     Asset
     ImGui
     Layers
+    ResourceRegistry
 )
 
 raindrop_add_project(Sim)

@@ -3,6 +3,7 @@
 #include <memory>
 #include <atomic>
 #include <filesystem>
+#include <spdlog/logger.h>
 
 #include "IModule.hpp"
 #include "Status.hpp"
@@ -22,21 +23,29 @@ namespace Raindrop::Modules{
             void registerModule(std::unique_ptr<IModuleInstance>&& loader);
 
             template<typename T>
-            void registerModule(){
+            void registerModule(const Name& name, const Version& version, DependencyList dependencies, bool critical = false){
                 registerModule(
                     std::make_unique<StaticModuleInstance>(
                         []() -> IModule* { return new T();},
-                        [](IModule* module) -> void {delete module;}
+                        [](IModule* module) -> void {delete module;},
+                        name,
+                        version,
+                        std::move(dependencies),
+                        critical
                     )
                 );
             }
 
             template<typename T, typename... Args>
-            void registerModule(Args&&... args){
+            void registerModule(const Name& name, const Version& version, const DependencyList& dependencies, bool critical, Args&&... args){
                 registerModule(
                     std::make_unique<StaticModuleInstance>(
                         [args...]() -> IModule* { return new T(std::forward<Args>(args)...);},
-                        [](IModule* module) -> void {delete module;}
+                        [](IModule* module) -> void {delete module;},
+                        name,
+                        version,
+                        std::move(dependencies),
+                        critical
                     )
                 );
             }
@@ -64,7 +73,8 @@ namespace Raindrop::Modules{
                 static_assert((std::is_constructible<Name, Modules>::value && ...), "The Modules names must be strings");
                 return std::make_tuple(getModuleAs<Ts>(Name(modules))...);
             }
-
+            
+            void initialize();
             void shutdown();
 
             void shutdownModule(Name module);
@@ -85,6 +95,7 @@ namespace Raindrop::Modules{
             Engine& _engine;
             Map _nodes;
             mutable std::mutex _mtx;
+            std::shared_ptr<spdlog::logger> _logger;
             
             void shutdownModuleNode(Node& node);
             void tryInitializeModule(Node& node);

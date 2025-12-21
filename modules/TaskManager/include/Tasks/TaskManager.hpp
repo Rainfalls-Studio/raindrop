@@ -4,28 +4,26 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <thread>
 #include <vector>
 #include <list>
 
 #include "TaskHandle.hpp"
-
-namespace Raindrop{
-    class Engine;
-}
+#include <Raindrop/Engine.hpp>
 
 namespace Raindrop::Tasks{
-    class TaskManager {
+    class TaskManager : public Modules::IModule {
         friend class ::Raindrop::Engine;
         public:
-            TaskManager(Engine& engine, unsigned workers = std::thread::hardware_concurrency());
-            ~TaskManager();
+            TaskManager();
+            virtual ~TaskManager() override;
+
+            virtual Modules::Result initialize(Modules::InitHelper& helper) override;
 
             TaskHandle createTask(std::function<TaskStatus()> fn, Priority priority = Priority::MEDIUM, std::string name = "");
 
             void submit(const TaskHandle& task);
-            void shutdown();
+            void shutdown() override;
             void stop();
 
             size_t taskCount();
@@ -44,7 +42,7 @@ namespace Raindrop::Tasks{
 
             using TaskPool = std::array<std::list<TaskInstance>, static_cast<size_t>(Priority::__size__)>;
             
-            Engine& _engine;
+            Engine* _engine;
             std::mutex mtx;
             std::condition_variable cv;
             TaskPool _tasks;

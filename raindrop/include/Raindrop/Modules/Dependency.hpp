@@ -15,11 +15,18 @@ namespace Raindrop::Modules{
                 _constraint{std::move(constraint)}
             {}
 
-            Dependency(const Dependency& other) = delete;
+            
+            Dependency(const Dependency& other) : 
+                _dependency(other._dependency),
+                _constraint(other._constraint)
+            {}
+            
             Dependency& operator=(const Dependency& other) = delete;
 
             Dependency(Dependency&& other) = default;
             Dependency& operator=(Dependency&& other) = default;
+
+            ~Dependency() = default;
 
             inline const Name& get() const noexcept{
                 return _dependency;

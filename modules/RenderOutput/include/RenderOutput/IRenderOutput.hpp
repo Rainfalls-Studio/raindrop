@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <unordered_map>
-#include <Raindrop/Scheduler/IStage.hpp>
+#include <Scheduler/IStage.hpp>
 #include <RenderCore/RenderCommandContext.hpp>
 
 namespace Raindrop::Render{

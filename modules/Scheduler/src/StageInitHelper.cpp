@@ -1,6 +1,6 @@
-#include "Raindrop/Scheduler/StageInitHelper.hpp"
-#include "Raindrop/Scheduler/Loop.hpp"
-#include "Raindrop/Engine.hpp"
+#include "Scheduler/StageInitHelper.hpp"
+#include "Scheduler/Loop.hpp"
+#include <Raindrop/Engine.hpp>
 
 namespace Raindrop::Scheduler{
     StageInitHelper::StageInitHelper(Engine& engine, const std::shared_ptr<LoopData>& data) :
