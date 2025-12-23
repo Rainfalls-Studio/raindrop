@@ -146,7 +146,7 @@ namespace Raindrop{
     
     // Check if a version satisfies this constraint
     bool VersionConstraint::satisfies(const Version& version) const {
-        if (!constraint_) return false;
+        if (!constraint_) return true; // empty acts as contraint *.*.*
         return constraint_->satisfies(version);
     }
     

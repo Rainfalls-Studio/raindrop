@@ -2,6 +2,8 @@
 
 #include <string>
 #include <typeindex>
+#include <utility>
+#include "IResourceWrapper.hpp"
 
 namespace ResourceRegistry::detail{
 
@@ -26,4 +28,33 @@ namespace ResourceRegistry::detail{
       // Minimal: compiler-specific demangling omitted.
       return ti.name();
     }
+
+
+    // Used to create wrappers without needing to make them depend of IResourceWrapper
+    template<typename Wrapper>
+    class WrapperModel final : IResourceWrapper {
+        public:
+            using WrapperType = Wrapper;
+
+
+            template<class... Args>
+            explicit WrapperModel(Args&&... args) : _wrapper(std::forward<Args>(args)...) {}
+
+            std::type_index wrapperType() const noexcept override {
+                return detail::wrapperTypeIndex<Wrapper>();
+            }
+
+            std::type_index valueType() const noexcept override {
+                return detail::valueTypeIndex<Wrapper>();
+            }
+
+            void* rawPtr() noexcept override { return &_wrapper; }
+            const void* rawPtr() const noexcept override { return &_wrapper; }
+
+            Wrapper& get() noexcept { return _wrapper; }
+            const Wrapper& get() const noexcept { return _wrapper; }
+        
+        private:
+            Wrapper _wrapper;
+    };
 }

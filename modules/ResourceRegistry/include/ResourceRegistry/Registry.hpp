@@ -4,10 +4,9 @@
 #include <Raindrop/Raindrop.hpp>
 #include "RRID.hpp"
 #include "IResourceWrapper.hpp"
+#include "detail.hpp"
 
 namespace ResourceRegistry{
-    
-
     class Registry : public Raindrop::Modules::IModule{
         public:
             struct Slot{
@@ -35,7 +34,19 @@ namespace ResourceRegistry{
                     throw std::runtime_error("ResourceRegistry::Registry::create: resource name already exists: " + name);
                 }
 
+                const uint32_t slotIndex = allocateSlotIndex();
+                Slot& s = _slots[slotIndex];
 
+                // Bump generation on reuse already done by destroy(); slot has a current generation.
+                s.id = RRID{ slotIndex, _generations[slotIndex] };
+                s.name = std::move(name);
+                s.wrapperType = std::type_index(typeid(Wrapper));
+                s.valueType = detail::valueTypeIndex<Wrapper>();
+                s.wrapper = std::make_unique<detail::WrapperModel<Wrapper>>(std::forward<Args>(args)...);
+                s.alive = true;
+
+                _nameToSlot.emplace(s.name, static_cast<size_t>(slotIndex));
+                return s.id;
             }
 
             void destroy(RRID id);

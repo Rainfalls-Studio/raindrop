@@ -28,7 +28,7 @@ int main(){
         "Test",
         Raindrop::Version(1, 0, 0),
         Raindrop::Modules::DependencyList{
-            Raindrop::Modules::Dependency("Window")
+            Raindrop::Modules::Dependency("Window", Raindrop::VersionConstraint::Parse("*.*.*"))
         },
         true
     );
