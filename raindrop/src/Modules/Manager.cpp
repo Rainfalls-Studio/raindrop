@@ -210,7 +210,15 @@ namespace Raindrop::Modules{
     }
 
     void Manager::initialize(){
+        for (const auto& node : _nodes){
+            auto& instance = node.second.instance;
+            if (!instance) continue;
+            
+            const auto& module = instance->module();
+            if (!module) continue;
 
+            module->postInitialize();
+        }
     }
 
     void Manager::shutdown(){
