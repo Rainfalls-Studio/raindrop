@@ -79,7 +79,7 @@ namespace ResourceRegistry{
 
             // try_get variants return nullptr if not found / stale / wrong type
             template <class Wrapper>
-                Wrapper* try_get(RRID rid) noexcept {
+            Wrapper* try_get(RRID rid) noexcept {
                 Slot* s = trySlot(rid);
                 if (!s) return nullptr;
                 if (s->wrapperType != std::type_index(typeid(Wrapper))) return nullptr;
