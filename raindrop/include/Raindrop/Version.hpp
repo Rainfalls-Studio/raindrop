@@ -81,6 +81,7 @@ namespace Raindrop{
             
             // Parse from string
             static VersionConstraint Parse(const std::string& constraint_str);
+            static VersionConstraint Any();
             
             // Check if a version satisfies this constraint
             bool satisfies(const Version& version) const;

@@ -32,7 +32,7 @@ int main(){
         "Test",
         Raindrop::Version(1, 0, 0),
         Raindrop::DependencyList{
-            Raindrop::Dependency("Window", Raindrop::VersionConstraint::Parse("*"))
+            Raindrop::Dependency("Window", Raindrop::VersionConstraint::Any())
         },
         true
     );

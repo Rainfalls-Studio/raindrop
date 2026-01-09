@@ -144,6 +144,16 @@ namespace Raindrop{
         vc.constraint_ = ParseConstraint(constraint_str);
         return vc;
     }
+
+    VersionConstraint VersionConstraint::Any(){
+        VersionConstraint vc;
+
+        auto constraint = std::make_unique<WildcardConstraint>();
+        constraint->majorWildcard = true;
+
+        vc.constraint_ = std::move(constraint);
+        return vc;
+    }
     
     // Check if a version satisfies this constraint
     bool VersionConstraint::satisfies(const Version& version) const {
