@@ -6,23 +6,23 @@
 #include <stdexcept>
 
 extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
-	return new Raindrop::Asset::AssetModule();
+	return new Asset::AssetModule();
 }
 
 extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
-namespace Raindrop::Asset{
+namespace Asset{
 	AssetModule::AssetModule() noexcept : _factories{}{}
 	AssetModule::~AssetModule(){}
 
 
-	Result AssetModule::initialize(InitHelper& helper){
+	Raindrop::Result AssetModule::initialize(Raindrop::InitHelper& helper){
 		_engine = &helper.engine();
 		spdlog::info("AssetModule successfully created !");
 
-		return Result::Success();
+		return Raindrop::Result::Success();
 	}
 
 	void AssetModule::shutdown(){

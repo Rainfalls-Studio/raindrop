@@ -4,7 +4,7 @@
 #include <vulkan/vulkan.hpp>
 #include <spdlog/spdlog.h>
 
-namespace Raindrop::Window{
+namespace Window{
     SDL_WindowFlags raindropToSDLFlags(WindowFlags flags){
         SDL_WindowFlags out = 0;
 
@@ -59,10 +59,10 @@ namespace Raindrop::Window{
         return exts;
     }
 
-    std::expected<vk::SurfaceKHR, Error> Window::createSurface(vk::Instance instance){
+    std::expected<vk::SurfaceKHR, Raindrop::Error> Window::createSurface(vk::Instance instance){
         VkSurfaceKHR surface;
         if (SDL_Vulkan_CreateSurface(_window, instance, nullptr, &surface) == false){
-            return std::unexpected(Error(std::make_error_code(std::errc::invalid_argument), SDL_GetError()));
+            return std::unexpected(Raindrop::Error(std::make_error_code(std::errc::invalid_argument), SDL_GetError()));
         }
 
         return vk::SurfaceKHR(surface);

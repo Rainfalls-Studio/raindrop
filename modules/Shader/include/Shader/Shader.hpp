@@ -6,7 +6,7 @@
 #include <Filesystem/FilesystemModule.hpp>
 #include <vulkan/vulkan.hpp>
 
-namespace Raindrop::Render{
+namespace Shader{
     class Shader : public Asset::Asset{
         public:
             enum class ErrorCode{
@@ -23,16 +23,16 @@ namespace Raindrop::Render{
 
             Shader(
                 std::shared_ptr<Filesystem::FilesystemModule> filesystem,
-                std::shared_ptr<RenderCoreModule> core,
+                std::shared_ptr<Render::RenderCoreModule> core,
                 const Filesystem::Path& path,
                 const std::string& entryPoint = "main"
             );
 
             ~Shader();
 
-            virtual std::expected<void, Error> load() override;
-            virtual std::expected<void, Error> reload() override;
-            virtual std::expected<void, Error> unload() override;
+            virtual std::expected<void, Raindrop::Error> load() override;
+            virtual std::expected<void, Raindrop::Error> reload() override;
+            virtual std::expected<void, Raindrop::Error> unload() override;
             virtual bool isLoaded() override;
 
             virtual std::uint32_t getMemoryUsage() const override;
@@ -42,10 +42,10 @@ namespace Raindrop::Render{
             vk::PipelineShaderStageCreateInfo stageInfo() const;
         
         protected:
-            virtual std::expected<std::vector<uint32_t>, Error> getCodeImpl() = 0;
+            virtual std::expected<std::vector<uint32_t>, Raindrop::Error> getCodeImpl() = 0;
 
             std::shared_ptr<Filesystem::FilesystemModule> _filesystem;
-            std::shared_ptr<Raindrop::Render::RenderCoreModule> _core;
+            std::shared_ptr<Render::RenderCoreModule> _core;
 
             Filesystem::Path _path;
             std::string _entryPoint;
@@ -53,6 +53,6 @@ namespace Raindrop::Render{
             vk::ShaderStageFlagBits _stage;
             vk::ShaderModule _module;
 
-            std::expected<vk::ShaderModule, Error> createModule();
+            std::expected<vk::ShaderModule, Raindrop::Error> createModule();
     };
 }

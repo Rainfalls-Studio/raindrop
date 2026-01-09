@@ -5,19 +5,19 @@
 #include <RenderCore/RenderCoreModule.hpp>
 #include "ImGuiContext.hpp"
 
-namespace Raindrop::ImGui{
-    class ImGuiModule : public IModule{
+namespace ImGui{
+    class ImGuiModule : public Raindrop::IModule{
         public:
             ImGuiModule();
             virtual ~ImGuiModule() override;
 
-            virtual Result initialize(InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
             virtual void shutdown() override;
 
             std::shared_ptr<ImGuiContext> createContext(std::shared_ptr<Render::IRenderOutput> output);
 
         private:
-            Engine* _engine;
+           Raindrop:: Engine* _engine;
             std::shared_ptr<Render::RenderCoreModule> _core;
             std::shared_ptr<spdlog::logger> _logger;
 

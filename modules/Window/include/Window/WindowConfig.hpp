@@ -4,7 +4,7 @@
 #include <string>
 #include <Raindrop/Utils/Flags.hpp>
 
-namespace Raindrop::Window{
+namespace Window{
     enum class WindowFlagBits {
         NONE = 0,
         FULLSCREEN = 1 << 0,

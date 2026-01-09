@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 
 extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
-	return new Raindrop::Render::RenderOutputModule();
+	return new Render::RenderOutputModule();
 }
 
 extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
@@ -12,7 +12,7 @@ extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 }
 
 
-namespace Raindrop::Render{
+namespace Render{
     class RenderOutputErrorCategory : public std::error_category{
         public:
             const char* name() const noexcept override{
@@ -37,11 +37,11 @@ namespace Raindrop::Render{
     RenderOutputModule::RenderOutputModule(){}
     RenderOutputModule::~RenderOutputModule(){}
 
-    Result RenderOutputModule::initialize(InitHelper& helper){
+    Raindrop::Result RenderOutputModule::initialize(Raindrop::InitHelper& helper){
         _engine = &helper.engine();
         _core = helper.getDependencyAs<RenderCoreModule>("RenderCore");
 
-        return Result::Success();
+        return Raindrop::Result::Success();
     }
 
     void RenderOutputModule::shutdown(){

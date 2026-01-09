@@ -6,10 +6,10 @@
 
 #include "Shader.hpp"
 
-namespace Raindrop::Render{
+namespace Shader{
     class ShaderFactory : public Asset::Factory{
         public:
-            ShaderFactory(Engine& engine);
+            ShaderFactory(Raindrop::Engine& engine);
 			virtual ~ShaderFactory();
 			
 			// get or create an asset based of the given parameters
@@ -19,7 +19,7 @@ namespace Raindrop::Render{
 			virtual std::string getName() const noexcept override;
         private:
             std::shared_ptr<Filesystem::FilesystemModule> _filesystem;
-            std::shared_ptr<RenderCoreModule> _renderCore;
+            std::shared_ptr<Render::RenderCoreModule> _renderCore;
 
             std::unordered_map<Filesystem::Path, std::weak_ptr<Shader>> _shaders;
     };

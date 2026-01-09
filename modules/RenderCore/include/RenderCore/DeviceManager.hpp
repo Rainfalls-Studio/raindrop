@@ -6,7 +6,7 @@
 #include <vulkan/vulkan.hpp>
 #include <VkBootstrap.h>
 
-namespace Raindrop::Render{
+namespace Render{
     class DeviceManager{
         public:
 
@@ -29,7 +29,7 @@ namespace Raindrop::Render{
             DeviceManager();
             ~DeviceManager();
 
-            std::expected<void, Error> initialize(vk::SurfaceKHR& surface, std::shared_ptr<Window::Window>& window);
+            std::expected<void, Raindrop::Error> initialize(vk::SurfaceKHR& surface, std::shared_ptr<Window::Window>& window);
             void shutdown();
 
             vk::Device device() const;
@@ -54,9 +54,9 @@ namespace Raindrop::Render{
             vk::PhysicalDevice _vkPhysicalDevice;
             vk::Device _vkDevice;
 
-            std::expected<void, Error> createInstance(InitData& surface);
-            std::expected<void, Error> pickPhysicalDevice(InitData& surface);
-            std::expected<void, Error> createDevice(InitData& surface);
+            std::expected<void, Raindrop::Error> createInstance(InitData& surface);
+            std::expected<void, Raindrop::Error> pickPhysicalDevice(InitData& surface);
+            std::expected<void, Raindrop::Error> createDevice(InitData& surface);
 
     };
 }

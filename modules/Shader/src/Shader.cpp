@@ -1,7 +1,7 @@
 #include "Shader/Shader.hpp"
 #include <spdlog/spdlog.h>
 
-namespace Raindrop::Render{
+namespace Shader{
 
     class ShaderErrorCategory : public std::error_category{
         public:
@@ -26,7 +26,7 @@ namespace Raindrop::Render{
 
     Shader::Shader(
         std::shared_ptr<Filesystem::FilesystemModule> filesystem,
-        std::shared_ptr<RenderCoreModule> core,
+        std::shared_ptr<Render::RenderCoreModule> core,
         const Filesystem::Path& path,
         const std::string& entryPoint
     ) : 
@@ -42,7 +42,7 @@ namespace Raindrop::Render{
         }
     }
 
-    std::expected<void, Error> Shader::load(){
+    std::expected<void, Raindrop::Error> Shader::load(){
 
         // skip if already loaded
         if (_module) return {};
@@ -64,12 +64,12 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> Shader::reload(){
+    std::expected<void, Raindrop::Error> Shader::reload(){
         return unload()
             .and_then([&]{return load();});
     }
 
-    std::expected<void, Error> Shader::unload(){
+    std::expected<void, Raindrop::Error> Shader::unload(){
         auto device = _core->deviceManager().device();
 
         if (_module){
@@ -96,7 +96,7 @@ namespace Raindrop::Render{
         return _module;
     }
 
-    std::expected<vk::ShaderModule, Error> Shader::createModule(){
+    std::expected<vk::ShaderModule, Raindrop::Error> Shader::createModule(){
         vk::ShaderModuleCreateInfo info{
             {},
             static_cast<uint32_t>(_code.size()) * sizeof(uint32_t),
@@ -108,7 +108,7 @@ namespace Raindrop::Render{
         if (auto result = device.createShaderModule(info); result.result == vk::Result::eSuccess){
             return result.value;
         } else {
-            return std::unexpected(Error(FailedShaderModuleCreationError(), vk::to_string(result.result)));
+            return std::unexpected(Raindrop::Error(FailedShaderModuleCreationError(), vk::to_string(result.result)));
         }
     }
 

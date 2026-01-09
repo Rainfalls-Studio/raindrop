@@ -12,7 +12,7 @@ namespace Raindrop{
     class Engine;
 }
 
-namespace Raindrop::Render{
+namespace Render{
     class Queue{
         friend class RenderCoreModule;
         public:
@@ -55,7 +55,7 @@ namespace Raindrop::Render{
             uint32_t _family;
     };
 
-    class RenderCoreModule : public IModule{
+    class RenderCoreModule : public Raindrop::IModule{
         public:
             enum class ErrorCode{
                 FAILED_INSTANCE_CREATION,
@@ -88,7 +88,7 @@ namespace Raindrop::Render{
             RenderCoreModule();
             virtual ~RenderCoreModule() = default;
 
-            virtual Result initialize(InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
             virtual void shutdown() override;
 
             DeviceManager& deviceManager() noexcept;
@@ -119,7 +119,7 @@ namespace Raindrop::Render{
                 vk::SurfaceKHR surface;
             };
 
-            Engine* _engine;
+            Raindrop::Engine* _engine;
             std::shared_ptr<Window::WindowModule> _windowModule;
 
             DeviceManager _deviceManager;
@@ -131,7 +131,7 @@ namespace Raindrop::Render{
             Queue _transferQueue;
             Queue _presentQueue;
 
-            std::expected<void, Error> findQueues();
-            std::expected<void, Error> createVmaAllocator();
+            std::expected<void, Raindrop::Error> findQueues();
+            std::expected<void, Raindrop::Error> createVmaAllocator();
     };
 }

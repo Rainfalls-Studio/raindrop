@@ -1,6 +1,6 @@
 #include "Filesystem/MountTable.hpp"
 
-namespace Raindrop::Filesystem{
+namespace Filesystem{
     MountTable::MountTable(){}
     MountTable::~MountTable(){}
 

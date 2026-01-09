@@ -9,7 +9,7 @@
 #include <imgui_impl_vulkan.h>
 #include <spdlog/spdlog.h>
 
-namespace Raindrop::ImGui{
+namespace ImGui{
 
     ImGuiKey ImGui_Raindrop_KeyEventToImGuiKey(Event::Key keycode, Event::PhysicalKey scancode){
         using Event::Key;

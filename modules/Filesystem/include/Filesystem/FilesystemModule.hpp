@@ -3,8 +3,8 @@
 #include "Raindrop/Modules/IModule.hpp"
 #include "MountTable.hpp"
 
-namespace Raindrop::Filesystem{
-    class FilesystemModule : public IModule{
+namespace Filesystem{
+    class FilesystemModule : public Raindrop::IModule{
         public:
 
             enum class ErrorCodes{
@@ -14,7 +14,7 @@ namespace Raindrop::Filesystem{
             FilesystemModule();
             virtual ~FilesystemModule() override = default;
 
-            virtual Result initialize(InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
             virtual void shutdown() override;
 
             MountTable& mountTable() noexcept;

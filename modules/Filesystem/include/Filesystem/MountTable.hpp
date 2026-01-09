@@ -6,7 +6,7 @@
 #include <list>
 #include <vector>
 
-namespace Raindrop::Filesystem{
+namespace Filesystem{
     class MountTable{
         public:
             struct Entry{

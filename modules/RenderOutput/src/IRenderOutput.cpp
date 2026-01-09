@@ -1,6 +1,6 @@
 #include <RenderOutput/IRenderOutput.hpp>
 
-namespace Raindrop::Render{
+namespace Render{
 
     IRenderOutput::BeginStage::BeginStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<RenderCommandContext> cmdCtx) :
         _output{output},

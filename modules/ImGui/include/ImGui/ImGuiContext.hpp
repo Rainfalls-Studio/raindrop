@@ -10,7 +10,7 @@
 #include <RenderOutput/IRenderOutput.hpp>
 #include <RenderCore/RenderCoreModule.hpp>
 
-namespace Raindrop::ImGui{
+namespace ImGui{
     class ImGuiContext{
         public:
             using NativeContext = ::ImGuiContext;

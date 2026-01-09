@@ -5,7 +5,6 @@
 #include <cassert>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
-#include <queue>
 
 #include <filesystem>
 namespace fs = std::filesystem;

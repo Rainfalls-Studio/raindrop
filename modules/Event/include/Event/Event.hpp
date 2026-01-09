@@ -2,7 +2,7 @@
 
 #include <Layers/Transmission.hpp>
 
-namespace Raindrop::Event{
+namespace Event{
 	class Event : public Layers::Transmission{
 		public:
 			Event() = default;

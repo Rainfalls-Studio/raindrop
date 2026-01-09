@@ -1,7 +1,7 @@
 #include "RenderCore/RenderCommandContext.hpp"
 #include <spdlog/spdlog.h>
 
-namespace Raindrop::Render{
+namespace Render{
 
     class RenderCommandContextErrorCategory : public std::error_category{
         public:
@@ -67,7 +67,7 @@ namespace Raindrop::Render{
         }
     }
 
-    std::expected<void, Error> RenderCommandContext::createPool(){
+    std::expected<void, Raindrop::Error> RenderCommandContext::createPool(){
 
         // getting family index
         uint32_t familyIndex = 0;
@@ -77,7 +77,7 @@ namespace Raindrop::Render{
             case Queue::Type::COMPUTE: familyIndex = _core->computeQueue().familyIndex(); break;
             case Queue::Type::TRANSFER: familyIndex = _core->transferQueue().familyIndex(); break;
             default:
-                return std::unexpected(Error(UnknownQueueTypeError(), "unknown queue type (type={})", static_cast<int>(_type)));
+                return std::unexpected(Raindrop::Error(UnknownQueueTypeError(), "unknown queue type (type={})", static_cast<int>(_type)));
         }
 
         // pool creation
@@ -96,7 +96,7 @@ namespace Raindrop::Render{
 
             } else {
                 spdlog::error("Failed to create render command context command pool");
-                return std::unexpected<Error>(Error(FailedPoolCreationError(), vk::to_string(result.result)));
+                return std::unexpected<Raindrop::Error>(Raindrop::Error(FailedPoolCreationError(), vk::to_string(result.result)));
             }
         }
 
@@ -117,9 +117,9 @@ namespace Raindrop::Render{
     }
 
 
-    std::expected<vk::CommandBuffer, Error> RenderCommandContext::begin(){
+    std::expected<vk::CommandBuffer, Raindrop::Error> RenderCommandContext::begin(){
         if (_recording){
-            return std::unexpected(Error(AlreadyRecordingError(), "Buffer (id={}) is already in recording state", _currentIndex));
+            return std::unexpected(Raindrop::Error(AlreadyRecordingError(), "Buffer (id={}) is already in recording state", _currentIndex));
         }
 
         #if 0
@@ -155,7 +155,7 @@ namespace Raindrop::Render{
         vk::CommandBufferBeginInfo info{};
 
         if (auto result = cmdBuffer.begin(info); result != vk::Result::eSuccess){
-            return std::unexpected(Error(FailedBeginRecordError(), "Failed to begin recording of command buffer (id={}) : {}", _currentIndex, vk::to_string(result)));
+            return std::unexpected(Raindrop::Error(FailedBeginRecordError(), "Failed to begin recording of command buffer (id={}) : {}", _currentIndex, vk::to_string(result)));
         }
 
         _recording=true;
@@ -163,16 +163,16 @@ namespace Raindrop::Render{
         return cmdBuffer;
     }
 
-    std::expected<void, Error> RenderCommandContext::end(){
+    std::expected<void, Raindrop::Error> RenderCommandContext::end(){
         if (!_recording){
-            return std::unexpected(Error(NotRecordingError(), "No buffer is currently in record state"));
+            return std::unexpected(Raindrop::Error(NotRecordingError(), "No buffer is currently in record state"));
         }
 
         auto buffer = _buffers[_currentIndex].cmdBuffer;
         _recording=false;
 
         if (auto result = buffer.end(); result != vk::Result::eSuccess){
-            return std::unexpected(Error(FailedEndRecordError(), "Failed to end recording of command buffer (id={}) : ", _currentIndex, vk::to_string(result)));
+            return std::unexpected(Raindrop::Error(FailedEndRecordError(), "Failed to end recording of command buffer (id={}) : ", _currentIndex, vk::to_string(result)));
         }
 
         return {};
@@ -182,7 +182,7 @@ namespace Raindrop::Render{
         _currentIndex = (_currentIndex + 1) % _bufferCount;
     }
 
-    std::expected<void, Error> RenderCommandContext::allocateBuffers(uint32_t n){
+    std::expected<void, Raindrop::Error> RenderCommandContext::allocateBuffers(uint32_t n){
         vk::CommandBufferAllocateInfo info(
             _pool,
             vk::CommandBufferLevel::ePrimary,
@@ -194,7 +194,7 @@ namespace Raindrop::Render{
         auto result = device.allocateCommandBuffers(info);
 
         if (result.result != vk::Result::eSuccess){
-            return std::unexpected(Error(FailedCommandBufferAllocationError(), "Failed to allocate {} command bufffer(s) : {}", n, vk::to_string(result.result)));
+            return std::unexpected(Raindrop::Error(FailedCommandBufferAllocationError(), "Failed to allocate {} command bufffer(s) : {}", n, vk::to_string(result.result)));
         }
 
         auto& buffers = result.value;
@@ -227,7 +227,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> RenderCommandContext::createFences(){
+    std::expected<void, Raindrop::Error> RenderCommandContext::createFences(){
         auto device = _core->deviceManager().device();
 
         vk::FenceCreateInfo info{
@@ -239,7 +239,7 @@ namespace Raindrop::Render{
             auto result = device.createFence(info);
 
             if (result.result != vk::Result::eSuccess){
-                return std::unexpected(Error(FailedFenceCreationError(), "Failed to create fence (id={}) : {}", i, vk::to_string(result.result)));
+                return std::unexpected(Raindrop::Error(FailedFenceCreationError(), "Failed to create fence (id={}) : {}", i, vk::to_string(result.result)));
             }
 
             fence = result.value;
@@ -248,7 +248,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> RenderCommandContext::createSemaphores(){
+    std::expected<void, Raindrop::Error> RenderCommandContext::createSemaphores(){
         auto device = _core->deviceManager().device();
 
         vk::SemaphoreCreateInfo info{};
@@ -258,7 +258,7 @@ namespace Raindrop::Render{
             auto result = device.createSemaphore(info);
 
             if (result.result != vk::Result::eSuccess){
-                return std::unexpected(Error(FailedSemaphoreCreationError(), "Failed to create semaphore (id={}) : {}", i, vk::to_string(result.result)));
+                return std::unexpected(Raindrop::Error(FailedSemaphoreCreationError(), "Failed to create semaphore (id={}) : {}", i, vk::to_string(result.result)));
             }
 
             semaphore = result.value;

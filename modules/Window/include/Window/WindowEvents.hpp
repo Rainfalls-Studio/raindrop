@@ -5,13 +5,13 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-namespace Raindrop::Window::Events{
+namespace Window::Events{
 
 	/**
 	 * @brief Base window event class
 	 * 
 	 */
-	class WindowEvent : public ::Raindrop::Event::Event{
+	class WindowEvent : public ::Event::Event{
 		public:
 			inline WindowEvent(const std::shared_ptr<Window>& window) noexcept : Event(), _window{window} {}
 			~WindowEvent() = default;
@@ -212,7 +212,7 @@ namespace Raindrop::Window::Events{
 	 * @brief Triggers after a window has been destroyed
 	 * 
 	 */
-	class WindowDestroyed : public ::Raindrop::Event::Event{
+	class WindowDestroyed : public ::Event::Event{
 		public:
 			inline WindowDestroyed() noexcept : Event(){}
 			~WindowDestroyed() = default;

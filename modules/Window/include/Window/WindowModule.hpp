@@ -10,12 +10,12 @@ namespace Raindrop{
     class Engine;
 }
 
-namespace Raindrop::Window{
-    class WindowModule : public IModule{
+namespace Window{
+    class WindowModule : public Raindrop::IModule{
         public:
             virtual ~WindowModule() = default;
 
-            virtual Result initialize(InitHelper& init) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& init) override;
             virtual void shutdown() override;
 
             void event();
@@ -23,7 +23,7 @@ namespace Raindrop::Window{
             std::shared_ptr<Window> createWindow(const WindowConfig& config);
         
         private:
-            Engine* _engine;
+            Raindrop::Engine* _engine;
             std::unordered_map<SDL_WindowID, std::weak_ptr<Window>> _windows;
             
     };

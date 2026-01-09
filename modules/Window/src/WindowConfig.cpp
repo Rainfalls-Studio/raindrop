@@ -1,6 +1,6 @@
 #include "Window/WindowConfig.hpp"
 
-namespace Raindrop::Window{
+namespace Window{
     WindowConfig WindowConfig::Empty() noexcept{
         return WindowConfig{
             .resolution = {1, 1},

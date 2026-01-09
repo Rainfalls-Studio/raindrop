@@ -2,10 +2,10 @@
 #include <glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
 
-namespace Raindrop::Render{
+namespace Shader{
     GLSLShader::GLSLShader(
         std::shared_ptr<Filesystem::FilesystemModule> filesystem,
-        std::shared_ptr<RenderCoreModule> core,
+        std::shared_ptr<Render::RenderCoreModule> core,
         const Filesystem::Path& path,
         const std::string& entryPoint
     ) : Shader(
@@ -138,14 +138,14 @@ namespace Raindrop::Render{
         throw std::runtime_error("Unknown shader stage: " + filename);
     }
 
-    std::expected<std::vector<uint32_t>, Error> GLSLShader::getCodeImpl(){
+    std::expected<std::vector<uint32_t>, Raindrop::Error> GLSLShader::getCodeImpl(){
 
         std::string source;
         {
             auto file = _filesystem->open(_path, Filesystem::OpenFlags::READ);
             if (!file){
                 // TODO : change to file read error
-                return std::unexpected(Error(FailedShaderModuleCreationError(), "Failed to load file : {}", _path));
+                return std::unexpected(Raindrop::Error(FailedShaderModuleCreationError(), "Failed to load file : {}", _path));
             }
 
             file->seek(0, Filesystem::SeekOrigin::END);

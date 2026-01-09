@@ -3,7 +3,7 @@
 #include "Types.hpp"
 #include <memory>
 
-namespace Raindrop::Filesystem{
+namespace Filesystem{
     class IFile{
         public:
             virtual ~IFile() = default;

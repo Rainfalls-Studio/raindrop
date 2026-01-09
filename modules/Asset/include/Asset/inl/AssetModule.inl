@@ -3,7 +3,7 @@
 #include "../Factory.hpp"
 
 
-namespace Raindrop::Asset{
+namespace Asset{
 	template<typename Asset, typename T, typename... Args>
 	std::shared_ptr<T> AssetModule::emplaceFactory(Args&&... args){
 		static_assert(std::is_base_of<Factory, T>::value, "The factory MUST be a derived class of Factory");

@@ -3,7 +3,7 @@
 #include "Event.hpp"
 #include <glm/glm.hpp>
 
-namespace Raindrop::Event{
+namespace Event{
     enum class MouseButton{
         LEFT,
         RIGHT,

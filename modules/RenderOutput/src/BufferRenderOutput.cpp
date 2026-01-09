@@ -1,7 +1,7 @@
 #include <RenderOutput/BufferRenderOutput.hpp>
 #include <spdlog/spdlog.h>
 
-namespace Raindrop::Render{
+namespace Render{
 
     class BufferRenderOutputErrorCategory : public std::error_category{
         public:
@@ -69,7 +69,7 @@ namespace Raindrop::Render{
         vmaDestroyImage(allocator, attachment.image, attachment.allocation);
     }
 
-    std::expected<void, Error> BufferRenderOutput::initialize(Engine& engine [[__maybe_unused__]]){
+    std::expected<void, Raindrop::Error> BufferRenderOutput::initialize(Raindrop::Engine& engine [[__maybe_unused__]]){
         createBuffers();
         return createRenderPass();
     }
@@ -96,7 +96,7 @@ namespace Raindrop::Render{
         _epoch++;
     }
 
-    std::expected<void, Error> BufferRenderOutput::createRenderPass(){
+    std::expected<void, Raindrop::Error> BufferRenderOutput::createRenderPass(){
         auto device = _core->deviceManager().device();
 
         std::vector<vk::AttachmentDescription> attachments;
@@ -200,7 +200,7 @@ namespace Raindrop::Render{
         };
 
         if (auto result = device.createRenderPass(info); result.result != vk::Result::eSuccess){
-            return std::unexpected(Error(FailedRenderPassCreationError(), "Failed to create render pass : {}", vk::to_string(result.result)));
+            return std::unexpected(Raindrop::Error(FailedRenderPassCreationError(), "Failed to create render pass : {}", vk::to_string(result.result)));
         } else {
             _renderPass = result.value;
         }
@@ -208,7 +208,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> BufferRenderOutput::createBuffer(Buffer& buffer){
+    std::expected<void, Raindrop::Error> BufferRenderOutput::createBuffer(Buffer& buffer){
 
         // create color attachments
         buffer.colorAttachments.resize(_colorDescriptions.size());
@@ -267,7 +267,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<vk::Framebuffer, Error> BufferRenderOutput::createFramebuffer(const Buffer& buffer){
+    std::expected<vk::Framebuffer, Raindrop::Error> BufferRenderOutput::createFramebuffer(const Buffer& buffer){
         
         auto device = _core->deviceManager().device();
 
@@ -297,14 +297,14 @@ namespace Raindrop::Render{
         auto result = device.createFramebuffer(info);
 
         if (result.result != vk::Result::eSuccess){
-            return std::unexpected(Error(FailedFramebufferCreationError(), "Failed to create framebuffer : {}", vk::to_string(result.result)));
+            return std::unexpected(Raindrop::Error(FailedFramebufferCreationError(), "Failed to create framebuffer : {}", vk::to_string(result.result)));
         }
 
         return result.value;
     }
 
 
-    std::expected<std::pair<vk::Image, VmaAllocation>, Error> BufferRenderOutput::createAttachmentImage(const AttachmentDescription& description){
+    std::expected<std::pair<vk::Image, VmaAllocation>, Raindrop::Error> BufferRenderOutput::createAttachmentImage(const AttachmentDescription& description){
         auto allocator = _core->allocator();
 
         vk::ImageCreateInfo info{
@@ -348,13 +348,13 @@ namespace Raindrop::Render{
         ));
 
         if (result !=  vk::Result::eSuccess){
-            return std::unexpected(Error(FailedAttachmentImageCreationError(), "Failed to create attachment image : {}", vk::to_string(result)));
+            return std::unexpected(Raindrop::Error(FailedAttachmentImageCreationError(), "Failed to create attachment image : {}", vk::to_string(result)));
         }
 
         return std::make_pair(image, allocation);
     }
 
-    std::expected<vk::ImageView, Error> BufferRenderOutput::createAttachmentImageView(const AttachmentDescription& description, vk::Image image, bool isDepth){
+    std::expected<vk::ImageView, Raindrop::Error> BufferRenderOutput::createAttachmentImageView(const AttachmentDescription& description, vk::Image image, bool isDepth){
         auto device = _core->deviceManager().device();
 
         vk::ImageViewCreateInfo info{
@@ -373,13 +373,13 @@ namespace Raindrop::Render{
         auto result = device.createImageView(info);
 
         if (result.result != vk::Result::eSuccess){
-            return std::unexpected(Error(FailedAttachmentImageViewCreationError(), "Failed to create attachment image view : {}", vk::to_string(result.result)));
+            return std::unexpected(Raindrop::Error(FailedAttachmentImageViewCreationError(), "Failed to create attachment image view : {}", vk::to_string(result.result)));
         }
 
         return result.value;
     }
 
-    std::expected<vk::Semaphore, Error> BufferRenderOutput::acquire(vk::Fence fence [[__maybe_unused__]], uint64_t timeout [[__maybe_unused__]]){
+    std::expected<vk::Semaphore, Raindrop::Error> BufferRenderOutput::acquire(vk::Fence fence [[__maybe_unused__]], uint64_t timeout [[__maybe_unused__]]){
         
         auto& buffer = _buffers[_currentIndex];
 
@@ -396,7 +396,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> BufferRenderOutput::present(vk::Semaphore finishedSemaphore [[__maybe_unused__]]){
+    std::expected<void, Raindrop::Error> BufferRenderOutput::present(vk::Semaphore finishedSemaphore [[__maybe_unused__]]){
         _currentIndex = (_currentIndex + 1) % _bufferCount;
         return {};
     }

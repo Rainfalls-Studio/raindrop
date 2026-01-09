@@ -5,19 +5,19 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
-	return new Raindrop::Event::EventModule();
+	return new Event::EventModule();
 }
 
 extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
-namespace Raindrop::Event{
+namespace Event{
     EventModule::EventModule(){}
 
-    Result EventModule::initialize(InitHelper& init){
+    Raindrop::Result EventModule::initialize(Raindrop::InitHelper& init){
         _layers = init.getDependencyAs<Layers::LayerModule>("Layers");
-        return Result::Success();
+        return Raindrop::Result::Success();
     }
 
     void EventModule::_createLogger(){

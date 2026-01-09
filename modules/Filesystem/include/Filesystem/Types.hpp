@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-namespace Raindrop::Filesystem{
+namespace Filesystem{
     using Offset = size_t;
     using Size = size_t;
 

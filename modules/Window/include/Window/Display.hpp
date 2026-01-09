@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <string_view>
 
-namespace Raindrop::Window{
+namespace Window{
     class Display{
         public:
             Display(SDL_DisplayID id);

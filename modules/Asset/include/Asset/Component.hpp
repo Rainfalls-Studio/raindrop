@@ -2,7 +2,7 @@
 
 #include "Asset.hpp"
 
-namespace Raindrop::Asset{
+namespace Asset{
 	class Component{
 		public:
 			Component() = default;

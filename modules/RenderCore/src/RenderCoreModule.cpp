@@ -27,7 +27,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
 }
 
 extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
-	return new Raindrop::Render::RenderCoreModule();
+	return new Render::RenderCoreModule();
 }
 
 extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
@@ -35,7 +35,7 @@ extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 }
 
 
-namespace Raindrop::Render{
+namespace Render{
     class RenderCoreErrorCategory : public std::error_category{
         public:
             const char* name() const noexcept override{
@@ -67,7 +67,7 @@ namespace Raindrop::Render{
 
     RenderCoreModule::RenderCoreModule(){}
 
-    Result RenderCoreModule::initialize(InitHelper& helper){
+    Raindrop::Result RenderCoreModule::initialize(Raindrop::InitHelper& helper){
         _engine = &helper.engine();
         _windowModule = std::dynamic_pointer_cast<Window::WindowModule>(helper.dependencies().at("Window"));
 
@@ -88,10 +88,10 @@ namespace Raindrop::Render{
 
         if (!result){
             const auto& error = result.error();
-            return Result::Error(error.message() + " " + error.reason());
+            return Raindrop::Result::Error(error.message() + " " + error.reason());
         }
 
-        return Result::Success();
+        return Raindrop::Result::Success();
     }
 
     DeviceManager& RenderCoreModule::deviceManager() noexcept{
@@ -107,10 +107,10 @@ namespace Raindrop::Render{
         _deviceManager.shutdown();
     }
 
-    std::expected<void, Error> RenderCoreModule::findQueues(){
+    std::expected<void, Raindrop::Error> RenderCoreModule::findQueues(){
         auto device = _deviceManager.vkbDevice();
 
-        auto getQueue = [&] (Queue& queue, vkb::QueueType type) -> std::expected<void, Error> {
+        auto getQueue = [&] (Queue& queue, vkb::QueueType type) -> std::expected<void, Raindrop::Error> {
             auto vkbQueue = device.get_queue(type);
             auto index = device.get_queue_index(type);
 
@@ -125,7 +125,7 @@ namespace Raindrop::Render{
                     case vkb::QueueType::transfer: str_type="transfer"; break; 
                 }
 
-                return std::unexpected(Error(NoCompatibleQueueFamilyError(), "Failed to find \"{}\" queue family : {}", str_type, error.message()));
+                return std::unexpected(Raindrop::Error(NoCompatibleQueueFamilyError(), "Failed to find \"{}\" queue family : {}", str_type, error.message()));
             }
 
             vk::QueueFlags flags;
@@ -151,7 +151,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> RenderCoreModule::createVmaAllocator(){
+    std::expected<void, Raindrop::Error> RenderCoreModule::createVmaAllocator(){
 
         VmaVulkanFunctions vulkanFuncs{};
         vulkanFuncs.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
@@ -172,7 +172,7 @@ namespace Raindrop::Render{
         };
 
         if (auto result = vmaCreateAllocator(&info, &_allocator); result != VK_SUCCESS){
-            return std::unexpected(Error(FailedAllocatorCreationError(), "Failed to create VMA Allocator : ", vk::to_string(vk::Result(result))));
+            return std::unexpected(Raindrop::Error(FailedAllocatorCreationError(), "Failed to create VMA Allocator : ", vk::to_string(vk::Result(result))));
         }
 
         return {};

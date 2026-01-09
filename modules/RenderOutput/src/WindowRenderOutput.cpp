@@ -3,11 +3,13 @@
 #include "RenderOutput/RenderOutputModule.hpp"
 #include <spdlog/spdlog.h>
 
+namespace Time = Raindrop::Time;
+
 // this will make the window use render pass
 // The absence of this define will make the window use only copy mechanism to render
 #define RENDERPASS
 
-namespace Raindrop::Render{
+namespace Render{
     WindowRenderOutput::Swapchain::Swapchain(RenderCoreModule& core_, vk::SwapchainKHR swapchain_) :
         core{core_},
         swapchain{swapchain_}
@@ -54,7 +56,7 @@ namespace Raindrop::Render{
         _wantedFrameCount = 2;
     }
 
-    std::expected<void, Error> WindowRenderOutput::initialize(Engine& engine){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::initialize(Raindrop::Engine& engine){
         _core = engine.getModuleManager().getModuleAs<RenderCoreModule>("RenderCore").get();
 
         spdlog::info("Initializing window render output...");
@@ -142,12 +144,12 @@ namespace Raindrop::Render{
         }
     }
 
-    std::expected<void, Error> WindowRenderOutput::createSurface(){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::createSurface(){
         auto window = _window.lock();
 
         if (!window){
             spdlog::error("Window is not valid");
-            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
+            return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
         }
 
         spdlog::info("Creating a vulkan surface...");
@@ -155,14 +157,14 @@ namespace Raindrop::Render{
         if (!result){
             auto& error = result.error();
             spdlog::error("Failed to create surface : {} : {}", error.message(), error.reason());
-            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create surface : {} : {}", error.message(), error.reason()));
+            return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create surface : {} : {}", error.message(), error.reason()));
         }
 
         _surface = result.value();
         return {};
     }
 
-    std::expected<void, Error> WindowRenderOutput::rebuildSwapchain(){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::rebuildSwapchain(){
         auto window = _window.lock();
         auto device = _core->deviceManager().device();
 
@@ -234,7 +236,7 @@ namespace Raindrop::Render{
 
             if (result.result != vk::Result::eSuccess){
                 spdlog::error("Failed to create swapchain : {}", vk::to_string(result.result));
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create swapchain"));
+                return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create swapchain"));
 
             }
 
@@ -254,7 +256,7 @@ namespace Raindrop::Render{
             .and_then([this]{return createSyncObjects();});
     }
 
-    std::expected<void, Error> WindowRenderOutput::getSupport(){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::getSupport(){
         auto core = *_core;
 
         auto physicalDevice = core.deviceManager().physicalDevice();
@@ -266,11 +268,11 @@ namespace Raindrop::Render{
         if (_support.supported()){
             return {};
         } else {
-            return std::unexpected(Error(RenderOutputModule::MissingSurfaceSupportError()));
+            return std::unexpected(Raindrop::Error(RenderOutputModule::MissingSurfaceSupportError()));
         }
     }
 
-    std::expected<void, Error> WindowRenderOutput::getSwapchainImages(){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::getSwapchainImages(){
         std::vector<vk::Image> images;
 
         auto device = _core->deviceManager().device();
@@ -280,7 +282,7 @@ namespace Raindrop::Render{
             
             if (result.result != vk::Result::eSuccess){
                 spdlog::error("Failed to get swapchain images : {}", vk::to_string(result.result));
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to get swapchain images"));
+                return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed to get swapchain images"));
             }
 
             images = result.value;
@@ -292,7 +294,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> WindowRenderOutput::createImageViews(){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::createImageViews(){
         auto device = _core->deviceManager().device();
 
         for (size_t i=0; i<_frameCount; i++){
@@ -316,7 +318,7 @@ namespace Raindrop::Render{
 
             if (result.result != vk::Result::eSuccess){
                 spdlog::error("Failed to create frame image view : {}", vk::to_string(result.result));
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create image view"));
+                return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create image view"));
             }
 
             frame.imageView = result.value;
@@ -326,7 +328,7 @@ namespace Raindrop::Render{
     }
 
 
-    std::expected<void, Error> WindowRenderOutput::createFramebuffers(){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::createFramebuffers(){
         auto device = _core->deviceManager().device();
 
         for (size_t i=0; i<_frameCount; i++){
@@ -343,7 +345,7 @@ namespace Raindrop::Render{
 
             if (result.result != vk::Result::eSuccess){
                 spdlog::error("Failed to create framebuffer : {}", vk::to_string(result.result));
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create framebuffer"));
+                return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create framebuffer"));
             }
 
             frame.framebuffer = result.value;
@@ -353,7 +355,7 @@ namespace Raindrop::Render{
     }
 
 
-    std::expected<void, Error> WindowRenderOutput::createSyncObjects(){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::createSyncObjects(){
         auto device = _core->deviceManager().device();
 
 		vk::SemaphoreCreateInfo semaphoreInfo;
@@ -363,7 +365,7 @@ namespace Raindrop::Render{
 
             if (result.result != vk::Result::eSuccess){
                 spdlog::error("Failed to create vulkan swapchain sync object : {}", vk::to_string(result.result));
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "failed to create vulkan swapchain sync object"));
+                return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "failed to create vulkan swapchain sync object"));
 
             }
             
@@ -373,7 +375,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> WindowRenderOutput::createRenderPass(){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::createRenderPass(){
 
         vk::RenderPassCreateInfo info;
 
@@ -417,7 +419,7 @@ namespace Raindrop::Render{
 
         if (result.result != vk::Result::eSuccess){
             spdlog::error("Failed to create render pass : {}", vk::to_string(result.result));
-            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create render pass"));
+            return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed to create render pass"));
         }
 
         _renderPass = result.value;
@@ -429,11 +431,11 @@ namespace Raindrop::Render{
         _rebuildPending = true;
     }
 
-    std::expected<vk::Semaphore, Error> WindowRenderOutput::acquire(vk::Fence fence, uint64_t timeout){
+    std::expected<vk::Semaphore, Raindrop::Error> WindowRenderOutput::acquire(vk::Fence fence, uint64_t timeout){
         auto window = _window.lock();
         if (!window){
             spdlog::error("Window is not valid");
-            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
+            return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
         }
 
         _acquired = false;
@@ -455,7 +457,7 @@ namespace Raindrop::Render{
 
             if (result != vk::Result::eSuccess && result != vk::Result::eTimeout){
                 spdlog::error("Failed to wait for in-flight fence : {}", vk::to_string(result));
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to wait for in-flight fence : {}", vk::to_string(result)));
+                return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed to wait for in-flight fence : {}", vk::to_string(result)));
             }
 
             // The framegraph already resets the fence
@@ -474,7 +476,7 @@ namespace Raindrop::Render{
 
             default:{
                 spdlog::error("Failed to acquire swapchain image : {}", vk::to_string(result));
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed acquire swapchain image : {}", vk::to_string(result)));
+                return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed acquire swapchain image : {}", vk::to_string(result)));
             }
         }
 
@@ -482,11 +484,11 @@ namespace Raindrop::Render{
         return frame.imageAvailable;
     }
 
-    std::expected<void, Error> WindowRenderOutput::present(vk::Semaphore finishedSemaphore){
+    std::expected<void, Raindrop::Error> WindowRenderOutput::present(vk::Semaphore finishedSemaphore){
 
         auto lock = _window.lock();
         if (!lock){
-            return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
+            return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "The window is not valid"));
         }
 
         // Check for window resize before presenting
@@ -520,7 +522,7 @@ namespace Raindrop::Render{
 
             default: {
                 spdlog::error("Failed to present swapchain image : {}", vk::to_string(result));
-                return std::unexpected(Error(RenderOutputModule::FailedObjectCreationError(), "Failed to present swapchain image : {}", vk::to_string(result)));
+                return std::unexpected(Raindrop::Error(RenderOutputModule::FailedObjectCreationError(), "Failed to present swapchain image : {}", vk::to_string(result)));
             }
         }
 

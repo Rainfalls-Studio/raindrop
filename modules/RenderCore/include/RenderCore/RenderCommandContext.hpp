@@ -10,7 +10,7 @@
 #include <Scheduler/IStage.hpp>
 #include <Raindrop/Error.hpp>
 
-namespace Raindrop::Render{
+namespace Render{
     class RenderCommandContext{
         public:
             enum class ErrorCode{
@@ -99,8 +99,8 @@ namespace Raindrop::Render{
             RenderCommandContext(std::shared_ptr<RenderCoreModule> core, Queue::Type type, uint32_t bufferCount = 1, const std::string& name = {});
             ~RenderCommandContext();
 
-            std::expected<vk::CommandBuffer, Error> begin();
-            std::expected<void, Error> end();
+            std::expected<vk::CommandBuffer, Raindrop::Error> begin();
+            std::expected<void, Raindrop::Error> end();
             void nextFrame();
 
             uint32_t currentIndex() const;
@@ -134,11 +134,11 @@ namespace Raindrop::Render{
             bool _recording = false;
             bool _skipFrame = false;
 
-            std::expected<void, Error> createPool();
+            std::expected<void, Raindrop::Error> createPool();
             void destroyPool();
-            std::expected<void, Error> allocateBuffers(uint32_t n);
-            std::expected<void, Error> createFences();
-            std::expected<void, Error> createSemaphores();
+            std::expected<void, Raindrop::Error> allocateBuffers(uint32_t n);
+            std::expected<void, Raindrop::Error> createFences();
+            std::expected<void, Raindrop::Error> createSemaphores();
 
             void freeCommandBuffers();
             void destroyFences();

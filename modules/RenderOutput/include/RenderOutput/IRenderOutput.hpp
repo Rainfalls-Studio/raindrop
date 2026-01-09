@@ -5,26 +5,26 @@
 #include <Scheduler/IStage.hpp>
 #include <RenderCore/RenderCommandContext.hpp>
 
-namespace Raindrop::Render{
+namespace Render{
     class IRenderOutput{
         public:
             using Name = std::string;
 
             class BeginStage : public Scheduler::IStage{
                 public:
-                    BeginStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<RenderCommandContext> cmdCtx);
+                    BeginStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<Render::RenderCommandContext> cmdCtx);
 
                     virtual const char* name() const override;
                     virtual Scheduler::StageResult execute() override;
 
                 private:
                     std::weak_ptr<IRenderOutput> _output;
-                    std::weak_ptr<RenderCommandContext> _cmdCtx;
+                    std::weak_ptr<Render::RenderCommandContext> _cmdCtx;
             };
 
             class EndStage : public Scheduler::IStage{
                 public:
-                    EndStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<RenderCommandContext> cmdCtx);
+                    EndStage(std::shared_ptr<IRenderOutput> output, std::shared_ptr<Render::RenderCommandContext> cmdCtx);
 
                     virtual const char* name() const override;
                     virtual Scheduler::StageResult execute() override;
@@ -47,7 +47,7 @@ namespace Raindrop::Render{
                     virtual Scheduler::StageResult execute() override;
                 
                 private:
-                    Engine* _engine;
+                    Raindrop::Engine* _engine;
                     std::weak_ptr<IRenderOutput> _output;
                     std::weak_ptr<RenderCommandContext> _cmdCtx;
             };
@@ -65,18 +65,18 @@ namespace Raindrop::Render{
                     virtual Scheduler::StageResult execute() override;
                 
                 private:
-                    Engine* _engine;
+                    Raindrop::Engine* _engine;
                     std::weak_ptr<IRenderOutput> _output;
                     std::weak_ptr<RenderCommandContext> _cmdCtx;
             };
 
             virtual ~IRenderOutput() = default;
 
-            virtual std::expected<void, Error> initialize(Engine& engine) = 0;
+            virtual std::expected<void, Raindrop::Error> initialize(Raindrop::Engine& engine) = 0;
             virtual void shutdown() = 0;
 
-            virtual std::expected<vk::Semaphore, Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) = 0;
-            virtual std::expected<void, Error> present(vk::Semaphore finishedSemaphore = {}) = 0;
+            virtual std::expected<vk::Semaphore, Raindrop::Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) = 0;
+            virtual std::expected<void, Raindrop::Error> present(vk::Semaphore finishedSemaphore = {}) = 0;
 
             virtual uint32_t getCurrentBufferIndex() const = 0;
             virtual uint32_t getBufferCount() const = 0;

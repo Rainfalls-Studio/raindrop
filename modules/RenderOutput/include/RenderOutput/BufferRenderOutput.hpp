@@ -5,7 +5,7 @@
 
 #include "IRenderOutput.hpp"
 
-namespace Raindrop::Render{
+namespace Render{
     class BufferRenderOutput : public IRenderOutput{
         public:
             enum class ErrorCode{
@@ -48,11 +48,11 @@ namespace Raindrop::Render{
             BufferRenderOutput(std::shared_ptr<RenderCoreModule> core, const Info& info);
             virtual ~BufferRenderOutput();
 
-            virtual std::expected<void, Error> initialize(Engine& engine) override;
+            virtual std::expected<void, Raindrop::Error> initialize(Raindrop::Engine& engine) override;
             virtual void shutdown() override;
 
-            virtual std::expected<vk::Semaphore, Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) override;
-            virtual std::expected<void, Error> present(vk::Semaphore finishedSemaphore = {}) override;
+            virtual std::expected<vk::Semaphore, Raindrop::Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) override;
+            virtual std::expected<void, Raindrop::Error> present(vk::Semaphore finishedSemaphore = {}) override;
 
             virtual uint32_t getCurrentBufferIndex() const override;
             virtual uint32_t getBufferCount() const override;
@@ -112,12 +112,12 @@ namespace Raindrop::Render{
             bool _acquired = false;
 
             void createBuffers();
-            std::expected<void, Error> createRenderPass();
-            std::expected<void, Error> createBuffer(Buffer& buffer);
-            std::expected<std::pair<vk::Image, VmaAllocation>, Error> createAttachmentImage(const AttachmentDescription& description);
-            std::expected<vk::ImageView, Error> createAttachmentImageView(const AttachmentDescription& description, vk::Image image, bool isDepth);
-            std::expected<vk::DeviceMemory, Error> allocateAttachmentMemory(const AttachmentDescription& buffer, vk::Image image);
-            std::expected<vk::Framebuffer, Error> createFramebuffer(const Buffer& buffer);
+            std::expected<void, Raindrop::Error> createRenderPass();
+            std::expected<void, Raindrop::Error> createBuffer(Buffer& buffer);
+            std::expected<std::pair<vk::Image, VmaAllocation>, Raindrop::Error> createAttachmentImage(const AttachmentDescription& description);
+            std::expected<vk::ImageView, Raindrop::Error> createAttachmentImageView(const AttachmentDescription& description, vk::Image image, bool isDepth);
+            std::expected<vk::DeviceMemory, Raindrop::Error> allocateAttachmentMemory(const AttachmentDescription& buffer, vk::Image image);
+            std::expected<vk::Framebuffer, Raindrop::Error> createFramebuffer(const Buffer& buffer);
 
             void destroyBuffers();
             void destroyBuffer(Buffer& buffer);

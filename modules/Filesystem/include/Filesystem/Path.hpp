@@ -5,7 +5,7 @@
 #include <format>
 #include <fmt/format.h>
 
-namespace Raindrop::Filesystem{
+namespace Filesystem{
     class Path{
         public:
             Path() = default;
@@ -90,24 +90,24 @@ namespace Raindrop::Filesystem{
 
 namespace std{
     template<>
-    struct hash<Raindrop::Filesystem::Path>{
-        std::size_t operator()(const Raindrop::Filesystem::Path& path) const noexcept{
+    struct hash<Filesystem::Path>{
+        std::size_t operator()(const Filesystem::Path& path) const noexcept{
             static std::hash<std::filesystem::path> h; 
             return h(path._storage);
         }
     };
 
     template <>
-    struct formatter<Raindrop::Filesystem::Path> : formatter<std::string>{
-        auto format(const Raindrop::Filesystem::Path& path, std::format_context& ctx) const {
+    struct formatter<Filesystem::Path> : formatter<std::string>{
+        auto format(const Filesystem::Path& path, std::format_context& ctx) const {
             return formatter<std::string>::format(path._storage.string(), ctx);
         }
     };
 }
 
 template <>
-struct fmt::formatter<Raindrop::Filesystem::Path> : fmt::formatter<std::string> {
-    auto format(const Raindrop::Filesystem::Path& path, fmt::format_context& ctx) const {
+struct fmt::formatter<Filesystem::Path> : fmt::formatter<std::string> {
+    auto format(const Filesystem::Path& path, fmt::format_context& ctx) const {
         return fmt::formatter<std::string>::format(path._storage.string(), ctx);
     }
 };

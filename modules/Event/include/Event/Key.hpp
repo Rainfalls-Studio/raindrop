@@ -2,7 +2,7 @@
 
 #include "Raindrop/Utils/Flags.hpp"
 
-namespace Raindrop::Event{
+namespace Event{
 
 	/**
 	 * @brief From SDL_Scancode

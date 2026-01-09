@@ -4,7 +4,7 @@
 #include "Types.hpp"
 #include "IFile.hpp"
 
-namespace Raindrop::Filesystem{
+namespace Filesystem{
     class IFile;
 
     class IProvider{

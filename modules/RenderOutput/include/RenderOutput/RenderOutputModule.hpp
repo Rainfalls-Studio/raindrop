@@ -6,8 +6,8 @@
 
 #include "IRenderOutput.hpp"
 
-namespace Raindrop::Render{
-    class RenderOutputModule : public IModule{
+namespace Render{
+    class RenderOutputModule : public Raindrop::IModule{
         public:
             enum class ErrorCode{
                 FAILED_OBJECT_CREATION,
@@ -26,7 +26,7 @@ namespace Raindrop::Render{
             RenderOutputModule();
             ~RenderOutputModule();
 
-            virtual Result initialize(InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
             virtual void shutdown() override;
 
             SharedRenderOutput getOutput(const IRenderOutput::Name& name);
@@ -70,7 +70,7 @@ namespace Raindrop::Render{
                 }
             };
 
-            Engine* _engine;
+            Raindrop::Engine* _engine;
             std::shared_ptr<RenderCoreModule> _core;
             std::unordered_map<IRenderOutput::Name, std::shared_ptr<RenderOutputInfo>> _outputs;
             

@@ -6,17 +6,17 @@
 #include "IRenderOutput.hpp"
 #include <Window/Window.hpp>
 
-namespace Raindrop::Render{
+namespace Render{
     class WindowRenderOutput : public IRenderOutput{
         public:
             WindowRenderOutput(Window::SharedWindow window);
             virtual ~WindowRenderOutput() = default;
 
-            virtual std::expected<void, Error> initialize(Engine& engine) override;
+            virtual std::expected<void, Raindrop::Error> initialize(Raindrop::Engine& engine) override;
             virtual void shutdown() override;
 
-            virtual std::expected<vk::Semaphore, Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) override;
-            virtual std::expected<void, Error> present(vk::Semaphore finishedSemaphore = {}) override;
+            virtual std::expected<vk::Semaphore, Raindrop::Error> acquire(vk::Fence fence, uint64_t timeout = UINT64_MAX) override;
+            virtual std::expected<void, Raindrop::Error> present(vk::Semaphore finishedSemaphore = {}) override;
 
             virtual uint32_t getCurrentBufferIndex() const override;
             virtual uint32_t getBufferCount() const override;
@@ -111,13 +111,13 @@ namespace Raindrop::Render{
             void findFrameCount();
             void findExtent(const vk::Extent2D& wanted);
 
-            std::expected<void, Error> createSurface();
-            std::expected<void, Error> rebuildSwapchain();
-            std::expected<void, Error> getSupport();
-            std::expected<void, Error> getSwapchainImages();
-            std::expected<void, Error> createImageViews();
-            std::expected<void, Error> createFramebuffers();
-            std::expected<void, Error> createSyncObjects();
-            std::expected<void, Error> createRenderPass();
+            std::expected<void, Raindrop::Error> createSurface();
+            std::expected<void, Raindrop::Error> rebuildSwapchain();
+            std::expected<void, Raindrop::Error> getSupport();
+            std::expected<void, Raindrop::Error> getSwapchainImages();
+            std::expected<void, Raindrop::Error> createImageViews();
+            std::expected<void, Raindrop::Error> createFramebuffers();
+            std::expected<void, Raindrop::Error> createSyncObjects();
+            std::expected<void, Raindrop::Error> createRenderPass();
     };
 }

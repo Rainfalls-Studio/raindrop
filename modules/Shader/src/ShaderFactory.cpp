@@ -2,12 +2,13 @@
 #include "Shader/GLSLShader.hpp"
 
 #include <Raindrop/Engine.hpp>
+#include <unordered_set>
 
-namespace Raindrop::Render{
-    ShaderFactory::ShaderFactory(Engine& engine){
+namespace Shader{
+    ShaderFactory::ShaderFactory(Raindrop::Engine& engine){
         auto& modules = engine.getModuleManager();
 
-        _renderCore = modules.getModuleAs<RenderCoreModule>("RenderCore");
+        _renderCore = modules.getModuleAs<Render::RenderCoreModule>("RenderCore");
         _filesystem = modules.getModuleAs<Filesystem::FilesystemModule>("Filesystem");
     }
 
@@ -16,6 +17,11 @@ namespace Raindrop::Render{
     }
 
     std::shared_ptr<Asset::Asset> ShaderFactory::getOrCreate(const Filesystem::Path& path){
+    
+        const std::unordered_set<std::string> validExtensions = {
+            ".glsl", ".vert", ".frag", ".geom", ".comp", ".tect", ".tese"
+        };
+
         const auto& ext = path.extension();
 
         if (auto it=_shaders.find(path); it != _shaders.end()){
@@ -26,7 +32,7 @@ namespace Raindrop::Render{
             }
         }
 
-        if (ext == ".glsl" || ext == ".vert" || ext == ".frag" || ext == ".geom" || ext == ".comp" || ext == ".tesc" || ext == ".tese"){
+        if (validExtensions.count(ext)){
             auto shader =  std::make_shared<GLSLShader>(_filesystem, _renderCore, path);
             _shaders[path] = shader;
             return shader;

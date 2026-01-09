@@ -4,7 +4,7 @@
 #include <string>
 #include "Filesystem/Path.hpp"
 
-namespace Raindrop::Asset{
+namespace Asset{
 	class Asset;
 
 	class Factory{

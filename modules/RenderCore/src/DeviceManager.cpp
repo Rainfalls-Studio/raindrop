@@ -19,7 +19,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
 }
 
 
-namespace Raindrop::Render{
+namespace Render{
     class DeviceManagerErrorCategory : public std::error_category{
         public:
             const char* name() const noexcept override{
@@ -46,7 +46,7 @@ namespace Raindrop::Render{
     DeviceManager::DeviceManager(){}
     DeviceManager::~DeviceManager(){}
 
-    std::expected<void, Error> DeviceManager::initialize(vk::SurfaceKHR& surface, std::shared_ptr<Window::Window>& window){
+    std::expected<void, Raindrop::Error> DeviceManager::initialize(vk::SurfaceKHR& surface, std::shared_ptr<Window::Window>& window){
         
         InitData data{
             surface,
@@ -77,7 +77,7 @@ namespace Raindrop::Render{
     }
 
 
-    std::expected<void, Error> DeviceManager::createInstance(InitData& init){
+    std::expected<void, Raindrop::Error> DeviceManager::createInstance(InitData& init){
         vkb::InstanceBuilder builder;
 
         if (init.window){
@@ -101,7 +101,7 @@ namespace Raindrop::Render{
 
         if (!result){
             const auto& error = result.error();
-            return std::unexpected(Error(FailedInstanceCreationError(), "Failed to create instance : {}", error.message()));
+            return std::unexpected(Raindrop::Error(FailedInstanceCreationError(), "Failed to create instance : {}", error.message()));
         }
 
         _instance = *result;
@@ -110,7 +110,7 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> DeviceManager::pickPhysicalDevice(InitData& init){
+    std::expected<void, Raindrop::Error> DeviceManager::pickPhysicalDevice(InitData& init){
         vkb::PhysicalDeviceSelector selector(_instance);
         
         if (init.window){
@@ -133,7 +133,7 @@ namespace Raindrop::Render{
         
         if (!result){
             const auto& error = result.error();
-            return std::unexpected(Error(PhysicalDeviceNotFoundError(), "Failed to find physical device : {}", error.message()));
+            return std::unexpected(Raindrop::Error(PhysicalDeviceNotFoundError(), "Failed to find physical device : {}", error.message()));
         }
 
         auto device = result.value();
@@ -146,14 +146,14 @@ namespace Raindrop::Render{
         return {};
     }
 
-    std::expected<void, Error> DeviceManager::createDevice(InitData& ){
+    std::expected<void, Raindrop::Error> DeviceManager::createDevice(InitData& ){
         vkb::DeviceBuilder builder(_physicalDevice);
 
         auto result = builder.build();
 
         if (!result){
             const auto& error = result.error();
-            return std::unexpected(Error(FailedDeviceCreationError(), "Failed to create device : {}", error.message()));
+            return std::unexpected(Raindrop::Error(FailedDeviceCreationError(), "Failed to create device : {}", error.message()));
         }
 
         _device = *result;

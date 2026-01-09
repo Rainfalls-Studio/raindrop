@@ -4,14 +4,14 @@
 #include <expected>
 #include <Raindrop/Error.hpp>
 
-namespace Raindrop::Asset{
+namespace Asset{
 	class Asset{
 		public:
 			virtual ~Asset() = default;
 
-            virtual std::expected<void, Error> load() = 0;
-            virtual std::expected<void, Error> reload() = 0;
-            virtual std::expected<void, Error> unload() = 0;
+            virtual std::expected<void, Raindrop::Error> load() = 0;
+            virtual std::expected<void, Raindrop::Error> reload() = 0;
+            virtual std::expected<void, Raindrop::Error> unload() = 0;
 
             virtual bool isLoaded() = 0;
 

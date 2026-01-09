@@ -5,7 +5,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
-	return new Raindrop::ImGui::ImGuiModule();
+	return new ImGui::ImGuiModule();
 }
 
 extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
@@ -13,17 +13,17 @@ extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 }
 
 
-namespace Raindrop::ImGui{
+namespace ImGui{
     ImGuiModule::ImGuiModule(){}
     ImGuiModule::~ImGuiModule(){}
 
-    Result ImGuiModule::initialize(InitHelper& helper){
+    Raindrop::Result ImGuiModule::initialize(Raindrop::InitHelper& helper){
         _engine = &helper.engine();
         _core = helper.getDependencyAs<Render::RenderCoreModule>("RenderCore");
 
         createLogger();
 
-        return Result::Success();
+        return Raindrop::Result::Success();
     }
 
     void ImGuiModule::createLogger(){

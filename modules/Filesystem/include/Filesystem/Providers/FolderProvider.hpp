@@ -2,7 +2,7 @@
 
 #include "../IProvider.hpp"
 
-namespace Raindrop::Filesystem{
+namespace Filesystem{
     class FolderProvider : public IProvider{
         public:
             FolderProvider(const Path& root);

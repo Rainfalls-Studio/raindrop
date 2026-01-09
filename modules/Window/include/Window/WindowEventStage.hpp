@@ -3,7 +3,7 @@
 #include <Scheduler/IStage.hpp>
 #include "WindowModule.hpp"
 
-namespace Raindrop::Window{
+namespace Window{
     class EventStage : public Scheduler::IStage{
         public:
             virtual ~EventStage() = default;

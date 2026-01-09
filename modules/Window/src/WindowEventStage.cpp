@@ -2,7 +2,7 @@
 #include "Window/WindowModule.hpp"
 #include <Raindrop/Engine.hpp>
 
-namespace Raindrop::Window{
+namespace Window{
     void EventStage::initialize(Scheduler::StageInitHelper& helper){
         auto& modules = helper.engine().getModuleManager();
         _windowModule = modules.getModuleAs<WindowModule>("Window");

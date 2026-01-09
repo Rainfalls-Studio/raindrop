@@ -1,7 +1,7 @@
 #include "Window/Display.hpp"
 #include <stdexcept>
 
-namespace Raindrop::Window{
+namespace Window{
     Display::Display(SDL_DisplayID id) : _id{id}{}
 
     glm::u32vec2 Display::getResolution() const{

@@ -10,7 +10,7 @@
 #include "WindowConfig.hpp"
 #include "Display.hpp"
 
-namespace Raindrop::Window{
+namespace Window{
     class Window{
         public:
             Window(const WindowConfig& config);
@@ -24,7 +24,7 @@ namespace Raindrop::Window{
             float scale() const;
 
 			std::vector<std::string_view> getInstanceExtensions();
-			std::expected<vk::SurfaceKHR, Error> createSurface(vk::Instance instance);
+			std::expected<vk::SurfaceKHR, Raindrop::Error> createSurface(vk::Instance instance);
 
             inline bool resized() const {
                 return _resized;

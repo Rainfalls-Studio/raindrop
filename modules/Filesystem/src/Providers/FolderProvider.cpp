@@ -1,10 +1,9 @@
 #include "Filesystem/Providers/FolderProvider.hpp"
 
 #include <filesystem>
-#include <cstring>
 #include <fstream>
 
-namespace Raindrop::Filesystem{
+namespace Filesystem{
     class File : public IFile{
         public:
             File(const Path& path, OpenFlags flags){

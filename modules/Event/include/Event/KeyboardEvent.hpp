@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <string>
 
-namespace Raindrop::Event{
+namespace Event{
     
     class KeyboardEvent : public Event{
         // KeyboardID keyboard;
