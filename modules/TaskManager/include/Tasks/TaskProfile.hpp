@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <Raindrop/Time/Clock.hpp>
 
-namespace Raindrop::Tasks{
+namespace Tasks{
     struct TaskProfile {
         TaskProfile() = default;
         TaskProfile(const TaskProfile& other) : 
@@ -20,8 +20,8 @@ namespace Raindrop::Tasks{
         std::array<uint32_t, EXECUTION_STORAGE_SIZE> lastExecutions;
         uint32_t cursor;
         
-        void addRun(const Time::Duration& duration) {
-            const uint64_t d = static_cast<uint64_t>(duration.as<Time::nanoseconds>().count());
+        void addRun(const Raindrop::Time::Duration& duration) {
+            const uint64_t d = static_cast<uint64_t>(duration.as<Raindrop::Time::nanoseconds>().count());
 
             runCount++;
             totalNs += d;

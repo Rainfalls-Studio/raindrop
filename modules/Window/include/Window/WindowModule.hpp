@@ -11,11 +11,11 @@ namespace Raindrop{
 }
 
 namespace Raindrop::Window{
-    class WindowModule : public Modules::IModule{
+    class WindowModule : public IModule{
         public:
             virtual ~WindowModule() = default;
 
-            virtual Modules::Result initialize(Modules::InitHelper& init) override;
+            virtual Result initialize(InitHelper& init) override;
             virtual void shutdown() override;
 
             void event();

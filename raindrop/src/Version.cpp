@@ -1,4 +1,5 @@
 #include "Raindrop/Version.hpp"
+#include <spdlog/spdlog.h>
 
 namespace Raindrop{
                 

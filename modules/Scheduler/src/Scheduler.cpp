@@ -7,15 +7,15 @@
 #include <spdlog/spdlog.h>
 
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
-	return new Raindrop::Scheduler::Scheduler();
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
+	return new Scheduler::Scheduler();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
-namespace Raindrop::Scheduler{
+namespace Scheduler{
     Tasks::TaskStatus StageResultToTaskStatus(const char* name, StageResult&& r){
         switch (r.type){
             case StageResult::SKIP: spdlog::warn("task \"{}\" skipped : {}", name,  r.getSkip().reason); [[fallthrough]];
@@ -30,11 +30,11 @@ namespace Raindrop::Scheduler{
     Scheduler::~Scheduler(){
     }
 
-    Modules::Result Scheduler::initialize(Modules::InitHelper& helper){
+    Raindrop::Result Scheduler::initialize(Raindrop::InitHelper& helper){
         _engine = &helper.engine();
         _taskManager = helper.getDependencyAs<Tasks::TaskManager>("TaskManager");
 
-        return Modules::Result::Success();
+        return Raindrop::Result::Success();
     }
 
 
@@ -65,6 +65,8 @@ namespace Raindrop::Scheduler{
 
     void Scheduler::run(const Loop& loop){
         assert(loop);
+        namespace Time = Raindrop::Time;
+
 
         auto taskManager = _taskManager.lock();
         if (!taskManager){

@@ -6,7 +6,7 @@
 #include "Event.hpp"
 
 namespace Raindrop::Event{
-    class EventModule : public Modules::IModule{
+    class EventModule : public IModule{
         public:
             class PollStage : public Scheduler::IStage{
                 public:
@@ -25,7 +25,7 @@ namespace Raindrop::Event{
             EventModule();
             virtual ~EventModule() = default;
 
-            virtual Modules::Result initialize(Modules::InitHelper& init) override;
+            virtual Result initialize(InitHelper& init) override;
             virtual void shutdown() override;
 
             template<typename T, typename... Args>

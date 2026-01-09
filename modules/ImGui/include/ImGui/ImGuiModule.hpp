@@ -6,12 +6,12 @@
 #include "ImGuiContext.hpp"
 
 namespace Raindrop::ImGui{
-    class ImGuiModule : public Modules::IModule{
+    class ImGuiModule : public IModule{
         public:
             ImGuiModule();
             virtual ~ImGuiModule() override;
 
-            virtual Modules::Result initialize(Modules::InitHelper& helper) override;
+            virtual Result initialize(InitHelper& helper) override;
             virtual void shutdown() override;
 
             std::shared_ptr<ImGuiContext> createContext(std::shared_ptr<Render::IRenderOutput> output);

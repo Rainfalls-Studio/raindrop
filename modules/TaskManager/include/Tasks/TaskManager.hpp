@@ -11,14 +11,14 @@
 #include "TaskHandle.hpp"
 #include <Raindrop/Engine.hpp>
 
-namespace Raindrop::Tasks{
-    class TaskManager : public Modules::IModule {
+namespace Tasks{
+    class TaskManager : public Raindrop::IModule {
         friend class ::Raindrop::Engine;
         public:
             TaskManager();
             virtual ~TaskManager() override;
 
-            virtual Modules::Result initialize(Modules::InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
 
             TaskHandle createTask(std::function<TaskStatus()> fn, Priority priority = Priority::MEDIUM, std::string name = "");
 
@@ -37,12 +37,12 @@ namespace Raindrop::Tasks{
             // A task that has been ask to be delayed and will run from a specific time
             struct WaitingTask{
                 TaskInstance instance;
-                Time::TimePoint availability;
+                Raindrop::Time::TimePoint availability;
             };
 
             using TaskPool = std::array<std::list<TaskInstance>, static_cast<size_t>(Priority::__size__)>;
             
-            Engine* _engine;
+            Raindrop::Engine* _engine;
             std::mutex mtx;
             std::condition_variable cv;
             TaskPool _tasks;

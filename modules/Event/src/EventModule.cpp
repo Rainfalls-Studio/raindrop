@@ -4,20 +4,20 @@
 #include <Raindrop/Modules/InitHelper.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
 	return new Raindrop::Event::EventModule();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
 namespace Raindrop::Event{
     EventModule::EventModule(){}
 
-    Modules::Result EventModule::initialize(Modules::InitHelper& init){
+    Result EventModule::initialize(InitHelper& init){
         _layers = init.getDependencyAs<Layers::LayerModule>("Layers");
-        return Modules::Result::Success();
+        return Result::Success();
     }
 
     void EventModule::_createLogger(){

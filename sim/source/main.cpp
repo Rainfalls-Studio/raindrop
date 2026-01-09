@@ -15,7 +15,7 @@
 
 using namespace Raindrop::Time::literals;
 
-class Sim : public Raindrop::Modules::IModule{
+class Sim : public Raindrop::IModule{
     public:
         Sim(){}
         virtual ~Sim() override{
@@ -23,7 +23,7 @@ class Sim : public Raindrop::Modules::IModule{
             _bufferCtx.reset();
         }
 
-        virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
+        virtual Raindrop::Result initialize(Raindrop::InitHelper& init) override{
             _engine = &init.engine();
 
             _filesystem= init.getDependencyAs<Raindrop::Filesystem::FilesystemModule>("Filesystem");
@@ -47,7 +47,7 @@ class Sim : public Raindrop::Modules::IModule{
             setupLoops();
 
 
-            return Raindrop::Modules::Result::Success();
+            return Raindrop::Result::Success();
         }
 
         void setupEditor(){
@@ -161,8 +161,8 @@ class Sim : public Raindrop::Modules::IModule{
             _shaderFactory = _assets->emplaceFactory<Raindrop::Render::Shader, Raindrop::Render::ShaderFactory>(*_engine);
         }
 
-        virtual Raindrop::Modules::DependencyList dependencies() const noexcept override{
-            using Raindrop::Modules::Dependency;
+        virtual Raindrop::DependencyList dependencies() const noexcept override{
+            using Raindrop::Dependency;
 
             return {
                 Dependency("Event"),
@@ -380,14 +380,14 @@ class Sim : public Raindrop::Modules::IModule{
 
         }
 
-        virtual Raindrop::Modules::Result dependencyReload(const Name& dependency) override {
+        virtual Raindrop::Result dependencyReload(const Name& dependency) override {
             spdlog::info(dependency);
             
             if (dependency == "Window"){
                 createWindow();
-                return Raindrop::Modules::Result::Success();
+                return Raindrop::Result::Success();
             }
-            return Raindrop::Modules::Result::Success();
+            return Raindrop::Result::Success();
         }
 
     private:

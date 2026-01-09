@@ -2,7 +2,7 @@
 
 #include "LoopData.hpp"
 
-namespace Raindrop::Scheduler{
+namespace Scheduler{
     class Loop{
         public:
             inline Loop(std::shared_ptr<LoopData> data = {}) : _data{data}{}
@@ -13,7 +13,7 @@ namespace Raindrop::Scheduler{
                 return *this;
             }
 
-            inline Loop& setPeriod(const Time::Duration& period) {
+            inline Loop& setPeriod(const Raindrop::Time::Duration& period) {
                 _data->setPeriod(period);
                 return *this;
             }

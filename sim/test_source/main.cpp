@@ -1,7 +1,7 @@
 #include <Raindrop/Raindrop.hpp>
 #include <Window/WindowModule.hpp>
 
-class Test : public Raindrop::Modules::IModule{
+class Test : public Raindrop::IModule{
     public:
         Test(){
 
@@ -11,10 +11,14 @@ class Test : public Raindrop::Modules::IModule{
 
         }
 
-        virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
+        virtual Raindrop::Result initialize(Raindrop::InitHelper& init) override{
+
+            return Raindrop::Result::Success();
+        }
+
+        void run(){
             spdlog::info("initialized ! ");
 
-            return Raindrop::Modules::Result::Success();
         }
 };
 
@@ -27,11 +31,15 @@ int main(){
     modules.registerModule<Test>(
         "Test",
         Raindrop::Version(1, 0, 0),
-        Raindrop::Modules::DependencyList{
-            Raindrop::Modules::Dependency("Window", Raindrop::VersionConstraint::Parse("*.*.*"))
+        Raindrop::DependencyList{
+            Raindrop::Dependency("Window", Raindrop::VersionConstraint::Parse("*"))
         },
         true
     );
 
-    // modules.getModuleAs<Test>("Test")
+    engine.initialize();
+
+    if (auto module = modules.getModuleAs<Test>("Test"); module != nullptr){
+        module->run();
+    }
 }

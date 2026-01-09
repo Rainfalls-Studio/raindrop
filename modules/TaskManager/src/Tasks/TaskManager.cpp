@@ -2,24 +2,24 @@
 #include <spdlog/spdlog.h>
 #include <Raindrop/Modules/InitHelper.hpp>
 
-constexpr static Raindrop::Time::Duration safetyMargin = Raindrop::Time::nanoseconds(500);
+namespace Time = Raindrop::Time;
+constexpr static Time::Duration safetyMargin = Time::nanoseconds(500);
 
-
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
-	return new Raindrop::Tasks::TaskManager();
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
+	return new Tasks::TaskManager();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
 
-namespace Raindrop::Tasks{
+namespace Tasks{
     TaskManager::TaskManager(){}
 
     TaskManager::~TaskManager() {}
 
-    Modules::Result TaskManager::initialize(Modules::InitHelper& helper){
+    Raindrop::Result TaskManager::initialize(Raindrop::InitHelper& helper){
         _engine = &helper.engine();
 
         size_t workers = std::thread::hardware_concurrency() - 2;
@@ -29,7 +29,7 @@ namespace Raindrop::Tasks{
             threads.emplace_back(&TaskManager::workerLoop, this);
         }
 
-        return Modules::Result::Success();
+        return Raindrop::Result::Success();
     }
 
 

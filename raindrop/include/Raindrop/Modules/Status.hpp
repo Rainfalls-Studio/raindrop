@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     enum class Status{
 
         // The modules has been referenced but not be declared

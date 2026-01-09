@@ -16,13 +16,13 @@ namespace Raindrop{
     class Engine;
 }
 
-namespace Raindrop::Scheduler{
+namespace Scheduler{
     struct LoopData : std::enable_shared_from_this<LoopData>{
         LoopData() = default;
         
-        Engine* engine;
+        Raindrop::Engine* engine;
         std::string name;
-        Time::Duration period = Time::Duration::zero(); // 0 means unlimited
+        Raindrop::Time::Duration period = Raindrop::Time::Duration::zero(); // 0 means unlimited
         Tasks::Priority executionPriority = Tasks::Priority::MEDIUM;
         std::vector<std::shared_ptr<IStage>> stages;
         LoopStorageRegistry storage;
@@ -30,7 +30,7 @@ namespace Raindrop::Scheduler{
         struct Runtime {
             LoopData* loop;
             std::atomic<bool> running{true};
-            Time::TimePoint lastRunTime;
+            Raindrop::Time::TimePoint lastRunTime;
             Tasks::TaskHandle controller;
         };
 
@@ -49,7 +49,7 @@ namespace Raindrop::Scheduler{
             return *this;
         }
 
-        inline LoopData& setPeriod(Time::Duration period_) {
+        inline LoopData& setPeriod(Raindrop::Time::Duration period_) {
             period = period_;
             return *this;
         }

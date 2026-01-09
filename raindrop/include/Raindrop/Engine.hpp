@@ -11,11 +11,11 @@ namespace Raindrop{
 
             void initialize();
 
-            Modules::Manager& getModuleManager() noexcept;
+            ModuleManager& getModuleManager() noexcept;
 
             std::filesystem::path executableDirectory();
 
         private:
-            Modules::Manager _modules;
+            ModuleManager _modules;
     };
 }

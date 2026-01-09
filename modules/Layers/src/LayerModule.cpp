@@ -1,20 +1,20 @@
 #include "Layers/LayerModule.hpp"
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
-	return new Raindrop::Layers::LayerModule();
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
+	return new Layers::LayerModule();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
-namespace Raindrop::Layers{
+namespace Layers{
     LayerModule::LayerModule(){}
     LayerModule::~LayerModule(){}
 
-    Modules::Result LayerModule::initialize(Modules::InitHelper&){
+    Raindrop::Result LayerModule::initialize(Raindrop::InitHelper&){
         _manager = std::make_unique<LayerManager>();
-        return Modules::Result::Success();
+        return Raindrop::Result::Success();
     }
 
     void LayerModule::shutdown(){

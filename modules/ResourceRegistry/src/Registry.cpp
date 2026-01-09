@@ -1,18 +1,18 @@
 #include "ResourceRegistry/Registry.hpp"
 
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
 	return new ResourceRegistry::Registry();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
 
 namespace ResourceRegistry{
-    Raindrop::Modules::Result Registry::initialize(Raindrop::Modules::InitHelper&){
-        return Raindrop::Modules::Result::Success();
+    Raindrop::Result Registry::initialize(Raindrop::InitHelper&){
+        return Raindrop::Result::Success();
     }
 
     void Registry::destroy(RRID rid) {

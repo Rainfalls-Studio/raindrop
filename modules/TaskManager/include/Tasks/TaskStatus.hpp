@@ -3,11 +3,11 @@
 #include <variant>
 #include <Raindrop/Time/Clock.hpp>
 
-namespace Raindrop::Tasks{
+namespace Tasks{
     struct CompletedStatus{};
 
     struct RetryStatus{
-        Time::Duration waitDuration;
+        Raindrop::Time::Duration waitDuration;
     };
 
     struct FailedStatus{
@@ -46,7 +46,7 @@ namespace Raindrop::Tasks{
             };
         } 
     
-        static inline constexpr TaskStatus Retry(Time::Duration waitDuration){
+        static inline constexpr TaskStatus Retry(Raindrop::Time::Duration waitDuration){
             return TaskStatus{
                 TaskStatus::RETRY,
                 RetryStatus{waitDuration}

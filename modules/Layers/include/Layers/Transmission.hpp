@@ -2,7 +2,7 @@
 
 #include <typeindex>
 
-namespace Raindrop::Layers{
+namespace Layers{
     struct Transmission{
         virtual ~Transmission() = default;
         

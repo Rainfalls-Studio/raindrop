@@ -2,6 +2,6 @@
 
 #include <string>
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     using Name = std::string;
 }

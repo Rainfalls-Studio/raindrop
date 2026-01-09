@@ -1,7 +1,7 @@
 #include "Raindrop/Modules/Instances/StaticModuleInstance.hpp"
 #include <cassert>
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     StaticModuleInstance::StaticModuleInstance(
         CreateFnc create,
         DestroyFnc destroy,

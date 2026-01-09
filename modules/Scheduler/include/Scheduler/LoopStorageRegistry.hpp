@@ -4,7 +4,7 @@
 #include <typeindex>
 #include <unordered_map>
 
-namespace Raindrop::Scheduler{
+namespace Scheduler{
     class ILoopStorage{
         public:
             virtual ~ILoopStorage() = default;

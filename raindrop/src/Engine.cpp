@@ -7,7 +7,7 @@ namespace Raindrop{
         _modules(*this)
     {}
 
-    Modules::Manager& Engine::getModuleManager() noexcept{
+    ModuleManager& Engine::getModuleManager() noexcept{
         return _modules;
     }
 

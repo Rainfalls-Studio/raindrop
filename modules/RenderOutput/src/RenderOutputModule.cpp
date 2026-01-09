@@ -3,11 +3,11 @@
 
 #include <spdlog/spdlog.h>
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
 	return new Raindrop::Render::RenderOutputModule();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
@@ -37,11 +37,11 @@ namespace Raindrop::Render{
     RenderOutputModule::RenderOutputModule(){}
     RenderOutputModule::~RenderOutputModule(){}
 
-    Modules::Result RenderOutputModule::initialize(Modules::InitHelper& helper){
+    Result RenderOutputModule::initialize(InitHelper& helper){
         _engine = &helper.engine();
         _core = helper.getDependencyAs<RenderCoreModule>("RenderCore");
 
-        return Modules::Result::Success();
+        return Result::Success();
     }
 
     void RenderOutputModule::shutdown(){

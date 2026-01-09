@@ -3,12 +3,12 @@
 #include <Raindrop/Modules/IModule.hpp>
 
 namespace CycleManager{
-    class Manager : public Raindrop::Modules::IModule{
+    class Manager : public Raindrop::IModule{
         public:
             Manager();
             ~Manager();
 
-            virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
             virtual void shutdown() override;
 
         private:

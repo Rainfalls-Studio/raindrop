@@ -3,7 +3,7 @@
 #include "StageInitHelper.hpp"
 #include "StageResult.hpp"
 
-namespace Raindrop::Scheduler{
+namespace Scheduler{
     class IStage {
         public:
             virtual ~IStage() = default;

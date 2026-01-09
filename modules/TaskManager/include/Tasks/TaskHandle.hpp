@@ -8,7 +8,7 @@
 #include "fwd.hpp"
 #include "TaskStatus.hpp"
 
-namespace Raindrop::Tasks{
+namespace Tasks{
     enum class Priority{
         BACKGROUND,
         VERY_LOW,
@@ -30,7 +30,7 @@ namespace Raindrop::Tasks{
                 std::shared_ptr<TaskDef> chained;
                 std::string name;
                 TaskProfile profile;
-                Time::Duration defaultRetryDelay = Time::milliseconds(1);
+                Raindrop::Time::Duration defaultRetryDelay = Raindrop::Time::milliseconds(1);
 
                 TaskDef(
                     const std::function<TaskStatus()>& fn_,
@@ -38,7 +38,7 @@ namespace Raindrop::Tasks{
                     std::string name_,
                     TaskProfile profile_,
                     std::shared_ptr<TaskDef> next = {},
-                    Time::Duration defaultRetryDelay_ = Time::milliseconds(1)
+                    Raindrop::Time::Duration defaultRetryDelay_ = Raindrop::Time::milliseconds(1)
                 ) : 
                     fn(std::move(fn_)),
                     priority(priority_),

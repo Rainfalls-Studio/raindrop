@@ -5,7 +5,7 @@
 #include "Transmission.hpp"
 #include "Result.hpp"
 
-namespace Raindrop::Layers{
+namespace Layers{
     class SubscriberBase{
         public:
             SubscriberBase(float priority) : _priority{priority}{}

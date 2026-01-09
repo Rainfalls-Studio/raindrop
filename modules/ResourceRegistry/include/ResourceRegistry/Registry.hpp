@@ -7,7 +7,7 @@
 #include "detail.hpp"
 
 namespace ResourceRegistry{
-    class Registry : public Raindrop::Modules::IModule{
+    class Registry : public Raindrop::IModule{
         public:
             struct Slot{
                 RRID id;
@@ -22,7 +22,7 @@ namespace ResourceRegistry{
             Registry() = default;
 
 
-            virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
 
             template<typename Wrapper, typename... Args>
             RRID create(std::string name, Args&&... args){

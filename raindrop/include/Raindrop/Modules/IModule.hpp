@@ -6,7 +6,7 @@
 #include "Result.hpp"
 #include "Dependency.hpp"
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     class InitHelper;
     using Name = std::string;  
 

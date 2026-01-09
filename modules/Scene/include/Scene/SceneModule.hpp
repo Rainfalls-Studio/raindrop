@@ -6,12 +6,12 @@
 
 namespace Raindrop::Scene{
     class SceneTrait;
-    class SceneModule : public Modules::IModule{
+    class SceneModule : public IModule{
         public:
             SceneModule() = default;
             virtual ~SceneModule() override = default;
 
-            virtual Modules::Result initialize(Modules::InitHelper& helper) override;
+            virtual Result initialize(InitHelper& helper) override;
         
         private:
             Engine* _engine;

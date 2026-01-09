@@ -4,7 +4,7 @@
 #include "common.hpp"
 #include "../Version.hpp"
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     class Dependency{
         public:
             inline Dependency(

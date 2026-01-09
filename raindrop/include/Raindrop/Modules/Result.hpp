@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     class Result{
         public:
             enum class Level{

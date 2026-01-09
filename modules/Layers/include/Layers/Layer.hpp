@@ -6,7 +6,7 @@
 #include "Context.hpp"
 #include "Subscriber.hpp"
 
-namespace Raindrop::Layers{
+namespace Layers{
     class Layer : public std::enable_shared_from_this<Layer>{
         public:
             Layer(const Layer&) = delete;

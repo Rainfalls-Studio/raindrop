@@ -3,12 +3,12 @@
 
 using namespace Raindrop::Time::literals;
 
-class Testbed : public Raindrop::Modules::IModule{
+class Testbed : public Raindrop::IModule{
     public:
         Testbed(){}
         virtual ~Testbed() override = default;
 
-        virtual Raindrop::Modules::Result initialize(Raindrop::Modules::InitHelper& init) override{
+        virtual Raindrop::Result initialize(Raindrop::InitHelper& init) override{
             _engine = &init.engine();
 
             auto filesystem = init.getDependencyAs<Raindrop::Filesystem::FilesystemModule>("Filesystem");
@@ -22,11 +22,11 @@ class Testbed : public Raindrop::Modules::IModule{
             createDebugLayer();
             setupLoops();
 
-            return Raindrop::Modules::Result::Success();
+            return Raindrop::Result::Success();
         }
 
-        virtual Raindrop::Modules::DependencyList dependencies() const noexcept override{
-            using Raindrop::Modules::Dependency;
+        virtual Raindrop::DependencyList dependencies() const noexcept override{
+            using Raindrop::Dependency;
 
             return {
                 Dependency("Event"),
@@ -172,14 +172,14 @@ class Testbed : public Raindrop::Modules::IModule{
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
         }
 
-        virtual Raindrop::Modules::Result dependencyReload(const Name& dependency) override {
+        virtual Raindrop::Result dependencyReload(const Name& dependency) override {
             spdlog::info(dependency);
             
             if (dependency == "Window"){
                 createWindow();
-                return Raindrop::Modules::Result::Success();
+                return Raindrop::Result::Success();
             }
-            return Raindrop::Modules::Result::Success();
+            return Raindrop::Result::Success();
         }
 
     private:

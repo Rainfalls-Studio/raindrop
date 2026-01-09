@@ -3,7 +3,7 @@
 #include <memory>
 #include "IModule.hpp"
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     class IModuleInstance{
         public:
             virtual ~IModuleInstance() = default;

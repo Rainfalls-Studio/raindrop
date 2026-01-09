@@ -26,11 +26,11 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
 	return VK_FALSE;
 }
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
 	return new Raindrop::Render::RenderCoreModule();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
@@ -67,7 +67,7 @@ namespace Raindrop::Render{
 
     RenderCoreModule::RenderCoreModule(){}
 
-    Modules::Result RenderCoreModule::initialize(Modules::InitHelper& helper){
+    Result RenderCoreModule::initialize(InitHelper& helper){
         _engine = &helper.engine();
         _windowModule = std::dynamic_pointer_cast<Window::WindowModule>(helper.dependencies().at("Window"));
 
@@ -88,10 +88,10 @@ namespace Raindrop::Render{
 
         if (!result){
             const auto& error = result.error();
-            return Modules::Result::Error(error.message() + " " + error.reason());
+            return Result::Error(error.message() + " " + error.reason());
         }
 
-        return Modules::Result::Success();
+        return Result::Success();
     }
 
     DeviceManager& RenderCoreModule::deviceManager() noexcept{

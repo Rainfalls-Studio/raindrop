@@ -3,7 +3,7 @@
 #include "Raindrop/Engine.hpp"
 #include "IModule.hpp"
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     class InitHelper{
         public:
             inline InitHelper(Engine& engine, const ModuleMap& dependencies) : _engine(engine), _dependencies(dependencies) {}
@@ -12,7 +12,7 @@ namespace Raindrop::Modules{
                 return _engine;
             }
 
-            inline Modules::Manager& modules() const noexcept{
+            inline ModuleManager& modules() const noexcept{
                 return _engine.getModuleManager();
             }
 

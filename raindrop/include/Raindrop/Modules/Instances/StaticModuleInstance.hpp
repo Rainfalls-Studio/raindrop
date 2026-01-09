@@ -3,7 +3,7 @@
 #include "../IModuleInstance.hpp"
 #include <functional>
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     class StaticModuleInstance : public IModuleInstance{
         public:
             using CreateFnc = std::function<IModule*()>;

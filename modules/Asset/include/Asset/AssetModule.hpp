@@ -12,7 +12,7 @@ namespace Raindrop{
 		class Asset;
 		class Factory;
 
-		class AssetModule : public Modules::IModule{
+		class AssetModule : public IModule{
 			public:
 				/**
 				* @brief Creates a new asset Manager
@@ -22,7 +22,7 @@ namespace Raindrop{
 				~AssetModule();
 
 
-				virtual Modules::Result initialize(Modules::InitHelper& helper) override;
+				virtual Result initialize(InitHelper& helper) override;
 				virtual void shutdown() override;
 
 				/**

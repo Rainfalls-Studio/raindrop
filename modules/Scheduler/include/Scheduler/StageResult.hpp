@@ -3,11 +3,11 @@
 #include <variant>
 #include <Raindrop/Time/Clock.hpp>
 
-namespace Raindrop::Scheduler{
+namespace Scheduler{
     struct ContinueStatus{};
 
     struct StageRetryStatus{
-        Time::Duration waitDuration;
+        Raindrop::Time::Duration waitDuration;
     };
 
     struct SkipStatus{
@@ -46,7 +46,7 @@ namespace Raindrop::Scheduler{
             };
         } 
     
-        static inline constexpr StageResult Retry(Time::Duration waitDuration){
+        static inline constexpr StageResult Retry(Raindrop::Time::Duration waitDuration){
             return StageResult{
                 RETRY_HOOK,
                 StageRetryStatus{waitDuration}

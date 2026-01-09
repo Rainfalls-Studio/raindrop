@@ -14,11 +14,11 @@ namespace Raindrop{
     class Engine;
 }
 
-namespace Raindrop::Modules{
-    class Manager{
+namespace Raindrop{
+    class ModuleManager{
         public:
-            Manager(Engine& engine);
-            ~Manager();
+            ModuleManager(Engine& engine);
+            ~ModuleManager();
 
             void registerModule(std::unique_ptr<IModuleInstance>&& loader);
 
@@ -77,11 +77,8 @@ namespace Raindrop::Modules{
             void initialize();
             void shutdown();
 
-            void shutdownModule(Name module);
-
         private:
             struct Node{
-                std::list<Name> dependents = {};
                 std::atomic<Status> status = Status::UNREGISTRED;
                 std::unique_ptr<IModuleInstance> instance = {};
 
@@ -90,16 +87,25 @@ namespace Raindrop::Modules{
                 }
             };
 
-            using Map = std::unordered_map<Name, Node>;
+            struct Batch{
+                std::vector<Name> modules;
+            };
 
+            
+            using Map = std::unordered_map<Name, Node>;
+            
             Engine& _engine;
+            
             Map _nodes;
             mutable std::mutex _mtx;
+
             std::shared_ptr<spdlog::logger> _logger;
-            
+            std::vector<Batch> _flattenTree;
+            bool _initialized;
+
             void shutdownModuleNode(Node& node);
-            void tryInitializeModule(Node& node);
             Status catchResultError(const Name& name, const Result& result);
             void initializeModule(Node& node);
+            
     };
 }

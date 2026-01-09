@@ -9,26 +9,26 @@
 
 #include <SDL3/SDL.h>
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
 	return new Raindrop::Window::WindowModule();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
 
 namespace Raindrop::Window{
-    Modules::Result WindowModule::initialize(Modules::InitHelper& init){
+    Result WindowModule::initialize(InitHelper& init){
         _engine = &init.engine();
 
         if (SDL_Init(SDL_INIT_VIDEO) == false){
-            return Modules::Result::Error("Failed to initialize SDL3");
+            return Result::Error("Failed to initialize SDL3");
         }
 
         spdlog::info("Initialized SDL3");
         
-        return Modules::Result::Success();
+        return Result::Success();
     }
 
     std::shared_ptr<Window> WindowModule::createWindow(const WindowConfig& config){

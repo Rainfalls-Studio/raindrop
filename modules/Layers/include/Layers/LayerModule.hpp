@@ -5,20 +5,20 @@
 
 #include "LayerManager.hpp"
 
-namespace Raindrop::Layers{
-    class LayerModule : public Modules::IModule{
+namespace Layers{
+    class LayerModule : public Raindrop::IModule{
         public:
             LayerModule();
             virtual ~LayerModule() override;
 
-            virtual Modules::Result initialize(Modules::InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
             virtual void shutdown() override;
             
             LayerManager* manager();
             const LayerManager* manager() const;
 
         private:
-            Engine* _engine;
+            Raindrop::Engine* _engine;
             std::unique_ptr<LayerManager> _manager;
 
             void createLogger();

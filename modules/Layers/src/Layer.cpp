@@ -1,6 +1,6 @@
 #include "Layers/Layer.hpp"
 
-namespace Raindrop::Layers{
+namespace Layers{
     Layer::~Layer(){}
 
     const std::string& Layer::name() const noexcept{

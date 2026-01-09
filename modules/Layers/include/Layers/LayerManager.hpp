@@ -4,7 +4,7 @@
 #include "Layer.hpp"
 #include "Context.hpp"
 
-namespace Raindrop::Layers{
+namespace Layers{
     class LayerManager{
         public:
             LayerManager();

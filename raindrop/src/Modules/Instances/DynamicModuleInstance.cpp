@@ -12,7 +12,7 @@ using json = nlohmann::json;
     #include <dlfcn.h>
 #endif
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     DynamicModuleInstance::DynamicModuleInstance(const std::filesystem::path& path) : _path{path}{
         readManifest(path);
     }
@@ -43,7 +43,7 @@ namespace Raindrop::Modules{
         auto dependenciesNode = manifest["dependencies"];
         for (const auto& [name, constraint] : dependenciesNode.items()){
             _dependencies.push_back(
-                Dependency(name, VersionConstraint::Parse(constraint))
+                Dependency(name, VersionConstraint::Parse(constraint.get<std::string>()))
             );
         }
 

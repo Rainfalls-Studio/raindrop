@@ -8,13 +8,13 @@ namespace Raindrop{
     class Engine;
 }
 
-namespace Raindrop::Scheduler{
-    class Scheduler : public Modules::IModule{
+namespace Scheduler{
+    class Scheduler : public Raindrop::IModule{
         public:
             Scheduler();
             virtual ~Scheduler() override;
 
-            virtual Modules::Result initialize(Modules::InitHelper& helper) override;
+            virtual Raindrop::Result initialize(Raindrop::InitHelper& helper) override;
             inline virtual void shutdown() override;
 
             Loop createLoop(const std::string& name);
@@ -23,7 +23,7 @@ namespace Raindrop::Scheduler{
 
 
         private:
-            Engine* _engine;
+            Raindrop::Engine* _engine;
             std::weak_ptr<Tasks::TaskManager> _taskManager;
             
             std::unordered_map<std::string, std::shared_ptr<LoopData>> _loops;

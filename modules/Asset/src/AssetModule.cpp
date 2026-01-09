@@ -5,11 +5,11 @@
 #include <exception>
 #include <stdexcept>
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
 	return new Raindrop::Asset::AssetModule();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
@@ -18,11 +18,11 @@ namespace Raindrop::Asset{
 	AssetModule::~AssetModule(){}
 
 
-	Modules::Result AssetModule::initialize(Modules::InitHelper& helper){
+	Result AssetModule::initialize(InitHelper& helper){
 		_engine = &helper.engine();
 		spdlog::info("AssetModule successfully created !");
 
-		return Modules::Result::Success();
+		return Result::Success();
 	}
 
 	void AssetModule::shutdown(){

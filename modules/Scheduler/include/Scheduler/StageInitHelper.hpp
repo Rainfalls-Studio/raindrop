@@ -7,22 +7,22 @@ namespace Raindrop{
     class Engine;
 }
 
-namespace Raindrop::Scheduler{
+namespace Scheduler{
     class Loop;
     struct LoopData;
     struct Hook;
 
     class StageInitHelper{
         public:
-            StageInitHelper(Engine& engine, const std::shared_ptr<LoopData>& data);
+            StageInitHelper(Raindrop::Engine& engine, const std::shared_ptr<LoopData>& data);
 
-            Engine& engine();
+            Raindrop::Engine& engine();
             Loop loop();
 
-            Modules::Manager& modules() const;
+            Raindrop::ModuleManager& modules() const;
 
         private:
-            Engine& _engine;
+            Raindrop::Engine& _engine;
             const std::shared_ptr<LoopData>& _loopData;
     };
 }

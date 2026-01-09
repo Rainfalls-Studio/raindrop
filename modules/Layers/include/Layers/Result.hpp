@@ -4,7 +4,7 @@
 #include <variant>
 #include <memory>
 
-namespace Raindrop::Layers{
+namespace Layers{
     class Layer;
 
     struct CompletedStatus{};

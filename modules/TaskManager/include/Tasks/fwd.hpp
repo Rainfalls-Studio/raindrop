@@ -2,7 +2,7 @@
 
 #include "Raindrop/fwd.hpp"
 
-namespace Raindrop::Tasks{
+namespace Tasks{
 
     class Task;
     class TaskManager;

@@ -4,11 +4,11 @@
 #include <imgui.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-extern "C" RAINDROP_EXPORT Raindrop::Modules::IModule* CreateModule(){
+extern "C" RAINDROP_EXPORT Raindrop::IModule* CreateModule(){
 	return new Raindrop::ImGui::ImGuiModule();
 }
 
-extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::Modules::IModule* module){
+extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 	delete module;
 }
 
@@ -17,13 +17,13 @@ namespace Raindrop::ImGui{
     ImGuiModule::ImGuiModule(){}
     ImGuiModule::~ImGuiModule(){}
 
-    Modules::Result ImGuiModule::initialize(Modules::InitHelper& helper){
+    Result ImGuiModule::initialize(InitHelper& helper){
         _engine = &helper.engine();
         _core = helper.getDependencyAs<Render::RenderCoreModule>("RenderCore");
 
         createLogger();
 
-        return Modules::Result::Success();
+        return Result::Success();
     }
 
     void ImGuiModule::createLogger(){

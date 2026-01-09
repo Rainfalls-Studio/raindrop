@@ -4,7 +4,7 @@
 #include <functional>
 #include <filesystem>
 
-namespace Raindrop::Modules{
+namespace Raindrop{
     class DynamicModuleInstance : public IModuleInstance{
         public:
             using CreateFnc = std::function<IModule*()>;

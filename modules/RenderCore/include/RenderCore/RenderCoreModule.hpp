@@ -55,7 +55,7 @@ namespace Raindrop::Render{
             uint32_t _family;
     };
 
-    class RenderCoreModule : public Modules::IModule{
+    class RenderCoreModule : public IModule{
         public:
             enum class ErrorCode{
                 FAILED_INSTANCE_CREATION,
@@ -88,7 +88,7 @@ namespace Raindrop::Render{
             RenderCoreModule();
             virtual ~RenderCoreModule() = default;
 
-            virtual Modules::Result initialize(Modules::InitHelper& helper) override;
+            virtual Result initialize(InitHelper& helper) override;
             virtual void shutdown() override;
 
             DeviceManager& deviceManager() noexcept;

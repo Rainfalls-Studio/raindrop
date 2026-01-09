@@ -1,7 +1,7 @@
 #include "Layers/LayerManager.hpp"
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace Raindrop::Layers{
+namespace Layers{
     LayerManager::LayerManager(){
         setupContext();
         createRoot();
