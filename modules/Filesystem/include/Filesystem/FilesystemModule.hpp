@@ -42,5 +42,6 @@ namespace Filesystem{
 
         private:
             MountTable _mounts;
+            std::shared_ptr<spdlog::logger> _logger;
     };
 }

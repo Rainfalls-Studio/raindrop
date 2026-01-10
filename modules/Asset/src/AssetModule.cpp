@@ -20,7 +20,9 @@ namespace Asset{
 
 	Raindrop::Result AssetModule::initialize(Raindrop::InitHelper& helper){
 		_engine = &helper.engine();
-		spdlog::info("AssetModule successfully created !");
+		_logger = helper.logger();
+
+		_logger->info("AssetModule successfully created !");
 
 		return Raindrop::Result::Success();
 	}
@@ -33,7 +35,7 @@ namespace Asset{
 	void AssetModule::insertFactory(const std::type_info& typeInfo, std::shared_ptr<Factory>&& factory){
 		const auto typeID = typeInfo.hash_code();
 		if (_factories.count(typeID) != 0){
-			spdlog::warn("Overwriting asset factory for {}", typeInfo.name());
+			_logger->warn("Overwriting asset factory for {}", typeInfo.name());
 		}
 
 		_factories[typeID] = factory;
@@ -61,7 +63,7 @@ namespace Asset{
 		auto it = _nameToFactoryID.find(name);
 		
 		if (it == _nameToFactoryID.end()){
-			spdlog::error("There are no factory registred as \"{}\"", name);
+			_logger->error("There are no factory registred as \"{}\"", name);
 			throw std::out_of_range("Factory not found");
 		}
 		
@@ -78,7 +80,7 @@ namespace Asset{
 		auto it = _factories.find(typeID);
 
 		if (it == _factories.end()){
-			spdlog::error("There are no factory registred for asset type \"{}\"", typeID);
+			_logger->error("There are no factory registred for asset type \"{}\"", typeID);
 			throw std::runtime_error("Factory not found");
 		}
 
@@ -87,7 +89,7 @@ namespace Asset{
 		if (factory == nullptr){
 			_factories.erase(it);
 
-			spdlog::error("The factory is no longer valid");
+			_logger->error("The factory is no longer valid");
 			throw std::out_of_range("Factory no longer valid");
 		}
 

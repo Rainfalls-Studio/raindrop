@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "Result.hpp"
-#include "Dependency.hpp"
+#include "InitHelper.hpp"
 
 namespace Raindrop{
     class InitHelper;
@@ -21,9 +21,4 @@ namespace Raindrop{
             inline virtual void preShutdown() {}
             inline virtual void shutdown() {}
     };
-
-    using SharedModule = std::shared_ptr<IModule>;
-    using WeakModule = std::shared_ptr<IModule>;
-    using ModuleMap = std::unordered_map<Name, SharedModule>;
-    using WeakModuleMap = std::unordered_map<Name, WeakModule>;
 }

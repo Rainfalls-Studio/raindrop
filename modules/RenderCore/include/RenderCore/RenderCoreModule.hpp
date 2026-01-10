@@ -121,6 +121,7 @@ namespace Render{
 
             Raindrop::Engine* _engine;
             std::shared_ptr<Window::WindowModule> _windowModule;
+            std::shared_ptr<spdlog::logger> _logger;
 
             DeviceManager _deviceManager;
 

@@ -17,14 +17,8 @@ namespace Event{
 
     Raindrop::Result EventModule::initialize(Raindrop::InitHelper& init){
         _layers = init.getDependencyAs<Layers::LayerModule>("Layers");
+        _logger = init.logger();
         return Raindrop::Result::Success();
-    }
-
-    void EventModule::_createLogger(){
-        _logger = spdlog::get("Raindrop::Event");
-        if (!_logger){
-            _logger = spdlog::stdout_color_mt("Raindrop::Event");
-        }
     }
 
     void EventModule::shutdown(){

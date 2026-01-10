@@ -39,6 +39,7 @@ namespace Render{
 
     Raindrop::Result RenderOutputModule::initialize(Raindrop::InitHelper& helper){
         _engine = &helper.engine();
+        _logger = helper.logger();
         _core = helper.getDependencyAs<RenderCoreModule>("RenderCore");
 
         return Raindrop::Result::Success();
@@ -51,30 +52,30 @@ namespace Render{
 
     void RenderOutputModule::initializeAllOutputs(){
         for (auto [it, info] : _outputs){
-            spdlog::info("Initializing render output \"{}\"", it);
+            _logger->info("Initializing render output \"{}\"", it);
 
             if (auto result = info->output->initialize(*_engine); !result){
                 auto& error = result.error();
-                spdlog::error("Failed to initialize render output \"{}\" : {}, {}", it, error.message(), error.reason());
+                _logger->error("Failed to initialize render output \"{}\" : {}, {}", it, error.message(), error.reason());
             }
         }
     }
 
     void RenderOutputModule::shutdownAllOutputs(){
         for (auto [it, info] : _outputs){
-            spdlog::info("Shuting down render output \"{}\"", it);
+            _logger->info("Shuting down render output \"{}\"", it);
             info->output->shutdown();
         }
     }
 
     void RenderOutputModule::rebuildAllOutputs(){
         for (auto [it, info] : _outputs){
-            spdlog::info("Rebuilding render output \"{}\"", it);
+            _logger->info("Rebuilding render output \"{}\"", it);
             info->output->shutdown();
 
             if (auto result = info->output->initialize(*_engine); !result){
                 auto& error = result.error();
-                spdlog::error("Failed to initialize render output \"{}\" : {}, {}", it, error.message(), error.reason());
+                _logger->error("Failed to initialize render output \"{}\" : {}, {}", it, error.message(), error.reason());
             }
         }
     }
@@ -87,16 +88,16 @@ namespace Render{
     }
 
     void RenderOutputModule::createOutput(const IRenderOutput::Name& name, SharedRenderOutput output){
-        spdlog::info("Registering and initializing render output \"{}\"", name);
+        _logger->info("Registering and initializing render output \"{}\"", name);
         
         if (_outputs.count(name) > 0){
-            spdlog::info("Overwriting existing output \"{}\"", name);
+            _logger->info("Overwriting existing output \"{}\"", name);
         }
         _outputs[name] = std::make_shared<RenderOutputInfo>(output, name);
 
         if (auto result = output->initialize(*_engine); !result){
             auto& error = result.error();
-            spdlog::error("Failed to initialize render output \"{}\" : {}, {}", name, error.message(), error.reason());
+            _logger->error("Failed to initialize render output \"{}\" : {}, {}", name, error.message(), error.reason());
         }
 
         findMainOutput();
@@ -114,7 +115,7 @@ namespace Render{
 
     void RenderOutputModule::findMainOutput(){
         if (_outputs.empty()){
-            spdlog::error("There are no registred render output !");
+            _logger->error("There are no registred render output !");
             _mainOutput = nullptr;
             return;
         }
@@ -124,7 +125,7 @@ namespace Render{
             _mainOutput = findFirstValid();
 
             if (_mainOutput)
-                spdlog::error("No render outputs match's the main output's name (\"{}\"). Falling back to \"{}\"", _mainOutputName, _mainOutput->name);
+                _logger->error("No render outputs match's the main output's name (\"{}\"). Falling back to \"{}\"", _mainOutputName, _mainOutput->name);
 
             return;
         }
@@ -134,7 +135,7 @@ namespace Render{
             _mainOutput = findFirstValid();
 
             if (_mainOutput)
-                spdlog::error("Found the main output, but it is not valid. Falling back to \"{}\"", _mainOutput->name);
+                _logger->error("Found the main output, but it is not valid. Falling back to \"{}\"", _mainOutput->name);
         }
     }
 
@@ -144,7 +145,7 @@ namespace Render{
                 return info;
             }
         }
-        spdlog::error("There are no valid outputs registred !");
+        _logger->error("There are no valid outputs registred !");
         return nullptr;
     }
 }

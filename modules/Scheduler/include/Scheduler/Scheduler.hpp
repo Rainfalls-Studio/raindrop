@@ -2,6 +2,7 @@
 
 #include "LoopData.hpp"
 #include "Loop.hpp"
+#include <Raindrop/Raindrop.hpp>
 #include <Tasks/TaskManager.hpp>
 
 namespace Raindrop{

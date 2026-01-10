@@ -2,15 +2,15 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace Layers{
-    LayerManager::LayerManager(){
-        setupContext();
+    LayerManager::LayerManager(std::shared_ptr<spdlog::logger> logger){
+        setupContext(logger);
         createRoot();
 
         SPDLOG_LOGGER_INFO(_ctx.logger, "Layer manager initialized !");
     }
 
-    void LayerManager::setupContext(){
-        _ctx.logger = spdlog::stdout_color_mt("Layers");
+    void LayerManager::setupContext(std::shared_ptr<spdlog::logger> logger){
+        _ctx.logger = logger;
     }
 
     void LayerManager::createRoot(){

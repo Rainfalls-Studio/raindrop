@@ -49,11 +49,6 @@ target_compile_definitions(RaindropEngine
         # "VULKAN_HPP_ASSERT_ON_RESULT=(expression)((void)0)"
 )
 
-add_custom_command(TARGET RaindropEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo
-        "[Raindrop] Setting RAINDROP_ENGINE_LIBRARY_PATH to: $<TARGET_FILE:RaindropEngine>"
-)
-
 set_property(GLOBAL PROPERTY RAINDROP_ENGINE_LIBRARY_PATH "$<TARGET_FILE:RaindropEngine>")
 
 # ---- Install rules ----

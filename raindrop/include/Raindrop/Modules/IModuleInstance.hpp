@@ -1,9 +1,14 @@
 #pragma once
 
 #include <memory>
-#include "IModule.hpp"
+#include "../Version.hpp"
+#include "Dependency.hpp"
+#include "Result.hpp"
 
 namespace Raindrop{
+    class IModule;
+    class InitHelper;
+
     class IModuleInstance{
         public:
             virtual ~IModuleInstance() = default;

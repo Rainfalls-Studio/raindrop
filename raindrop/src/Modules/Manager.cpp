@@ -58,29 +58,6 @@ namespace Raindrop{
         node.instance = std::move(instance);
     }
 
-    void ModuleManager::initializeModule(Node& node){
-        Result result = Result::Level::ERROR;
-        auto& instance = node.instance;
-        Name nodeName = node.name();
-
-        ModuleMap dependencies;
-
-        for (auto & dependency : instance->dependencies()){
-            const auto& depName = dependency.get();
-            Node& depNode = _nodes[depName];
-
-            dependencies[depName] = depNode.instance->module();
-        }
-
-        InitHelper helper(_engine, dependencies);
-
-        _logger->trace("initializing node \"{}\"...", nodeName);
-
-        // node.version = _version;
-        result = instance->initialize(helper);
-        node.status = catchResultError(nodeName, result);
-    }
-
     Status ModuleManager::catchResultError(const Name& name, const Result& result){
 
         const std::string result_msg = result.message().empty() ? "" : (": " + result.message());
@@ -107,7 +84,7 @@ namespace Raindrop{
         return Status::FAILED;
     }
 
-    SharedModule ModuleManager::getModule(const std::string& name) noexcept{
+    std::shared_ptr<IModule> ModuleManager::getModule(const std::string& name) noexcept{
         auto& node = _nodes[name];
 
         if (node.status == Status::INITIALIZED){
@@ -230,7 +207,7 @@ namespace Raindrop{
                 auto& node = _nodes[name];
 
                 bool ok = true;
-                ModuleMap dependencies;
+                std::unordered_map<Name, std::shared_ptr<IModule>> dependencies;
 
                 for (auto& dep : node.instance->dependencies()){
 
@@ -253,9 +230,18 @@ namespace Raindrop{
                     continue;
                 }
 
-                InitHelper helper(_engine, dependencies);
+                std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt(name);
 
-                auto result = node.instance->initialize(helper);
+                InitHelper helper(_engine, dependencies, logger);
+
+                Result result = Result::Error();
+
+                try{
+                    result = node.instance->initialize(helper);
+                } catch (std::exception& e){
+                    result = Result::Error(std::string("exception : ") + e.what());
+                }
+
                 node.status = catchResultError(name, result);
 
                 if (result.level() != Result::Level::SUCCESS && node.instance->critical()){

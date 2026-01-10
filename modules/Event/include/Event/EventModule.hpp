@@ -44,7 +44,5 @@ namespace Event{
             std::deque<std::unique_ptr<Event>> _events;
 
             void pushEvent(std::unique_ptr<Event>&& event);
-
-            void _createLogger();
     };
 }

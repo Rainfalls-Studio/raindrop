@@ -7,7 +7,7 @@
 namespace Layers{
     class LayerManager{
         public:
-            LayerManager();
+            LayerManager(std::shared_ptr<spdlog::logger> logger);
 
             inline Layer* operator->(){
                 return _root.get();
@@ -21,7 +21,7 @@ namespace Layers{
             Context _ctx;
             std::shared_ptr<Layer> _root;
 
-            void setupContext();
+            void setupContext(std::shared_ptr<spdlog::logger> logger);
             void createRoot();
     };
 }

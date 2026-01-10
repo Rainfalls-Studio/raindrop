@@ -21,7 +21,6 @@ namespace ImGui{
             std::shared_ptr<Render::RenderCoreModule> _core;
             std::shared_ptr<spdlog::logger> _logger;
 
-            void createLogger();
             void initializeImGui();
     };
 }

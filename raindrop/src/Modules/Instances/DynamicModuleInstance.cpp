@@ -1,4 +1,5 @@
 #include "Raindrop/Modules/Instances/DynamicModuleInstance.hpp"
+#include "Raindrop/Modules/IModule.hpp"
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;

@@ -71,6 +71,7 @@ namespace Render{
             };
 
             Raindrop::Engine* _engine;
+            std::shared_ptr<spdlog::logger> _logger;
             std::shared_ptr<RenderCoreModule> _core;
             std::unordered_map<IRenderOutput::Name, std::shared_ptr<RenderOutputInfo>> _outputs;
             

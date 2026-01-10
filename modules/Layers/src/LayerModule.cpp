@@ -12,8 +12,8 @@ namespace Layers{
     LayerModule::LayerModule(){}
     LayerModule::~LayerModule(){}
 
-    Raindrop::Result LayerModule::initialize(Raindrop::InitHelper&){
-        _manager = std::make_unique<LayerManager>();
+    Raindrop::Result LayerModule::initialize(Raindrop::InitHelper& init){
+        _manager = std::make_unique<LayerManager>(init.logger());
         return Raindrop::Result::Success();
     }
 

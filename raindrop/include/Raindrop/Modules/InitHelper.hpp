@@ -6,7 +6,7 @@
 namespace Raindrop{
     class InitHelper{
         public:
-            inline InitHelper(Engine& engine, const ModuleMap& dependencies) : _engine(engine), _dependencies(dependencies) {}
+            inline InitHelper(Engine& engine, const std::unordered_map<Name, std::shared_ptr<IModule>>& dependencies, const std::shared_ptr<spdlog::logger>& logger) : _engine(engine), _dependencies(dependencies), _logger{logger} {}
 
             inline Engine& engine() const noexcept{
                 return _engine;
@@ -16,11 +16,11 @@ namespace Raindrop{
                 return _engine.getModuleManager();
             }
 
-            inline const ModuleMap& dependencies() const noexcept{
+            inline const std::unordered_map<Name, std::shared_ptr<IModule>>& dependencies() const noexcept{
                 return _dependencies;
             }
 
-            SharedModule getDependency(const Name& name) const{
+            std::shared_ptr<IModule> getDependency(const Name& name) const{
                 return _dependencies.at(name);
             }
 
@@ -42,9 +42,14 @@ namespace Raindrop{
                 return std::make_tuple(getDependencyAs<Ts>(Name(modules))...);
             }
 
+            std::shared_ptr<spdlog::logger> logger() const noexcept{
+                return _logger;
+            }
+
         private:
             Engine& _engine;
-            ModuleMap _dependencies;
+            std::unordered_map<Name, std::shared_ptr<IModule>> _dependencies;
+            std::shared_ptr<spdlog::logger> _logger;
 
     };
 }

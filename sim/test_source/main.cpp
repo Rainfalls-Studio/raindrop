@@ -13,13 +13,15 @@ class Test : public Raindrop::IModule{
 
         virtual Raindrop::Result initialize(Raindrop::InitHelper& init) override{
 
-            return Raindrop::Result::Success();
         }
 
         void run(){
             spdlog::info("initialized ! ");
 
         }
+    
+    private:
+        std::shared_ptr<Window::Window> _window;
 };
 
 int main(){

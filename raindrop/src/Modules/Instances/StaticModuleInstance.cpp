@@ -1,4 +1,5 @@
 #include "Raindrop/Modules/Instances/StaticModuleInstance.hpp"
+#include "Raindrop/Modules/IModule.hpp"
 #include <cassert>
 
 namespace Raindrop{

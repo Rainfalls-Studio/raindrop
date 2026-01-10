@@ -15,7 +15,8 @@ extern "C" RAINDROP_EXPORT void DestroyModule(Raindrop::IModule* module){
 namespace Filesystem{
     FilesystemModule::FilesystemModule(){}
 
-    Raindrop::Result FilesystemModule::initialize(Raindrop::InitHelper&){
+    Raindrop::Result FilesystemModule::initialize(Raindrop::InitHelper& init){
+        _logger = init.logger();
         return Raindrop::Result::Success();
     }
 

@@ -5,9 +5,8 @@
 #include <filesystem>
 #include <spdlog/logger.h>
 
-#include "IModule.hpp"
 #include "Status.hpp"
-#include "IModuleInstance.hpp"
+#include "Dependency.hpp"
 #include "Instances/StaticModuleInstance.hpp"
 
 namespace Raindrop{
@@ -15,6 +14,8 @@ namespace Raindrop{
 }
 
 namespace Raindrop{
+    class IModule;
+
     class ModuleManager{
         public:
             ModuleManager(Engine& engine);
@@ -53,7 +54,7 @@ namespace Raindrop{
             void loadModule(const std::filesystem::path& path);
             void loadModules(const std::filesystem::path& directoryPath);
 
-            [[nodiscard]] SharedModule getModule(const Name& name) noexcept;
+            [[nodiscard]] std::shared_ptr<IModule> getModule(const Name& name) noexcept;
 
             template<typename... Modules>
             [[nodiscard]] auto getModules(const Modules&... modules){
@@ -105,7 +106,5 @@ namespace Raindrop{
 
             void shutdownModuleNode(Node& node);
             Status catchResultError(const Name& name, const Result& result);
-            void initializeModule(Node& node);
-            
     };
 }

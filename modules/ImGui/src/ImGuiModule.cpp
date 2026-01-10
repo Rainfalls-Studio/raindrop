@@ -20,14 +20,9 @@ namespace ImGui{
     Raindrop::Result ImGuiModule::initialize(Raindrop::InitHelper& helper){
         _engine = &helper.engine();
         _core = helper.getDependencyAs<Render::RenderCoreModule>("RenderCore");
-
-        createLogger();
+        _logger = helper.logger();
 
         return Raindrop::Result::Success();
-    }
-
-    void ImGuiModule::createLogger(){
-        _logger = spdlog::stdout_color_mt("ImGui");
     }
 
     void ImGuiModule::shutdown(){

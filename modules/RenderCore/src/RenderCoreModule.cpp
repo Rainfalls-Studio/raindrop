@@ -69,6 +69,7 @@ namespace Render{
 
     Raindrop::Result RenderCoreModule::initialize(Raindrop::InitHelper& helper){
         _engine = &helper.engine();
+        _logger = helper.logger();
         _windowModule = std::dynamic_pointer_cast<Window::WindowModule>(helper.dependencies().at("Window"));
 
         vk::SurfaceKHR surface = VK_NULL_HANDLE;

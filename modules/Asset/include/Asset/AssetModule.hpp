@@ -83,6 +83,7 @@ namespace Asset{
 		protected:
 			Raindrop::Engine* _engine;
 			mutable std::mutex _mutex;
+			std::shared_ptr<spdlog::logger> _logger;
 			
 			std::unordered_map<std::string, std::size_t> _nameToFactoryID;
 			std::unordered_map<std::size_t, std::weak_ptr<Factory>> _factories;
